@@ -1,0 +1,4 @@
+Copyright (c) <<var;name="copyright";original="<year> <copyright holders>";match=".+">>
+
+Licensed under the Educational Community License version 1.0
+

@@ -1,0 +1,2 @@
+<<beginOptional>>"<<endOptional>>Licensed under the Open Software License version 1.0<<beginOptional>>"<<endOptional>>
+
