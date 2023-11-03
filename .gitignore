@@ -1,0 +1,11 @@
+/obj/
+/bin/
+/alire/
+/jsonld/
+/config/
+*~
+\#*
+/*.s
+/*.ali
+/*.ads
+/*.adb

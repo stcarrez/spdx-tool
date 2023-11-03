@@ -1,0 +1,25 @@
+# This is a crate
+name = "spdx_tool"
+description = "SPDX Tool"
+version = "0.1.0-dev"
+
+authors = ["ciceron"]
+maintainers = ["ciceron <Stephane.Carrez@gmail.com>"]
+maintainers-logins = ["stcarrez"]
+licenses = "Apache-2.0"
+website = ""
+tags = []
+
+executables = ["spdx_tool"]
+
+[[depends-on]]
+utilada = "^2.6.0"
+
+[[depends-on]]
+spdx = "~0.2.0"
+
+[[depends-on]]
+utilada_unit = "^2.6.0"
+
+[configuration]
+disabled = true
