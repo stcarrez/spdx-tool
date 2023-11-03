@@ -2,7 +2,7 @@ build:
 	alr build
 
 generate:
-	are --rule=package.xml -o src --content-only --name-access --list-access .
+	are --rule=are-package.xml -o src --content-only --name-access --list-access .
 
 test: build
 	bin/spdx_tool-harness

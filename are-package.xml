@@ -1,0 +1,20 @@
+<package>
+
+  <resource name='SPDX_Tool.Licenses.Files'
+            format='binary'
+            type='access constant Buffer_Type'>
+    <header>--  SPDX-License-Identifier: Apache-2.0</header>
+    <header>--  License templates extracted from https://github.com/spdx/license-list-data.git</header>
+
+    <!-- Copy files with .txt extension from 'help' directory -->
+    <install mode='copy' strip-extension='yes'>
+      <fileset dir="licenses">
+        <include name="**/*.txt"/>
+        <include name="**/Apache-2.0-alt.txt"/>
+        <include name="**/gnat-gcc.txt"/>
+        <include name="**/gnat-gcc-exception.txt"/>
+      </fileset>
+    </install>
+  </resource>
+
+</package>
