@@ -3,6 +3,7 @@
 /alire/
 /jsonld/
 /config/
+/regtests/results/
 *~
 \#*
 /*.s
