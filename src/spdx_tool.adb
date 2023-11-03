@@ -84,7 +84,7 @@ package body SPDX_Tool is
                       From : in Buffer_Index) return Buffer_Index is
       Pos : Buffer_Index := From;
    begin
-      while Pos <= Buffer'Last and then not Is_Eol (Buffer (Pos)) loop
+      while Pos < Buffer'Last and then not Is_Eol (Buffer (Pos)) loop
          Pos := Pos + 1;
       end loop;
       return Pos;
