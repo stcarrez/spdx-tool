@@ -1,0 +1,115 @@
+abstract project Spdx_Tool_Config is
+   for Source_Dirs use ();
+
+   type Yes_No is ("yes", "no");
+
+   type Library_Type_Type is ("relocatable", "static", "static-pic");
+
+   type Build_Type is ("distrib", "debug", "optimize", "profile", "coverage");
+   Mode : Build_Type := external ("BUILD", "debug");
+
+   Processors := External ("PROCESSORS", "1");
+
+   package Builder is
+       for Default_Switches ("Ada") use ("-j" & Processors);
+   end Builder;
+
+   package compiler is
+      warnings := ("-gnatwua");
+      defaults := ("-gnat2012");
+      case Mode is
+         when "distrib" =>
+            for Default_Switches ("Ada") use defaults & ("-O2", "-gnatafno", "-gnatVa", "-gnatwa");
+
+         when "debug" =>
+            for Default_Switches ("Ada") use defaults & warnings
+               & ("-g", "-gnata", "-gnatVaMI", "-gnaty3abcefhiklmnprstxM99OABu");
+
+         when "coverage" =>
+            for Default_Switches ("Ada") use defaults & warnings
+               & ("-g", "-O2", "-gnata", "-gnatVaMI", "-gnaty3abcefhiklmnprstxM99O",
+                  "-fprofile-arcs", "-ftest-coverage");
+
+         when "optimize" =>
+            for Default_Switches ("Ada") use defaults & warnings
+               & ("-O2", "-gnatn", "-gnatp", "-fdata-sections", "-ffunction-sections");
+
+         when "profile" =>
+            for Default_Switches ("Ada") use defaults & warnings & ("-pg");
+
+      end case;
+   end compiler;
+
+   package binder is
+      case Mode is
+         when "debug" =>
+            for Default_Switches ("Ada") use ("-E");
+
+	 when others =>
+            for Default_Switches ("Ada") use ("-E");
+
+      end case;
+   end binder;
+
+   package linker is
+      case Mode is
+         when "profile" =>
+            for Default_Switches ("Ada") use ("-pg");
+
+         when "distrib" =>
+            for Default_Switches ("Ada") use ("-s");
+
+         when "optimize" =>
+            for Default_Switches ("Ada") use ("-Wl,--gc-sections");
+
+         when "coverage" =>
+            for Default_Switches ("ada") use ("-fprofile-arcs");
+	 
+	 when others =>
+	    null;
+      end case;
+
+   end linker;        
+ 
+   package Ide is
+      for VCS_Kind use "git";
+   end Ide;
+
+   Ada_Compiler_Switches := External_As_List ("ADAFLAGS", " ");
+   Ada_Compiler_Switches := Ada_Compiler_Switches &
+          (
+            "-O0" -- Optimize for debug
+           ,"-ffunction-sections" -- Separate ELF section for each function
+           ,"-fdata-sections" -- Separate ELF section for each variable
+           ,"-g" -- Generate debug info
+           ,"-gnatwa" -- Enable all warnings
+           ,"-gnatw.X" -- Disable warnings for No_Exception_Propagation
+           ,"-gnatVa" -- All validity checks
+           ,"-gnaty3" -- Specify indentation level of 3
+           ,"-gnatya" -- Check attribute casing
+           ,"-gnatyA" -- Use of array index numbers in array attributes
+           ,"-gnatyB" -- Check Boolean operators
+           ,"-gnatyb" -- Blanks not allowed at statement end
+           ,"-gnatyc" -- Check comments
+           ,"-gnaty-d" -- Disable check no DOS line terminators present
+           ,"-gnatye" -- Check end/exit labels
+           ,"-gnatyf" -- No form feeds or vertical tabs
+           ,"-gnatyh" -- No horizontal tabs
+           ,"-gnatyi" -- Check if-then layout
+           ,"-gnatyk" -- Check keyword casing
+           ,"-gnatyl" -- Check layout
+           ,"-gnatym" -- Check maximum line length
+           ,"-gnatyn" -- Check casing of entities in Standard
+           ,"-gnatyO" -- Check that overriding subprograms are explicitly marked as such
+           ,"-gnatyp" -- Check pragma casing
+           ,"-gnatyr" -- Check identifier references casing
+           ,"-gnatyS" -- Check no statements after THEN/ELSE
+           ,"-gnatyt" -- Check token spacing
+           ,"-gnatyu" -- Check unnecessary blank lines
+           ,"-gnatyx" -- Check extra parentheses
+          );
+
+   type Build_Profile_Kind is ("release", "validation", "development");
+   Build_Profile : Build_Profile_Kind := "development";
+
+end Spdx_Tool_Config;
