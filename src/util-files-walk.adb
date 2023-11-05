@@ -94,6 +94,7 @@ package body Util.Files.Walk is
       Pos   : Natural;
       C     : Character;
       Node  : Pattern_Access;
+      Previous : Pattern_Access;
    begin
       while First <= Pattern'Last loop
          Exact := True;
@@ -111,28 +112,39 @@ package body Util.Files.Walk is
                Node := new Name_Pattern_Type
                  '(Len  => Pos - First,
                    Name => Pattern (First .. Pos - 1),
-                   Scan => True,
+                   Exclude  => Exclude,
                    Negative => False,
+                   Dir_Only => True,
+                   others => <>);
+            elsif Pos < Pattern'Last then
+               Node := new Name_Pattern_Type
+                 '(Len  => Pos - First,
+                   Name => Pattern (First .. Pos - 1),
+                   Exclude => False,
                    Dir_Only => True,
                    others => <>);
             else
                Node := new Name_Pattern_Type
                  '(Len  => Pos - First,
                    Name => Pattern (First .. Pos - 1),
-                   Scan => Exclude,
+                   Exclude => Exclude,
                    Dir_Only => False,
                    others => <>);
             end if;
             if First = Pattern'First then
                Node.Next := Root;
                Root := Node;
+               Previous := Node;
+            else
+               Previous.Child := Node;
+               Previous := Node;
             end if;
          else
             if Is_Multi_Wildcard (Pattern (First .. Pos - 1)) then
                Node := new Name_Pattern_Type
                  '(Len  => 2,
                    Name => "**",
-                   Scan => Exclude,
+                   Exclude => Exclude,
                    Multi_Wildcard => True,
                    Dir_Only => True,
                    others => <>);
@@ -140,7 +152,7 @@ package body Util.Files.Walk is
                Node := new Name_Pattern_Type
                  '(Len  => 1,
                    Name => "*",
-                   Scan => Exclude,
+                   Exclude => Exclude,
                    Multi_Wildcard => False,
                    Dir_Only => True,
                    others => <>);
@@ -148,7 +160,7 @@ package body Util.Files.Walk is
                Node := new Regex_Pattern_Type
                  '(Regex => GNAT.Regexp.Compile (Pattern (First .. Pos - 1),
                                                  Glob => True),
-                   Scan => not Exclude,
+                   Exclude => Exclude,
                    Multi_Wildcard => False,
                    Dir_Only => False,
                    others => <>);
@@ -156,6 +168,10 @@ package body Util.Files.Walk is
             if First = Pattern'First then
                Node.Next := Root;
                Root := Node;
+               Previous := Node;
+            else
+               Previous.Child := Node;
+               Previous := Node;
             end if;
          end if;
          First := Pos + 1;
@@ -201,25 +217,31 @@ package body Util.Files.Walk is
    begin
       if Filter.Local /= null then
          Match1 := Match (Filter.Local, Name);
-         if Match1 /= null and then Match1.Negative then
+         if Match1 /= null and then not Match1.Exclude then
             return Match1;
          end if;
       end if;
       if Filter.Current /= null then
          Match2 := Match (Filter.Current, Name);
-         if Match2 /= null and then Match2.Negative then
+         if Match2 /= null and then not Match2.Exclude then
             return Match2;
+         end if;
+         if Filter.Current.Child /= null then
+            Match6 := Match (Filter.Current.Child, Name);
+            if Match6 /= null and then not Match6.Exclude then
+               return Match6;
+            end if;
          end if;
       end if;
       if Filter.Local_Recursive /= null then
          Match3 := Match (Filter.Local_Recursive, Name);
-         if Match3 /= null and then Match3.Negative then
+         if Match3 /= null and then not Match3.Exclude then
             return Match3;
          end if;
       end if;
       if Filter.Recursive /= null then
          Match4 := Match (Filter.Recursive, Name);
-         if Match4 /= null and then Match4.Negative then
+         if Match4 /= null and then not Match4.Exclude then
             return Match4;
          end if;
       end if;
@@ -227,8 +249,23 @@ package body Util.Files.Walk is
          F := Filter.Previous;
          while F /= null loop
             Match5 := Match_Sibling (F, Name);
-            if Match5 /= null and then Match4.Negative then
+            if Match5 /= null and then not Match5.Exclude then
                return Match5;
+            end if;
+            if F.Local_Recursive /= null then
+               Match5 := Match (F.Local_Recursive, Name);
+               if Match5 /= null and then not Match5.Exclude then
+                  return Match5;
+               end if;
+               if Match6 = null then
+                  Match6 := Match5;
+               end if;
+            end if;
+            if F.Recursive /= null then
+               Match5 := Match (F.Recursive, Name);
+               if Match5 /= null and then not Match5.Exclude then
+                  return Match5;
+               end if;
             end if;
             if Match6 = null then
                Match6 := Match5;
@@ -368,16 +405,24 @@ package body Util.Files.Walk is
          declare
             Name   : constant String := AD.Simple_Name (Ent);
          begin
+            if Name = "regtests" then
+               Log.Debug ("Found regtests");
+            end if;
             if Name /= "." and then Name /= ".." then
                Result.Pattern := Match (Filter.Filter.all, Name);
-               if Result.Pattern = null or else Result.Pattern.Scan then
+               if Result.Pattern = null or else not Result.Pattern.Exclude
+                 or else Result.Pattern.Dir_Only
+               then
                   declare
                      Full_Path : constant String := AD.Full_Name (Ent);
+                     Kind      : constant AD.File_Kind := AD.Kind (Full_Path);
                   begin
-                     if AD.Kind (Full_Path) /= AD.Directory then
+                     if Kind /= AD.Directory
+                       and then (Result.Pattern = null or else not Result.Pattern.Exclude)
+                     then
                         Walker_Type'Class (Walker).Scan_File (Full_Path);
-                     elsif Result.Pattern = null
-                       or else Result.Pattern.Negative
+                     elsif Kind = AD.Directory
+                       and then (Result.Pattern = null or else not Result.Pattern.Exclude)
                      then
                         Walker_Type'Class (Walker).Scan (Full_Path, Result);
                      end if;

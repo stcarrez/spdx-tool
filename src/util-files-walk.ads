@@ -90,6 +90,29 @@ private
    --  * a Multi_Wildcard node matches any path component several times,
    --  * the `Name_Pattern_Type` node is used for an exact name match,
    --  * the `Regex_Pattern_Type` node contains a Regexp patern.
+   --
+   --  With the following ignore lists:
+   --
+   --  src
+   --  bin
+   --  lib
+   --  obj
+   --  src/sys/http
+   --  src/sys/os-generated
+   --
+   --  The pattern tree looks like:
+   --
+   --  "src" ---[Next]---> "bin" ---[Next]---> "lib" --->[Next]---> "obj"
+   --    |
+   --   [Child]
+   --    |
+   --    v
+   --  "sys"
+   --    |
+   --   [Child]
+   --    |
+   --    v
+   --   "http" ---[Next]---> "os-generated"
    type Pattern_Type is tagged;
    type Pattern_Access is access all Pattern_Type'Class;
 
@@ -98,7 +121,7 @@ private
       Next           : Pattern_Access;
       Negative       : Boolean := False;
       Dir_Only       : Boolean := False;
-      Scan           : Boolean := True;
+      Exclude        : Boolean := True;
       Wildcard       : Boolean := False;
       Multi_Wildcard : Boolean := False;
    end record;
