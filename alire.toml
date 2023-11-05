@@ -12,6 +12,8 @@ tags = []
 
 executables = ["spdx_tool"]
 
+project-files = ["spdx_tool.gpr", "tools/tools.gpr"]
+
 [[depends-on]]
 utilada = "^2.6.0"
 
@@ -23,3 +25,6 @@ utilada_unit = "^2.6.0"
 
 [configuration]
 disabled = true
+
+[[depends-on]]
+ansiada = "^1.0.0"
