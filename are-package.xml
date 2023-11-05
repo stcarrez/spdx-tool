@@ -17,4 +17,20 @@
     </install>
   </resource>
 
+  <resource name='SPDX_Tool.Files.Extensions'
+            format='map'
+            type='access constant String'>
+    <header>--  SPDX-License-Identifier: Apache-2.0</header>
+    <header>--  Extensions mapping generated from extensions.json</header>
+
+    <mapper type='json'/>
+
+    <!-- Copy files with .txt extension from 'help' directory -->
+    <install mode='copy' strip-extension='yes'>
+      <fileset dir="tools">
+        <include name="extensions.json"/>
+      </fileset>
+    </install>
+  </resource>
+
 </package>
