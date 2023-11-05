@@ -32,13 +32,13 @@ package body SPDX_Tool.Licenses.Tests is
       Path    : constant String := Util.Tests.Get_Path ("regtests/files/identify/" & Filename);
       Manager : License_Manager (1);
       File    : SPDX_Tool.Files.File_Type (100);
-      Result  : License_Match;
+      Result  : Infos.License_Info;
    begin
       --  Load only one license to simplify the debugging in case of problem.
       Manager.Load_License ("licenses/" & License);
-      File.Open (Path);
+      Manager.File_Mgr (1).Open (File, Path);
       Result := Manager.Find_License (File);
-      Util.Tests.Assert_Equals (T, Expect, Result.License,
+      Util.Tests.Assert_Equals (T, Expect, Result.Name,
                                 "Invalid license found", Source, Line);
    end Check_License;
 

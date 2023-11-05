@@ -23,11 +23,12 @@ package body SPDX_Tool.Files.Tests is
    procedure Test_Open (T : in out Test) is
       Path : constant String
         := Util.Tests.Get_Path ("regtests/files/identify/apache-2.0-1.ads");
+      Manager : File_Manager;
    begin
       declare
          Info : File_Type (100);
       begin
-         Info.Open (Path);
+         Manager.Open (Info, Path);
          Util.Tests.Assert_Equals (T, 17, Info.Count,
                                    "Invalid number of lines");
          Assert_Equals (T, ADA_COMMENT, Info.Cmt_Style,
@@ -37,7 +38,7 @@ package body SPDX_Tool.Files.Tests is
       declare
          Info : File_Type (100);
       begin
-         Info.Open (Util.Tests.Get_Path
+         Manager.Open (Info, Util.Tests.Get_Path
                     ("regtests/files/identify/gpl-3.0-1.sub"));
          Util.Tests.Assert_Equals (T, 29, Info.Count,
                                    "Invalid number of lines");
