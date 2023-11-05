@@ -53,6 +53,7 @@ private
    Opt_Version : aliased Boolean := False;
    Opt_Check   : aliased Boolean := False;
    Opt_Update  : aliased Boolean := False;
+   Opt_Files   : aliased Boolean := False;
    Opt_Tasks   : aliased Integer := 1;
 
    LF    : constant Byte := 16#0A#;

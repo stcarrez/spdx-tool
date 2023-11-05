@@ -17,7 +17,10 @@ with GNAT.Regpat;
 with Util.Files.Walk;
 with SPDX_Tool.Files;
 with SPDX;
+with SPDX_Tool.Files;
+with SPDX_Tool.Infos;
 private with Util.Executors;
+private with Util.Concurrent.Counters;
 package SPDX_Tool.Licenses is
 
    package UFW renames Util.Files.Walk;
@@ -78,8 +81,13 @@ package SPDX_Tool.Licenses is
    function Get_Template (License : License_Type) return String;
 
    --  Analyze the content to find license information in the header comment.
-   procedure Analyze (Manager : in out License_Manager;
-                      Path : in String);
+   procedure Analyze (Manager  : in out License_Manager;
+                      File_Mgr : in out SPDX_Tool.Files.File_Manager;
+                      File     : in out SPDX_Tool.Infos.File_Info);
+
+   generic
+      with procedure Process (Map : in SPDX_Tool.Infos.File_Map);
+   procedure Report (Manager : in out License_Manager);
 
 private
 
@@ -129,12 +137,6 @@ private
       Unknown_Count : Natural := 0;
       Max_Line : Natural := 0;
    end License_Stats;
-
-   type License_Match is record
-      First_Line : Natural := 0;
-      Last_Line  : Natural := 0;
-      License    : UString;
-   end record;
 
    --  The license templates are read within a tree of tokens.  To find a
    --  license match, the license text in the source file header is split in
@@ -209,8 +211,8 @@ private
    type License_Manager_Access is access all License_Manager;
 
    type License_Job_Type is record
-      Path    : UString;
       Manager : License_Manager_Access;
+      File    : SPDX_Tool.Infos.File_Info_Access;
    end record;
 
    procedure Execute (Job : in out License_Job_Type);
@@ -225,6 +227,9 @@ private
    subtype Executor_Manager is Executors.Executor_Manager;
    subtype Executor_Manager_Access is Executors.Executor_Manager_Access;
 
+   type File_Manager_Array is array (Positive range <>)
+     of aliased SPDX_Tool.Files.File_Manager;
+
    type License_Manager (Count : Task_Count) is
    limited new UFW.Walker_Type with record
       Manager  : License_Manager_Access;
@@ -232,17 +237,20 @@ private
       Job      : Job_Type := SCAN_LICENSES;
       Stats    : License_Stats;
       Tokens   : Token_Access;
+      Mgr_Idx  : Util.Concurrent.Counters.Counter;
+      File_Mgr : File_Manager_Array (1 .. Count);
       Executor : Executor_Manager (Count);
+      Files    : SPDX_Tool.Infos.File_Map;
    end record;
 
    function Find_License (Manager : in License_Manager;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
-                          return License_Match;
+                          return Infos.License_Info;
 
    function Find_License (Manager : in License_Manager;
                           File    : in SPDX_Tool.Files.File_Type)
-                          return License_Match;
+                          return Infos.License_Info;
 
    overriding
    procedure Finalize (Manager : in out License_Manager);

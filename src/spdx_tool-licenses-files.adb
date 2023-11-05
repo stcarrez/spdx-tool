@@ -1,4 +1,6 @@
 --  Advanced Resource Embedder 1.3.0
+--  SPDX-License-Identifier: Apache-2.0
+--  License templates extracted from https://github.com/spdx/license-list-data.git
 with Interfaces; use Interfaces;
 
 package body SPDX_Tool.Licenses.Files is

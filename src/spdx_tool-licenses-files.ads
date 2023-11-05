@@ -1,4 +1,6 @@
 --  Advanced Resource Embedder 1.3.0
+--  SPDX-License-Identifier: Apache-2.0
+--  License templates extracted from https://github.com/spdx/license-list-data.git
 package SPDX_Tool.Licenses.Files is
 
    type Content_Access is access constant Buffer_Type;

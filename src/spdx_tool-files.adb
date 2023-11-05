@@ -1,15 +1,27 @@
 -- --------------------------------------------------------------------
---  spdx_tool-languages -- basic language analysis
+--  spdx_tool-files -- read files and identify languages and header comments
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Streams.Stream_IO;
-with Util.Files;
+with Ada.Text_IO;
+with Util.Log.Loggers;
+with Util.Measures;
+with Interfaces.C.Strings;
+with SPDX_Tool.Files.Extensions;
 package body SPDX_Tool.Files is
 
-   function Is_Eol (Buf : Buffer_Accessor;
-                    Pos : Buffer_Index)
-                    return Boolean is (Buf.Data (Pos) in LF | CR);
+   package ICS renames Interfaces.C.Strings;
+
+   use type Magic.Magic_t;
+   use type ICS.chars_ptr;
+
+   Log : constant Util.Log.Loggers.Logger :=
+     Util.Log.Loggers.Create ("SPDX_Tool.Files");
+
+   procedure Write_Comment (File    : in out Util.Streams.Output_Stream'Class;
+                            Style   : in Comment_Style;
+                            Comment : in String);
 
    Line_Comments : constant Language_Array :=
      ((Style         => ADA_COMMENT,
@@ -44,6 +56,13 @@ package body SPDX_Tool.Files is
        Comment_End   => Create_Buffer ("-->"),
        Is_Block      => True)
      );
+
+   Perf : Util.Measures.Measure_Set;
+
+   procedure Report is
+   begin
+      Util.Measures.Write (Perf, "Perf", Ada.Text_IO.Standard_Output);
+   end Report;
 
    function Find_Comment_Style (Data : in Buffer_Accessor;
                                 From : in Buffer_Index) return Comment_Info is
@@ -124,7 +143,8 @@ package body SPDX_Tool.Files is
    function Is_Comment_Presentation (C : Byte) return Boolean is
       (C in Character'Pos ('*') | Character'Pos ('-'));
 
-   procedure Open (File     : in out File_Type;
+   procedure Open (Manager  : in File_Manager;
+                   File     : in out File_Type;
                    Path     : in String) is
    begin
       File.File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
@@ -133,15 +153,33 @@ package body SPDX_Tool.Files is
       File.Cmt_Style := NO_COMMENT;
       declare
          Buf     : constant Buffer_Accessor := File.Buffer.Value;
-         Len     : Buffer_Index;
+         Len     : Buffer_Size;
          Pos     : Buffer_Index := Buf.Data'First;
          First   : Buffer_Index;
          Last    : Buffer_Index;
          Line_No : Natural := 0;
          Style   : Comment_Info := (NO_COMMENT, Mode => NO_COMMENT, others => <>);
+         R : Interfaces.C.Strings.chars_ptr;
       begin
          File.File.Read (Into => Buf.Data, Last => Len);
          File.Last_Offset := Len;
+         if Len > 0 then
+            declare
+               S : Util.Measures.Stamp;
+            begin
+               R := Magic.Buffer (Manager.Magic_Cookie,
+                                  Buf.Data'Address, Interfaces.C.size_t (Len));
+               if R /= Interfaces.C.Strings.Null_Ptr then
+                  Util.Measures.Report (Perf, S, "magic_buffer");
+                  Log.Info ("{0}: {1}", Path, Interfaces.C.Strings.Value (R));
+                  File.Ident.Mime := To_UString (Interfaces.C.Strings.Value (R));
+               else
+                  Log.Info ("{0}: error {1}", Path,
+                         Magic.Errno (Manager.Magic_Cookie)'Image);
+                  File.Ident.Mime := To_UString ("unknown");
+               end if;
+            end;
+         end if;
          while Pos <= Len loop
             First := Pos;
             Line_No := Line_No + 1;
@@ -215,16 +253,16 @@ package body SPDX_Tool.Files is
       File.Write (Comment);
    end Write_Comment;
 
-   procedure Save (File    : in out File_Type;
+   procedure Save (Manager : in File_Manager;
+                   File    : in out File_Type;
                    Path    : in String;
                    First   : in Natural;
                    Last    : in Natural;
                    License : in String) is
       Buf       : constant Buffer_Accessor := File.Buffer.Value;
-      Tmp_Path  : String := Path & ".tmp";
+      Tmp_Path  : constant String := Path & ".tmp";
+      Pos       : constant Buffer_Index := Buf.Data'First;
       Output    : Util.Streams.Files.File_Stream;
-      Pos       : Buffer_Index := Buf.Data'First;
-      Line      : Natural := 0;
       First_Pos : Buffer_Index;
    begin
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
@@ -232,7 +270,8 @@ package body SPDX_Tool.Files is
       if First_Pos > Pos then
          Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
       end if;
-      Write_Comment (Output, File.Lines (First).Style.Style, "SPDX-License-Identifier: " & License);
+      Write_Comment (Output, File.Lines (First).Style.Style,
+                     "SPDX-License-Identifier: " & License);
       First_Pos := File.Lines (Last).Style.Last;
       if First_Pos < File.Last_Offset then
          Output.Write (Buf.Data (First_Pos .. File.Last_Offset));
@@ -243,5 +282,42 @@ package body SPDX_Tool.Files is
       Output.Close;
       --  Util.Files.Rename (Old_Name => Tmp_Path, New_Name => Path);
    end Save;
+
+   --  ------------------------------
+   --  Initialize the file manager and prepare the libmagic library.
+   --  ------------------------------
+   procedure Initialize (Manager : in out File_Manager;
+                         Path    : in String) is
+      E : Integer;
+      S : ICS.chars_ptr;
+   begin
+      Manager.Magic_Cookie := Magic.Open (Magic.MAGIC_MIME);
+      if Manager.Magic_Cookie = null then
+         return;
+      end if;
+
+      S := ICS.New_String (Path);
+      E := Magic.Load (Manager.Magic_Cookie, S);
+      ICS.Free (S);
+      if E /= 0 then
+         S := Magic.Error (Manager.Magic_Cookie);
+         if S /= ICS.Null_Ptr then
+            Log.Error ("cannot load magic file {0}: {1}",
+                       Path, Interfaces.C.Strings.Value (S));
+         else
+            Log.Error ("cannot load magic file {0}",
+                       Path);
+         end if;
+      end if;
+   end Initialize;
+
+   overriding
+   procedure Finalize (Manager : in out File_Manager) is
+   begin
+      if Manager.Magic_Cookie /= null then
+         Magic.Close (Manager.Magic_Cookie);
+         Manager.Magic_Cookie := null;
+      end if;
+   end Finalize;
 
 end SPDX_Tool.Files;

@@ -14,7 +14,13 @@ with Util.Files.Walk;
 with Util.Log.Loggers;
 with Util.Strings;
 
+with PT.Drivers.Texts;
+with PT.Texts;
+
+with SPDX_Tool.Infos;
 with SPDX_Tool.Licenses;
+with SPDX_Tool.Reports;
+with SPDX_Tool.Files;
 procedure SPDX_Tool.Main is
 
    package GC renames GNAT.Command_Line;
@@ -60,6 +66,11 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--update",
                         Help   => -("Update the license to use a SPDX-License tag"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Files'Access,
+                        Switch => "-f",
+                        Long_Switch => "--files",
+                        Help   => -("List files grouped by license name"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.License_Dir'Access,
                         Switch => "-l:",
                         Long_Switch => "--license-dir=",
@@ -74,6 +85,20 @@ procedure SPDX_Tool.Main is
                         Help   => -("Number of threads to process the files")
                          & Default_Tasks);
    end Setup;
+
+   procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
+      Driver    : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Width => 80);
+      Printer   : PT.Texts.Printer_Type := PT.Texts.Create (Driver);
+   begin
+      if Opt_Check then
+         SPDX_Tool.Reports.Print_Licenses (Driver, Files);
+      end if;
+      if Opt_Files then
+         SPDX_Tool.Reports.Print_Files (Driver, Files);
+      end if;
+   end Print_Report;
+
+   procedure Report_Summary is new SPDX_Tool.Licenses.Report (Print_Report);
 
    F : Util.Files.Walk.Filter_Type;
 begin
@@ -91,9 +116,13 @@ begin
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       return;
    end if;
+   if not Opt_Files and not Opt_Check and not Opt_Update then
+      Opt_Check := True;
+   end if;
    declare
       Manager : SPDX_Tool.Licenses.License_Manager (Opt_Tasks);
    begin
+      F.Exclude (".git");
       if Licenses.License_Dir /= null
         and then Licenses.License_Dir.all /= ""
       then
@@ -120,23 +149,17 @@ begin
             elsif AD.Kind (Arg) = AD.Directory then
                Manager.Scan (Arg, F);
             else
-               Manager.Analyze (Arg);
+               --  Manager.Analyze (Arg);
+               null;
             end if;
          end;
       end loop;
       Manager.Wait;
-      declare
-         use SPDX_Tool.Licenses.Count_Maps;
-
-         Stats : constant SPDX_Tool.Licenses.Count_Maps.Map
-            := Manager.Get_Stats;
+      Report_Summary (Manager);
       begin
-         for Stat in Stats.Iterate loop
-            Log.Error ("Stat {0} -> {1}",
-                       Key (Stat), Util.Strings.Image (Element (Stat)));
-         end loop;
          Manager.Print_Header;
       end;
+      SPDX_Tool.Files.Report;
    end;
 
 exception

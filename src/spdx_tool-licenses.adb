@@ -19,11 +19,14 @@ package body SPDX_Tool.Licenses is
 
    use type SPDX_Tool.Files.Comment_Style;
    use type SPDX_Tool.Files.Comment_Mode;
+   use type SPDX_Tool.Infos.License_Kind;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
 
    package UBO renames Util.Beans.Objects;
+
+   File_Mgr : SPDX_Tool.Files.File_Manager_Access := null with Thread_Local_Storage;
 
    function Find_Header (List : UBO.Object) return UBO.Object is
       Iter : UBO.Iterators.Iterator := UBO.Iterators.First (List);
@@ -95,6 +98,9 @@ package body SPDX_Tool.Licenses is
                         Job     : in Job_Type;
                         Tasks   : in Task_Count) is
    begin
+      for I in Manager.File_Mgr'Range loop
+         Manager.File_Mgr (I).Initialize ("/usr/share/misc/magic");
+      end loop;
       Manager.Job := Job;
       Manager.Manager := Manager'Unchecked_Access;
       Manager.Executor.Start;
@@ -221,7 +227,7 @@ package body SPDX_Tool.Licenses is
       function Create_Regpat (Content : in Buffer_Type) return Token_Access is
          Regpat : String (1 .. Content'Length);
          for Regpat'Address use Content'Address;
-         Pat : GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
+         Pat : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
       begin
          return new Regpat_Token_Type '(Len => Content'Length,
                                         Plen => Pat.Size,
@@ -366,6 +372,7 @@ package body SPDX_Tool.Licenses is
    overriding
    procedure Scan_File (Manager : in out License_Manager;
                         Path   : String) is
+      use SPDX_Tool.Infos;
       Job   : License_Job_Type;
       Count : Natural;
    begin
@@ -403,8 +410,11 @@ package body SPDX_Tool.Licenses is
             Manager.Load_License (Path);
 
          when others =>
-            Job.Path := To_UString (Path);
+            Job.File := new File_Info '(Len => Path'Length,
+                                        Path => Path,
+                                        others => <>);
             Job.Manager := Manager.Manager;
+            Manager.Files.Insert (Path, Job.File);
             Manager.Executor.Execute (Job);
             Count := Manager.Executor.Get_Count;
             if Count > Manager.Max_Fill then
@@ -463,11 +473,11 @@ package body SPDX_Tool.Licenses is
    function Find_License (Manager : in License_Manager;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
-                          return License_Match is
+                          return Infos.License_Info is
 
       Line    : Positive := Lines'First;
       Current : Token_Access := null;
-      Result  : License_Match;
+      Result  : Infos.License_Info;
       Pos, Last, First : Buffer_Index;
       Next_Token : Token_Access;
    begin
@@ -484,7 +494,8 @@ package body SPDX_Tool.Licenses is
                      Pos := Skip_Spaces (Content, First, Last);
                      Result.First_Line := Line;
                      Result.Last_Line := Line;
-                     Result.License := To_UString (Content (Pos .. Last));
+                     Result.Name := To_UString (Content (Pos .. Last));
+                     Result.Match := Infos.SPDX_LICENSE;
                      return Result;
                   end if;
                end if;
@@ -518,8 +529,9 @@ package body SPDX_Tool.Licenses is
                  and then Current.Next.Kind = TOK_LICENSE
                then
                   Current := Current.Next;
-                  Result.License := Final_Token_Type (Current.all).License;
+                  Result.Name := Final_Token_Type (Current.all).License;
                   Result.Last_Line := Line;
+                  Result.Match := Infos.TEMPLATE_LICENSE;
                   return Result;
                end if;
             end loop;
@@ -527,49 +539,82 @@ package body SPDX_Tool.Licenses is
          Line := Line + 1;
       end loop;
       Result.Last_Line := Line;
+      Result.Match := Infos.UNKNOWN_LICENSE;
       return Result;
    end Find_License;
 
    function Find_License (Manager : in License_Manager;
-                          File    : in SPDX_Tool.Files.File_Type) return License_Match is
+                          File    : in SPDX_Tool.Files.File_Type)
+                          return Infos.License_Info is
       Buf     : constant Buffer_Accessor := File.Buffer.Value;
-      Result  : License_Match := (others => <>);
+      Result  : Infos.License_Info := (others => <>);
       Line    : Positive := 1;
    begin
+      if File.Cmt_Style = SPDX_Tool.Files.NO_COMMENT then
+         Result.Match := Infos.NONE;
+         return Result;
+      end if;
       while Line <= File.Count loop
          Result := Find_License (Manager, Buf.Data,
                                  File.Lines (Line .. File.Count));
-         exit when Length (Result.License) > 0;
+         exit when Result.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE;
          Line := Line + 1;
       end loop;
       return Result;
    end Find_License;
 
-   procedure Analyze (Manager : in out License_Manager;
-                      Path : in String) is
-      File   : SPDX_Tool.Files.File_Type (100);
-      Result : License_Match;
+   procedure Analyze (Manager  : in out License_Manager;
+                      File_Mgr : in out SPDX_Tool.Files.File_Manager;
+                      File     : in out SPDX_Tool.Infos.File_Info) is
+      Data   : SPDX_Tool.Files.File_Type (100);
    begin
-      File.Open (Path);
-      Result := Manager.Find_License (File);
-      if Length (Result.License) > 0 then
-         Log.Info ("{0}: {1}", Path, To_String (Result.License));
-         Manager.Stats.Increment (To_String (Result.License));
+      File_Mgr.Open (Data, File.Path);
+      File.License := Manager.Find_License (Data);
+      File.Mime := Data.Ident.Mime;
+      if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+
+         Log.Info ("{0}: {1}", File.Path, To_String (File.License.Name));
+         Manager.Stats.Increment (To_String (File.License.Name));
          if Manager.Job = UPDATE_LICENSES then
-            File.Save
-              (Path    => Path,
-               First   => Result.First_Line,
-               Last    => Result.Last_Line,
-               License => To_String (Result.License));
+            File_Mgr.Save
+              (File    => Data,
+               Path    => File.Path,
+               First   => File.License.First_Line,
+               Last    => File.License.Last_Line,
+               License => To_String (File.License.Name));
          end if;
       else
-         Log.Info ("{0}: {1} lines {2} cmt", Path,
-                   Util.Strings.Image (File.Count),
-                   Util.Strings.Image (File.Count));
-         Manager.Stats.Increment ("files");
-         Manager.Stats.Add_Header (File);
+         declare
+            use SPDX_Tool.Files;
+
+            Cmt_Count : Natural := 0;
+         begin
+            for I in Data.Lines'Range loop
+               if Data.Lines (I).Comment /= NO_COMMENT then
+                  Cmt_Count := Cmt_Count + 1;
+               end if;
+            end loop;
+            if Cmt_Count = 0 then
+               Log.Info ("{0} is {1}: {2} lines no comment", File.Path,
+                         To_String (Data.Ident.Mime),
+                         Util.Strings.Image (Data.Count));
+               Manager.Stats.Increment (To_String (Data.Ident.Mime));
+            else
+               Log.Info ("{0} is {1}: {2} lines {3} cmt", File.Path,
+                         To_String (Data.Ident.Mime),
+                         Util.Strings.Image (Data.Count),
+                         Util.Strings.Image (Cmt_Count));
+               Manager.Stats.Increment ("unknown " & To_String (Data.Ident.Mime));
+               Manager.Stats.Add_Header (Data);
+            end if;
+         end;
       end if;
    end Analyze;
+
+   procedure Report (Manager : in out License_Manager) is
+   begin
+      Process (Manager.Files);
+   end Report;
 
    overriding
    procedure Finalize (Manager : in out License_Manager) is
@@ -582,15 +627,27 @@ package body SPDX_Tool.Licenses is
                 Util.Strings.Image (Manager.Max_Fill));
    end Finalize;
 
-   procedure Execute (Job : in out License_Job_Type) is
+   function Get_File_Manager (Manager : in out License_Manager)
+                              return SPDX_Tool.Files.File_Manager_Access is
+      Value : Integer;
    begin
-      Job.Manager.Analyze (To_String (Job.Path));
+      Util.Concurrent.Counters.Increment (Manager.Mgr_Idx, Value);
+      return Manager.File_Mgr (Value + 1)'Unchecked_Access;
+   end Get_File_Manager;
+
+   procedure Execute (Job : in out License_Job_Type) is
+      use type SPDX_Tool.Files.File_Manager_Access;
+   begin
+      if File_Mgr = null then
+         File_Mgr := Job.Manager.Get_File_Manager;
+      end if;
+      Job.Manager.Analyze (File_Mgr.all, Job.File.all);
    end Execute;
 
    procedure Error (Job : in out License_Job_Type;
                     Ex  : in Ada.Exceptions.Exception_Occurrence) is
    begin
-      Log.Error ("Job {0} failed", To_String (Job.Path));
+      Log.Error ("Job {0} failed", Job.File.Path);
       Log.Error ("Exception", Ex);
    end Error;
 

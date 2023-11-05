@@ -1,11 +1,21 @@
 -- --------------------------------------------------------------------
---  spdx_tool-files -- basic language analysis
+--  spdx_tool-files -- read files and identify languages and header comments
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
+with Ada.Finalization;
 
 with Util.Streams.Files;
+private with Magic;
 package SPDX_Tool.Files is
+
+   package AF renames Ada.Finalization;
+   procedure Report;
+
+   type Identification is record
+      Mime     : UString;
+      Language : UString;
+   end record;
 
    type Comment_Style is (NO_COMMENT,
                           ADA_COMMENT,
@@ -41,6 +51,40 @@ package SPDX_Tool.Files is
    end record;
    type Line_Array is array (Positive range <>) of Line_Type;
 
+   type File_Type (Max_Lines : Positive) is limited record
+      File         : Util.Streams.Files.File_Stream;
+      Buffer       : Buffer_Ref;
+      Last_Offset  : Buffer_Size;
+      Count        : Natural := 0;
+      Ident        : Identification;
+      Cmt_Style    : Comment_Style := NO_COMMENT;
+      Lines        : Line_Array (1 .. Max_Lines);
+   end record;
+
+   type File_Manager is limited new AF.Limited_Controlled with private;
+   type File_Manager_Access is access all File_Manager;
+
+   --  Initialize the file manager and prepare the libmagic library.
+   procedure Initialize (Manager : in out File_Manager;
+                         Path    : in String);
+
+   --  Open the file and read the first data block (4K) to identify the
+   --  language and comment headers.
+   procedure Open (Manager  : in File_Manager;
+                   File     : in out File_Type;
+                   Path     : in String);
+
+   --  Save the file to replace the header license template by the corresponding
+   --  SPDX license header.
+   procedure Save (Manager : in File_Manager;
+                   File    : in out File_Type;
+                   Path    : in String;
+                   First   : in Natural;
+                   Last    : in Natural;
+                   License : in String);
+
+private
+
    type Language_Type is record
       Style         : Comment_Style;
       Comment_Start : Buffer_Ref;
@@ -49,25 +93,20 @@ package SPDX_Tool.Files is
    end record;
    type Language_Array is array (Comment_Index range <>) of Language_Type;
 
-   type File_Type (Max_Lines : Positive) is tagged limited record
-      File         : Util.Streams.Files.File_Stream;
-      Buffer       : Buffer_Ref;
-      Last_Offset  : Buffer_Index;
-      Count        : Natural := 0;
-      Cmt_Style    : Comment_Style := NO_COMMENT;
-      Lines        : Line_Array (1 .. Max_Lines);
-   end record;
-
    function Find_Comment_Style (Data : in Buffer_Accessor;
                                 From : in Buffer_Index) return Comment_Info;
 
-   procedure Open (File     : in out File_Type;
-                   Path     : in String);
+   type Identifier is tagged limited null record;
 
-   procedure Save (File    : in out File_Type;
-                   Path    : in String;
-                   First   : in Natural;
-                   Last    : in Natural;
-                   License : in String);
+   procedure Identify (Plugin : in Identifier;
+                       File   : in out File_Type;
+                       Result : out Identification) is null;
+
+   type File_Manager is limited new AF.Limited_Controlled with record
+      Magic_Cookie : Magic.Magic_t;
+   end record;
+
+   overriding
+   procedure Finalize (Manager : in out File_Manager);
 
 end SPDX_Tool.Files;
