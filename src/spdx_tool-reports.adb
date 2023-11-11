@@ -32,9 +32,9 @@ package body SPDX_Tool.Reports is
       if Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          return To_String (Info.Name);
       elsif Info.Match = Infos.UNKNOWN_LICENSE then
-         return "unkown";
+         return -("Unkown");
       else
-         return "no license";
+         return -("No license");
       end if;
    end Get_License;
 
@@ -81,9 +81,9 @@ package body SPDX_Tool.Reports is
 
          Writer.Layout_Fields (Fields);
 
-         Writer.Put (Fields (1), "License");
-         Writer.Put (Fields (2), "Count");
-         Writer.Put (Fields (3), "Ratio");
+         Writer.Put (Fields (1), -("License"));
+         Writer.Put (Fields (2), -("Count"));
+         Writer.Put (Fields (3), -("Ratio"));
          Writer.New_Line;
 
          Writer.Set_Style (Fields (1), Styles.Default);

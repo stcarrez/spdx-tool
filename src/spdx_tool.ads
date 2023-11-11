@@ -7,6 +7,7 @@
 with Ada.Streams;
 with Ada.Strings.Unbounded;
 with Util.Blobs;
+with Intl;
 package SPDX_Tool is
 
    use Ada.Streams;
@@ -40,7 +41,7 @@ package SPDX_Tool is
    function Length (S : UString) return Natural
                     renames Ada.Strings.Unbounded.Length;
 
-   function "-" (M : in String) return String is (M);
+   function "-" (M : in String) return String renames Intl."-";
 
    subtype Task_Count is Positive range 1 .. 32;
 

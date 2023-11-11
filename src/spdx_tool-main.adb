@@ -133,7 +133,7 @@ begin
       Configure_Logs (Opt_Debug, Opt_Verbose);
    end if;
    if not (Opt_Tasks in Task_Count'Range) then
-      Log.Error ("Invalid number of tasks: {0}",
+      Log.Error (-("Invalid number of tasks: {0}"),
                  Util.Strings.Image (Opt_Tasks));
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       return;
