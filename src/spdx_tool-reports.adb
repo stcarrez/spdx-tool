@@ -97,8 +97,8 @@ package body SPDX_Tool.Reports is
                               Value => Item.Count,
                               Min   => 0,
                               Max   => Total,
-                              Style1 => Styles.Marker,
-                              Style2 => Styles.Default);
+                              Style1 => Styles.Marker1,
+                              Style2 => Styles.Marker2);
             Writer.New_Line;
          end loop;
       end;

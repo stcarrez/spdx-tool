@@ -12,7 +12,8 @@ package SPDX_Tool.Reports is
       Title   : PT.Style_Type;
       Label   : PT.Style_Type;
       Default : PT.Style_Type;
-      Marker  : PT.Style_Type;
+      Marker1 : PT.Style_Type;
+      Marker2 : PT.Style_Type;
    end record;
 
    --  Print the license used and their associated number of files.

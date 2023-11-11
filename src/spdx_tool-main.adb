@@ -58,6 +58,10 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--debug",
                         Help   => -("Enable debug execution"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_No_Color'Access,
+                        Long_Switch => "--no-color",
+                        Help   => -("Disable colors in output"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Check'Access,
                         Switch => "-c",
                         Long_Switch => "--check",
@@ -93,11 +97,20 @@ procedure SPDX_Tool.Main is
       Driver    : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Width => 80);
       Printer   : PT.Texts.Printer_Type := PT.Texts.Create (Driver);
    begin
-      Styles.Title := Driver.Create_Style (PT.Colors.White);
-      Styles.Default := Driver.Create_Style (PT.Colors.Grey);
-      Styles.Marker := Driver.Create_Style (PT.Colors.Green);
-      Driver.Set_Fill (Styles.Default, PT.Drivers.Texts.F_HLINE2);
-      Driver.Set_Fill (Styles.Marker, PT.Drivers.Texts.F_HLINE2);
+      if not Opt_No_Color then
+         Styles.Title := Driver.Create_Style (PT.Colors.White);
+         Styles.Default := Driver.Create_Style (PT.Colors.White);
+         Styles.Marker1 := Driver.Create_Style (PT.Colors.Green);
+         Styles.Marker2 := Driver.Create_Style (PT.Colors.Grey);
+         Driver.Set_Font (Styles.Title, PT.F_BOLD);
+      else
+         Styles.Title := Driver.Create_Style;
+         Styles.Default := Styles.Title;
+         Styles.Marker1 := Styles.Title;
+         Styles.Marker2 := Styles.Title;
+      end if;
+      Driver.Set_Fill (Styles.Marker2, PT.Drivers.Texts.F_HLINE2);
+      Driver.Set_Fill (Styles.Marker1, PT.Drivers.Texts.F_HLINE2);
       Driver.Set_Flush (PT.Drivers.Texts.GNAT_IO.Flush'Access);
       if Opt_Check then
          SPDX_Tool.Reports.Print_Licenses (Driver, Styles, Files);
@@ -168,7 +181,7 @@ begin
       begin
          Manager.Print_Header;
       end;
-      SPDX_Tool.Files.Report;
+      --  SPDX_Tool.Files.Report;
    end;
 
 exception

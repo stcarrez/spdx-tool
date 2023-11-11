@@ -48,13 +48,14 @@ private
 
    procedure Configure_Logs (Debug : Boolean; Verbose : Boolean);
 
-   Opt_Debug   : aliased Boolean := False;
-   Opt_Verbose : aliased Boolean := False;
-   Opt_Version : aliased Boolean := False;
-   Opt_Check   : aliased Boolean := False;
-   Opt_Update  : aliased Boolean := False;
-   Opt_Files   : aliased Boolean := False;
-   Opt_Tasks   : aliased Integer := 1;
+   Opt_Debug    : aliased Boolean := False;
+   Opt_Verbose  : aliased Boolean := False;
+   Opt_Version  : aliased Boolean := False;
+   Opt_Check    : aliased Boolean := False;
+   Opt_Update   : aliased Boolean := False;
+   Opt_Files    : aliased Boolean := False;
+   Opt_No_Color : aliased Boolean := False;
+   Opt_Tasks    : aliased Integer := 1;
 
    LF    : constant Byte := 16#0A#;
    CR    : constant Byte := 16#0D#;
