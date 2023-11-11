@@ -5,8 +5,6 @@
 -----------------------------------------------------------------------
 
 with Util.Strings;
-with SPDX_Tool.Infos;
-with PT.Drivers.Texts;
 with PT.Texts;
 with PT.Colors;
 with PT.Charts;
@@ -16,6 +14,14 @@ package body SPDX_Tool.Reports is
    use type SPDX_Tool.Infos.License_Kind;
 
    package Occurrences is new SCI.Occurrences (Element_Type => Natural);
+
+   procedure List_Occurrences is new Occurrences.List;
+
+   function "-" (Left, Right : Natural) return PT.W_Type is
+     (PT.W_Type (Natural '(Left - Right)));
+
+   procedure Draw_Percent_Bar is
+     new PT.Charts.Draw_Bar (Natural);
 
    function Get_License (Info : in Infos.License_Info) return String;
 
@@ -37,35 +43,23 @@ package body SPDX_Tool.Reports is
    --  ------------------------------
    function Format_Percent (Dv    : in Natural;
                             Value : in Natural) return String is
-      Val   : Integer := (Dv * 1000) / Value;
-      Div   : Natural;
+      Val   : constant Integer := (Dv * 1000) / Value;
+      Div   : constant Natural := Val mod 10;
    begin
-      Div := Val mod 10;
       return Util.Strings.Image (Val / 10) & '.' & To_Digit (Div);
    end Format_Percent;
 
+   --  ------------------------------
    --  Print the license used and their associated number of files.
+   --  ------------------------------
    procedure Print_Licenses (Printer : in out PT.Printer_Type'Class;
+                             Styles  : in Style_Configuration;
                              Files   : in SPDX_Tool.Infos.File_Map) is
-      Set  : Occurrences.Set;
-      List : Occurrences.Vector;
-
-      procedure List_Occurrences is
-         new Occurrences.List;
-
-      function "-" (Left, Right : Natural) return PT.W_Type is
-         (PT.W_Type (Natural '(Left - Right)));
-
-      procedure Draw_Percent_Bar is
-         new PT.Charts.Draw_Bar (Natural);
-
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Writer, 0);
       Fields : PT.Texts.Field_Array (1 .. 4);
-      Green  : constant PT.Style_Type := Writer.Create_Style (PT.Colors.Green);
-      Black  : constant PT.Style_Type := Writer.Create_Style (PT.Colors.Black);
-      Style1 : constant PT.Style_Type := Writer.Create_Style (PT.Colors.White);
-      Style2 : constant PT.Style_Type := Writer.Create_Style (PT.Colors.White);
+      Set    : Occurrences.Set;
+      List   : Occurrences.Vector;
    begin
       for File of Files loop
          Occurrences.Add (Set, Get_License (File.License), 1);
@@ -75,18 +69,26 @@ package body SPDX_Tool.Reports is
          Total  : constant Natural := Occurrences.Sum (List, 0);
          Max    : constant PT.X_Type := PT.X_Type (Occurrences.Longest (List));
       begin
-         --  Writer.Set_Fill (Green, PT.Drivers.Texts.F_MED);
-         --  Writer.Set_Fill (Black, PT.Drivers.Texts.F_MED);
-         Writer.Set_Justify (Style1, PT.J_LEFT);
-         Writer.Set_Justify (Style2, PT.J_RIGHT);
-         Writer.Create_Field (Fields (1), Style1, 0.0);
-         Writer.Create_Field (Fields (2), Style2, 10.0);
-         Writer.Create_Field (Fields (3), Style2, 10.0);
-         Writer.Create_Field (Fields (4), Style2, 20.0);
-         Writer.Set_Bottom_Right_Padding (Fields (3), (W => 1, H => 0));
+         Writer.Create_Field (Fields (1), Styles.Title, 0.0);
+         Writer.Create_Field (Fields (2), Styles.Title, 10.0);
+         Writer.Create_Field (Fields (3), Styles.Title, 10.0);
+         Writer.Create_Field (Fields (4), Styles.Title, 20.0);
+         Writer.Set_Bottom_Right_Padding (Fields (3), (W => 2, H => 0));
          Writer.Set_Max_Dimension (Fields (1), (W => Max, H => 0));
+         Writer.Set_Justify (Fields (1), PT.J_LEFT);
+         Writer.Set_Justify (Fields (2), PT.J_RIGHT);
+         Writer.Set_Justify (Fields (3), PT.J_RIGHT);
 
          Writer.Layout_Fields (Fields);
+
+         Writer.Put (Fields (1), "License");
+         Writer.Put (Fields (2), "Count");
+         Writer.Put (Fields (3), "Ratio");
+         Writer.New_Line;
+
+         Writer.Set_Style (Fields (1), Styles.Default);
+         Writer.Set_Style (Fields (2), Styles.Default);
+         Writer.Set_Style (Fields (3), Styles.Default);
          for Item of List loop
             Writer.Put (Fields (1), Item.Item);
             Writer.Put (Fields (2), Item.Count'Image);
@@ -95,7 +97,8 @@ package body SPDX_Tool.Reports is
                               Value => Item.Count,
                               Min   => 0,
                               Max   => Total,
-                              Style1 => Green, Style2 => Black);
+                              Style1 => Styles.Marker,
+                              Style2 => Styles.Default);
             Writer.New_Line;
          end loop;
       end;
@@ -103,18 +106,13 @@ package body SPDX_Tool.Reports is
 
    --  Print the license used and their associated number of files.
    procedure Print_Files (Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration;
                           Files   : in SPDX_Tool.Infos.File_Map) is
       Set  : Occurrences.Set;
       List : Occurrences.Vector;
-
-      procedure List_Occurrences is
-         new Occurrences.List;
-
-      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Writer         : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       License_Fields : PT.Texts.Field_Array (1 .. 3);
       File_Fields    : PT.Texts.Field_Array (1 .. 2);
-      Style1 : constant PT.Style_Type := Writer.Create_Style (PT.Colors.White);
-      Style2 : constant PT.Style_Type := Writer.Create_Style (PT.Colors.White);
    begin
       for File of Files loop
          Occurrences.Add (Set, Get_License (File.License), 1);
@@ -123,16 +121,16 @@ package body SPDX_Tool.Reports is
       declare
          Max    : constant PT.X_Type := PT.X_Type (Occurrences.Longest (List));
       begin
-         Writer.Set_Justify (Style1, PT.J_LEFT);
-         Writer.Set_Justify (Style2, PT.J_RIGHT);
-         Writer.Create_Field (License_Fields (1), Style1, 0.0);
-         Writer.Create_Field (License_Fields (2), Style2, 20.0);
-         Writer.Create_Field (License_Fields (3), Style2, 20.0);
+         Writer.Create_Field (License_Fields (1), Styles.Title, 0.0);
+         Writer.Create_Field (License_Fields (2), Styles.Title, 20.0);
+         Writer.Create_Field (License_Fields (3), Styles.Title, 20.0);
          Writer.Set_Max_Dimension (License_Fields (1), (W => Max, H => 0));
+         Writer.Set_Justify (License_Fields (1), PT.J_LEFT);
+         Writer.Set_Justify (License_Fields (2), PT.J_RIGHT);
 
          Writer.Layout_Fields (License_Fields);
-         Writer.Create_Field (File_Fields (1), Style1, 0.0);
-         Writer.Create_Field (File_Fields (2), Style2, 0.0);
+         Writer.Create_Field (File_Fields (1), Styles.Default, 0.0);
+         Writer.Create_Field (File_Fields (2), Styles.Default, 0.0);
          Writer.Set_Max_Dimension (File_Fields (1), (W => 3, H => 0));
          Writer.Layout_Fields (File_Fields);
 

@@ -15,7 +15,9 @@ with Util.Log.Loggers;
 with Util.Strings;
 
 with PT.Drivers.Texts;
+with PT.Drivers.Texts.GNAT_IO;
 with PT.Texts;
+with PT.Colors;
 
 with SPDX_Tool.Infos;
 with SPDX_Tool.Licenses;
@@ -87,14 +89,21 @@ procedure SPDX_Tool.Main is
    end Setup;
 
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
+      Styles    : SPDX_Tool.Reports.Style_Configuration;
       Driver    : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Width => 80);
       Printer   : PT.Texts.Printer_Type := PT.Texts.Create (Driver);
    begin
+      Styles.Title := Driver.Create_Style (PT.Colors.White);
+      Styles.Default := Driver.Create_Style (PT.Colors.Grey);
+      Styles.Marker := Driver.Create_Style (PT.Colors.Green);
+      Driver.Set_Fill (Styles.Default, PT.Drivers.Texts.F_HLINE2);
+      Driver.Set_Fill (Styles.Marker, PT.Drivers.Texts.F_HLINE2);
+      Driver.Set_Flush (PT.Drivers.Texts.GNAT_IO.Flush'Access);
       if Opt_Check then
-         SPDX_Tool.Reports.Print_Licenses (Driver, Files);
+         SPDX_Tool.Reports.Print_Licenses (Driver, Styles, Files);
       end if;
       if Opt_Files then
-         SPDX_Tool.Reports.Print_Files (Driver, Files);
+         SPDX_Tool.Reports.Print_Files (Driver, Styles, Files);
       end if;
    end Print_Report;
 
