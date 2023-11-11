@@ -6,6 +6,7 @@ with "utilada_sys.gpr";
 with "utilada_unit.gpr";
 with "spdx_tool_config.gpr";
 with "printer-toolkit/printer_toolkitada";
+with "intl/intl.gpr";
 project Spdx_Tool is
 
    type Yes_No is ("yes", "no");
@@ -32,6 +33,12 @@ project Spdx_Tool is
    package Binder is
       for Switches ("Ada") use ("-Es"); --  Symbolic traceback
    end Binder;
+
+   package Linker is
+      for Default_Switches ("Ada") use Spdx_Tool_Config.Linker'Default_Switches ("Ada")
+      & Intl.Linker'Default_Switches ("Ada");
+
+   end Linker;
 
    package Builder is
       for Executable ("spdx_tool-main.adb") use "spdx-tool";
