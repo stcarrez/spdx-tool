@@ -25,11 +25,6 @@ package SPDX_Tool is
                            renames Util.Blobs.Create_Blob;
    Null_Buffer : constant Buffer_Ref := Util.Blobs.Null_Blob;
 
-   type Range_Index is record
-      First, Last : Buffer_Index := 0;
-   end record;
-   type Range_Array is array (Positive range <>) of Range_Index;
-
    type Comment_Type is (COMMENT_C, COMMENT_CPP, COMMENT_ADA);
 
    subtype UString is Ada.Strings.Unbounded.Unbounded_String;
