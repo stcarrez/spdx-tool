@@ -16,13 +16,11 @@ with Util.Strings;
 
 with PT.Drivers.Texts;
 with PT.Drivers.Texts.GNAT_IO;
-with PT.Texts;
 with PT.Colors;
 
 with SPDX_Tool.Infos;
 with SPDX_Tool.Licenses;
 with SPDX_Tool.Reports;
-with SPDX_Tool.Files;
 procedure SPDX_Tool.Main is
 
    package GC renames GNAT.Command_Line;
@@ -30,6 +28,9 @@ procedure SPDX_Tool.Main is
 
    use type GNAT.Strings.String_Access;
    use type AD.File_Kind;
+
+   procedure Setup;
+   procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map);
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Main");
@@ -95,7 +96,6 @@ procedure SPDX_Tool.Main is
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
       Styles    : SPDX_Tool.Reports.Style_Configuration;
       Driver    : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Width => 80);
-      Printer   : PT.Texts.Printer_Type := PT.Texts.Create (Driver);
    begin
       if not Opt_No_Color then
          Styles.Title := Driver.Create_Style (PT.Colors.White);
