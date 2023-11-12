@@ -28,3 +28,9 @@ disabled = true
 
 [[depends-on]]
 ansiada = "^1.0.0"
+
+[[depends-on]]
+intl = "^1.0.0"
+
+[[depends-on]]
+printer_toolkitada = "~0.1.0"
