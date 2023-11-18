@@ -26,6 +26,8 @@ package body SPDX_Tool.Files.Tests is
                        Test_Multiline_Comment'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (Ada)",
                        Test_Save_Ada'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (C)",
+                       Test_Save_C'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -171,5 +173,23 @@ package body SPDX_Tool.Files.Tests is
          Test    => Result,
          Message => "Invalid replacement");
    end Test_Save_Ada;
+
+   procedure Test_Save_C (T : in out Test) is
+      Path : constant String
+        := Util.Tests.Get_Path ("regtests/files/identify/apache-2.0-3.c");
+      Result : constant String
+        := Util.Tests.Get_Test_Path ("replace-apache-2.0.3.c");
+      Manager : File_Manager;
+      Info : File_Type (100);
+   begin
+      Manager.Open (Info, Path);
+      Manager.Save (Info, Result, 5, 15, "Apache-2.0");
+      T.Assert (Ada.Directories.Exists (Path), "File not created");
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/replace-apache-2.0.3.c"),
+         Test    => Result,
+         Message => "Invalid replacement");
+   end Test_Save_C;
 
 end SPDX_Tool.Files.Tests;

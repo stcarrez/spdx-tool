@@ -19,5 +19,6 @@ package SPDX_Tool.Files.Tests is
 
    --  Test reading and replacing Ada header comment.
    procedure Test_Save_Ada (T : in out Test);
+   procedure Test_Save_C (T : in out Test);
 
 end SPDX_Tool.Files.Tests;
