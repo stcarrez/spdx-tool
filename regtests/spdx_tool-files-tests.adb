@@ -53,6 +53,22 @@ package body SPDX_Tool.Files.Tests is
          Assert_Equals (T, SHELL_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
       end;
+
+      declare
+         Info : File_Type (100);
+      begin
+         Manager.Open (Info, Util.Tests.Get_Path
+                    ("regtests/files/identify/gnat-3.0.ads"));
+         Util.Tests.Assert_Equals (T, 24, Info.Count,
+                                   "Invalid number of lines");
+         Assert_Equals (T, ADA_COMMENT, Info.Cmt_Style,
+                        "Invalid comment style");
+
+         for I in 1 .. 24 loop
+            Assert_Equals (T, LINE_COMMENT, Info.Lines (I).Comment,
+                           "Invalid identification at" & I'Image);
+         end loop;
+      end;
    end Test_Open;
 
    --  ------------------------------
