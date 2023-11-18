@@ -34,6 +34,8 @@ package body SPDX_Tool.Files.Tests is
                        Test_Save_Shell'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (Tex)",
                        Test_Save_Tex'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (OCaml)",
+                       Test_Save_OCaml'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -298,5 +300,23 @@ package body SPDX_Tool.Files.Tests is
          Test    => Result,
          Message => "Invalid replacement");
    end Test_Save_Tex;
+
+   procedure Test_Save_OCaml (T : in out Test) is
+      Path : constant String
+        := Util.Tests.Get_Path ("regtests/files/identify/lgpl-2.1.ml");
+      Result : constant String
+        := Util.Tests.Get_Test_Path ("replace-lgpl-2.1.ml");
+      Manager : File_Manager;
+      Info : File_Type (100);
+   begin
+      Manager.Open (Info, Path);
+      Manager.Save (Info, Result, 11, 13, "LGPL-2.1");
+      T.Assert (Ada.Directories.Exists (Path), "File not created");
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/replace-lgpl-2.1.ml"),
+         Test    => Result,
+         Message => "Invalid replacement");
+   end Test_Save_OCaml;
 
 end SPDX_Tool.Files.Tests;
