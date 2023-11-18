@@ -93,9 +93,6 @@ private
    end record;
    type Language_Array is array (Comment_Index range <>) of Language_Type;
 
-   function Find_Comment_Style (Data : in Buffer_Accessor;
-                                From : in Buffer_Index) return Comment_Info;
-
    type Identifier is tagged limited null record;
 
    procedure Identify (Plugin : in Identifier;

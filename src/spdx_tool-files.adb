@@ -65,25 +65,6 @@ package body SPDX_Tool.Files is
       Util.Measures.Write (Perf, "Perf", Ada.Text_IO.Standard_Output);
    end Report;
 
-   function Find_Comment_Style (Data : in Buffer_Accessor;
-                                From : in Buffer_Index) return Comment_Info is
-      Last : constant Buffer_Index := Data.Data'Last;
-   begin
-      for Index in Line_Comments'Range loop
-         declare
-            Comment : Language_Type renames Line_Comments (Index);
-            Cmt : constant Buffer_Accessor := Comment.Comment_Start.Value;
-         begin
-            if From + Cmt.Len <= Last
-              and then Data.Data (From .. From + Cmt.Len - 1) = Cmt.Data
-            then
-               return (Comment.Style, From + Cmt.Len, From, From, Index, LINE_COMMENT);
-            end if;
-         end;
-      end loop;
-      return (NO_COMMENT, others => <>);
-   end Find_Comment_Style;
-
    procedure Find_Comment (Buffer : in Buffer_Type;
                            From   : in Buffer_Index;
                            Last   : in Buffer_Index;
@@ -270,7 +251,7 @@ package body SPDX_Tool.Files is
          end if;
          Write_Comment (Output, File.Lines (First).Style.Style,
                         "SPDX-License-Identifier: " & License);
-         First_Pos := File.Lines (Last).Style.Last;
+         First_Pos := File.Lines (Last).Style.Last + 1;
       else
          First_Pos := File.Lines (First).Style.Start;
          if First_Pos > Pos then
