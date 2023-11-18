@@ -80,17 +80,55 @@ package body SPDX_Tool.Files.Tests is
 
          Assert_Equals (T, BLOCK_COMMENT, Info.Lines (2).Comment,
                         "Invalid identification at 2");
-         Assert_Equals (T, 34, Info.Lines (2).Style.Start,
+         Assert_Equals (T, 37, Info.Lines (2).Style.Start,
                         "Invalid start at 2");
          Assert_Equals (T, 90, Info.Lines (2).Style.Last,
                         "Invalid last at 2");
 
          Assert_Equals (T, END_COMMENT, Info.Lines (15).Comment,
                         "Invalid identification at 15");
-         Assert_Equals (T, 662, Info.Lines (15).Style.Start,
+         Assert_Equals (T, 665, Info.Lines (15).Style.Start,
                         "Invalid start at 15");
          Assert_Equals (T, 738, Info.Lines (15).Style.Last,
                         "Invalid last at 25");
+      end;
+
+      declare
+         Info : File_Type (100);
+      begin
+         Manager.Open (Info, Util.Tests.Get_Path
+                    ("regtests/files/identify/apache-2.0-3.c"));
+         Util.Tests.Assert_Equals (T, 16, Info.Count,
+                                   "Invalid number of lines");
+         Assert_Equals (T, C_COMMENT, Info.Cmt_Style,
+                        "Invalid comment style");
+         Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
+                        "Invalid identification at 1");
+         Assert_Equals (T, 3, Info.Lines (1).Style.Start,
+                        "Invalid start at 1");
+         Assert_Equals (T, 39, Info.Lines (1).Style.Last,
+                        "Invalid last at 1");
+
+         Assert_Equals (T, BLOCK_COMMENT, Info.Lines (2).Comment,
+                        "Invalid identification at 2");
+         Assert_Equals (T, 45, Info.Lines (2).Style.Start,
+                        "Invalid start at 2");
+         Assert_Equals (T, 102, Info.Lines (2).Style.Last,
+                        "Invalid last at 2");
+
+         Assert_Equals (T, BLOCK_COMMENT, Info.Lines (15).Comment,
+                        "Invalid identification at 15");
+         Assert_Equals (T, 699, Info.Lines (15).Style.Start,
+                        "Invalid start at 15");
+         Assert_Equals (T, 728, Info.Lines (15).Style.Last,
+                        "Invalid last at 15");
+
+         Assert_Equals (T, END_COMMENT, Info.Lines (16).Comment,
+                        "Invalid identification at 16");
+         Assert_Equals (T, 731, Info.Lines (16).Style.Start,
+                        "Invalid start at 16");
+         Assert_Equals (T, 731, Info.Lines (16).Style.Last,
+                        "Invalid last at 16");
       end;
    end Test_Multiline_Comment;
 
