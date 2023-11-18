@@ -22,5 +22,6 @@ package SPDX_Tool.Files.Tests is
    procedure Test_Save_C (T : in out Test);
    procedure Test_Save_CPP (T : in out Test);
    procedure Test_Save_Shell (T : in out Test);
+   procedure Test_Save_Tex (T : in out Test);
 
 end SPDX_Tool.Files.Tests;
