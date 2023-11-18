@@ -14,4 +14,7 @@ package SPDX_Tool.Files.Tests is
    --  Test reading a file, identifying lines and comments.
    procedure Test_Open (T : in out Test);
 
+   --  Test reading a file with multiline comments.
+   procedure Test_Multiline_Comment (T : in out Test);
+
 end SPDX_Tool.Files.Tests;
