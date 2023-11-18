@@ -20,6 +20,14 @@ package body SPDX_Tool.Files is
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Files");
 
+   procedure Find_Comment (Buffer : in Buffer_Type;
+                           From   : in Buffer_Index;
+                           Last   : in Buffer_Index;
+                           Result : out Comment_Info);
+   function Find_End_Comment (Buffer   : in Buffer_Type;
+                              From     : in Buffer_Index;
+                              Last     : in Buffer_Index;
+                              Language : in Language_Type) return Buffer_Index;
    procedure Write_Comment (File    : in out Util.Streams.Output_Stream'Class;
                             Style   : in Comment_Style;
                             Comment : in String);
@@ -39,10 +47,6 @@ package body SPDX_Tool.Files is
        Is_Block      => False),
       (Style         => LATEX_COMMENT,
        Comment_Start => Create_Buffer ("%"),
-       Comment_End   => Null_Buffer,
-       Is_Block      => False),
-      (Style         => M4_COMMENT,
-       Comment_Start => Create_Buffer ("dnl"),
        Comment_End   => Null_Buffer,
        Is_Block      => False)
      );
@@ -232,9 +236,6 @@ package body SPDX_Tool.Files is
 
          when LATEX_COMMENT =>
             File.Write ("% ");
-
-         when M4_COMMENT =>
-            File.Write ("dnl ");
 
          when CPP_COMMENT =>
             File.Write ("// ");

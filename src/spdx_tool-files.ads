@@ -22,7 +22,6 @@ package SPDX_Tool.Files is
                           C_COMMENT,
                           CPP_COMMENT,
                           SHELL_COMMENT,
-                          M4_COMMENT,
                           LATEX_COMMENT,
                           XML_COMMENT,
                           OCAML_COMMENT);
