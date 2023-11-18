@@ -64,6 +64,10 @@ package body SPDX_Tool.Files is
 
    Perf : Util.Measures.Measure_Set;
 
+   function Block_Comment_Length (Index : Comment_Index) return Natural is
+     (Natural (Block_Comments (Index).Comment_Start.Value.Len
+      + Block_Comments (Index).Comment_End.Value.Len));
+
    procedure Report is
    begin
       Util.Measures.Write (Perf, "Perf", Ada.Text_IO.Standard_Output);
@@ -241,6 +245,33 @@ package body SPDX_Tool.Files is
       File.Write (Comment);
    end Write_Comment;
 
+   procedure Boxed_License (Lines  : in Line_Array;
+                            Buffer : in Buffer_Type;
+                            First  : in Positive;
+                            Last   : in Positive;
+                            Spaces : out Natural;
+                            Boxed  : out Boolean;
+                            Length : out Natural) is
+      Line_Length : constant Buffer_Size :=
+        Lines (First).Line_End - Lines (First).Line_Start;
+      Pos : Buffer_Index;
+   begin
+      Spaces := 0;
+      Boxed := False;
+      Length := Natural (Line_Length);
+      for I in First .. Last loop
+         if Lines (I).Line_End - Lines (I).Line_Start /= Line_Length then
+            return;
+         end if;
+         Pos := Skip_Spaces (Buffer, Lines (I).Style.Start, Lines (I).Style.Last);
+         if Pos /= Lines (I).Style.Start then
+            Spaces := Spaces + Natural (Pos - Lines (I).Style.Start);
+         end if;
+      end loop;
+      Spaces := Spaces / (Last - First);
+      Boxed := True;
+   end Boxed_License;
+
    procedure Save (Manager : in File_Manager;
                    File    : in out File_Type;
                    Path    : in String;
@@ -252,6 +283,9 @@ package body SPDX_Tool.Files is
       Pos       : constant Buffer_Index := Buf.Data'First;
       Output    : Util.Streams.Files.File_Stream;
       First_Pos : Buffer_Index;
+      Spaces    : Natural;
+      Is_Boxed  : Boolean;
+      Length    : Natural;
    begin
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
       if File.Lines (First).Comment = LINE_COMMENT then
@@ -262,6 +296,30 @@ package body SPDX_Tool.Files is
          Write_Comment (Output, File.Lines (First).Style.Style,
                         "SPDX-License-Identifier: " & License);
          First_Pos := File.Lines (Last).Style.Last + 1;
+      elsif File.Lines (First).Comment = LINE_BLOCK_COMMENT then
+         First_Pos := File.Lines (First).Style.Start;
+         if First_Pos > Pos then
+            Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
+         end if;
+         Boxed_License (File.Lines, Buf.Data, First, Last, Spaces,
+                        Is_Boxed, Length);
+         if Is_Boxed then
+            Length := Length - Spaces;
+            while Spaces > 0 loop
+               Output.Write (" ");
+               Spaces := Spaces - 1;
+            end loop;
+         end if;
+         Output.Write ("SPDX-License-Identifier: " & License);
+         if Is_Boxed then
+            Spaces := Length - License'Length - String '("SPDX-License-Identifier: ")'Length;
+            Spaces := Spaces - Block_Comment_Length (File.Lines (Last).Style.Index) + 1;
+            while Spaces > 0 loop
+               Output.Write (" ");
+               Spaces := Spaces - 1;
+            end loop;
+         end if;
+         First_Pos := File.Lines (Last).Style.Last - 1;
       else
          First_Pos := File.Lines (First).Style.Start;
          if First_Pos > Pos then

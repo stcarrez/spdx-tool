@@ -108,4 +108,14 @@ private
    overriding
    procedure Finalize (Manager : in out File_Manager);
 
+   --  Check if the license is using some boxed presentation.
+   procedure Boxed_License (Lines  : in Line_Array;
+                            Buffer : in Buffer_Type;
+                            First  : in Positive;
+                            Last   : in Positive;
+                            Spaces : out Natural;
+                            Boxed  : out Boolean;
+                            Length : out Natural) with
+     Pre => First < Last;
+
 end SPDX_Tool.Files;
