@@ -24,10 +24,12 @@ package SPDX_Tool.Files is
                           SHELL_COMMENT,
                           M4_COMMENT,
                           LATEX_COMMENT,
-                          XML_COMMENT);
+                          XML_COMMENT,
+                          OCAML_COMMENT);
 
    type Comment_Mode is (NO_COMMENT,
                          LINE_COMMENT,
+                         LINE_BLOCK_COMMENT,
                          START_COMMENT,
                          BLOCK_COMMENT,
                          END_COMMENT);

@@ -55,6 +55,10 @@ package body SPDX_Tool.Files is
       (Style         => XML_COMMENT,
        Comment_Start => Create_Buffer ("<!--"),
        Comment_End   => Create_Buffer ("-->"),
+       Is_Block      => True),
+      (Style         => OCAML_COMMENT,
+       Comment_Start => Create_Buffer ("(*"),
+       Comment_End   => Create_Buffer ("*)"),
        Is_Block      => True)
      );
 
@@ -179,6 +183,12 @@ package body SPDX_Tool.Files is
                end if;
             else
                Find_Comment (Buf.Data, First, Pos, Style);
+               if Style.Mode = START_COMMENT then
+                  Last := Find_End_Comment (Buf.Data, First, Pos, Block_Comments (Style.Index));
+                  if Last > First then
+                     Style.Mode := LINE_BLOCK_COMMENT;
+                  end if;
+               end if;
             end if;
             File.Lines (Line_No).Style := Style;
             if Style.Style /= NO_COMMENT then
