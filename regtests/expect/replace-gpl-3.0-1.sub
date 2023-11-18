@@ -1,0 +1,11 @@
+#! /bin/sh
+# Configuration validation subroutine script.
+#   Copyright 1992-2022 Free Software Foundation, Inc.
+
+# shellcheck disable=SC2006,SC2268 # see below for rationale
+
+timestamp='2022-01-03'
+
+# SPDX-License-Identifier: GPL-3.0
+
+
