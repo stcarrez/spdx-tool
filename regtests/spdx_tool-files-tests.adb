@@ -173,6 +173,37 @@ package body SPDX_Tool.Files.Tests is
          Assert_Equals (T, 731, Info.Lines (16).Style.Last,
                         "Invalid last at 16");
       end;
+
+      declare
+         Info : File_Type (100);
+      begin
+         Manager.Open (Info, Util.Tests.Get_Path
+                    ("regtests/files/identify/lgpl-2.1.ml"));
+         Util.Tests.Assert_Equals (T, 16, Info.Count,
+                                   "Invalid number of lines");
+         Assert_Equals (T, OCAML_COMMENT, Info.Cmt_Style,
+                        "Invalid comment style");
+         Assert_Equals (T, LINE_BLOCK_COMMENT, Info.Lines (1).Comment,
+                        "Invalid identification at 1");
+         Assert_Equals (T, 3, Info.Lines (1).Style.Start,
+                        "Invalid start at 1");
+         Assert_Equals (T, 76, Info.Lines (1).Style.Last,
+                        "Invalid last at 1");
+
+         Assert_Equals (T, LINE_BLOCK_COMMENT, Info.Lines (2).Comment,
+                        "Invalid identification at 2");
+         Assert_Equals (T, 80, Info.Lines (2).Style.Start,
+                        "Invalid start at 2");
+         Assert_Equals (T, 153, Info.Lines (2).Style.Last,
+                        "Invalid last at 2");
+
+         Assert_Equals (T, LINE_BLOCK_COMMENT, Info.Lines (15).Comment,
+                        "Invalid identification at 15");
+         Assert_Equals (T, 1081, Info.Lines (15).Style.Start,
+                        "Invalid start at 15");
+         Assert_Equals (T, 1154, Info.Lines (15).Style.Last,
+                        "Invalid last at 15");
+      end;
    end Test_Multiline_Comment;
 
    --  ------------------------------
