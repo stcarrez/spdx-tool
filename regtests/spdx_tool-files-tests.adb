@@ -74,6 +74,22 @@ package body SPDX_Tool.Files.Tests is
                            "Invalid identification at" & I'Image);
          end loop;
       end;
+
+      declare
+         Info : File_Type (100);
+      begin
+         Manager.Open (Info, Util.Tests.Get_Path
+                    ("regtests/files/identify/gpl-2.0-1.C"));
+         Util.Tests.Assert_Equals (T, 35, Info.Count,
+                                   "Invalid number of lines");
+         Assert_Equals (T, CPP_COMMENT, Info.Cmt_Style,
+                        "Invalid comment style");
+
+         for I in 1 .. 35 loop
+            Assert_Equals (T, LINE_COMMENT, Info.Lines (I).Comment,
+                           "Invalid identification at" & I'Image);
+         end loop;
+      end;
    end Test_Open;
 
    --  ------------------------------
