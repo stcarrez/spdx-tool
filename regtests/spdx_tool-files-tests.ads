@@ -17,4 +17,7 @@ package SPDX_Tool.Files.Tests is
    --  Test reading a file with multiline comments.
    procedure Test_Multiline_Comment (T : in out Test);
 
+   --  Test reading and replacing Ada header comment.
+   procedure Test_Save_Ada (T : in out Test);
+
 end SPDX_Tool.Files.Tests;
