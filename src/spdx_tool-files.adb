@@ -6,6 +6,7 @@
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO;
 with Util.Log.Loggers;
+with Util.Files;
 with Util.Measures;
 with Interfaces.C.Strings;
 with SPDX_Tool.Files.Extensions;
@@ -262,13 +263,22 @@ package body SPDX_Tool.Files is
       First_Pos : Buffer_Index;
    begin
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
-      First_Pos := File.Lines (First).Style.Head;
-      if First_Pos > Pos then
-         Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
+      if File.Lines (First).Comment = LINE_COMMENT then
+         First_Pos := File.Lines (First).Style.Head;
+         if First_Pos > Pos then
+            Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
+         end if;
+         Write_Comment (Output, File.Lines (First).Style.Style,
+                        "SPDX-License-Identifier: " & License);
+         First_Pos := File.Lines (Last).Style.Last;
+      else
+         First_Pos := File.Lines (First).Style.Start;
+         if First_Pos > Pos then
+            Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
+         end if;
+         Output.Write ("SPDX-License-Identifier: " & License);
+         First_Pos := File.Lines (Last).Style.Last;
       end if;
-      Write_Comment (Output, File.Lines (First).Style.Style,
-                     "SPDX-License-Identifier: " & License);
-      First_Pos := File.Lines (Last).Style.Last;
       if First_Pos < File.Last_Offset then
          Output.Write (Buf.Data (First_Pos .. File.Last_Offset));
       end if;
@@ -276,7 +286,7 @@ package body SPDX_Tool.Files is
       --  Copy the rest of the file unmodified.
       Util.Streams.Copy (From => File.File, Into => Output);
       Output.Close;
-      --  Util.Files.Rename (Old_Name => Tmp_Path, New_Name => Path);
+      Util.Files.Rename (Old_Name => Tmp_Path, New_Name => Path);
    end Save;
 
    --  ------------------------------
