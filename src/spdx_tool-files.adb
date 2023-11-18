@@ -140,9 +140,6 @@ package body SPDX_Tool.Files is
       return From;
    end Find_End_Comment;
 
-   function Is_Comment_Presentation (C : Byte) return Boolean is
-      (C in Character'Pos ('*') | Character'Pos ('-'));
-
    procedure Open (Manager  : in File_Manager;
                    File     : in out File_Type;
                    Path     : in String) is
@@ -194,9 +191,8 @@ package body SPDX_Tool.Files is
                   Style.Mode := BLOCK_COMMENT;
                   Last := Pos;
                end if;
-               First := Skip_Spaces (Buf.Data, First, Last);
-               if First < Last and then Is_Comment_Presentation (Buf.Data (First)) then
-                  First := Skip_Spaces (Buf.Data, First + 1, Last);
+               if First < Last then
+                  First := Skip_Presentation (Buf.Data, First, Last);
                   Style.Start := First;
                end if;
             else

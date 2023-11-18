@@ -64,10 +64,27 @@ private
    function Is_Eol (C : Byte)
                       return Boolean is (C in CR | LF);
 
+   function Is_Comment_Presentation (C : Byte) return Boolean is
+      (C in Character'Pos ('*') | Character'Pos ('-') | Character'Pos ('+'));
+
    --  Find index of the first non white space after first and up to last.
    function Skip_Spaces (Buffer : in Buffer_Type;
                          First  : in Buffer_Index;
                          Last   : in Buffer_Index) return Buffer_Index
+     with Pre => First <= Last and then First >= Buffer'First
+     and then Last <= Buffer'Last;
+
+   --  Skip an optional presentation marker at beginning of a line.
+   --  Presentation markers include '*', '-' and may be repeated several times.
+   --  Then, spaces are skipped.  Example of presentation:
+   --    *
+   --    **
+   --    *-*
+   --    **
+   --    --
+   function Skip_Presentation (Buffer : in Buffer_Type;
+                               First  : in Buffer_Index;
+                               Last   : in Buffer_Index) return Buffer_Index
      with Pre => First <= Last and then First >= Buffer'First
      and then Last <= Buffer'Last;
 
