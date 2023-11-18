@@ -28,6 +28,8 @@ package body SPDX_Tool.Files.Tests is
                        Test_Save_Ada'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (C)",
                        Test_Save_C'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (C++)",
+                       Test_Save_CPP'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -207,5 +209,23 @@ package body SPDX_Tool.Files.Tests is
          Test    => Result,
          Message => "Invalid replacement");
    end Test_Save_C;
+
+   procedure Test_Save_CPP (T : in out Test) is
+      Path : constant String
+        := Util.Tests.Get_Path ("regtests/files/identify/gpl-2.0-1.C");
+      Result : constant String
+        := Util.Tests.Get_Test_Path ("replace-gpl-2.0-1.C");
+      Manager : File_Manager;
+      Info : File_Type (100);
+   begin
+      Manager.Open (Info, Path);
+      Manager.Save (Info, Result, 12, 27, "GPL-2.0");
+      T.Assert (Ada.Directories.Exists (Path), "File not created");
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/replace-gpl-2.0-1.C"),
+         Test    => Result,
+         Message => "Invalid replacement");
+   end Test_Save_CPP;
 
 end SPDX_Tool.Files.Tests;
