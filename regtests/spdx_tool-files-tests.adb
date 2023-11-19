@@ -212,6 +212,44 @@ package body SPDX_Tool.Files.Tests is
          Assert_Equals (T, 1154, Info.Lines (15).Style.Last,
                         "Invalid last at 15");
       end;
+
+      declare
+         Info : File_Type (100);
+      begin
+         Manager.Open (Info, Util.Tests.Get_Path
+                    ("regtests/files/identify/lgpl-2.1.java"));
+         Util.Tests.Assert_Equals (T, 18, Info.Count,
+                                   "Invalid number of lines");
+         Assert_Equals (T, C_COMMENT, Info.Cmt_Style,
+                        "Invalid comment style");
+         Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
+                        "Invalid identification at 1");
+         Assert_Equals (T, 3, Info.Lines (1).Style.Start,
+                        "Invalid start at 1");
+         Assert_Equals (T, 2, Info.Lines (1).Style.Last,
+                        "Invalid last at 1");
+
+         Assert_Equals (T, BLOCK_COMMENT, Info.Lines (2).Comment,
+                        "Invalid identification at 2");
+         Assert_Equals (T, 8, Info.Lines (2).Style.Start,
+                        "Invalid start at 2");
+         Assert_Equals (T, 30, Info.Lines (2).Style.Last,
+                        "Invalid last at 2");
+
+         Assert_Equals (T, BLOCK_COMMENT, Info.Lines (3).Comment,
+                        "Invalid identification at 3");
+         Assert_Equals (T, 36, Info.Lines (3).Style.Start,
+                        "Invalid start at 3");
+         Assert_Equals (T, 68, Info.Lines (3).Style.Last,
+                        "Invalid last at 3");
+
+         Assert_Equals (T, END_COMMENT, Info.Lines (18).Comment,
+                        "Invalid identification at 18");
+         Assert_Equals (T, 806, Info.Lines (18).Style.Start,
+                        "Invalid start at 18");
+         Assert_Equals (T, 806, Info.Lines (18).Style.Last,
+                        "Invalid last at 18");
+      end;
    end Test_Multiline_Comment;
 
    --  ------------------------------
