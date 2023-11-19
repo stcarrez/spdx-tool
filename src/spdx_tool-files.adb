@@ -36,6 +36,10 @@ package body SPDX_Tool.Files is
        Comment_End   => Null_Buffer,
        Is_Block      => False),
       (Style         => LATEX_COMMENT,
+       Comment_Start => Create_Buffer ("%%"),
+       Comment_End   => Null_Buffer,
+       Is_Block      => False),
+      (Style         => LATEX_COMMENT,
        Comment_Start => Create_Buffer ("%"),
        Comment_End   => Null_Buffer,
        Is_Block      => False)
