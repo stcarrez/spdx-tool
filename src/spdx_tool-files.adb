@@ -258,19 +258,23 @@ package body SPDX_Tool.Files is
       Pos : Buffer_Index;
    begin
       Spaces := 0;
-      Boxed := False;
+      Boxed := True;
       Length := Natural (Line_Length);
       for I in First .. Last loop
          if Lines (I).Line_End - Lines (I).Line_Start /= Line_Length then
-            return;
+            Boxed := False;
          end if;
-         Pos := Skip_Spaces (Buffer, Lines (I).Style.Start, Lines (I).Style.Last);
-         if Pos /= Lines (I).Style.Start then
-            Spaces := Spaces + Natural (Pos - Lines (I).Style.Start);
+         if Lines (I).Style.Start < Lines (I).Style.Last then
+            Pos := Skip_Spaces (Buffer, Lines (I).Style.Start, Lines (I).Style.Last);
+            if Pos /= Lines (I).Style.Start then
+               Spaces := Spaces + Natural (Pos - Lines (I).Style.Start);
+            end if;
          end if;
       end loop;
-      Spaces := Spaces / (Last - First);
-      Boxed := True;
+      Spaces := (Spaces + Last - First) / (Last - First + 1);
+      if Length > Spaces then
+         Length := Length - Spaces;
+      end if;
    end Boxed_License;
 
    procedure Save (Manager : in File_Manager;
@@ -289,36 +293,19 @@ package body SPDX_Tool.Files is
       Length    : Natural;
    begin
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
+      Boxed_License (File.Lines, Buf.Data, First, Last, Spaces, Is_Boxed, Length);
+
       if File.Lines (First).Comment = LINE_COMMENT then
-         First_Pos := File.Lines (First).Style.Head;
-         if First_Pos > Pos then
-            Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
-         end if;
-         Write_Comment (Output, File.Lines (First).Style.Style,
-                        "SPDX-License-Identifier: " & License);
-         First_Pos := File.Lines (Last).Style.Last + 1;
-      elsif File.Lines (First).Comment = LINE_BLOCK_COMMENT then
          First_Pos := File.Lines (First).Style.Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
-         Boxed_License (File.Lines, Buf.Data, First, Last, Spaces,
-                        Is_Boxed, Length);
-         if Is_Boxed then
-            Length := Length - Spaces;
-            while Spaces > 0 loop
-               Output.Write (" ");
-               Spaces := Spaces - 1;
-            end loop;
-         end if;
-         Output.Write ("SPDX-License-Identifier: " & License);
-         if Is_Boxed then
-            Spaces := Length - License'Length - String '("SPDX-License-Identifier: ")'Length;
-            Spaces := Spaces - Block_Comment_Length (File.Lines (Last).Style.Index) + 1;
-            while Spaces > 0 loop
-               Output.Write (" ");
-               Spaces := Spaces - 1;
-            end loop;
+         First_Pos := File.Lines (Last).Style.Last + 1;
+
+      elsif File.Lines (First).Comment = LINE_BLOCK_COMMENT then
+         First_Pos := File.Lines (First).Style.Start;
+         if First_Pos > Pos then
+            Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
          First_Pos := File.Lines (Last).Style.Last - 1;
       else
@@ -326,9 +313,25 @@ package body SPDX_Tool.Files is
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
-         Output.Write ("SPDX-License-Identifier: " & License);
-         First_Pos := File.Lines (Last).Style.Last;
+         First_Pos := File.Lines (Last).Style.Last + 1;
       end if;
+
+      if Spaces > 0 then
+         while Spaces > 0 loop
+            Output.Write (" ");
+            Spaces := Spaces - 1;
+         end loop;
+      end if;
+      Output.Write ("SPDX-License-Identifier: " & License);
+      if Is_Boxed then
+         Spaces := Length - License'Length - String '("SPDX-License-Identifier: ")'Length;
+         Spaces := Spaces - Block_Comment_Length (File.Lines (Last).Style.Index) + 1;
+         while Spaces > 0 loop
+            Output.Write (" ");
+            Spaces := Spaces - 1;
+         end loop;
+      end if;
+
       if First_Pos < File.Last_Offset then
          Output.Write (Buf.Data (First_Pos .. File.Last_Offset));
       end if;
