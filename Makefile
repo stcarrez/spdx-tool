@@ -1,4 +1,5 @@
-MAKE_ARGS=-- -XBUILD=coverage
+BUILD=debug
+MAKE_ARGS=-- -XBUILD=$(BUILD)
 
 build:
 	alr build $(MAKE_ARGS)
