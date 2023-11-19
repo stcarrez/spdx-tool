@@ -1,0 +1,16 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--                         GNAT COMPILER COMPONENTS                         --
+--                                                                          --
+--                             P R J . T R E E                              --
+--                                                                          --
+--                                 S p e c                                  --
+--                                                                          --
+--          Copyright (C) 2001-2014, Free Software Foundation, Inc.         --
+--                                                                          --
+-- SPDX-License-Identifier: GPL-3.0                                         --
+--                                                                          --
+-- GNAT was originally developed  by the GNAT team at  New York University. --
+-- Extensive contributions were provided by Ada Core Technologies Inc.      --
+--                                                                          --
+------------------------------------------------------------------------------
