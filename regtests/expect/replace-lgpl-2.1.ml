@@ -8,7 +8,7 @@
 (*   Copyright 2002 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
 (*                                                                        *)
-(*    SPDX-License-Identifier: LGPL-2.1                                   *)
+(*   SPDX-License-Identifier: LGPL-2.1                                    *)
 (*                                                                        *)
 (**************************************************************************)
 
