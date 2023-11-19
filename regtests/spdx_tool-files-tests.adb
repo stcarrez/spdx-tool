@@ -40,6 +40,8 @@ package body SPDX_Tool.Files.Tests is
                        Test_Save_OCaml'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (Erlang)",
                        Test_Save_Erlang'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (Java)",
+                       Test_Save_Java'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -358,5 +360,23 @@ package body SPDX_Tool.Files.Tests is
          Test    => Result,
          Message => "Invalid replacement");
    end Test_Save_Erlang;
+
+   procedure Test_Save_Java (T : in out Test) is
+      Path : constant String
+        := Util.Tests.Get_Path ("regtests/files/identify/lgpl-2.1.java");
+      Result : constant String
+        := Util.Tests.Get_Test_Path ("replace-lgpl-2.1.java");
+      Manager : File_Manager;
+      Info : File_Type (100);
+   begin
+      Manager.Open (Info, Path);
+      Manager.Save (Info, Result, 5, 17, "LGPL-2.1");
+      T.Assert (Ada.Directories.Exists (Path), "File not created");
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/replace-lgpl-2.1.java"),
+         Test    => Result,
+         Message => "Invalid replacement");
+   end Test_Save_Java;
 
 end SPDX_Tool.Files.Tests;
