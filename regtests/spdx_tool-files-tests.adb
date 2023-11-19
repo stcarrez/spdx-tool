@@ -392,7 +392,7 @@ package body SPDX_Tool.Files.Tests is
       Info : File_Type (100);
    begin
       Manager.Open (Info, Path);
-      Manager.Save (Info, Result, 6, 20, "Apache-2.0");
+      Manager.Save (Info, Result, 6, 16, "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Path), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
