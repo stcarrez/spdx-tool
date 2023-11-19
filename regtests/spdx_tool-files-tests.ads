@@ -27,5 +27,6 @@ package SPDX_Tool.Files.Tests is
    procedure Test_Save_OCaml (T : in out Test);
    procedure Test_Save_Erlang (T : in out Test);
    procedure Test_Save_Java (T : in out Test);
+   procedure Test_Save_XHTML (T : in out Test);
 
 end SPDX_Tool.Files.Tests;
