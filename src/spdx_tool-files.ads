@@ -3,14 +3,10 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-with Ada.Finalization;
 
 with Util.Streams.Files;
-private with Magic;
+with SPDX_Tool.Magic;
 package SPDX_Tool.Files is
-
-   package AF renames Ada.Finalization;
-   procedure Report;
 
    type Identification is record
       Mime     : UString;
@@ -62,7 +58,7 @@ package SPDX_Tool.Files is
       Lines        : Line_Array (1 .. Max_Lines);
    end record;
 
-   type File_Manager is limited new AF.Limited_Controlled with private;
+   type File_Manager is tagged limited private;
    type File_Manager_Access is access all File_Manager;
 
    --  Initialize the file manager and prepare the libmagic library.
@@ -100,12 +96,9 @@ private
                        File   : in out File_Type;
                        Result : out Identification) is null;
 
-   type File_Manager is limited new AF.Limited_Controlled with record
-      Magic_Cookie : Magic.Magic_t;
+   type File_Manager is tagged limited record
+      Magic_Manager : Magic.Magic_Manager;
    end record;
-
-   overriding
-   procedure Finalize (Manager : in out File_Manager);
 
    --  Check if the license is using some boxed presentation.
    procedure Boxed_License (Lines  : in Line_Array;

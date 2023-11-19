@@ -4,18 +4,12 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Streams.Stream_IO;
-with Ada.Text_IO;
+
 with Util.Log.Loggers;
 with Util.Files;
 with Util.Measures;
-with Interfaces.C.Strings;
 with SPDX_Tool.Files.Extensions;
 package body SPDX_Tool.Files is
-
-   package ICS renames Interfaces.C.Strings;
-
-   use type Magic.Magic_t;
-   use type ICS.chars_ptr;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Files");
@@ -28,9 +22,6 @@ package body SPDX_Tool.Files is
                               From     : in Buffer_Index;
                               Last     : in Buffer_Index;
                               Language : in Language_Type) return Buffer_Index;
-   procedure Write_Comment (File    : in out Util.Streams.Output_Stream'Class;
-                            Style   : in Comment_Style;
-                            Comment : in String);
 
    Line_Comments : constant Language_Array :=
      ((Style         => ADA_COMMENT,
@@ -66,16 +57,9 @@ package body SPDX_Tool.Files is
        Is_Block      => True)
      );
 
-   Perf : Util.Measures.Measure_Set;
-
    function Block_Comment_Length (Index : Comment_Index) return Natural is
      (Natural (Block_Comments (Index).Comment_Start.Value.Len
       + Block_Comments (Index).Comment_End.Value.Len));
-
-   procedure Report is
-   begin
-      Util.Measures.Write (Perf, "Perf", Ada.Text_IO.Standard_Output);
-   end Report;
 
    procedure Find_Comment (Buffer : in Buffer_Type;
                            From   : in Buffer_Index;
@@ -150,26 +134,12 @@ package body SPDX_Tool.Files is
          Last    : Buffer_Index;
          Line_No : Natural := 0;
          Style   : Comment_Info := (NO_COMMENT, Mode => NO_COMMENT, others => <>);
-         R : Interfaces.C.Strings.chars_ptr;
       begin
          File.File.Read (Into => Buf.Data, Last => Len);
          File.Last_Offset := Len;
          if Len > 0 then
-            declare
-               S : Util.Measures.Stamp;
-            begin
-               R := Magic.Buffer (Manager.Magic_Cookie,
-                                  Buf.Data'Address, Interfaces.C.size_t (Len));
-               if R /= Interfaces.C.Strings.Null_Ptr then
-                  Util.Measures.Report (Perf, S, "magic_buffer");
-                  Log.Info ("{0}: {1}", Path, Interfaces.C.Strings.Value (R));
-                  File.Ident.Mime := To_UString (Interfaces.C.Strings.Value (R));
-               else
-                  Log.Info ("{0}: error {1}", Path,
-                         Magic.Errno (Manager.Magic_Cookie)'Image);
-                  File.Ident.Mime := To_UString ("unknown");
-               end if;
-            end;
+            File.Ident.Mime := To_UString
+              (Manager.Magic_Manager.Identify (Buf.Data (Buf.Data'First .. Len)));
          end if;
          while Pos <= Len loop
             First := Pos;
@@ -222,29 +192,6 @@ package body SPDX_Tool.Files is
          File.Count := Line_No;
       end;
    end Open;
-
-   procedure Write_Comment (File    : in out Util.Streams.Output_Stream'Class;
-                            Style   : in Comment_Style;
-                            Comment : in String) is
-   begin
-      case Style is
-         when ADA_COMMENT =>
-            File.Write ("--  ");
-
-         when SHELL_COMMENT =>
-            File.Write ("# ");
-
-         when LATEX_COMMENT =>
-            File.Write ("% ");
-
-         when CPP_COMMENT =>
-            File.Write ("// ");
-
-         when others =>
-            null;
-      end case;
-      File.Write (Comment);
-   end Write_Comment;
 
    procedure Boxed_License (Lines  : in Line_Array;
                             Buffer : in Buffer_Type;
@@ -357,36 +304,8 @@ package body SPDX_Tool.Files is
    --  ------------------------------
    procedure Initialize (Manager : in out File_Manager;
                          Path    : in String) is
-      E : Integer;
-      S : ICS.chars_ptr;
    begin
-      Manager.Magic_Cookie := Magic.Open (Magic.MAGIC_MIME);
-      if Manager.Magic_Cookie = null then
-         return;
-      end if;
-
-      S := ICS.New_String (Path);
-      E := Magic.Load (Manager.Magic_Cookie, S);
-      ICS.Free (S);
-      if E /= 0 then
-         S := Magic.Error (Manager.Magic_Cookie);
-         if S /= ICS.Null_Ptr then
-            Log.Error ("cannot load magic file {0}: {1}",
-                       Path, Interfaces.C.Strings.Value (S));
-         else
-            Log.Error ("cannot load magic file {0}",
-                       Path);
-         end if;
-      end if;
+      Manager.Magic_Manager.Initialize (Path);
    end Initialize;
-
-   overriding
-   procedure Finalize (Manager : in out File_Manager) is
-   begin
-      if Manager.Magic_Cookie /= null then
-         Magic.Close (Manager.Magic_Cookie);
-         Manager.Magic_Cookie := null;
-      end if;
-   end Finalize;
 
 end SPDX_Tool.Files;
