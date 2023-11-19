@@ -7,7 +7,6 @@ with Ada.Streams.Stream_IO;
 
 with Util.Log.Loggers;
 with Util.Files;
-with Util.Measures;
 with SPDX_Tool.Files.Extensions;
 package body SPDX_Tool.Files is
 
@@ -122,6 +121,8 @@ package body SPDX_Tool.Files is
                    File     : in out File_Type;
                    Path     : in String) is
    begin
+      Log.Debug ("Open file {0}", Path);
+
       File.File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
       File.Buffer := Create_Buffer (4096);
       File.Count := 0;
@@ -240,6 +241,8 @@ package body SPDX_Tool.Files is
       Is_Boxed  : Boolean;
       Length    : Natural;
    begin
+      Log.Info ("Writing license {0} in {1}", License, Path);
+
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
       Boxed_License (File.Lines, Buf.Data, First, Last, Spaces, Is_Boxed, Length);
 
