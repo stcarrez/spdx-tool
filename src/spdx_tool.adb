@@ -56,6 +56,9 @@ package body SPDX_Tool is
                                Last   : in Buffer_Index) return Buffer_Index is
       Pos : Buffer_Index := First;
    begin
+      if Is_Space (Buffer (Pos)) then
+         Pos := Skip_Spaces (Buffer, Pos, Last);
+      end if;
       while Pos <= Last and then Is_Comment_Presentation (Buffer (Pos)) loop
          Pos := Pos + 1;
       end loop;
