@@ -288,6 +288,7 @@ package body SPDX_Tool.Files is
       Pos       : constant Buffer_Index := Buf.Data'First;
       Output    : Util.Streams.Files.File_Stream;
       First_Pos : Buffer_Index;
+      Next_Pos  : Buffer_Index;
       Spaces    : Natural;
       Is_Boxed  : Boolean;
       Length    : Natural;
@@ -300,20 +301,29 @@ package body SPDX_Tool.Files is
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
-         First_Pos := File.Lines (Last).Style.Last + 1;
+         if Is_Boxed then
+            Next_Pos := File.Lines (Last).Style.Last;
+            while Next_Pos > First_Pos
+              and then not Is_Space (Buf.Data (Next_Pos - 1))
+            loop
+               Next_Pos := Next_Pos - 1;
+            end loop;
+         else
+            Next_Pos := File.Lines (Last).Style.Last + 1;
+         end if;
 
       elsif File.Lines (First).Comment = LINE_BLOCK_COMMENT then
          First_Pos := File.Lines (First).Style.Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
-         First_Pos := File.Lines (Last).Style.Last - 1;
+         Next_Pos := File.Lines (Last).Style.Last - 1;
       else
          First_Pos := File.Lines (First).Style.Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
-         First_Pos := File.Lines (Last).Style.Last + 1;
+         Next_Pos := File.Lines (Last).Style.Last + 1;
       end if;
 
       if Spaces > 0 then
@@ -332,8 +342,8 @@ package body SPDX_Tool.Files is
          end loop;
       end if;
 
-      if First_Pos < File.Last_Offset then
-         Output.Write (Buf.Data (First_Pos .. File.Last_Offset));
+      if Next_Pos < File.Last_Offset then
+         Output.Write (Buf.Data (Next_Pos .. File.Last_Offset));
       end if;
 
       --  Copy the rest of the file unmodified.
