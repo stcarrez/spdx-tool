@@ -57,6 +57,8 @@ private
    CR    : constant Byte := 16#0D#;
    SPACE : constant Byte := 16#20#;
    TAB   : constant Byte := 16#09#;
+   OPEN_PAREN  : constant Byte := Character'Pos ('(');
+   CLOSE_PAREN : constant Byte := Character'Pos (')');
 
    function Is_Space (C : Byte)
                       return Boolean is (C in SPACE | TAB | CR | LF);

@@ -79,7 +79,13 @@ package body SPDX_Tool.Files is
             if From + Cmt.Len <= Last
               and then Buffer (From .. From + Cmt.Len - 1) = Cmt.Data
             then
-               Result := (Comment.Style, From + Cmt.Len, From, From, Index, LINE_COMMENT);
+               Result := (Style   => Comment.Style,
+                          Start   => From + Cmt.Len,
+                          Last    => From,
+                          Head    => From,
+                          Trailer => 0,
+                          Index   => Index,
+                          Mode    => LINE_COMMENT);
                return;
             end if;
          end;
@@ -93,7 +99,13 @@ package body SPDX_Tool.Files is
                if Pos + Cmt.Len <= Last
                   and then Buffer (Pos .. Pos + Cmt.Len - 1) = Cmt.Data
                then
-                  Result := (Comment.Style, From + Cmt.Len, From, From, Index, START_COMMENT);
+                  Result := (Style   => Comment.Style,
+                             Start   => From + Cmt.Len,
+                             Last    => From,
+                             Head    => From,
+                             Trailer => 0,
+                             Index   => Index,
+                             Mode    => START_COMMENT);
                   return;
                end if;
             end;
@@ -156,6 +168,7 @@ package body SPDX_Tool.Files is
                Last := Find_End_Comment (Buf.Data, First, Pos, Block_Comments (Style.Index));
                if Last > First then
                   Style.Mode := END_COMMENT;
+                  Style.Trailer := Block_Comments (Style.Index).Comment_End.Value.Len;
                else
                   Style.Mode := BLOCK_COMMENT;
                   Last := Pos;
@@ -170,6 +183,7 @@ package body SPDX_Tool.Files is
                   Last := Find_End_Comment (Buf.Data, First, Pos, Block_Comments (Style.Index));
                   if Last > First then
                      Style.Mode := LINE_BLOCK_COMMENT;
+                     Style.Trailer := Block_Comments (Style.Index).Comment_End.Value.Len;
                   end if;
                end if;
             end if;

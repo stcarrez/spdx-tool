@@ -470,6 +470,47 @@ package body SPDX_Tool.Licenses is
       return GNAT.Regpat.Match (Token.Pattern, Item);
    end Matches;
 
+   function Extract_SPDX (Lines   : in SPDX_Tool.Files.Line_Array;
+                          Content : in Buffer_Type;
+                          Line    : in Positive;
+                          From    : in Buffer_Index) return Infos.License_Info is
+      Is_Boxed : Boolean;
+      Spaces, Length : Natural;
+      Pos  : Buffer_Index := From;
+      Last : Buffer_Index := Lines (Line).Style.Last;
+      Result  : Infos.License_Info;
+   begin
+      if Lines (Line).Comment = SPDX_Tool.Files.LINE_BLOCK_COMMENT then
+         Last := Last - Lines (Line).Style.Trailer;
+      end if;
+      if Lines'First = Lines'Last then
+         Is_Boxed := False;
+      else
+         SPDX_Tool.Files.Boxed_License (Lines, Content, Lines'First, Lines'Last,
+                                        Spaces, Is_Boxed, Length);
+      end if;
+      Pos := Skip_Spaces (Content, From, Last);
+      if Is_Boxed then
+         while Last > Pos and then not Is_Space (Content (Last)) loop
+            Last := Last - 1;
+         end loop;
+      end if;
+      while Last > Pos and then Is_Space (Content (Last)) loop
+         Last := Last - 1;
+      end loop;
+
+      --  Drop a possible parenthesis arround the SPDX license ex: '(...)'
+      if Content (Pos) = OPEN_PAREN and then Content (Last) = CLOSE_PAREN then
+         Pos := Pos + 1;
+         Last := Last - 1;
+      end if;
+      Result.First_Line := Line;
+      Result.Last_Line := Line;
+      Result.Name := To_UString (Content (Pos .. Last));
+      Result.Match := Infos.SPDX_LICENSE;
+      return Result;
+   end Extract_SPDX;
+
    function Find_License (Manager : in License_Manager;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
@@ -480,7 +521,6 @@ package body SPDX_Tool.Licenses is
       Result  : Infos.License_Info;
       Pos, Last, First : Buffer_Index;
       Next_Token : Token_Access;
-      Is_Boxed : Boolean;
    begin
       Result.First_Line := Line;
       while Line <= Lines'Last loop
@@ -492,26 +532,7 @@ package body SPDX_Tool.Licenses is
                if Pos <= Last then
                   First := Next_With (Content, Pos, SPDX_License_Tag);
                   if First > Pos then
-                     declare
-                        Spaces, Length : Natural;
-                     begin
-                        SPDX_Tool.Files.Boxed_License (Lines, Content, Lines'First, Lines'Last,
-                                                       Spaces, Is_Boxed, Length);
-                        Pos := Skip_Spaces (Content, First, Last);
-                        if Is_Boxed or else Lines(Line).Comment = SPDX_Tool.Files.LINE_BLOCK_COMMENT then
-                           while Last > Pos and then not Is_Space (Content (Last)) loop
-                              Last := Last - 1;
-                           end loop;
-                           while Last > Pos and then Is_Space (Content (Last)) loop
-                              Last := Last - 1;
-                           end loop;
-                        end if;
-                        Result.First_Line := Line;
-                        Result.Last_Line := Line;
-                        Result.Name := To_UString (Content (Pos .. Last));
-                        Result.Match := Infos.SPDX_LICENSE;
-                        return Result;
-                     end;
+                     return Extract_SPDX (Lines, Content, Line, First);
                   end if;
                end if;
             end if;
