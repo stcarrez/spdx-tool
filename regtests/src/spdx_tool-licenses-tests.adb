@@ -62,6 +62,7 @@ package body SPDX_Tool.Licenses.Tests is
    procedure Test_Find_License_SPDX (T : in out Test) is
    begin
       Check_License (T, "gpl-2.0-only-1.sh", "standard/LGPL-2.1+.txt", "GPL-2.0-only");
+      Check_License (T, "mit-2.c", "standard/LGPL-2.1+.txt", "MIT");
    end Test_Find_License_SPDX;
 
 end SPDX_Tool.Licenses.Tests;
