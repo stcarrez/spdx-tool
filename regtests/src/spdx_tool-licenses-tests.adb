@@ -21,6 +21,8 @@ package body SPDX_Tool.Licenses.Tests is
                        Test_Find_License_Fixed'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (variable)",
                        Test_Find_License_Var'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (SPDX)",
+                       Test_Find_License_SPDX'Access);
    end Add_Tests;
 
    procedure Check_License (T        : in out Test;
@@ -56,5 +58,10 @@ package body SPDX_Tool.Licenses.Tests is
       --  Check_License (T, "apache-2.0-2.ads", "standard/Apache-2.0.txt", "Apache-2.0");
       Check_License (T, "lgpl-2.1.c", "standard/LGPL-2.1+.txt", "LGPL-2.1+");
    end Test_Find_License_Var;
+
+   procedure Test_Find_License_SPDX (T : in out Test) is
+   begin
+      Check_License (T, "gpl-2.0-only-1.sh", "standard/LGPL-2.1+.txt", "GPL-2.0-only");
+   end Test_Find_License_SPDX;
 
 end SPDX_Tool.Licenses.Tests;

@@ -14,5 +14,6 @@ package SPDX_Tool.Licenses.Tests is
    --  Test Find_License with simple license files
    procedure Test_Find_License_Fixed (T : in out Test);
    procedure Test_Find_License_Var (T : in out Test);
+   procedure Test_Find_License_SPDX (T : in out Test);
 
 end SPDX_Tool.Licenses.Tests;
