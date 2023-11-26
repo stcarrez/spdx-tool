@@ -14,6 +14,7 @@ package SPDX_Tool.Reports is
       Default : PT.Style_Type;
       Marker1 : PT.Style_Type;
       Marker2 : PT.Style_Type;
+      With_Progress : Boolean := True;
    end record;
 
    --  Print the license used and their associated number of files.

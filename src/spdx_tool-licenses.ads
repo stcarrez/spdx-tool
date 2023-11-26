@@ -8,15 +8,11 @@ with Ada.Directories;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Vectors;
-with Ada.Strings.Hash;
-with Ada.Containers.Indefinite_Hashed_Maps;
 
 with GNAT.Strings;
 with GNAT.Regpat;
 
 with Util.Files.Walk;
-with SPDX_Tool.Files;
-with SPDX;
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
 private with Util.Executors;

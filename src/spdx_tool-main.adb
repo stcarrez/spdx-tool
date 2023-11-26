@@ -102,12 +102,14 @@ procedure SPDX_Tool.Main is
          Styles.Default := Driver.Create_Style (PT.Colors.White);
          Styles.Marker1 := Driver.Create_Style (PT.Colors.Green);
          Styles.Marker2 := Driver.Create_Style (PT.Colors.Grey);
+         Styles.With_Progress := True;
          Driver.Set_Font (Styles.Title, PT.F_BOLD);
       else
          Styles.Title := Driver.Create_Style;
          Styles.Default := Styles.Title;
          Styles.Marker1 := Styles.Title;
          Styles.Marker2 := Styles.Title;
+         Styles.With_Progress := False;
       end if;
       Driver.Set_Fill (Styles.Marker2, PT.Drivers.Texts.F_HLINE2);
       Driver.Set_Fill (Styles.Marker1, PT.Drivers.Texts.F_HLINE2);

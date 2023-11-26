@@ -3,7 +3,6 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-with Ada.Unchecked_Deallocation;
 with Ada.Streams.Stream_IO;
 
 with Util.Strings;
@@ -13,7 +12,6 @@ with Util.Serialize.IO.JSON;
 with Util.Log.Loggers;
 with Util.Streams.Files;
 
-with SPDX_Tool.Files;
 with SPDX_Tool.Licenses.Files;
 package body SPDX_Tool.Licenses is
 
@@ -665,10 +663,6 @@ package body SPDX_Tool.Licenses is
 
    overriding
    procedure Finalize (Manager : in out License_Manager) is
-      use type Executors.Executor_Manager_Access;
-      procedure Free is
-        new Ada.Unchecked_Deallocation (Object => Executor_Manager'Class,
-                                        Name   => Executor_Manager_Access);
    begin
       Log.Info ("License manager stopping, max fill {0}",
                 Util.Strings.Image (Manager.Max_Fill));
@@ -699,7 +693,7 @@ package body SPDX_Tool.Licenses is
    end Error;
 
    function Hash (Buf : in Buffer_Type) return Ada.Containers.Hash_Type is
-      H : Ada.Containers.Hash_Type := Buf'Length;
+      H : constant Ada.Containers.Hash_Type := Buf'Length;
    begin
       return H;
    end Hash;
@@ -728,8 +722,7 @@ package body SPDX_Tool.Licenses is
       procedure Add_Line (Line : in Buffer_Type; Line_Number : Positive) is
 
          procedure Process (Item : in out Line_Maps.Map) is
-            New_Line : Line_Stat (Len => Line'Length) := (Len => Line'Length, Count => 1, Content => Line);
-            Pos  : Line_Maps.Cursor := Item.Find (Line);
+            Pos  : constant Line_Maps.Cursor := Item.Find (Line);
          begin
             if Line_Maps.Has_Element (Pos) then
                Item.Replace_Element (Pos, Line_Maps.Element (Pos) + 1);
@@ -749,7 +742,6 @@ package body SPDX_Tool.Licenses is
       procedure Add_Header (File : in SPDX_Tool.Files.File_Type) is
          Buf     : constant Buffer_Accessor := File.Buffer.Value;
          Start, Last : Buffer_Index;
-         Pos : Line_Sets.Cursor;
       begin
          for Line in 1 .. File.Count loop
             if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
@@ -780,8 +772,8 @@ package body SPDX_Tool.Licenses is
             begin
                for Iter in Lines.Element (I).Iterate loop
                   declare
-                     Content : Buffer_Type := Line_Maps.Key (Iter);
-                     Count : Positive := Line_Maps.Element (Iter);
+                     Content : constant Buffer_Type := Line_Maps.Key (Iter);
+                     Count   : constant Positive := Line_Maps.Element (Iter);
                   begin
                      Stat.Include ((Len => Content'Length,
                                     Count => Count,
@@ -794,9 +786,9 @@ package body SPDX_Tool.Licenses is
          for I in L'Range loop
             if not L (I).Is_Empty then
                declare
-                  First : Line_Stat := L (I).First_Element;
-                  Last  : Line_Stat := L (I).Last_Element;
-                  S : String (1 .. Natural (First.Len));
+                  First : constant Line_Stat := L (I).First_Element;
+                  Last  : constant Line_Stat := L (I).Last_Element;
+                  S     : String (1 .. Natural (First.Len));
                   for S'Address use First.Content'Address;
                begin
                   Log.Info ("{0}|{1}|{2}", First.Count'Image, Last.Count'Image, S);

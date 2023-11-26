@@ -89,7 +89,6 @@ package body Util.Files.Walk is
                                   return Boolean is (Name = "**");
 
       First : Positive := Pattern'First;
-      Sep   : Natural;
       Exact : Boolean;
       Pos   : Natural;
       C     : Character;

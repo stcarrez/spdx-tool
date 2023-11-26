@@ -6,7 +6,6 @@
 
 with Util.Strings;
 with PT.Texts;
-with PT.Colors;
 with PT.Charts;
 with SCI.Occurrences;
 package body SPDX_Tool.Reports is
@@ -93,18 +92,22 @@ package body SPDX_Tool.Reports is
             Writer.Put (Fields (1), Item.Item);
             Writer.Put (Fields (2), Item.Count'Image);
             Writer.Put (Fields (3), Format_Percent (Item.Count, Total));
-            Draw_Percent_Bar (Chart, Writer.Get_Box (Fields (4)),
-                              Value => Item.Count,
-                              Min   => 0,
-                              Max   => Total,
-                              Style1 => Styles.Marker1,
-                              Style2 => Styles.Marker2);
+            if Styles.With_Progress then
+               Draw_Percent_Bar (Chart, Writer.Get_Box (Fields (4)),
+                                 Value => Item.Count,
+                                 Min   => 0,
+                                 Max   => Total,
+                                 Style1 => Styles.Marker1,
+                                 Style2 => Styles.Marker2);
+            end if;
             Writer.New_Line;
          end loop;
       end;
    end Print_Licenses;
 
+   --  ------------------------------
    --  Print the license used and their associated number of files.
+   --  ------------------------------
    procedure Print_Files (Printer : in out PT.Printer_Type'Class;
                           Styles  : in Style_Configuration;
                           Files   : in SPDX_Tool.Infos.File_Map) is
