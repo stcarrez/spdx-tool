@@ -80,6 +80,16 @@ package SPDX_Tool.Files is
                    Last    : in Natural;
                    License : in String);
 
+   --  Check if the license is using some boxed presentation.
+   procedure Boxed_License (Lines  : in Line_Array;
+                            Buffer : in Buffer_Type;
+                            First  : in Positive;
+                            Last   : in Positive;
+                            Spaces : out Natural;
+                            Boxed  : out Boolean;
+                            Length : out Natural) with
+     Pre => First < Last;
+
 private
 
    type Language_Type is record
@@ -99,15 +109,5 @@ private
    type File_Manager is tagged limited record
       Magic_Manager : Magic.Magic_Manager;
    end record;
-
-   --  Check if the license is using some boxed presentation.
-   procedure Boxed_License (Lines  : in Line_Array;
-                            Buffer : in Buffer_Type;
-                            First  : in Positive;
-                            Last   : in Positive;
-                            Spaces : out Natural;
-                            Boxed  : out Boolean;
-                            Length : out Natural) with
-     Pre => First < Last;
 
 end SPDX_Tool.Files;

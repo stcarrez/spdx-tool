@@ -480,6 +480,7 @@ package body SPDX_Tool.Licenses is
       Result  : Infos.License_Info;
       Pos, Last, First : Buffer_Index;
       Next_Token : Token_Access;
+      Is_Boxed : Boolean;
    begin
       Result.First_Line := Line;
       while Line <= Lines'Last loop
@@ -491,12 +492,26 @@ package body SPDX_Tool.Licenses is
                if Pos <= Last then
                   First := Next_With (Content, Pos, SPDX_License_Tag);
                   if First > Pos then
-                     Pos := Skip_Spaces (Content, First, Last);
-                     Result.First_Line := Line;
-                     Result.Last_Line := Line;
-                     Result.Name := To_UString (Content (Pos .. Last));
-                     Result.Match := Infos.SPDX_LICENSE;
-                     return Result;
+                     declare
+                        Spaces, Length : Natural;
+                     begin
+                        SPDX_Tool.Files.Boxed_License (Lines, Content, Lines'First, Lines'Last,
+                                                       Spaces, Is_Boxed, Length);
+                        Pos := Skip_Spaces (Content, First, Last);
+                        if Is_Boxed or else Lines(Line).Comment = SPDX_Tool.Files.LINE_BLOCK_COMMENT then
+                           while Last > Pos and then not Is_Space (Content (Last)) loop
+                              Last := Last - 1;
+                           end loop;
+                           while Last > Pos and then Is_Space (Content (Last)) loop
+                              Last := Last - 1;
+                           end loop;
+                        end if;
+                        Result.First_Line := Line;
+                        Result.Last_Line := Line;
+                        Result.Name := To_UString (Content (Pos .. Last));
+                        Result.Match := Infos.SPDX_LICENSE;
+                        return Result;
+                     end;
                   end if;
                end if;
             end if;
@@ -555,13 +570,22 @@ package body SPDX_Tool.Licenses is
          return Result;
       end if;
       while Line <= File.Count loop
-         Result := Find_License (Manager, Buf.Data,
-                                 File.Lines (Line .. File.Count));
-         exit when Result.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE;
+         if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
+            Result := Find_License (Manager, Buf.Data,
+                                    File.Lines (Line .. File.Count));
+            exit when Result.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE;
+         end if;
          Line := Line + 1;
       end loop;
       return Result;
    end Find_License;
+
+   --  Analyze the file to find license information in the header comment.
+   procedure Analyze (Manager  : in out License_Manager;
+                      Path     : in String) is
+   begin
+      Manager.Scan_File (Path);
+   end Analyze;
 
    procedure Analyze (Manager  : in out License_Manager;
                       File_Mgr : in out SPDX_Tool.Files.File_Manager;

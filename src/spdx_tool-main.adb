@@ -171,8 +171,7 @@ begin
             elsif AD.Kind (Arg) = AD.Directory then
                Manager.Scan (Arg, F);
             else
-               --  Manager.Analyze (Arg);
-               null;
+               Manager.Analyze (Arg);
             end if;
          end;
       end loop;

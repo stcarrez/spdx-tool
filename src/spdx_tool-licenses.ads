@@ -80,6 +80,10 @@ package SPDX_Tool.Licenses is
    function Get_Name (License : License_Type) return String;
    function Get_Template (License : License_Type) return String;
 
+   --  Analyze the file to find license information in the header comment.
+   procedure Analyze (Manager  : in out License_Manager;
+                      Path     : in String);
+
    --  Analyze the content to find license information in the header comment.
    procedure Analyze (Manager  : in out License_Manager;
                       File_Mgr : in out SPDX_Tool.Files.File_Manager;
