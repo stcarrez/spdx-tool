@@ -15,8 +15,8 @@ executables = ["spdx_tool_harness"]
 spdx_tool = "*"
 utilada_unit = "^2.6.0"
 
-# [configuration]
-# disabled = true
+[configuration]
+disabled = true
 
 [[pins]]
 spdx_tool = { path='..' }

@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
+with SPDX_Tool.Tests;
 with SPDX_Tool.Files.Tests;
 with SPDX_Tool.Licenses.Tests;
 package body SPDX_Tool.Testsuite is
@@ -12,6 +13,8 @@ package body SPDX_Tool.Testsuite is
 
    function Suite return Util.Tests.Access_Test_Suite is
    begin
+      --  Executed in reverse order
+      SPDX_Tool.Tests.Add_Tests (Tests'Access);
       SPDX_Tool.Licenses.Tests.Add_Tests (Tests'Access);
       SPDX_Tool.Files.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
