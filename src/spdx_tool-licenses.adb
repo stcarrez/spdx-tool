@@ -98,9 +98,11 @@ package body SPDX_Tool.Licenses is
                         Job     : in Job_Type;
                         Tasks   : in Task_Count) is
    begin
-      for I in Manager.File_Mgr'Range loop
-         Manager.File_Mgr (I).Initialize ("/usr/share/misc/magic");
-      end loop;
+      if Opt_Mimes then
+         for I in Manager.File_Mgr'Range loop
+            Manager.File_Mgr (I).Initialize ("/usr/share/misc/magic");
+         end loop;
+      end if;
       Manager.Job := Job;
       Manager.Manager := Manager'Unchecked_Access;
       Manager.Executor.Start;

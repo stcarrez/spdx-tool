@@ -50,6 +50,7 @@ private
    Opt_Check    : aliased Boolean := False;
    Opt_Update   : aliased Boolean := False;
    Opt_Files    : aliased Boolean := False;
+   Opt_Mimes    : aliased Boolean := False;
    Opt_No_Color : aliased Boolean := False;
    Opt_Tasks    : aliased Integer := 1;
 

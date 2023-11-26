@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------
 
 with Util.Streams.Files;
-with SPDX_Tool.Magic;
+with SPDX_Tool.Magic_Manager;
 package SPDX_Tool.Files is
 
    type Identification is record
@@ -108,7 +108,7 @@ private
                        Result : out Identification) is null;
 
    type File_Manager is tagged limited record
-      Magic_Manager : Magic.Magic_Manager;
+      Magic_Manager : SPDX_Tool.Magic_Manager.Magic_Manager;
    end record;
 
 end SPDX_Tool.Files;

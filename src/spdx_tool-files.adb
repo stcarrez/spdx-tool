@@ -154,9 +154,15 @@ package body SPDX_Tool.Files is
       begin
          File.File.Read (Into => Buf.Data, Last => Len);
          File.Last_Offset := Len;
-         if Len > 0 then
-            File.Ident.Mime := To_UString
-              (Manager.Magic_Manager.Identify (Buf.Data (Buf.Data'First .. Len)));
+         if Len > 0 and then Manager.Magic_Manager.Is_Initialized then
+            begin
+               File.Ident.Mime := To_UString
+                 (Manager.Magic_Manager.Identify (Buf.Data (Buf.Data'First .. Len)));
+
+            exception
+               when others =>
+                  Log.Error (-("cannot identify mime type for '{0}'"), Path);
+            end;
          end if;
          while Pos <= Len loop
             First := Pos;
@@ -326,7 +332,7 @@ package body SPDX_Tool.Files is
    procedure Initialize (Manager : in out File_Manager;
                          Path    : in String) is
    begin
-      Manager.Magic_Manager.Initialize (Path);
+      Magic_Manager.Initialize (Manager.Magic_Manager, Path);
    end Initialize;
 
 end SPDX_Tool.Files;
