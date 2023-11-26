@@ -20,9 +20,6 @@ utilada = "^2.6.0"
 [[depends-on]]
 spdx = "~0.2.0"
 
-[[depends-on]]
-utilada_unit = "^2.6.0"
-
 # [configuration]
 # disabled = true
 
