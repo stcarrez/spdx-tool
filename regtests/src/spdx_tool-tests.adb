@@ -17,8 +17,10 @@ package body SPDX_Tool.Tests is
    begin
       Caller.Add_Test (Suite, "Test SPDX_Tool.Usage",
                        Test_Usage'Access);
-      Caller.Add_Test (Suite, "Test SPDX_Tool.Scan",
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses",
                        Test_Report_Licenses'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Files",
+                       Test_Report_Files'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -39,5 +41,17 @@ package body SPDX_Tool.Tests is
       Util.Tests.Assert_Matches (T, ".*Apache-2.0.*[0-9]+.*100.0.*",
                                  Result, "Invalid result");
    end Test_Report_Licenses;
+
+   procedure Test_Report_Files (T : in out Test) is
+      Result : UString;
+   begin
+      T.Execute (Tool & " --no-color -f regtests/src", Result, 0);
+      Util.Tests.Assert_Matches (T, ".*Apache-2.0.*",
+                                 Result, "wrong license");
+      Util.Tests.Assert_Matches (T, ".*regtests/src/spdx_tool-files-tests.adb.*",
+                                 Result, "missing file");
+      Util.Tests.Assert_Matches (T, ".*regtests/src/spdx_tool-tests.ads.*",
+                                 Result, "missing file");
+   end Test_Report_Files;
 
 end SPDX_Tool.Tests;
