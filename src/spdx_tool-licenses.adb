@@ -605,16 +605,36 @@ package body SPDX_Tool.Licenses is
    --  ------------------------------
    --  Define the list of SPDX license names to ignore.
    --  ------------------------------
-   procedure Set_Ignored_Licenses (Manager : in out License_Manager;
-                                   List    : in String) is
+   procedure Set_Filter (Manager : in out License_Manager;
+                         List    : in String;
+                         Exclude : in Boolean) is
       procedure Process (Token : in String; Done : out Boolean);
       procedure Process (Token : in String; Done : out Boolean) is
       begin
-         Manager.Filters.Include (Token);
+         if Exclude then
+            Manager.Exclude_Filters.Include (Token);
+         else
+            Manager.Include_Filters.Include (Token);
+         end if;
       end Process;
    begin
       Util.Strings.Tokenizers.Iterate_Tokens (List, ",", Process'Access);
-   end Set_Ignored_Licenses;
+   end Set_Filter;
+
+   --  ------------------------------
+   --  Returns true if the license is filtered.
+   --  ------------------------------
+   function Is_Filtered (Manager : in License_Manager;
+                         Name    : in String) return Boolean is
+   begin
+      if Manager.Include_Filters.Contains (Name) then
+         return False;
+      end if;
+      if Manager.Exclude_Filters.Contains (Name) then
+         return True;
+      end if;
+      return not Manager.Include_Filters.Is_Empty;
+   end Is_Filtered;
 
    --  ------------------------------
    --  Analyze the file to find license information in the header comment.
@@ -637,7 +657,7 @@ package body SPDX_Tool.Licenses is
          declare
             Name : constant String := To_String (File.License.Name);
          begin
-            File.Filtered := Manager.Filters.Contains (Name);
+            File.Filtered := Manager.Is_Filtered (Name);
             if File.Filtered then
                Log.Info ("{0}: {1} (ignored)", File.Path, Name);
             else
@@ -665,17 +685,27 @@ package body SPDX_Tool.Licenses is
                end if;
             end loop;
             if Cmt_Count = 0 then
-               Log.Info ("{0} is {1}: {2} lines no comment", File.Path,
-                         To_String (Data.Ident.Mime),
-                         Util.Strings.Image (Data.Count));
-               Manager.Stats.Increment (To_String (Data.Ident.Mime));
+               File.Filtered := Manager.Is_Filtered (No_License);
+               if File.Filtered then
+                  Log.Info ("{0}: {1} (ignored)", File.Path, No_License);
+               else
+                  Log.Info ("{0} is {1}: {2} lines no comment", File.Path,
+                            To_String (Data.Ident.Mime),
+                            Util.Strings.Image (Data.Count));
+                  Manager.Stats.Increment (To_String (Data.Ident.Mime));
+               end if;
             else
-               Log.Info ("{0} is {1}: {2} lines {3} cmt", File.Path,
-                         To_String (Data.Ident.Mime),
-                         Util.Strings.Image (Data.Count),
-                         Util.Strings.Image (Cmt_Count));
-               Manager.Stats.Increment ("unknown " & To_String (Data.Ident.Mime));
-               Manager.Stats.Add_Header (Data);
+               File.Filtered := Manager.Is_Filtered (Unknown_License);
+               if File.Filtered then
+                  Log.Info ("{0}: {1} (ignored)", File.Path, Unknown_License);
+               else
+                  Log.Info ("{0} is {1}: {2} lines {3} cmt", File.Path,
+                            To_String (Data.Ident.Mime),
+                            Util.Strings.Image (Data.Count),
+                            Util.Strings.Image (Cmt_Count));
+                  Manager.Stats.Increment ("unknown " & To_String (Data.Ident.Mime));
+                  Manager.Stats.Add_Header (Data);
+               end if;
             end if;
          end;
       end if;

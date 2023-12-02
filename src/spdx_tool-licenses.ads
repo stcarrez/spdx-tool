@@ -23,9 +23,12 @@ package SPDX_Tool.Licenses is
    package UFW renames Util.Files.Walk;
 
    SPDX_License_Tag : constant String := "SPDX-License-Identifier:";
+   Unknown_License  : constant String := "Unknown";
+   No_License       : constant String := "None";
 
    License_Dir     : aliased GNAT.Strings.String_Access;
-   Filter_Licenses : aliased GNAT.Strings.String_Access;
+   Ignore_Licenses : aliased GNAT.Strings.String_Access;
+   Only_Licenses   : aliased GNAT.Strings.String_Access;
 
    package Count_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (Key_Type     => String,
@@ -79,8 +82,13 @@ package SPDX_Tool.Licenses is
    function Get_Template (License : License_Type) return String;
 
    --  Define the list of SPDX license names to ignore.
-   procedure Set_Ignored_Licenses (Manager : in out License_Manager;
-                                   List    : in String);
+   procedure Set_Filter (Manager : in out License_Manager;
+                         List    : in String;
+                         Exclude : in Boolean);
+
+   --  Returns true if the license is filtered.
+   function Is_Filtered (Manager : in License_Manager;
+                         Name    : in String) return Boolean;
 
    --  Analyze the file to find license information in the header comment.
    procedure Analyze (Manager  : in out License_Manager;
@@ -247,7 +255,8 @@ private
       File_Mgr : File_Manager_Array (1 .. Count);
       Executor : Executor_Manager (Count);
       Files    : SPDX_Tool.Infos.File_Map;
-      Filters  : Util.Strings.Sets.Set;
+      Include_Filters : Util.Strings.Sets.Set;
+      Exclude_Filters : Util.Strings.Sets.Set;
    end record;
 
    function Find_License (Manager : in License_Manager;

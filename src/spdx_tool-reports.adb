@@ -16,6 +16,9 @@ package body SPDX_Tool.Reports is
 
    procedure List_Occurrences is new Occurrences.List;
 
+   function Format_Percent (Dv    : in Natural;
+                            Value : in Natural) return String;
+
    function "-" (Left, Right : Natural) return PT.W_Type is
      (PT.W_Type (Natural '(Left - Right)));
 
@@ -31,9 +34,9 @@ package body SPDX_Tool.Reports is
       if Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          return To_String (Info.Name);
       elsif Info.Match = Infos.UNKNOWN_LICENSE then
-         return -("Unkown");
+         return -("Unknown");
       else
-         return -("No license");
+         return -("None");
       end if;
    end Get_License;
 
