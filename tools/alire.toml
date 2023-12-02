@@ -1,0 +1,23 @@
+# This is a crate
+name = "tools"
+description = "SPDX Tool"
+version = "0.1.0-dev"
+
+authors = ["ciceron"]
+maintainers = ["ciceron <Stephane.Carrez@gmail.com>"]
+maintainers-logins = ["stcarrez"]
+licenses = "Apache-2.0"
+website = ""
+tags = []
+
+executables = ["genlangmap"]
+
+[[depends-on]]
+spdx_tool = "*"
+utilada = "^2.6.0"
+
+[configuration]
+disabled = true
+
+[[pins]]
+spdx_tool = { path='..' }

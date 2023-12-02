@@ -2,6 +2,7 @@ with "utilada_base.gpr";
 with "utilada_conf.gpr";
 with "utilada_core.gpr";
 with "utilada_sys.gpr";
+with "spdx_tool.gpr";
 with "../spdx_tool_config.gpr";
 project Tools is
 
@@ -11,10 +12,9 @@ project Tools is
    for Exec_Dir use "../bin";
    for Main use ("genlangmap.adb");
 
-   package Compiler renames Spdx_Tool_Config.Compiler;
-
-   package Binder is
-      for Switches ("Ada") use ("-Es"); --  Symbolic traceback
-   end Binder;
+   package Builder  renames Spdx_Tool.Builder;
+   package Compiler renames Spdx_Tool.Compiler;
+   package Binder   renames Spdx_tool.Binder;
+   package Linker renames Spdx_Tool.Linker;
 
 end Tools;
