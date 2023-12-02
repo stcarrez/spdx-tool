@@ -35,6 +35,7 @@ package SPDX_Tool.Infos is
       Mime     : UString;
       Language : UString;
       Path     : String (1 .. Len);
+      Filtered : Boolean := False;
    end record;
    type File_Info_Access is access all File_Info;
 

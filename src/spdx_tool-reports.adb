@@ -61,7 +61,9 @@ package body SPDX_Tool.Reports is
       List   : Occurrences.Vector;
    begin
       for File of Files loop
-         Occurrences.Add (Set, Get_License (File.License), 1);
+         if not File.Filtered then
+            Occurrences.Add (Set, Get_License (File.License), 1);
+         end if;
       end loop;
       List_Occurrences (Set, List);
       declare
@@ -118,7 +120,9 @@ package body SPDX_Tool.Reports is
       File_Fields    : PT.Texts.Field_Array (1 .. 2);
    begin
       for File of Files loop
-         Occurrences.Add (Set, Get_License (File.License), 1);
+         if not File.Filtered then
+            Occurrences.Add (Set, Get_License (File.License), 1);
+         end if;
       end loop;
       List_Occurrences (Set, List);
       declare

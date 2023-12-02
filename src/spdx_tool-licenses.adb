@@ -6,6 +6,7 @@
 with Ada.Streams.Stream_IO;
 
 with Util.Strings;
+with Util.Strings.Tokenizers;
 with Util.Beans.Objects;
 with Util.Beans.Objects.Iterators;
 with Util.Serialize.IO.JSON;
@@ -601,7 +602,23 @@ package body SPDX_Tool.Licenses is
       return Result;
    end Find_License;
 
+   --  ------------------------------
+   --  Define the list of SPDX license names to ignore.
+   --  ------------------------------
+   procedure Set_Ignored_Licenses (Manager : in out License_Manager;
+                                   List    : in String) is
+      procedure Process (Token : in String; Done : out Boolean);
+      procedure Process (Token : in String; Done : out Boolean) is
+      begin
+         Manager.Filters.Include (Token);
+      end Process;
+   begin
+      Util.Strings.Tokenizers.Iterate_Tokens (List, ",", Process'Access);
+   end Set_Ignored_Licenses;
+
+   --  ------------------------------
    --  Analyze the file to find license information in the header comment.
+   --  ------------------------------
    procedure Analyze (Manager  : in out License_Manager;
                       Path     : in String) is
    begin
@@ -617,17 +634,25 @@ package body SPDX_Tool.Licenses is
       File.License := Manager.Find_License (Data);
       File.Mime := Data.Ident.Mime;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-
-         Log.Info ("{0}: {1}", File.Path, To_String (File.License.Name));
-         Manager.Stats.Increment (To_String (File.License.Name));
-         if Manager.Job = UPDATE_LICENSES then
-            File_Mgr.Save
-              (File    => Data,
-               Path    => File.Path,
-               First   => File.License.First_Line,
-               Last    => File.License.Last_Line,
-               License => To_String (File.License.Name));
-         end if;
+         declare
+            Name : constant String := To_String (File.License.Name);
+         begin
+            File.Filtered := Manager.Filters.Contains (Name);
+            if File.Filtered then
+               Log.Info ("{0}: {1} (ignored)", File.Path, Name);
+            else
+               Log.Info ("{0}: {1}", File.Path, Name);
+               Manager.Stats.Increment (Name);
+               if Manager.Job = UPDATE_LICENSES then
+                  File_Mgr.Save
+                    (File    => Data,
+                     Path    => File.Path,
+                     First   => File.License.First_Line,
+                     Last    => File.License.Last_Line,
+                     License => Name);
+               end if;
+            end if;
+         end;
       else
          declare
             use SPDX_Tool.Files;

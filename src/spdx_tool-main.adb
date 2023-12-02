@@ -78,6 +78,12 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--files",
                         Help   => -("List files grouped by license name"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Filter_Licenses'Access,
+                        Switch => "-F:",
+                        Long_Switch => "--filter-licenses=",
+                        Argument => "NAMES",
+                        Help   => -("Filter licenses to only consider the given list"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.License_Dir'Access,
                         Switch => "-l:",
                         Long_Switch => "--license-dir=",
@@ -146,6 +152,9 @@ begin
    declare
       Manager : SPDX_Tool.Licenses.License_Manager (Opt_Tasks);
    begin
+      if Licenses.Filter_Licenses /= null then
+         Manager.Set_Ignored_Licenses (Licenses.Filter_Licenses.all);
+      end if;
       F.Exclude (".git");
       if Licenses.License_Dir /= null
         and then Licenses.License_Dir.all /= ""
