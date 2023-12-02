@@ -164,4 +164,63 @@ package body SPDX_Tool.Reports is
       end;
    end Print_Files;
 
+   --  ------------------------------
+   --  Print the mime types used and their associated number of files.
+   --  ------------------------------
+   procedure Print_Mimes (Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration;
+                          Files   : in SPDX_Tool.Infos.File_Map) is
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Writer, 0);
+      Fields : PT.Texts.Field_Array (1 .. 4);
+      Set    : Occurrences.Set;
+      List   : Occurrences.Vector;
+   begin
+      for File of Files loop
+         if not File.Filtered then
+            Occurrences.Add (Set, To_String (File.Mime), 1);
+         end if;
+      end loop;
+      List_Occurrences (Set, List);
+      declare
+         Total  : constant Natural := Occurrences.Sum (List, 0);
+         Max    : constant PT.X_Type := PT.X_Type (Occurrences.Longest (List));
+      begin
+         Writer.Create_Field (Fields (1), Styles.Title, 0.0);
+         Writer.Create_Field (Fields (2), Styles.Title, 10.0);
+         Writer.Create_Field (Fields (3), Styles.Title, 10.0);
+         Writer.Create_Field (Fields (4), Styles.Title, 20.0);
+         Writer.Set_Bottom_Right_Padding (Fields (3), (W => 2, H => 0));
+         Writer.Set_Max_Dimension (Fields (1), (W => Max, H => 0));
+         Writer.Set_Justify (Fields (1), PT.J_LEFT);
+         Writer.Set_Justify (Fields (2), PT.J_RIGHT);
+         Writer.Set_Justify (Fields (3), PT.J_RIGHT);
+
+         Writer.Layout_Fields (Fields);
+
+         Writer.Put (Fields (1), -("Mime type"));
+         Writer.Put (Fields (2), -("Count"));
+         Writer.Put (Fields (3), -("Ratio"));
+         Writer.New_Line;
+
+         Writer.Set_Style (Fields (1), Styles.Default);
+         Writer.Set_Style (Fields (2), Styles.Default);
+         Writer.Set_Style (Fields (3), Styles.Default);
+         for Item of List loop
+            Writer.Put (Fields (1), Item.Item);
+            Writer.Put (Fields (2), Item.Count'Image);
+            Writer.Put (Fields (3), Format_Percent (Item.Count, Total));
+            if Styles.With_Progress then
+               Draw_Percent_Bar (Chart, Writer.Get_Box (Fields (4)),
+                                 Value => Item.Count,
+                                 Min   => 0,
+                                 Max   => Total,
+                                 Style1 => Styles.Marker1,
+                                 Style2 => Styles.Marker2);
+            end if;
+            Writer.New_Line;
+         end loop;
+      end;
+   end Print_Mimes;
+
 end SPDX_Tool.Reports;
