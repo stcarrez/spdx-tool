@@ -17,6 +17,8 @@ package body SPDX_Tool.Tests is
    begin
       Caller.Add_Test (Suite, "Test SPDX_Tool.Usage",
                        Test_Usage'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Scan",
+                       Test_Report_Licenses'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -29,5 +31,13 @@ package body SPDX_Tool.Tests is
       Util.Tests.Assert_Matches (T, "spdx-tool - SPDX license management tool.*",
                                  Result, "Invalid usage");
    end Test_Usage;
+
+   procedure Test_Report_Licenses (T : in out Test) is
+      Result : UString;
+   begin
+      T.Execute (Tool & " --no-color regtests/src", Result, 0);
+      Util.Tests.Assert_Matches (T, ".*Apache-2.0.*[0-9]+.*100.0.*",
+                                 Result, "Invalid result");
+   end Test_Report_Licenses;
 
 end SPDX_Tool.Tests;
