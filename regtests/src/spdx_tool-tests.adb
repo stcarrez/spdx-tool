@@ -23,6 +23,8 @@ package body SPDX_Tool.Tests is
                        Test_Report_Files'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --only-licenses",
                        Test_Report_Only_Licenses_Files'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --ignore-licenses",
+                       Test_Report_Ignore_Licenses_Files'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -67,5 +69,20 @@ package body SPDX_Tool.Tests is
       Util.Tests.Assert_Matches (T, ".*regtests/spdx_tool_tests.gpr.*",
                                  Result, "missing file");
    end Test_Report_Only_Licenses_Files;
+
+   procedure Test_Report_Ignore_Licenses_Files (T : in out Test) is
+      Result : UString;
+   begin
+      T.Execute (Tool & " --no-color --ignore-licenses None,Unkown,Apache-2.0 -f regtests",
+                 Result, 0);
+      Util.Tests.Assert_Matches (T, ".*GPL-3.0.*",
+                                 Result, "wrong license");
+      Util.Tests.Assert_Matches (T, ".*regtests/expect/replace-gnat-3.0.ads.*",
+                                 Result, "missing file");
+      Util.Tests.Assert_Matches (T, ".*MIT.*",
+                                 Result, "wrong license");
+      Util.Tests.Assert_Matches (T, ".*regtests/expect/replace-mit-1.tex.*",
+                                 Result, "missing file");
+   end Test_Report_Ignore_Licenses_Files;
 
 end SPDX_Tool.Tests;
