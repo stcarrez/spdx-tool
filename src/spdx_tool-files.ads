@@ -57,6 +57,7 @@ package SPDX_Tool.Files is
       Ident        : Identification;
       Cmt_Style    : Comment_Style := NO_COMMENT;
       Lines        : Line_Array (1 .. Max_Lines);
+      Language     : UString;
    end record;
 
    type File_Manager is tagged limited private;
@@ -110,5 +111,10 @@ private
    type File_Manager is tagged limited record
       Magic_Manager : SPDX_Tool.Magic_Manager.Magic_Manager;
    end record;
+
+   --  Identify the language used by the given file.
+   procedure Find_Language (Manager : in File_Manager;
+                            File    : in out File_Type;
+                            Path    : in String);
 
 end SPDX_Tool.Files;

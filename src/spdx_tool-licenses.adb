@@ -653,6 +653,7 @@ package body SPDX_Tool.Licenses is
       File_Mgr.Open (Data, File.Path);
       File.License := Manager.Find_License (Data);
       File.Mime := Data.Ident.Mime;
+      File.Language := Data.Language;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          declare
             Name : constant String := To_String (File.License.Name);

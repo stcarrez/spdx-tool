@@ -32,4 +32,9 @@ package SPDX_Tool.Reports is
                           Styles  : in Style_Configuration;
                           Files   : in SPDX_Tool.Infos.File_Map);
 
+   --  Print the languages used and their associated number of files.
+   procedure Print_Languages (Printer : in out PT.Printer_Type'Class;
+                              Styles  : in Style_Configuration;
+                              Files   : in SPDX_Tool.Infos.File_Map);
+
 end SPDX_Tool.Reports;

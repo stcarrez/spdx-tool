@@ -16,6 +16,7 @@ with Util.Strings;
 
 with PT.Drivers.Texts;
 with PT.Drivers.Texts.GNAT_IO;
+with PT.Texts;
 with PT.Colors;
 
 with SPDX_Tool.Infos;
@@ -68,6 +69,15 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--check",
                         Help   => -("Check and gather licenses used in source files"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Mimes'Access,
+                        Switch => "-m",
+                        Long_Switch => "--mimes",
+                        Help   => -("Identify mime types of files"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Languages'Access,
+                        Long_Switch => "--languages",
+                        Help   => -("Identify languages used in files"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Update'Access,
                         Switch => "-u",
                         Long_Switch => "--update",
@@ -104,8 +114,9 @@ procedure SPDX_Tool.Main is
    end Setup;
 
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
-      Styles    : SPDX_Tool.Reports.Style_Configuration;
-      Driver    : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Width => 80);
+      Styles : SPDX_Tool.Reports.Style_Configuration;
+      Driver : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Width => 80);
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Driver);
    begin
       if not Opt_No_Color then
          Styles.Title := Driver.Create_Style (PT.Colors.White);
@@ -128,7 +139,22 @@ procedure SPDX_Tool.Main is
          SPDX_Tool.Reports.Print_Licenses (Driver, Styles, Files);
       end if;
       if Opt_Files then
+         if Opt_Check then
+            Writer.New_Line;
+         end if;
          SPDX_Tool.Reports.Print_Files (Driver, Styles, Files);
+      end if;
+      if Opt_Mimes then
+         if Opt_Check or else Opt_Files then
+            Writer.New_Line;
+         end if;
+         SPDX_Tool.Reports.Print_Mimes (Driver, Styles, Files);
+      end if;
+      if Opt_Languages then
+         if Opt_Check or else Opt_Files or else Opt_Mimes then
+            Writer.New_Line;
+         end if;
+         SPDX_Tool.Reports.Print_Languages (Driver, Styles, Files);
       end if;
    end Print_Report;
 

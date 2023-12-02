@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Streams.Stream_IO;
+with Ada.Directories;
 
 with Util.Log.Loggers;
 with Util.Files;
@@ -133,6 +134,18 @@ package body SPDX_Tool.Files is
       return From;
    end Find_End_Comment;
 
+   --  Identify the language used by the given file.
+   procedure Find_Language (Manager : in File_Manager;
+                            File     : in out File_Type;
+                            Path     : in String) is
+      Ext  : constant String := Ada.Directories.Extension (Path);
+      Kind : access constant String := SPDX_Tool.Files.Extensions.Get_Mapping (Ext);
+   begin
+      if Kind /= null then
+         File.Language := To_UString (Kind.all);
+      end if;
+   end Find_Language;
+
    procedure Open (Manager  : in File_Manager;
                    File     : in out File_Type;
                    Path     : in String) is
@@ -154,6 +167,7 @@ package body SPDX_Tool.Files is
       begin
          File.File.Read (Into => Buf.Data, Last => Len);
          File.Last_Offset := Len;
+         Manager.Find_Language (File, Path);
          if Len > 0 and then Manager.Magic_Manager.Is_Initialized then
             begin
                File.Ident.Mime := To_UString
