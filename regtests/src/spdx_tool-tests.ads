@@ -16,5 +16,6 @@ package SPDX_Tool.Tests is
 
    procedure Test_Report_Licenses (T : in out Test);
    procedure Test_Report_Files (T : in out Test);
+   procedure Test_Report_Only_Licenses_Files (T : in out Test);
 
 end SPDX_Tool.Tests;

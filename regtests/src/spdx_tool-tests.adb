@@ -17,10 +17,12 @@ package body SPDX_Tool.Tests is
    begin
       Caller.Add_Test (Suite, "Test SPDX_Tool.Usage",
                        Test_Usage'Access);
-      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses",
+      Caller.Add_Test (Suite, "Test SPDX_Tool --check",
                        Test_Report_Licenses'Access);
-      Caller.Add_Test (Suite, "Test SPDX_Tool.Files",
+      Caller.Add_Test (Suite, "Test SPDX_Tool --files",
                        Test_Report_Files'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --only-licenses",
+                       Test_Report_Only_Licenses_Files'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -53,5 +55,17 @@ package body SPDX_Tool.Tests is
       Util.Tests.Assert_Matches (T, ".*regtests/src/spdx_tool-tests.ads.*",
                                  Result, "missing file");
    end Test_Report_Files;
+
+   procedure Test_Report_Only_Licenses_Files (T : in out Test) is
+      Result : UString;
+   begin
+      T.Execute (Tool & " --no-color --only-licenses None -f regtests", Result, 0);
+      Util.Tests.Assert_Matches (T, ".*None.*",
+                                 Result, "wrong license");
+      Util.Tests.Assert_Matches (T, ".*regtests/alire.toml.*",
+                                 Result, "missing file");
+      Util.Tests.Assert_Matches (T, ".*regtests/spdx_tool_tests.gpr.*",
+                                 Result, "missing file");
+   end Test_Report_Only_Licenses_Files;
 
 end SPDX_Tool.Tests;
