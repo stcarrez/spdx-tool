@@ -650,16 +650,25 @@ package body SPDX_Tool.Licenses is
    --  ------------------------------
    --  Define the list of SPDX license names to ignore.
    --  ------------------------------
-   procedure Set_Filter (Manager : in out License_Manager;
-                         List    : in String;
-                         Exclude : in Boolean) is
+   procedure Set_Filter (Manager  : in out License_Manager;
+                         List     : in String;
+                         Language : in Boolean;
+                         Exclude  : in Boolean) is
       procedure Process (Token : in String; Done : out Boolean);
       procedure Process (Token : in String; Done : out Boolean) is
       begin
-         if Exclude then
-            Manager.Exclude_Filters.Include (Token);
+         if Language then
+            if Exclude then
+               Manager.Exclude_Languages.Include (Token);
+            else
+               Manager.Include_Languages.Include (Token);
+            end if;
          else
-            Manager.Include_Filters.Include (Token);
+            if Exclude then
+               Manager.Exclude_Filters.Include (Token);
+            else
+               Manager.Include_Filters.Include (Token);
+            end if;
          end if;
          Done := False;
       end Process;
@@ -671,12 +680,20 @@ package body SPDX_Tool.Licenses is
    --  Returns true if the license is filtered.
    --  ------------------------------
    function Is_Filtered (Manager : in License_Manager;
-                         Name    : in String) return Boolean is
+                         File    : in SPDX_Tool.Infos.File_Info) return Boolean is
+      Name     : constant String := To_String (File.License.Name);
+      Language : constant String := To_String (File.Language);
    begin
       if Manager.Include_Filters.Contains (Name) then
          return False;
       end if;
       if Manager.Exclude_Filters.Contains (Name) then
+         return True;
+      end if;
+      if Manager.Include_Languages.Contains (Language) then
+         return False;
+      end if;
+      if Manager.Exclude_Languages.Contains (Language) then
          return True;
       end if;
       return not Manager.Include_Filters.Is_Empty;
@@ -704,7 +721,7 @@ package body SPDX_Tool.Licenses is
          declare
             Name : constant String := To_String (File.License.Name);
          begin
-            File.Filtered := Manager.Is_Filtered (Name);
+            File.Filtered := Manager.Is_Filtered (File);
             if File.Filtered then
                Log.Info ("{0}: {1} (ignored)", File.Path, Name);
             else
@@ -722,7 +739,7 @@ package body SPDX_Tool.Licenses is
          end;
       elsif Data.Last_Offset = 0 then
          File.License.Name := To_UString (Empty_File);
-         File.Filtered := Manager.Is_Filtered (Empty_File);
+         File.Filtered := Manager.Is_Filtered (File);
          if File.Filtered then
             Log.Info ("{0}: {1} (ignored)", File.Path, Empty_File);
          else
@@ -740,7 +757,8 @@ package body SPDX_Tool.Licenses is
                end if;
             end loop;
             if Cmt_Count = 0 then
-               File.Filtered := Manager.Is_Filtered (No_License);
+               File.License.Name := To_UString (No_License);
+               File.Filtered := Manager.Is_Filtered (File);
                if File.Filtered then
                   Log.Info ("{0}: {1} (ignored)", File.Path, No_License);
                else
@@ -750,7 +768,8 @@ package body SPDX_Tool.Licenses is
                   Manager.Stats.Increment (To_String (Data.Ident.Mime));
                end if;
             else
-               File.Filtered := Manager.Is_Filtered (Unknown_License);
+               File.License.Name := To_UString (Unknown_License);
+               File.Filtered := Manager.Is_Filtered (File);
                if File.Filtered then
                   Log.Info ("{0}: {1} (ignored)", File.Path, Unknown_License);
                else

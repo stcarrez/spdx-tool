@@ -27,9 +27,11 @@ package SPDX_Tool.Licenses is
    No_License       : constant String := "None";
    Empty_File       : constant String := "Empty file";
 
-   License_Dir     : aliased GNAT.Strings.String_Access;
-   Ignore_Licenses : aliased GNAT.Strings.String_Access;
-   Only_Licenses   : aliased GNAT.Strings.String_Access;
+   License_Dir      : aliased GNAT.Strings.String_Access;
+   Ignore_Licenses  : aliased GNAT.Strings.String_Access;
+   Only_Licenses    : aliased GNAT.Strings.String_Access;
+   Ignore_Languages : aliased GNAT.Strings.String_Access;
+   Only_Languages   : aliased GNAT.Strings.String_Access;
 
    package Count_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (Key_Type     => String,
@@ -85,14 +87,16 @@ package SPDX_Tool.Licenses is
    function Get_Name (License : License_Type) return String;
    function Get_Template (License : License_Type) return String;
 
-   --  Define the list of SPDX license names to ignore.
-   procedure Set_Filter (Manager : in out License_Manager;
-                         List    : in String;
-                         Exclude : in Boolean);
+   --  Define the list of SPDX license names or list of language filters
+   --  to ignore.
+   procedure Set_Filter (Manager  : in out License_Manager;
+                         List     : in String;
+                         Language : in Boolean;
+                         Exclude  : in Boolean);
 
    --  Returns true if the license is filtered.
    function Is_Filtered (Manager : in License_Manager;
-                         Name    : in String) return Boolean;
+                         File    : in SPDX_Tool.Infos.File_Info) return Boolean;
 
    --  Analyze the file to find license information in the header comment.
    procedure Analyze (Manager  : in out License_Manager;
@@ -261,6 +265,8 @@ private
       Files    : SPDX_Tool.Infos.File_Map;
       Include_Filters : Util.Strings.Sets.Set;
       Exclude_Filters : Util.Strings.Sets.Set;
+      Include_Languages : Util.Strings.Sets.Set;
+      Exclude_Languages : Util.Strings.Sets.Set;
    end record;
 
    function Find_License (Manager : in License_Manager;

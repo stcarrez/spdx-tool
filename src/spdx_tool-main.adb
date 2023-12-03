@@ -88,15 +88,25 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--files",
                         Help   => -("List files grouped by license name"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Only_Licenses'Access,
+                        Long_Switch => "--only-licenses=",
+                        Argument => "NAMES",
+                        Help   => -("Only consider files with licenses in the given list"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Only_Languages'Access,
+                        Long_Switch => "--only-languages=",
+                        Argument => "NAMES",
+                        Help   => -("Only consider files with languages in the given list"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.Ignore_Licenses'Access,
                         Long_Switch => "--ignore-licenses=",
                         Argument => "NAMES",
                         Help   => -("Ignore the files with licenses in the given list"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Only_Licenses'Access,
-                        Long_Switch => "--only-licenses=",
+                        Output => SPDX_Tool.Licenses.Ignore_Languages'Access,
+                        Long_Switch => "--ignore-languages=",
                         Argument => "NAMES",
-                        Help   => -("Only consider files with licenses in the given list"));
+                        Help   => -("Ignore the files with languages in the given list"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.License_Dir'Access,
                         Switch => "-l:",
@@ -183,12 +193,24 @@ begin
       Manager : SPDX_Tool.Licenses.License_Manager (Opt_Tasks);
    begin
       if Licenses.Only_Licenses /= null then
-         Manager.Set_Filter (List    => Licenses.Only_Licenses.all,
-                             Exclude => False);
+         Manager.Set_Filter (List     => Licenses.Only_Licenses.all,
+                             Language => False,
+                             Exclude  => False);
       end if;
       if Licenses.Ignore_Licenses /= null then
-         Manager.Set_Filter (List    => Licenses.Ignore_Licenses.all,
-                             Exclude => True);
+         Manager.Set_Filter (List     => Licenses.Ignore_Licenses.all,
+                             Language => False,
+                             Exclude  => True);
+      end if;
+      if Licenses.Only_Languages /= null then
+         Manager.Set_Filter (List     => Licenses.Only_Languages.all,
+                             Language => True,
+                             Exclude  => False);
+      end if;
+      if Licenses.Ignore_Languages /= null then
+         Manager.Set_Filter (List     => Licenses.Ignore_Languages.all,
+                             Language => True,
+                             Exclude  => True);
       end if;
       F.Exclude (".git");
       if Licenses.License_Dir /= null
