@@ -25,6 +25,16 @@ package body SPDX_Tool.Licenses is
 
    package UBO renames Util.Beans.Objects;
 
+   function Extract_SPDX (Lines   : in SPDX_Tool.Files.Line_Array;
+                          Content : in Buffer_Type;
+                          Line    : in Positive;
+                          From    : in Buffer_Index) return Infos.License_Info;
+   function Find_Header (List : UBO.Object) return UBO.Object;
+   function Find_Value (Info : UBO.Object; Name : String) return Boolean;
+   function Find_Value (Info : UBO.Object; Name : String) return UString;
+   function Find_Token (Token : in Token_Access;
+                        Word  : in Buffer_Type) return Token_Access;
+
    File_Mgr : SPDX_Tool.Files.File_Manager_Access := null with Thread_Local_Storage;
 
    function Find_Header (List : UBO.Object) return UBO.Object is
@@ -131,6 +141,33 @@ package body SPDX_Tool.Licenses is
       Manager.Job := READ_LICENSES;
    end Load_Licenses;
 
+   procedure Load_Jsonld_License (Manager : in out License_Manager;
+                                  Path    : in String) is
+      L : License_Type;
+   begin
+      Load (L, Path);
+      if Length (L.Template) > 0 then
+         declare
+            T : constant String := To_String (L.Template);
+            N : constant String := To_String (L.Name);
+            P : Natural := T'First;
+         begin
+            while P < T'Last and then T (P) /= ASCII.LF loop
+               P := P + 1;
+            end loop;
+            Log.Info ("{0}", T (T'First .. P - 1));
+            if N'Length > 0 then
+               Util.Files.Write_File (N & ".txt", T);
+            end if;
+         end;
+      elsif Length (L.Name) > 0 then
+         Log.Error ("{0}: {1} => {2}", Path, To_String (L.Name),
+                    To_String (L.Template));
+      else
+         Log.Error ("{0}", Path);
+      end if;
+   end Load_Jsonld_License;
+
    --  ------------------------------
    --  Load the license template from the given path.
    --  ------------------------------
@@ -150,6 +187,15 @@ package body SPDX_Tool.Licenses is
    procedure Load_License (Manager : in out License_Manager;
                            Name    : in String;
                            Content : in Buffer_Type) is
+      procedure Next_Token (Token : out Token_Kind);
+      function Find_Token (Word : in Buffer_Type) return Token_Access;
+      procedure Append_Token (Token : in Token_Access);
+      function Create_Regpat (Content : in Buffer_Type) return Token_Access;
+      procedure Parse_Var;
+      procedure Parse_Optional;
+      procedure Parse_Copyright;
+      procedure Parse_Token;
+      procedure Finish;
 
       Pos   : Buffer_Index := Content'First;
       First : Buffer_Index;
@@ -271,7 +317,7 @@ package body SPDX_Tool.Licenses is
                while Pos <= Content'Last loop
                   if Content (Pos) = Character'Pos ('\') then
                      Pos := Pos + 1;
-                     exit when Pos > content'Last;
+                     exit when Pos > Content'Last;
                   else
                      exit when Content (Pos) = Character'Pos ('"');
                   end if;
@@ -306,9 +352,9 @@ package body SPDX_Tool.Licenses is
 
       procedure Parse_Token is
       begin
-         if Next_With (Content, First, "PURPOSE.") > First then
-            Log.Info ("Found PURPOSE");
-         end if;
+         --  if Next_With (Content, First, "PURPOSE.") > First then
+         --     Log.Info ("Found PURPOSE");
+         --  end if;
          Token := Find_Token (Content (First .. Pos - 1));
          if Token = null then
             Token := new Token_Type '(Len => Pos - First,
@@ -404,31 +450,7 @@ package body SPDX_Tool.Licenses is
 
       case Manager.Job is
          when SCAN_LICENSES =>
-            declare
-               L : License_Type;
-            begin
-               Load (L, Path);
-               if Length (L.Template) > 0 then
-                  declare
-                     T : constant String := To_String (L.Template);
-                     N : constant String := To_String (L.Name);
-                     P : Natural := T'First;
-                  begin
-                     while P < T'Last and then T (P) /= ASCII.LF loop
-                        P := P + 1;
-                     end loop;
-                     Log.Info ("{0}", T (T'First .. P - 1));
-                     if N'Length > 0 then
-                        Util.Files.Write_File (N & ".txt", T);
-                     end if;
-                  end;
-               elsif Length (L.Name) > 0 then
-                  Log.Error ("{0}: {1} => {2}", Path, To_String (L.Name),
-                             To_String (L.Template));
-               else
-                  Log.Error ("{0}", Path);
-               end if;
-            end;
+            Manager.Load_Jsonld_License (Path);
 
          when LOAD_LICENSES =>
             Manager.Load_License (Path);
@@ -639,6 +661,7 @@ package body SPDX_Tool.Licenses is
          else
             Manager.Include_Filters.Include (Token);
          end if;
+         Done := False;
       end Process;
    begin
       Util.Strings.Tokenizers.Iterate_Tokens (List, ",", Process'Access);
@@ -801,6 +824,7 @@ package body SPDX_Tool.Licenses is
       end Increment;
 
       procedure Add_Line (Line : in Buffer_Type; Line_Number : Positive) is
+         procedure Process (Item : in out Line_Maps.Map);
 
          procedure Process (Item : in out Line_Maps.Map) is
             Pos  : constant Line_Maps.Cursor := Item.Find (Line);

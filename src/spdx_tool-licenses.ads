@@ -79,6 +79,9 @@ package SPDX_Tool.Licenses is
    procedure Load (License : in out License_Type;
                    Path    : in String);
 
+   procedure Load_Jsonld_License (Manager : in out License_Manager;
+                                  Path    : in String);
+
    function Get_Name (License : License_Type) return String;
    function Get_Template (License : License_Type) return String;
 
@@ -271,5 +274,8 @@ private
 
    overriding
    procedure Finalize (Manager : in out License_Manager);
+
+   function Get_File_Manager (Manager : in out License_Manager)
+                              return SPDX_Tool.Files.File_Manager_Access;
 
 end SPDX_Tool.Licenses;
