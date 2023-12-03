@@ -8,6 +8,7 @@ with Ada.Directories;
 
 with Util.Log.Loggers;
 with Util.Files;
+with Util.Strings;
 with SPDX_Tool.Files.Extensions;
 package body SPDX_Tool.Files is
 
@@ -138,12 +139,44 @@ package body SPDX_Tool.Files is
    procedure Find_Language (Manager : in File_Manager;
                             File     : in out File_Type;
                             Path     : in String) is
+      Len  : constant Buffer_Size := File.Last_Offset;
       Ext  : constant String := Ada.Directories.Extension (Path);
       Kind : access constant String := SPDX_Tool.Files.Extensions.Get_Mapping (Ext);
    begin
       if Kind /= null then
          File.Language := To_UString (Kind.all);
+      elsif Len = 0 then
+         File.Language := To_UString ("Empty file");
+         return;
       end if;
+      if Len > 0 and then Manager.Magic_Manager.Is_Initialized then
+         declare
+            Buf  : constant Buffer_Accessor := File.Buffer.Value;
+            Mime : constant String
+              := Manager.Magic_Manager.Identify (Buf.Data (Buf.Data'First .. Len));
+         begin
+            File.Ident.Mime := To_UString (Mime);
+            if Kind = null then
+               if Util.Strings.Starts_With (Mime, "text/") then
+                  File.Language := To_UString ("Text file");
+               elsif Util.Strings.Starts_With (Mime, "image/") then
+                  File.Language := To_UString ("Image");
+               elsif Util.Strings.Starts_With (Mime, "video/") then
+                  File.Language := To_UString ("Video");
+               elsif Util.Strings.Starts_With (Mime, "application/pdf") then
+                  File.Language := To_UString ("PDF");
+               elsif Util.Strings.Starts_With (Mime, "application/zip") then
+                  File.Language := To_UString ("ZIP");
+               elsif Util.Strings.Starts_With (Mime, "application/x-tar") then
+                  File.Language := To_UString ("TAR");
+               end if;
+            end if;
+         end;
+      end if;
+
+   exception
+      when others =>
+         Log.Error (-("cannot identify mime type for '{0}'"), Path);
    end Find_Language;
 
    procedure Open (Manager  : in File_Manager;
@@ -168,16 +201,6 @@ package body SPDX_Tool.Files is
          File.File.Read (Into => Buf.Data, Last => Len);
          File.Last_Offset := Len;
          Manager.Find_Language (File, Path);
-         if Len > 0 and then Manager.Magic_Manager.Is_Initialized then
-            begin
-               File.Ident.Mime := To_UString
-                 (Manager.Magic_Manager.Identify (Buf.Data (Buf.Data'First .. Len)));
-
-            exception
-               when others =>
-                  Log.Error (-("cannot identify mime type for '{0}'"), Path);
-            end;
-         end if;
          while Pos <= Len loop
             First := Pos;
             Line_No := Line_No + 1;
