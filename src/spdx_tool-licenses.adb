@@ -80,6 +80,9 @@ package body SPDX_Tool.Licenses is
       License.Name := Find_Value (Info, "spdx:licenseId");
       License.Template := Find_Value (Info,
                                       "spdx:standardLicenseHeaderTemplate");
+      if Length (License.Template) = 0 then
+         License.Template := Find_Value (Info, "spdx:standardLicenseTemplate");
+      end if;
    end Load;
 
    function Get_Name (License : License_Type) return String is
@@ -199,6 +202,7 @@ package body SPDX_Tool.Licenses is
 
       procedure Append_Token (Token : in Token_Access) is
       begin
+         Token.Previous := Previous;
          if Previous = null then
             if Manager.Tokens = null then
                Manager.Tokens := Token;
@@ -228,14 +232,27 @@ package body SPDX_Tool.Licenses is
       function Create_Regpat (Content : in Buffer_Type) return Token_Access is
          Regpat : String (1 .. Content'Length);
          for Regpat'Address use Content'Address;
-         Pat : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
       begin
-         return new Regpat_Token_Type '(Len => Content'Length,
-                                        Plen => Pat.Size,
-                                        Next => null,
-                                        Alternate => null,
-                                        Content => Content,
-                                        Pattern => Pat);
+         declare
+            Pat : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
+         begin
+            return new Regpat_Token_Type '(Len => Content'Length,
+                                           Plen => Pat.Size,
+                                           Previous => null,
+                                           Next => null,
+                                           Alternate => null,
+                                           Content => Content,
+                                           Pattern => Pat);
+         end;
+
+      exception
+         when others =>
+            Log.Error ("Cannot compile regex: '{0}'", Regpat);
+            return new Token_Type '(Len => Content'Length,
+                                    Previous => null,
+                                    Next => null,
+                                    Alternate => null,
+                                    Content => Content);
       end Create_Regpat;
 
       --  Parse and extract information from <<var tags>>.
@@ -252,7 +269,12 @@ package body SPDX_Tool.Licenses is
                First := Match;
                Pos := Match;
                while Pos <= Content'Last loop
-                  exit when Content (Pos) = Character'Pos ('"');
+                  if Content (Pos) = Character'Pos ('\') then
+                     Pos := Pos + 1;
+                     exit when Pos > content'Last;
+                  else
+                     exit when Content (Pos) = Character'Pos ('"');
+                  end if;
                   Pos := Pos + 1;
                end loop;
                Token := Find_Token (Content (First .. Pos - 1));
@@ -290,6 +312,7 @@ package body SPDX_Tool.Licenses is
          Token := Find_Token (Content (First .. Pos - 1));
          if Token = null then
             Token := new Token_Type '(Len => Pos - First,
+                                      Previous => null,
                                       Next => null,
                                       Alternate => null,
                                       Content => Content (First .. Pos - 1));
@@ -674,6 +697,14 @@ package body SPDX_Tool.Licenses is
                end if;
             end if;
          end;
+      elsif Data.Last_Offset = 0 then
+         File.License.Name := To_UString (Empty_File);
+         File.Filtered := Manager.Is_Filtered (Empty_File);
+         if File.Filtered then
+            Log.Info ("{0}: {1} (ignored)", File.Path, Empty_File);
+         else
+            Log.Info ("{0}: {1}", File.Path, Empty_File);
+         end if;
       else
          declare
             use SPDX_Tool.Files;
@@ -747,12 +778,6 @@ package body SPDX_Tool.Licenses is
       Log.Error ("Job {0} failed", Job.File.Path);
       Log.Error ("Exception", Ex);
    end Error;
-
-   function Hash (Buf : in Buffer_Type) return Ada.Containers.Hash_Type is
-      H : constant Ada.Containers.Hash_Type := Buf'Length;
-   begin
-      return H;
-   end Hash;
 
    procedure Print_Header (Manager : in out License_Manager) is
    begin

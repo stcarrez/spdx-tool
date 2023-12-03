@@ -25,6 +25,7 @@ package SPDX_Tool.Licenses is
    SPDX_License_Tag : constant String := "SPDX-License-Identifier:";
    Unknown_License  : constant String := "Unknown";
    No_License       : constant String := "None";
+   Empty_File       : constant String := "Empty file";
 
    License_Dir     : aliased GNAT.Strings.String_Access;
    Ignore_Licenses : aliased GNAT.Strings.String_Access;
@@ -122,9 +123,8 @@ private
    function "<" (Left, Right : Line_Stat) return Boolean
       is (Left.Count > Right.Count
           or else (Left.Count = Right.Count and then Left.Len < Right.Len)
-          or else (Left.Count = Right.Count and then Left.Len = Right.Len and then Left.Content < Right.Content));
-
-   function Hash (Buf : in Buffer_Type) return Ada.Containers.Hash_Type;
+          or else (Left.Count = Right.Count and then Left.Len = Right.Len
+            and then Left.Content < Right.Content));
 
    package Line_Maps is new Ada.Containers.Indefinite_Ordered_Maps
     (Key_Type => Buffer_Type, Element_Type => Positive, "<" => "<", "=" => "=");
@@ -182,6 +182,7 @@ private
 
    type Token_Type (Len : Buffer_Size) is tagged limited record
       Next      : Token_Access;
+      Previous  : Token_Access;
       Alternate : Token_Access;
       Content   : Buffer_Type (1 .. Len);
    end record;
