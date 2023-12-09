@@ -28,24 +28,25 @@ package SPDX_Tool.Licenses is
    Empty_File       : constant String := "Empty file";
 
    License_Dir      : aliased GNAT.Strings.String_Access;
+   Export_Dir       : aliased GNAT.Strings.String_Access;
    Ignore_Licenses  : aliased GNAT.Strings.String_Access;
    Only_Licenses    : aliased GNAT.Strings.String_Access;
    Ignore_Languages : aliased GNAT.Strings.String_Access;
    Only_Languages   : aliased GNAT.Strings.String_Access;
+   Opt_No_Builtin   : aliased Boolean := False;
 
    package Count_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (Key_Type     => String,
       Element_Type => Natural);
 
-   type Job_Type is (READ_LICENSES, UPDATE_LICENSES, LOAD_LICENSES, SCAN_LICENSES);
+   type Job_Type is (READ_LICENSES, UPDATE_LICENSES, LOAD_LICENSES);
 
    type License_Manager (Count : Task_Count) is
    limited new UFW.Walker_Type with private;
 
    --  Configure the license manager.
    procedure Configure (Manager : in out License_Manager;
-                        Job     : in Job_Type;
-                        Tasks   : in Task_Count);
+                        Job     : in Job_Type);
 
    --  Load the license templates defined in the directory for the license
    --  identification and analysis.
@@ -81,6 +82,13 @@ package SPDX_Tool.Licenses is
    procedure Load (License : in out License_Type;
                    Path    : in String);
 
+   procedure Save_License (License : in License_Type;
+                           Path    : in String);
+
+   --  Load the license template from the given path.
+   procedure Load_License (Manager : in out License_Manager;
+                           Path    : in String);
+
    procedure Load_Jsonld_License (Manager : in out License_Manager;
                                   Path    : in String);
 
@@ -113,9 +121,6 @@ package SPDX_Tool.Licenses is
 
 private
 
-   --  Load the license template from the given path.
-   procedure Load_License (Manager : in out License_Manager;
-                           Path    : in String);
    procedure Load_License (Manager : in out License_Manager;
                            Name    : in String;
                            Content : in Buffer_Type);
@@ -256,7 +261,8 @@ private
    limited new UFW.Walker_Type with record
       Manager  : License_Manager_Access;
       Max_Fill : Natural := 0;
-      Job      : Job_Type := SCAN_LICENSES;
+      Started  : Boolean := False;
+      Job      : Job_Type := READ_LICENSES;
       Stats    : License_Stats;
       Tokens   : Token_Access;
       Mgr_Idx  : Util.Concurrent.Counters.Counter;

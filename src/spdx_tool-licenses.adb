@@ -19,6 +19,7 @@ package body SPDX_Tool.Licenses is
    use type SPDX_Tool.Files.Comment_Style;
    use type SPDX_Tool.Files.Comment_Mode;
    use type SPDX_Tool.Infos.License_Kind;
+   use type GNAT.Strings.String_Access;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
@@ -107,21 +108,25 @@ package body SPDX_Tool.Licenses is
 
    --  Configure the license manager.
    procedure Configure (Manager : in out License_Manager;
-                        Job     : in Job_Type;
-                        Tasks   : in Task_Count) is
+                        Job     : in Job_Type) is
    begin
-      if Opt_Mimes then
-         for I in Manager.File_Mgr'Range loop
-            Manager.File_Mgr (I).Initialize ("/usr/share/misc/magic");
-         end loop;
+      if not Manager.Started then
+         if Opt_Mimes then
+            for I in Manager.File_Mgr'Range loop
+               Manager.File_Mgr (I).Initialize ("/usr/share/misc/magic");
+            end loop;
+         end if;
+         Manager.Manager := Manager'Unchecked_Access;
+         Manager.Executor.Start;
+         Manager.Started := True;
       end if;
       Manager.Job := Job;
-      Manager.Manager := Manager'Unchecked_Access;
-      Manager.Executor.Start;
 
-      for Name of Files.Names loop
-         Manager.Load_License (Name.all, Files.Get_Content (Name.all).all);
-      end loop;
+      if not Opt_No_Builtin then
+         for Name of Files.Names loop
+            Manager.Load_License (Name.all, Files.Get_Content (Name.all).all);
+         end loop;
+      end if;
    end Configure;
 
    --  ------------------------------
@@ -141,31 +146,47 @@ package body SPDX_Tool.Licenses is
       Manager.Job := READ_LICENSES;
    end Load_Licenses;
 
+   procedure Save_License (License : in License_Type;
+                           Path    : in String) is
+      Content : constant String := To_String (License.Template);
+      P : Natural := Content'First;
+   begin
+      while P < Content'Last and then Content (P) /= ASCII.LF loop
+         P := P + 1;
+      end loop;
+      Log.Debug ("{0}", Content (Content'First .. P - 1));
+      Util.Files.Write_File (Path, Content);
+   end Save_License;
+
    procedure Load_Jsonld_License (Manager : in out License_Manager;
                                   Path    : in String) is
-      L : License_Type;
+      License : License_Type;
    begin
-      Load (L, Path);
-      if Length (L.Template) > 0 then
-         declare
-            T : constant String := To_String (L.Template);
-            N : constant String := To_String (L.Name);
-            P : Natural := T'First;
-         begin
-            while P < T'Last and then T (P) /= ASCII.LF loop
-               P := P + 1;
-            end loop;
-            Log.Info ("{0}", T (T'First .. P - 1));
-            if N'Length > 0 then
-               Util.Files.Write_File (N & ".txt", T);
-            end if;
-         end;
-      elsif Length (L.Name) > 0 then
-         Log.Error ("{0}: {1} => {2}", Path, To_String (L.Name),
-                    To_String (L.Template));
-      else
-         Log.Error ("{0}", Path);
+      Load (License, Path);
+      if Length (License.Name) = 0 then
+         Log.Error ("{0}: no license found", Path);
+         return;
       end if;
+      declare
+         Name : constant String := To_String (License.Name);
+      begin
+         Log.Info ("{0}: {1}", Path, Name);
+         if Length (License.Template) > 0
+           and then Export_Dir /= null
+           and then Export_Dir.all /= ""
+         then
+            Save_License (License,
+                          Util.Files.Compose (Export_Dir.all, Name & ".txt"));
+         else
+            declare
+               Content : String := To_String (License.Template);
+               Buffer  : Buffer_Type (1 .. Content'Length);
+               for Buffer'Address use Content'Address;
+            begin
+               Manager.Load_License (Name, Buffer);
+            end;
+         end if;
+      end;
    end Load_Jsonld_License;
 
    --  ------------------------------
@@ -173,15 +194,23 @@ package body SPDX_Tool.Licenses is
    --  ------------------------------
    procedure Load_License (Manager : in out License_Manager;
                            Path    : in String) is
-      File   : Util.Streams.Files.File_Stream;
-      Buffer : Buffer_Type (1 .. 4096);
-      Last   : Ada.Streams.Stream_Element_Offset;
-      Name   : constant String := Ada.Directories.Base_Name (Path);
+      Name : constant String := Ada.Directories.Base_Name (Path);
+      Ext  : constant String := Ada.Directories.Extension (Path);
    begin
       Log.Info ("Load license template {0}", Path);
-      File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
-      File.Read (Into => Buffer, Last => Last);
-      Manager.Load_License (Name, Buffer (1 .. Last));
+      if Ext = "jsonld" then
+         Manager.Load_Jsonld_License (Path);
+      else
+         declare
+            File   : Util.Streams.Files.File_Stream;
+            Buffer : Buffer_Type (1 .. 4096);
+            Last   : Ada.Streams.Stream_Element_Offset;
+         begin
+            File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
+            File.Read (Into => Buffer, Last => Last);
+            Manager.Load_License (Name, Buffer (1 .. Last));
+         end;
+      end if;
    end Load_License;
 
    procedure Load_License (Manager : in out License_Manager;
@@ -449,9 +478,6 @@ package body SPDX_Tool.Licenses is
       Log.Info ("Scan file {0}", Path);
 
       case Manager.Job is
-         when SCAN_LICENSES =>
-            Manager.Load_Jsonld_License (Path);
-
          when LOAD_LICENSES =>
             Manager.Load_License (Path);
 

@@ -32,6 +32,8 @@ procedure SPDX_Tool.Main is
 
    procedure Setup;
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map);
+   procedure Read_Licenses (Manager : in out SPDX_Tool.Licenses.License_Manager;
+                            Path    : in String);
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Main");
@@ -74,10 +76,6 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--mimes",
                         Help   => -("Identify mime types of files"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Languages'Access,
-                        Long_Switch => "--languages",
-                        Help   => -("Identify languages used in files"));
-      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Update'Access,
                         Switch => "-u",
                         Long_Switch => "--update",
@@ -87,6 +85,14 @@ procedure SPDX_Tool.Main is
                         Switch => "-f",
                         Long_Switch => "--files",
                         Help   => -("List files grouped by license name"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Languages'Access,
+                        Long_Switch => "--languages",
+                        Help   => -("Identify languages used in files"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Opt_No_Builtin'Access,
+                        Long_Switch => "--no-builtin-licenses",
+                        Help   => -("Disable internal builtin license repository"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.Only_Licenses'Access,
                         Long_Switch => "--only-licenses=",
@@ -110,9 +116,14 @@ procedure SPDX_Tool.Main is
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.License_Dir'Access,
                         Switch => "-l:",
-                        Long_Switch => "--license-dir=",
+                        Long_Switch => "--license=",
                         Argument => "PATH",
-                        Help   => -("Path of a directory with JSON licenses"));
+                        Help   => -("Path of a license file or a directory with licenses"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Export_Dir'Access,
+                        Long_Switch => "--export=",
+                        Argument => "PATH",
+                        Help   => -("Export the licenses in the directory"));
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Tasks'Access,
                         Switch => "-t:",
@@ -170,7 +181,24 @@ procedure SPDX_Tool.Main is
 
    procedure Report_Summary is new SPDX_Tool.Licenses.Report (Print_Report);
 
-   F : Util.Files.Walk.Filter_Type;
+   procedure Read_Licenses (Manager : in out SPDX_Tool.Licenses.License_Manager;
+                            Path    : in String) is
+      Filter : Util.Files.Walk.Filter_Type;
+   begin
+      Manager.Configure (Licenses.LOAD_LICENSES);
+      Filter.Include ("*.jsonld");
+      Filter.Include ("*.txt");
+      Filter.Exclude ("*");
+      if not AD.Exists (Path) then
+         Log.Error (-("path '{0}' does not exist"), Path);
+         Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+      elsif AD.Kind (Path) = AD.Directory then
+         Manager.Scan (Path, Filter);
+      else
+         Manager.Load_License (Path);
+      end if;
+   end Read_Licenses;
+
 begin
    Opt_Tasks := Integer (System.Multiprocessors.Number_Of_CPUs);
    Setup;
@@ -191,6 +219,7 @@ begin
    end if;
    declare
       Manager : SPDX_Tool.Licenses.License_Manager (Opt_Tasks);
+      Filter  : Util.Files.Walk.Filter_Type;
    begin
       if Licenses.Only_Licenses /= null then
          Manager.Set_Filter (List     => Licenses.Only_Licenses.all,
@@ -212,22 +241,17 @@ begin
                              Language => True,
                              Exclude  => True);
       end if;
-      F.Exclude (".git");
       if Licenses.License_Dir /= null
         and then Licenses.License_Dir.all /= ""
       then
-         Manager.Configure (Licenses.SCAN_LICENSES,
-                            Task_Count (Opt_Tasks));
-         F.Include ("*.jsonld");
-         F.Exclude ("*");
-         Manager.Scan (Licenses.License_Dir.all, F);
-      elsif Opt_Update then
-         Manager.Configure (Licenses.UPDATE_LICENSES,
-                            Task_Count (Opt_Tasks));
-      else
-         Manager.Configure (Licenses.READ_LICENSES,
-                            Task_Count (Opt_Tasks));
+         Read_Licenses (Manager, Licenses.License_Dir.all);
       end if;
+      if Opt_Update then
+         Manager.Configure (Licenses.UPDATE_LICENSES);
+      else
+         Manager.Configure (Licenses.READ_LICENSES);
+      end if;
+      Filter.Exclude (".git");
       loop
          declare
             Arg : constant String := GC.Get_Argument;
@@ -237,7 +261,7 @@ begin
                Log.Error (-("path '{0}' does not exist"), Arg);
                Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
             elsif AD.Kind (Arg) = AD.Directory then
-               Manager.Scan (Arg, F);
+               Manager.Scan (Arg, Filter);
             else
                Manager.Analyze (Arg);
             end if;
