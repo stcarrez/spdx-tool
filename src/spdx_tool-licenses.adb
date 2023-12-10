@@ -33,8 +33,6 @@ package body SPDX_Tool.Licenses is
    function Find_Header (List : UBO.Object) return UBO.Object;
    function Find_Value (Info : UBO.Object; Name : String) return Boolean;
    function Find_Value (Info : UBO.Object; Name : String) return UString;
-   function Find_Token (Token : in Token_Access;
-                        Word  : in Buffer_Type) return Token_Access;
 
    File_Mgr : SPDX_Tool.Files.File_Manager_Access := null with Thread_Local_Storage;
 
@@ -226,6 +224,9 @@ package body SPDX_Tool.Licenses is
       procedure Parse_Token;
       procedure Finish;
 
+      BEGIN_OPTIONAL : constant String := "<<beginOptional>>";
+      END_OPTIONAL   : constant String := "<<endOptional>>";
+
       Pos   : Buffer_Index := Content'First;
       First : Buffer_Index;
       Tok   : Token_Kind;
@@ -233,28 +234,37 @@ package body SPDX_Tool.Licenses is
 
       procedure Next_Token (Token : out Token_Kind) is
          Match : Buffer_Index;
+         Check : Buffer_Index := Pos;
       begin
-         if Content (Pos) = Character'Pos ('<') then
-            Match := Next_With (Content, Pos, "<<beginOptional>>");
-            if Match > Pos then
-               Pos := Match;
-               Token := TOK_OPTIONAL;
-               return;
+         while Check <= Content'Last loop
+            if Content (Check) = Character'Pos ('<') then
+               Match := Next_With (Content, Check, BEGIN_OPTIONAL);
+               if Match > Check then
+                  exit when Check /= Pos;
+                  Pos := Match;
+                  Token := TOK_OPTIONAL;
+                  return;
+               end if;
+               Match := Next_With (Content, Check, END_OPTIONAL);
+               if Match > Check then
+                  exit when Check /= Pos;
+                  Pos := Match;
+                  Token := TOK_OPTIONAL;
+                  return;
+               end if;
+               Match := Next_With (Content, Check, "<<var");
+               if Match > Check then
+                  exit when Check /= Pos;
+                  Pos := Match;
+                  Token := TOK_VAR;
+                  return;
+               end if;
+            else
+               exit when Is_Space (Content (Check));
             end if;
-            Match := Next_With (Content, Pos, "<<endOptional>>");
-            if Match > Pos then
-               Pos := Match;
-               Token := TOK_OPTIONAL;
-               return;
-            end if;
-            Match := Next_With (Content, Pos, "<<var");
-            if Match > Pos then
-               Pos := Match;
-               Token := TOK_VAR;
-               return;
-            end if;
-         end if;
-         Pos := Next_Space (Content, Pos, Content'Last);
+            Check := Check + 1;
+         end loop;
+         Pos := Check;
          Token := TOK_WORD;
       end Next_Token;
 
@@ -369,9 +379,58 @@ package body SPDX_Tool.Licenses is
          end loop;
       end Parse_Var;
 
+      --  Parse the optional in the form:
+      --  <<beginOptional>
+      --  ...
+      --  <<endOptional>>
       procedure Parse_Optional is
+         Match    : Buffer_Index;
+         Optional : Optional_Token_Access;
       begin
-         null;
+         Optional := new Optional_Token_Type '(Len => 0,
+                                               Previous => null,
+                                               Next => null,
+                                               Alternate => null,
+                                               others => <>);
+         Token := Optional.all'Access;
+         while Pos <= Content'Last loop
+
+            --  Ignore white spaces betwen tokens.
+            while Is_Space (Content (Pos)) loop
+               Pos := Pos + 1;
+               if Pos > Content'Last then
+                  Token := Optional.all'Access;
+                  Append_Token (Token);
+                  Previous := Token;
+                  return;
+               end if;
+            end loop;
+
+            Match := Next_With (Content, Pos, END_OPTIONAL);
+            if Match > Pos then
+               Pos := Match;
+               Token := Optional.all'Access;
+               Append_Token (Token);
+               Previous := Token;
+               return;
+            end if;
+
+            First := Pos;
+            Pos := Next_Space (Content, Pos, Content'Last);
+            Token := new Token_Type '(Len => Pos - First,
+                                      Previous => Token,
+                                      Next => null,
+                                      Alternate => null,
+                                      Content => Content (First .. Pos - 1));
+            if Optional.Optional = null then
+               Optional.Optional := Token;
+            else
+               Token.Previous.Next := Token;
+            end if;
+         end loop;
+         Token := Optional.all'Access;
+         Append_Token (Token);
+         Previous := Token;
       end Parse_Optional;
 
       procedure Parse_Copyright is
@@ -506,40 +565,90 @@ package body SPDX_Tool.Licenses is
       Manager.Executor.Wait;
    end Wait;
 
-   function Find_Token (Token : in Token_Access;
-                        Word  : in Buffer_Type) return Token_Access is
-      Current : Token_Access := Token;
-      Tok : constant String := To_String (To_UString (Word));
+   procedure Matches (Token   : in Token_Type;
+                      Content : in Buffer_Type;
+                      From    : in Buffer_Index;
+                      To      : in Buffer_Index;
+                      Result  : out Buffer_Index;
+                      Next    : out Token_Access) is
    begin
-      while Current /= null loop
-         if Current.Matches (Word) then
-            Log.Debug ("Found match {0} - {1}",
-                    To_String (To_UString (Current.Content)), Tok);
-            return Current;
-         end if;
-         Log.Debug ("No match {0} - {1}",
-                    To_String (To_UString (Current.Content)), Tok);
-         Current := Current.Alternate;
-      end loop;
-      return null;
-   end Find_Token;
-
-   function Matches (Token : in Token_Type;
-                     Word  : in Buffer_Type) return Boolean is
-   begin
-      if Token.Content = Word then
-         return True;
+      if Token.Content = Content (From .. To) then
+         Result := To + 1;
+         Next := Token.Next;
+      else
+         Result := From;
+         Next := null;
       end if;
-      return False;
    end Matches;
 
    overriding
-   function Matches (Token : in Regpat_Token_Type;
-                     Word  : in Buffer_Type) return Boolean is
-      Item : String (1 .. Word'Length);
-      for Item'Address use Word'Address;
+   procedure Matches (Token   : in Regpat_Token_Type;
+                      Content : in Buffer_Type;
+                      From    : in Buffer_Index;
+                      To      : in Buffer_Index;
+                      Result  : out Buffer_Index;
+                      Next    : out Token_Access) is
+      Item : String (1 .. Content'Length);
+      for Item'Address use Content'Address;
    begin
-      return GNAT.Regpat.Match (Token.Pattern, Item);
+      if GNAT.Regpat.Match (Token.Pattern, Item) then
+         Result := To + 1;
+         Next := Token.Next;
+      else
+         Result := From;
+         Next := null;
+      end if;
+   end Matches;
+
+   overriding
+   procedure Matches (Token   : in Optional_Token_Type;
+                      Content : in Buffer_Type;
+                      From    : in Buffer_Index;
+                      To      : in Buffer_Index;
+                      Result  : out Buffer_Index;
+                      Next    : out Token_Access) is
+   begin
+      if Token.Optional = null then
+         Result := From;
+         Next := null;
+         return;
+      end if;
+      Token.Optional.Matches (Content, From, To, Result, Next);
+      if Next = null then
+         Token.Next.Matches (Content, From, To, Result, Next);
+         return;
+      end if;
+
+      --  Other optional tokens must match.
+      declare
+         Last  : constant Buffer_Index := Content'Last;
+         First : Buffer_Index := From;
+         Pos   : Buffer_Index := To;
+         Check : Token_Access := Token.Optional.Next;
+      begin
+         while Check /= null loop
+            if Pos + 1 > Last then
+               Result := From;
+               Next := null;
+               return;
+            end if;
+            First := Skip_Spaces (Content, Pos + 1, Last);
+            if First > Last then
+               Result := From;
+               Next := null;
+               return;
+            end if;
+            Pos := Next_Space (Content, First, Last);
+            Check.Matches (Content, First, Pos - 1, Result, Next);
+            if Next = null and then Result = First then
+               Result := From;
+               return;
+            end if;
+            Check := Check.Next;
+         end loop;
+         Next := Token.Next;
+         Result := Pos + 1;
+      end;
    end Matches;
 
    function Extract_SPDX (Lines   : in SPDX_Tool.Files.Line_Array;
@@ -583,6 +692,25 @@ package body SPDX_Tool.Licenses is
       return Result;
    end Extract_SPDX;
 
+   procedure Match (Token   : in Token_Access;
+                    Content : in Buffer_Type;
+                    From    : in Buffer_Index;
+                    Last    : in Buffer_Index;
+                    Result  : out Buffer_Index;
+                    Next    : out Token_Access) is
+      Current : Token_Access := Token;
+   begin
+      while Current /= null loop
+         Current.Matches (Content, From, Last, Result, Next);
+         if Next /= null then
+            return;
+         end if;
+         Current := Current.Alternate;
+      end loop;
+      Next := null;
+      Result := From;
+   end Match;
+
    function Find_License (Manager : in License_Manager;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
@@ -614,17 +742,9 @@ package body SPDX_Tool.Licenses is
                First := Pos;
                Pos := Next_Space (Content, Pos, Last);
                if Current = null then
-                  Next_Token := Find_Token (Manager.Tokens,
-                                            Content (First .. Pos - 1));
+                  Match (Manager.Tokens, Content, First, Pos - 1, Pos, Next_Token);
                else
-                  Next_Token := Find_Token (Current.Next,
-                                            Content (First .. Pos - 1));
-                  if Next_Token = null
-                     and then Current.Kind = TOK_VAR
-                     and then Current.Matches (Content (First .. Pos - 1))
-                  then
-                     Next_Token := Current;
-                  end if;
+                  Match (Current, Content, First, Pos - 1, Pos, Next_Token);
                end if;
                if Next_Token = null then
                   if Current /= null then

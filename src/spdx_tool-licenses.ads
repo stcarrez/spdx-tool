@@ -199,8 +199,19 @@ private
       Content   : Buffer_Type (1 .. Len);
    end record;
 
-   function Matches (Token : in Token_Type;
-                     Word  : in Buffer_Type) return Boolean;
+   procedure Match (Token   : in Token_Access;
+                    Content : in Buffer_Type;
+                    From    : in Buffer_Index;
+                    Last    : in Buffer_Index;
+                    Result  : out Buffer_Index;
+                    Next    : out Token_Access);
+
+   procedure Matches (Token   : in Token_Type;
+                      Content : in Buffer_Type;
+                      From    : in Buffer_Index;
+                      To      : in Buffer_Index;
+                      Result  : out Buffer_Index;
+                      Next    : out Token_Access);
 
    function Kind (Token : in Token_Type)
                   return Token_Kind is (TOK_WORD);
@@ -216,8 +227,29 @@ private
                   return Token_Kind is (TOK_VAR);
 
    overriding
-   function Matches (Token : in Regpat_Token_Type;
-                     Word  : in Buffer_Type) return Boolean;
+   procedure Matches (Token   : in Regpat_Token_Type;
+                      Content : in Buffer_Type;
+                      From    : in Buffer_Index;
+                      To      : in Buffer_Index;
+                      Result  : out Buffer_Index;
+                      Next    : out Token_Access);
+
+   type Optional_Token_Type is new Token_Type (Len => 0) with record
+      Optional : Token_Access;
+   end record;
+   type Optional_Token_Access is access all Optional_Token_Type;
+
+   overriding
+   function Kind (Token : in Optional_Token_Type)
+                  return Token_Kind is (TOK_OPTIONAL);
+
+   overriding
+   procedure Matches (Token   : in Optional_Token_Type;
+                      Content : in Buffer_Type;
+                      From    : in Buffer_Index;
+                      To      : in Buffer_Index;
+                      Result  : out Buffer_Index;
+                      Next    : out Token_Access);
 
    type Final_Token_Type (Len : Buffer_Size)
    is new Token_Type (Len) with record
