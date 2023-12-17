@@ -164,6 +164,13 @@ private
       Max_Line : Natural := 0;
    end License_Stats;
 
+   type Line_Pos is record
+      Line : Positive := 1;
+      Pos  : Buffer_Index;
+   end record;
+
+   subtype Line_Array is SPDX_Tool.Files.Line_Array;
+
    --  The license templates are read within a tree of tokens.  To find a
    --  license match, the license text in the source file header is split in
    --  tokens and we start from the license manager root token.  We move to
@@ -201,20 +208,42 @@ private
 
    procedure Match (Token   : in Token_Access;
                     Content : in Buffer_Type;
-                    From    : in Buffer_Index;
+                    Lines   : in Line_Array;
+                    From    : in Line_Pos;
                     Last    : in Buffer_Index;
-                    Result  : out Buffer_Index;
+                    Result  : out Line_Pos;
                     Next    : out Token_Access);
 
    procedure Matches (Token   : in Token_Type;
                       Content : in Buffer_Type;
-                      From    : in Buffer_Index;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
                       To      : in Buffer_Index;
-                      Result  : out Buffer_Index;
+                      Result  : out Line_Pos;
                       Next    : out Token_Access);
 
    function Kind (Token : in Token_Type)
                   return Token_Kind is (TOK_WORD);
+
+   function Depth (Token : in Token_Type'Class) return Natural;
+
+   type Any_Token_Type (Len : Buffer_Size)
+   is new Token_Type (Len) with record
+      Max_Length : Buffer_Size;
+   end record;
+
+   overriding
+   function Kind (Token : in Any_Token_Type)
+                  return Token_Kind is (TOK_VAR);
+
+   overriding
+   procedure Matches (Token   : in Any_Token_Type;
+                      Content : in Buffer_Type;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
+                      To      : in Buffer_Index;
+                      Result  : out Line_Pos;
+                      Next    : out Token_Access);
 
    type Regpat_Token_Type (Len  : Buffer_Size;
                            Plen : GNAT.Regpat.Program_Size)
@@ -229,9 +258,10 @@ private
    overriding
    procedure Matches (Token   : in Regpat_Token_Type;
                       Content : in Buffer_Type;
-                      From    : in Buffer_Index;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
                       To      : in Buffer_Index;
-                      Result  : out Buffer_Index;
+                      Result  : out Line_Pos;
                       Next    : out Token_Access);
 
    type Optional_Token_Type is new Token_Type (Len => 0) with record
@@ -246,9 +276,10 @@ private
    overriding
    procedure Matches (Token   : in Optional_Token_Type;
                       Content : in Buffer_Type;
-                      From    : in Buffer_Index;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
                       To      : in Buffer_Index;
-                      Result  : out Buffer_Index;
+                      Result  : out Line_Pos;
                       Next    : out Token_Access);
 
    type Final_Token_Type (Len : Buffer_Size)
@@ -307,14 +338,20 @@ private
       Exclude_Languages : Util.Strings.Sets.Set;
    end record;
 
+   type License_Match is record
+      Info  : Infos.License_Info;
+      Last  : Token_Access;
+      Depth : Natural := 0;
+   end record;
+
    function Find_License (Manager : in License_Manager;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
-                          return Infos.License_Info;
+                          return License_Match;
 
    function Find_License (Manager : in License_Manager;
                           File    : in SPDX_Tool.Files.File_Type)
-                          return Infos.License_Info;
+                          return License_Match;
 
    overriding
    procedure Finalize (Manager : in out License_Manager);

@@ -259,8 +259,10 @@ package body SPDX_Tool.Licenses is
                   Token := TOK_VAR;
                   return;
                end if;
-            else
+            elsif Check = Pos then
                exit when Is_Space (Content (Check));
+            else
+               exit when Is_Space_Or_Punctuation (Content (Check));
             end if;
             Check := Check + 1;
          end loop;
@@ -318,6 +320,31 @@ package body SPDX_Tool.Licenses is
          Regpat : String (1 .. Content'Length);
          for Regpat'Address use Content'Address;
       begin
+         if Regpat = ".+" then
+            return new Any_Token_Type '(Len => Content'Length,
+                                        Previous => null,
+                                        Next => null,
+                                        Alternate => null,
+                                        Content => Content,
+                                        Max_Length => 1000);
+         end if;
+         if Regpat = ".*" or else Regpat = ".{0,5000}" then
+            return new Any_Token_Type '(Len => Content'Length,
+                                        Previous => null,
+                                        Next => null,
+                                        Alternate => null,
+                                        Content => Content,
+                                        Max_Length => 1000);
+         end if;
+         if Regpat = ".{0,20}" then
+            return new Any_Token_Type '(Len => Content'Length,
+                                        Previous => null,
+                                        Next => null,
+                                        Alternate => null,
+                                        Content => Content,
+                                        Max_Length => 20);
+         end if;
+         Log.Info ("Pattern: '{0}'", Regpat);
          declare
             Pat : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
          begin
@@ -363,6 +390,10 @@ package body SPDX_Tool.Licenses is
                   Pos := Pos + 1;
                end loop;
                Token := Find_Token (Content (First .. Pos - 1));
+               if Token /= null then
+                  Log.Info ("Reuse pattern {0}",
+                           To_String (To_UString (Content (First .. Pos - 1))));
+               end if;
                if Token = null then
                   Token := Create_Regpat (Content => Content (First .. Pos - 1));
                   Append_Token (Token);
@@ -417,6 +448,15 @@ package body SPDX_Tool.Licenses is
 
             First := Pos;
             Pos := Next_Space (Content, Pos, Content'Last);
+            if Pos - First > END_OPTIONAL'Length then
+               for I in First + 1 .. Pos loop
+                  Match := Next_With (Content, I, END_OPTIONAL);
+                  if Match > I then
+                     Pos := I;
+                     exit;
+                  end if;
+               end loop;
+            end if;
             Token := new Token_Type '(Len => Pos - First,
                                       Previous => Token,
                                       Next => null,
@@ -565,47 +605,181 @@ package body SPDX_Tool.Licenses is
       Manager.Executor.Wait;
    end Wait;
 
+   function Depth (Token : in Token_Type'Class) return Natural is
+      Result : Natural := 0;
+      Parent : Token_Access := Token.Previous;
+   begin
+      while Parent /= null loop
+         Parent := Parent.Previous;
+         Result := Result + 1;
+      end loop;
+      return Result;
+   end Depth;
+
    procedure Matches (Token   : in Token_Type;
                       Content : in Buffer_Type;
-                      From    : in Buffer_Index;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
                       To      : in Buffer_Index;
-                      Result  : out Buffer_Index;
+                      Result  : out Line_Pos;
                       Next    : out Token_Access) is
    begin
-      if Token.Content = Content (From .. To) then
-         Result := To + 1;
+      if Token.Content = Content (From.Pos .. To) then
+         Result := (Line => From.Line, Pos => To + 1);
          Next := Token.Next;
       else
          Result := From;
          Next := null;
       end if;
+   end Matches;
+
+   function Skip_Spaces (Content : in Buffer_Type;
+                         Lines   : in Line_Array;
+                         From    : in Line_Pos) return Line_Pos is
+      Result : Line_Pos := From;
+   begin
+      while Result.Line <= Lines'Last loop
+         declare
+            Last : Buffer_Index := Lines (Result.Line).Line_End;
+         begin
+            if Result.Pos < Last then
+               Result.Pos := Skip_Spaces (Content, Result.Pos, Last);
+               exit when Result.Pos < Last;
+            end if;
+            Result.Line := Result.Line + 1;
+            exit when Result.Line > Lines'Last;
+            Result.Pos := Lines (Result.Line).Line_Start;
+         end;
+      end loop;
+      return Result;
+   end Skip_Spaces;
+
+   overriding
+   procedure Matches (Token   : in Any_Token_Type;
+                      Content : in Buffer_Type;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
+                      To      : in Buffer_Index;
+                      Result  : out Line_Pos;
+                      Next    : out Token_Access) is
+      Last  : constant Buffer_Index := Content'Last;
+      Check : constant Token_Access := Token.Next;
+      Pos   : Line_Pos := (Line => From.Line, Pos => To);
+   begin
+      if Check = null then
+         Result := From;
+         Next := null;
+         return;
+      end if;
+      while Pos.Pos < Last loop
+         declare
+            End_Pos : constant Line_Pos := Pos;
+            First   : constant Line_Pos
+              := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos + 1));
+            End_Line : Buffer_Index;
+         begin
+            exit when First.Line > Lines'Last;
+            exit when End_Pos.Pos - From.Pos > Token.Max_Length;
+            exit when Lines (First.Line).Comment = SPDX_Tool.Files.NO_COMMENT;
+            End_Line := Lines (First.Line).Style.Last;
+            Pos.Pos := Next_Space (Content, First.Pos, End_Line);
+            Match (Check, Content, Lines, First, Pos.Pos - 1, Result, Next);
+            if Next /= null and then Result /= First then
+               return;
+            end if;
+            if Pos.Pos >= End_Line then
+               Pos.Line := First.Line + 1;
+               exit when Pos.Line > Lines'Last;
+               exit when Lines (Pos.Line).Comment = SPDX_Tool.Files.NO_COMMENT;
+               Pos.Pos := Lines (Pos.Line).Style.Start - 1;
+            else
+               Pos.Line := First.Line;
+            end if;
+         end;
+      end loop;
+      Result := From;
+      Next := null;
    end Matches;
 
    overriding
    procedure Matches (Token   : in Regpat_Token_Type;
                       Content : in Buffer_Type;
-                      From    : in Buffer_Index;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
                       To      : in Buffer_Index;
-                      Result  : out Buffer_Index;
+                      Result  : out Line_Pos;
                       Next    : out Token_Access) is
-      Item : String (1 .. Content'Length);
-      for Item'Address use Content'Address;
+      Last  : constant Buffer_Index := Content'Last;
+      --  Start : constant Positive := Positive (From);
+      End_Pos : Positive;
+      --  First : Buffer_Index := From;
+      Pos   : Line_Pos := (Line => From.Line, Pos => To);
+      Check : Token_Access := Token.Next;
    begin
-      if GNAT.Regpat.Match (Token.Pattern, Item) then
-         Result := To + 1;
-         Next := Token.Next;
-      else
+      if Check = null then
          Result := From;
          Next := null;
+         return;
       end if;
+      Match (Check, Content, Lines, From, To, Result, Next);
+      if Next /= null and then Result /= From
+        and then GNAT.Regpat.Match (Token.Pattern, "")
+      then
+         return;
+      end if;
+      while Pos.Pos < Last loop
+         declare
+            End_Pos : constant Line_Pos := Pos;
+            First   : constant Line_Pos
+              := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos + 1));
+            End_Line : Buffer_Index;
+         begin
+            exit when First.Line > Lines'Last;
+            exit when Lines (First.Line).Comment = SPDX_Tool.Files.NO_COMMENT;
+            End_Line := Lines (First.Line).Style.Last;
+            Pos.Pos := Next_Space (Content, First.Pos, End_Line);
+            Match (Check, Content, Lines, First, Pos.Pos - 1, Result, Next);
+            if Next /= null and then Result /= First then
+               return;
+            end if;
+            if Pos.Pos >= End_Line then
+               Pos.Line := First.Line + 1;
+               exit when Pos.Line > Lines'Last;
+               Pos.Pos := Lines (Pos.Line).Style.Start;
+            else
+               Pos.Line := First.Line;
+            end if;
+         end;
+      end loop;
+      --  while Pos.Pos < Last loop
+      --   End_Pos := Positive (Pos);
+      --   First := Skip_Spaces (Content, Pos + 1, Last);
+      --   exit when First > Last;
+      --   Pos := Next_Space (Content, First, Last);
+      --   Check.Matches (Content, First, Pos - 1, Result, Next);
+      --   if Next /= null and then Result /= First then
+      --      declare
+      --         Item : String (1 .. Content'Length);
+      --         for Item'Address use Content'Address;
+      --      begin
+      --         Log.Debug ("Check '{0}'", Item (Start .. End_Pos));
+     --          if GNAT.Regpat.Match (Token.Pattern, Item (Start .. End_Pos)) then
+      --            return;
+      --         end if;
+      --      end;
+      --   end if;
+      --  end loop;
+      Result := From;
+      Next := null;
    end Matches;
 
    overriding
    procedure Matches (Token   : in Optional_Token_Type;
                       Content : in Buffer_Type;
-                      From    : in Buffer_Index;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
                       To      : in Buffer_Index;
-                      Result  : out Buffer_Index;
+                      Result  : out Line_Pos;
                       Next    : out Token_Access) is
    begin
       if Token.Optional = null then
@@ -613,33 +787,38 @@ package body SPDX_Tool.Licenses is
          Next := null;
          return;
       end if;
-      Token.Optional.Matches (Content, From, To, Result, Next);
+      Token.Optional.Matches (Content, Lines, From, To, Result, Next);
       if Next = null then
-         Token.Next.Matches (Content, From, To, Result, Next);
+         Token.Next.Matches (Content, Lines, From, To, Result, Next);
          return;
       end if;
 
       --  Other optional tokens must match.
       declare
          Last  : constant Buffer_Index := Content'Last;
-         First : Buffer_Index := From;
-         Pos   : Buffer_Index := To;
+         First : Line_Pos := From;
+         Pos   : Line_Pos := (Line => From.Line, Pos => To);
          Check : Token_Access := Token.Optional.Next;
+         End_Line : Buffer_Index;
       begin
          while Check /= null loop
-            if Pos + 1 > Last then
+            if Pos.Pos + 1 > Last
+              or else Lines (Pos.Line).Comment /= SPDX_Tool.Files.NO_COMMENT
+            then
                Result := From;
                Next := null;
                return;
             end if;
-            First := Skip_Spaces (Content, Pos + 1, Last);
-            if First > Last then
+            First := Skip_Spaces (Content, Lines,
+                                  (Line => Pos.Line, Pos => Pos.Pos + 1));
+            if First.Line > Lines'Last then
                Result := From;
                Next := null;
                return;
             end if;
-            Pos := Next_Space (Content, First, Last);
-            Check.Matches (Content, First, Pos - 1, Result, Next);
+            End_Line := Lines (First.Line).Style.Last;
+            Pos.Pos := Next_Space (Content, First.Pos, End_Line);
+            Check.Matches (Content, Lines, First, Pos.Pos - 1, Result, Next);
             if Next = null and then Result = First then
                Result := From;
                return;
@@ -647,7 +826,7 @@ package body SPDX_Tool.Licenses is
             Check := Check.Next;
          end loop;
          Next := Token.Next;
-         Result := Pos + 1;
+         Result := (Line => Pos.Line, Pos => Pos.Pos + 1);
       end;
    end Matches;
 
@@ -694,14 +873,15 @@ package body SPDX_Tool.Licenses is
 
    procedure Match (Token   : in Token_Access;
                     Content : in Buffer_Type;
-                    From    : in Buffer_Index;
+                    Lines   : in Line_Array;
+                    From    : in Line_Pos;
                     Last    : in Buffer_Index;
-                    Result  : out Buffer_Index;
+                    Result  : out Line_Pos;
                     Next    : out Token_Access) is
       Current : Token_Access := Token;
    begin
       while Current /= null loop
-         Current.Matches (Content, From, Last, Result, Next);
+         Current.Matches (Content, Lines, From, Last, Result, Next);
          if Next /= null then
             return;
          end if;
@@ -714,42 +894,51 @@ package body SPDX_Tool.Licenses is
    function Find_License (Manager : in License_Manager;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
-                          return Infos.License_Info is
-
-      Line    : Positive := Lines'First;
+                          return License_Match is
       Current : Token_Access := null;
-      Result  : Infos.License_Info;
-      Pos, Last, First : Buffer_Index;
+      Result  : License_Match;
+      Pos, First : Line_Pos;
       Next_Token : Token_Access;
+      Last : Buffer_Index;
    begin
-      Result.First_Line := Line;
-      while Line <= Lines'Last loop
-         if Lines (Line).Style.Style /= SPDX_Tool.Files.NO_COMMENT then
-            Pos := Lines (Line).Style.Start;
-            Last := Lines (Line).Style.Last;
-            if Current = null and then Pos <= Last then
-               Pos := Skip_Spaces (Content, Pos, Last);
-               if Pos <= Last then
-                  First := Next_With (Content, Pos, SPDX_License_Tag);
-                  if First > Pos then
-                     return Extract_SPDX (Lines, Content, Line, First);
+      Result.Info.First_Line := Lines'First;
+      Pos.Line := Lines'First;
+      Pos.Pos := Content'First;
+      while Pos.Line <= Lines'Last loop
+         First.Line := Pos.Line;
+         if Lines (Pos.Line).Style.Style /= SPDX_Tool.Files.NO_COMMENT then
+            if Pos.Pos < Lines (Pos.Line).Style.Start then
+               Pos.Pos := Lines (Pos.Line).Style.Start;
+            end if;
+            Last := Lines (Pos.Line).Style.Last;
+            if Current = null and then Pos.Pos <= Last then
+               Pos.Pos := Skip_Spaces (Content, Pos.Pos, Last);
+               if Pos.Pos <= Last then
+                  First.Pos := Next_With (Content, Pos.Pos, SPDX_License_Tag);
+                  if First.Pos > Pos.Pos then
+                     Result.Info := Extract_SPDX (Lines, Content, First.Line, First.Pos);
+                     Result.Last := null;
+                     return Result;
                   end if;
                end if;
             end if;
-            while Pos <= Last loop
-               Pos := Skip_Spaces (Content, Pos, Last);
-               exit when Pos > Last;
-               First := Pos;
-               Pos := Next_Space (Content, Pos, Last);
+            while Pos.Pos <= Last and then First.Line = Pos.Line loop
+               Pos.Pos := Skip_Spaces (Content, Pos.Pos, Last);
+               exit when Pos.Pos > Last;
+               First.Pos := Pos.Pos;
+               Pos.Pos := Next_Space (Content, Pos.Pos, Last);
                if Current = null then
-                  Match (Manager.Tokens, Content, First, Pos - 1, Pos, Next_Token);
+                  Match (Manager.Tokens, Content, Lines, First,
+                         Pos.Pos - 1, Pos, Next_Token);
                else
-                  Match (Current, Content, First, Pos - 1, Pos, Next_Token);
+                  Match (Current, Content, Lines, First,
+                         Pos.Pos - 1, Pos, Next_Token);
                end if;
                if Next_Token = null then
                   if Current /= null then
                      Log.Debug ("Missmatch found");
                   end if;
+                  Result.Last := Current;
                   return Result;
                end if;
                Current := Next_Token;
@@ -757,36 +946,50 @@ package body SPDX_Tool.Licenses is
                  and then Current.Next.Kind = TOK_LICENSE
                then
                   Current := Current.Next;
-                  Result.Name := Final_Token_Type (Current.all).License;
-                  Result.Last_Line := Line;
-                  Result.Match := Infos.TEMPLATE_LICENSE;
+                  Result.Info.Name := Final_Token_Type (Current.all).License;
+                  Result.Info.Last_Line := Pos.Line;
+                  Result.Info.Match := Infos.TEMPLATE_LICENSE;
+                  Result.Last := Current;
                   return Result;
                end if;
             end loop;
          end if;
-         Line := Line + 1;
+         if First.Line = Pos.Line then
+            Pos.Line := Pos.Line + 1;
+         end if;
       end loop;
-      Result.Last_Line := Line;
-      Result.Match := Infos.UNKNOWN_LICENSE;
+      Result.Info.Last_Line := Pos.Line;
+      Result.Info.Match := Infos.UNKNOWN_LICENSE;
+      Result.Last := null;
       return Result;
    end Find_License;
 
    function Find_License (Manager : in License_Manager;
                           File    : in SPDX_Tool.Files.File_Type)
-                          return Infos.License_Info is
+                          return License_Match is
       Buf     : constant Buffer_Accessor := File.Buffer.Value;
-      Result  : Infos.License_Info := (others => <>);
+      Result  : License_Match := (Last => null, Depth => 0, others => <>);
+      Match   : License_Match;
       Line    : Positive := 1;
    begin
       if File.Cmt_Style = SPDX_Tool.Files.NO_COMMENT then
-         Result.Match := Infos.NONE;
+         Result.Info.Match := Infos.NONE;
          return Result;
       end if;
       while Line <= File.Count loop
          if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
-            Result := Find_License (Manager, Buf.Data,
+            Match := Find_License (Manager, Buf.Data,
                                     File.Lines (Line .. File.Count));
-            exit when Result.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE;
+            if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+               return Match;
+            end if;
+            if Match.Last /= null then
+               Match.Depth := Match.Last.Depth;
+               if Result.Last = null or else Match.Depth > Result.Depth then
+                  Result.Last := Match.Last;
+                  Result.Depth := Match.Depth;
+               end if;
+            end if;
          end if;
          Line := Line + 1;
       end loop;
@@ -858,9 +1061,11 @@ package body SPDX_Tool.Licenses is
                       File_Mgr : in out SPDX_Tool.Files.File_Manager;
                       File     : in out SPDX_Tool.Infos.File_Info) is
       Data   : SPDX_Tool.Files.File_Type (100);
+      Result : License_Match;
    begin
       File_Mgr.Open (Data, File.Path);
-      File.License := Manager.Find_License (Data);
+      Result := Manager.Find_License (Data);
+      File.License := Result.Info;
       File.Mime := Data.Ident.Mime;
       File.Language := Data.Language;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
@@ -892,6 +1097,26 @@ package body SPDX_Tool.Licenses is
             Log.Info ("{0}: {1}", File.Path, Empty_File);
          end if;
       else
+         if Result.Last /= null then
+            declare
+               procedure Print_License (License : in Token_Access) is
+                  Token : Token_Access := License;
+               begin
+                  while Token /= null loop
+                     if Token.Alternate /= null then
+                        Print_License (Token.Alternate);
+                     end if;
+                     if Token.Kind = TOK_LICENSE then
+                        Log.Error ("Possible license: {0}",
+                                   To_String (Final_Token_Type (Token.all).License));
+                     end if;
+                     Token := Token.Next;
+                  end loop;
+               end Print_License;
+            begin
+               Print_License (Result.Last);
+            end;
+         end if;
          declare
             use SPDX_Tool.Files;
 
