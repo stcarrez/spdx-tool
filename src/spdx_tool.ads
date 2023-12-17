@@ -62,20 +62,34 @@ private
    OPEN_PAREN  : constant Byte := Character'Pos ('(');
    CLOSE_PAREN : constant Byte := Character'Pos (')');
 
-   function Is_Space (C : Byte)
-                      return Boolean is (C in SPACE | TAB | CR | LF);
+   function Is_Space
+     (C : Byte)
+      return Boolean is (C in SPACE | TAB | CR | LF);
 
-   function Is_Eol (C : Byte)
-                      return Boolean is (C in CR | LF);
+   function Is_Space_Or_Punctuation
+     (C : Byte)
+      return Boolean is (C in SPACE | TAB | CR | LF
+                           | Character'Pos (':') | Character'Pos (',')
+                           | Character'Pos ('.') | Character'Pos (';')
+                           | Character'Pos ('!') | Character'Pos ('(')
+                           | Character'Pos (')'));
 
-   function Is_Comment_Presentation (C : Byte) return Boolean is
-      (C in Character'Pos ('*') | Character'Pos ('-') | Character'Pos ('+'));
+   function Is_Eol
+     (C : Byte)
+      return Boolean is (C in CR | LF);
+
+   function Is_Comment_Presentation
+     (C : Byte)
+      return Boolean is (C in Character'Pos ('*')
+                           | Character'Pos ('-')
+                           | Character'Pos ('+'));
 
    --  Find index of the first non white space after first and up to last.
    function Skip_Spaces (Buffer : in Buffer_Type;
                          First  : in Buffer_Index;
                          Last   : in Buffer_Index) return Buffer_Index
-     with Pre => First <= Last and then First >= Buffer'First
+     with Pre => First <= Last
+     and then First >= Buffer'First
      and then Last <= Buffer'Last;
 
    --  Skip an optional presentation marker at beginning of a line.
@@ -89,26 +103,30 @@ private
    function Skip_Presentation (Buffer : in Buffer_Type;
                                First  : in Buffer_Index;
                                Last   : in Buffer_Index) return Buffer_Index
-     with Pre => First <= Last and then First >= Buffer'First
+     with Pre => First <= Last
+     and then First >= Buffer'First
      and then Last <= Buffer'Last;
 
    function Next_Space (Buffer : in Buffer_Type;
                         First  : in Buffer_Index;
                         Last   : in Buffer_Index) return Buffer_Index
-     with Pre => First <= Last and then First >= Buffer'First
+     with Pre => First <= Last
+     and then First >= Buffer'First
      and then Last <= Buffer'Last;
 
    --  Move to the next position after the text if the buffer matches.
    function Next_With (Buffer : in Buffer_Type;
                        From   : in Buffer_Index;
                        Text   : in String) return Buffer_Index
-     with Pre => From >= Buffer'First and then From <= Buffer'Last
+     with Pre => From >= Buffer'First
+     and then From <= Buffer'Last
      and then Text'Length > 0;
 
    --  Find the end of line.
    function Find_Eol (Buffer : in Buffer_Type;
                       From   : in Buffer_Index) return Buffer_Index
-     with Pre => From >= Buffer'First and then From <= Buffer'Last;
+     with Pre => From >= Buffer'First
+     and then From <= Buffer'Last;
 
    function To_UString (Buffer : in Buffer_Type) return UString;
 

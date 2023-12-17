@@ -73,7 +73,10 @@ package body SPDX_Tool is
                         Last   : in Buffer_Index) return Buffer_Index is
       Pos : Buffer_Index := First;
    begin
-      while Pos <= Last and then not Is_Space (Buffer (Pos)) loop
+      if Pos <= Last and then not Is_Space (Buffer (Pos)) then
+         Pos := Pos + 1;
+      end if;
+      while Pos <= Last and then not Is_Space_Or_Punctuation (Buffer (Pos)) loop
          Pos := Pos + 1;
       end loop;
       return Pos;
