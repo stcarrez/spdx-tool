@@ -5,13 +5,16 @@
 -----------------------------------------------------------------------
 
 with GNAT.Source_Info;
-with Util.Assertions;
 with Util.Test_Caller;
 with SPDX_Tool.Files;
 package body SPDX_Tool.Licenses.Tests is
 
-   procedure Assert_Equals is
-     new Util.Assertions.Assert_Equals_T (Value_Type => Files.Comment_Style);
+   procedure Check_License (T        : in out Test;
+                            Filename : in String;
+                            License  : in String;
+                            Expect   : in String;
+                            Source   : in String := GNAT.Source_Info.File;
+                            Line     : in Natural := GNAT.Source_Info.Line);
 
    package Caller is new Util.Test_Caller (Test, "SPDX_Tool.Licenses");
 
@@ -34,13 +37,13 @@ package body SPDX_Tool.Licenses.Tests is
       Path    : constant String := Util.Tests.Get_Path ("regtests/files/identify/" & Filename);
       Manager : License_Manager (1);
       File    : SPDX_Tool.Files.File_Type (100);
-      Result  : Infos.License_Info;
+      Result  : License_Match;
    begin
       --  Load only one license to simplify the debugging in case of problem.
       Manager.Load_License ("licenses/" & License);
       Manager.File_Mgr (1).Open (File, Path);
       Result := Manager.Find_License (File);
-      Util.Tests.Assert_Equals (T, Expect, Result.Name,
+      Util.Tests.Assert_Equals (T, Expect, Result.Info.Name,
                                 "Invalid license found", Source, Line);
    end Check_License;
 
