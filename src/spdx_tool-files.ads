@@ -32,13 +32,16 @@ package SPDX_Tool.Files is
    type Comment_Index is new Natural;
 
    type Comment_Info is record
-      Style    : Comment_Style := NO_COMMENT;
-      Start    : Buffer_Index := 1;
-      Last     : Buffer_Index := 1;
-      Head     : Buffer_Index := 1;
-      Trailer  : Buffer_Size := 0;
-      Index    : Comment_Index := 0;
-      Mode     : Comment_Mode := NO_COMMENT;
+      Style      : Comment_Style := NO_COMMENT;
+      Start      : Buffer_Index := 1;
+      Last       : Buffer_Index := 1;
+      Head       : Buffer_Index := 1;
+      Text_Start : Buffer_Index := 1;
+      Text_Last  : Buffer_Index := 1;
+      Trailer    : Buffer_Size := 0;
+      Index      : Comment_Index := 0;
+      Mode       : Comment_Mode := NO_COMMENT;
+      Boxed      : Boolean := False;
    end record;
 
    type Line_Type is record
@@ -49,6 +52,36 @@ package SPDX_Tool.Files is
    end record;
    type Line_Array is array (Positive range <>) of Line_Type;
 
+   --  Check if Lines (From..To) are of the same length.
+   function Is_Same_Length (Lines : in Line_Array;
+                            From  : in Positive;
+                            To    : in Positive) return Boolean
+     with Pre => From <= To;
+
+   --  Check if we have the same byte for every line starting from the
+   --  end of the line with the given offset.
+   function Is_Same_Byte (Lines  : in Line_Array;
+                          Buffer : in Buffer_Type;
+                          From   : in Positive;
+                          To     : in Positive;
+                          Offset : in Buffer_Size) return Boolean
+     with Pre => Is_Same_Length (Lines, From, To);
+
+   --  Find the common length at end of each line between From and To.
+   function Common_End_Length (Lines  : in Line_Array;
+                               Buffer : in Buffer_Type;
+                               From   : in Positive;
+                               To     : in Positive) return Buffer_Size
+     with Pre => Is_Same_Length (Lines, From, To);
+
+   --  Identify boundaries of a license with a boxed presentation.
+   --  Having identified such boxed presentation, update the lines Text_Last
+   --  position to indicate the last position of the text for each line
+   --  to ignore the boxed presentation.
+   procedure Boxed_License (Lines  : in out Line_Array;
+                            Buffer : in Buffer_Type;
+                            Boxed  : out Boolean);
+
    type File_Type (Max_Lines : Positive) is limited record
       File         : Util.Streams.Files.File_Stream;
       Buffer       : Buffer_Ref;
@@ -58,6 +91,7 @@ package SPDX_Tool.Files is
       Cmt_Style    : Comment_Style := NO_COMMENT;
       Lines        : Line_Array (1 .. Max_Lines);
       Language     : UString;
+      Boxed        : Boolean;
    end record;
 
    type File_Manager is tagged limited private;

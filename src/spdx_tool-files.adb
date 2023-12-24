@@ -85,9 +85,12 @@ package body SPDX_Tool.Files is
                           Start   => From + Cmt.Len,
                           Last    => From,
                           Head    => From,
+                          Text_Start => From + Cmt.Len,
+                          Text_Last  => Last,
                           Trailer => 0,
                           Index   => Index,
-                          Mode    => LINE_COMMENT);
+                          Mode    => LINE_COMMENT,
+                          Boxed   => False);
                return;
             end if;
          end;
@@ -105,9 +108,12 @@ package body SPDX_Tool.Files is
                              Start   => From + Cmt.Len,
                              Last    => From,
                              Head    => From,
+                             Text_Start => From + Cmt.Len,
+                             Text_Last  => Last,
                              Trailer => 0,
                              Index   => Index,
-                             Mode    => START_COMMENT);
+                             Mode    => START_COMMENT,
+                             Boxed   => False);
                   return;
                end if;
             end;
@@ -141,7 +147,8 @@ package body SPDX_Tool.Files is
                             Path     : in String) is
       Len  : constant Buffer_Size := File.Last_Offset;
       Ext  : constant String := Ada.Directories.Extension (Path);
-      Kind : access constant String := SPDX_Tool.Files.Extensions.Get_Mapping (Ext);
+      Kind : constant access constant String
+        := SPDX_Tool.Files.Extensions.Get_Mapping (Ext);
    begin
       if Kind /= null then
          File.Language := To_UString (Kind.all);
@@ -219,6 +226,7 @@ package body SPDX_Tool.Files is
                if First < Last then
                   First := Skip_Presentation (Buf.Data, First, Last);
                   Style.Start := First;
+                  Style.Text_Start := First;
                end if;
             else
                Find_Comment (Buf.Data, First, Pos, Style);
@@ -252,8 +260,89 @@ package body SPDX_Tool.Files is
             end if;
          end loop;
          File.Count := Line_No;
+         Boxed_License (File.Lines (File.Lines'First .. Line_No),
+                        Buf.Data, File.Boxed);
       end;
    end Open;
+
+   --  ------------------------------
+   --  Check if Lines (From..To) are of the same length.
+   --  ------------------------------
+   function Is_Same_Length (Lines : in Line_Array;
+                            From  : in Positive;
+                            To    : in Positive) return Boolean is
+      Line_Length : constant Buffer_Size :=
+        1 + Lines (From).Line_End - Lines (From).Line_Start;
+   begin
+      return (for all I in From + 1 .. To =>
+                1 + Lines (I).Line_End - Lines (I).Line_Start = Line_Length);
+   end Is_Same_Length;
+
+   --  ------------------------------
+   --  Check if we have the same byte for every line starting from the
+   --  end of the line with the given offset.
+   --  ------------------------------
+   function Is_Same_Byte (Lines  : in Line_Array;
+                          Buffer : in Buffer_Type;
+                          From   : in Positive;
+                          To     : in Positive;
+                          Offset : in Buffer_Size) return Boolean is
+      C : constant Byte := Buffer (Lines (From).Line_End - Offset);
+   begin
+      return (for all I in From + 1 .. To =>
+                Buffer (Lines (I).Line_End - Offset) = C);
+   end Is_Same_Byte;
+
+   --  ------------------------------
+   --  Find the common length at end of each line between From and To.
+   --  ------------------------------
+   function Common_End_Length (Lines  : in Line_Array;
+                               Buffer : in Buffer_Type;
+                               From   : in Positive;
+                               To     : in Positive) return Buffer_Size is
+      Line_Length : constant Buffer_Size :=
+        Lines (From).Line_End - Lines (From).Line_Start;
+      Len : Buffer_Size := 0;
+   begin
+      while Len < Line_Length loop
+         if not Is_Same_Byte (Lines, Buffer, From, To, Len) then
+            exit;
+         end if;
+         Len := Len + 1;
+      end loop;
+      return Len;
+   end Common_End_Length;
+
+   --  ------------------------------
+   --  Identify boundaries of a license with a boxed presentation.
+   --  Having identified such boxed presentation, update the lines Text_Last
+   --  position to indicate the last position of the text for each line
+   --  to ignore the boxed presentation.
+   --  ------------------------------
+   procedure Boxed_License (Lines  : in out Line_Array;
+                            Buffer : in Buffer_Type;
+                            Boxed  : out Boolean) is
+      Limit  : constant Natural := (Lines'Length / 2);
+      Common : Buffer_Size;
+   begin
+      for I in Lines'First .. Limit loop
+         if Lines (I).Comment /= NO_COMMENT then
+            for J in reverse I + 3 .. Lines'Last loop
+               if Lines (J).Comment /= NO_COMMENT
+                 and then Is_Same_Length (Lines, I, J)
+               then
+                  Boxed := True;
+                  Common := Common_End_Length (Lines, Buffer, I, J);
+                  for K in I .. J loop
+                     Lines (K).Style.Boxed := True;
+                     Lines (K).Style.Text_Last := Lines (K).Style.Last - Common;
+                  end loop;
+                  return;
+               end if;
+            end loop;
+         end if;
+      end loop;
+   end Boxed_License;
 
    procedure Boxed_License (Lines  : in Line_Array;
                             Buffer : in Buffer_Type;
