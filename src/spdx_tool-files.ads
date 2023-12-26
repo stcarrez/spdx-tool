@@ -39,6 +39,7 @@ package SPDX_Tool.Files is
       Text_Start : Buffer_Index := 1;
       Text_Last  : Buffer_Index := 1;
       Trailer    : Buffer_Size := 0;
+      Length     : Natural := 0;
       Index      : Comment_Index := 0;
       Mode       : Comment_Mode := NO_COMMENT;
       Boxed      : Boolean := False;

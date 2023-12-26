@@ -88,6 +88,7 @@ package body SPDX_Tool.Files is
                           Text_Start => From + Cmt.Len,
                           Text_Last  => Last,
                           Trailer => 0,
+                          Length  => 0,
                           Index   => Index,
                           Mode    => LINE_COMMENT,
                           Boxed   => False);
@@ -111,6 +112,7 @@ package body SPDX_Tool.Files is
                              Text_Start => From + Cmt.Len,
                              Text_Last  => Last,
                              Trailer => 0,
+                             Length  => 0,
                              Index   => Index,
                              Mode    => START_COMMENT,
                              Boxed   => False);
@@ -238,6 +240,7 @@ package body SPDX_Tool.Files is
                   end if;
                end if;
             end if;
+            Style.Length := Printable_Length (Buf.Data, First, Pos);
             File.Lines (Line_No).Style := Style;
             if Style.Style /= NO_COMMENT then
                File.Lines (Line_No).Comment := Style.Mode;
@@ -271,11 +274,10 @@ package body SPDX_Tool.Files is
    function Is_Same_Length (Lines : in Line_Array;
                             From  : in Positive;
                             To    : in Positive) return Boolean is
-      Line_Length : constant Buffer_Size :=
-        1 + Lines (From).Line_End - Lines (From).Line_Start;
+      Line_Length : constant Natural := Lines (From).Style.Length;
    begin
       return (for all I in From + 1 .. To =>
-                1 + Lines (I).Line_End - Lines (I).Line_Start = Line_Length);
+                Lines (I).Style.Length = Line_Length);
    end Is_Same_Length;
 
    --  ------------------------------
