@@ -110,6 +110,26 @@ package body SPDX_Tool is
       return Pos;
    end Find_Eol;
 
+   --  ------------------------------
+   --  Guess the printable length of the content assuming UTF-8 sequence.
+   --  ------------------------------
+   function Printable_Length (Buffer : in Buffer_Type;
+                              From   : in Buffer_Index;
+                              Last   : in Buffer_Index) return Natural is
+      Count : Natural := 0;
+      Pos   : Buffer_Index := From;
+      Val   : Byte;
+   begin
+      while Pos <= Last loop
+         Val := Buffer (Pos);
+         Pos := Pos + 1;
+         if Val >= 16#C0# or else Val < 16#80# then
+            Count := Count + 1;
+         end if;
+      end loop;
+      return Count;
+   end Printable_Length;
+
    function To_UString (Buffer : in Buffer_Type) return UString is
       Content : String (1 .. Buffer'Length);
       for Content'Address use Buffer'Address;
