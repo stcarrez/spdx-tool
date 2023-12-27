@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------
 
 with Util.Streams.Files;
+with SPDX_Tool.Infos;
 with SPDX_Tool.Magic_Manager;
 package SPDX_Tool.Files is
 
@@ -116,6 +117,14 @@ package SPDX_Tool.Files is
                    First   : in Natural;
                    Last    : in Natural;
                    License : in String);
+
+   --  Extract from the header the license text that was found.
+   --  When no license text was clearly identified, extract the text
+   --  found in the header comment.
+   function Extract_License (Manager : in File_Manager;
+                             File    : in File_Type;
+                             License : in Infos.License_Info)
+                             return Infos.License_Text_Access;
 
    --  Check if the license is using some boxed presentation.
    procedure Boxed_License (Lines  : in Line_Array;

@@ -15,6 +15,8 @@ package body SPDX_Tool.Files is
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Files");
 
+   use type Infos.License_Kind;
+
    procedure Find_Comment (Buffer : in Buffer_Type;
                            From   : in Buffer_Index;
                            Last   : in Buffer_Index;
@@ -453,6 +455,65 @@ package body SPDX_Tool.Files is
       Output.Close;
       Util.Files.Rename (Old_Name => Tmp_Path, New_Name => Path);
    end Save;
+
+   --  ------------------------------
+   --  Extract from the header the license text that was found.
+   --  When no license text was clearly identified, extract the text
+   --  found in the header comment.
+   --  ------------------------------
+   function Extract_License (Manager : in File_Manager;
+                             File    : in File_Type;
+                             License : in Infos.License_Info)
+                             return Infos.License_Text_Access is
+      First_Line : Natural;
+      Last_Line  : Natural;
+      Size       : Buffer_Size;
+   begin
+      if License.Match /= Infos.NONE then
+         First_Line := License.First_Line;
+         Last_Line := License.Last_Line;
+      else
+         First_Line := 1;
+         Last_Line := File.Count;
+         while First_Line > Last_Line
+           and then File.Lines (First_Line).Comment = NO_COMMENT
+         loop
+            First_Line := First_Line + 1;
+         end loop;
+         while Last_Line > First_Line
+           and then File.Lines (Last_Line).Comment = NO_COMMENT
+         loop
+            Last_Line := Last_Line - 1;
+         end loop;
+      end if;
+      if First_Line > Last_Line then
+         return null;
+      end if;
+      Size := Buffer_Size (Last_Line - First_Line + 1);
+      for I in First_Line .. Last_Line loop
+         Size := Size + File.Lines (I).Style.Text_Last
+           - File.Lines (I).Style.Text_Start + 1;
+      end loop;
+      declare
+         Buf   : constant Buffer_Accessor := File.Buffer.Value;
+         Text  : constant Infos.License_Text_Access := new Infos.License_Text (Len => Size);
+         Pos   : Buffer_Index := 1;
+         Start : Buffer_Index;
+         Last  : Buffer_Index;
+         Len   : Buffer_Size;
+      begin
+         for I in First_Line .. Last_Line loop
+            Start := File.Lines (I).Style.Text_Start;
+            Last := File.Lines (I).Style.Text_Last;
+            Len := Last - Start + 1;
+            Text.Content (Pos .. Pos + Len - 1) := Buf.Data (Start .. Last);
+            Pos := Pos + Len;
+            Text.Content (Pos) := LF;
+            Pos := Pos + 1;
+         end loop;
+         return Text;
+      end;
+   end Extract_License;
 
    --  ------------------------------
    --  Initialize the file manager and prepare the libmagic library.
