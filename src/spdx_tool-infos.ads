@@ -27,6 +27,12 @@ package SPDX_Tool.Infos is
       Match      : License_Kind := NONE;
    end record;
 
+   --  Holds the license text found in the header of the file
+   type License_Text (Len : Buffer_Size) is record
+      Content : Buffer_Type (1 .. Len);
+   end record;
+   type License_Text_Access is access all License_Text;
+
    --  Information collected for a file.  An instance is created for each
    --  file that is scanned and put in a File_Maps.  The file is analyzed
    --  by a separate thread which populates the `License` and `Mime` info.
@@ -36,6 +42,7 @@ package SPDX_Tool.Infos is
       Language : UString;
       Path     : String (1 .. Len);
       Filtered : Boolean := False;
+      Text     : License_Text_Access;
    end record;
    type File_Info_Access is access all File_Info;
 
