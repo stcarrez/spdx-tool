@@ -88,7 +88,7 @@ package body SPDX_Tool.Files is
                           Last    => From,
                           Head    => From,
                           Text_Start => From + Cmt.Len,
-                          Text_Last  => Last,
+                          Text_Last  => Skip_Backward_Spaces (Buffer, From, Last),
                           Trailer => 0,
                           Length  => 0,
                           Index   => Index,
@@ -112,7 +112,7 @@ package body SPDX_Tool.Files is
                              Last    => From,
                              Head    => From,
                              Text_Start => From + Cmt.Len,
-                             Text_Last  => Last,
+                             Text_Last  => Skip_Backward_Spaces (Buffer, From, Last),
                              Trailer => 0,
                              Length  => 0,
                              Index   => Index,
@@ -219,10 +219,13 @@ package body SPDX_Tool.Files is
             Pos := Find_Eol (Buf.Data (Pos .. Len), Pos);
             if Style.Mode in START_COMMENT | BLOCK_COMMENT then
                Style.Start := First;
+               Style.Text_Start := First;
+               Style.Text_Last := Pos - 1;
                Last := Find_End_Comment (Buf.Data, First, Pos, Block_Comments (Style.Index));
                if Last > First then
                   Style.Mode := END_COMMENT;
                   Style.Trailer := Block_Comments (Style.Index).Comment_End.Value.Len;
+                  Style.Text_Last := Last - Style.Trailer;
                else
                   Style.Mode := BLOCK_COMMENT;
                   Last := Pos;
@@ -231,6 +234,9 @@ package body SPDX_Tool.Files is
                   First := Skip_Presentation (Buf.Data, First, Last);
                   Style.Start := First;
                   Style.Text_Start := First;
+               end if;
+               if Style.Text_Last < Style.Text_Start then
+                     Style.Text_Last := Style.Text_Start - 1;
                end if;
             else
                Find_Comment (Buf.Data, First, Pos, Style);
@@ -269,6 +275,27 @@ package body SPDX_Tool.Files is
                         Buf.Data, File.Boxed);
       end;
    end Open;
+
+   --  ------------------------------
+   --  Compute maximum length of lines between From..To as byte count.
+   --  ------------------------------
+   function Max_Length (Lines : in Line_Array;
+                        From  : in Positive;
+                        To    : in Positive) return Buffer_Size is
+      Max : Buffer_Size := 0;
+   begin
+      for I in From .. To loop
+         declare
+            Len : constant Buffer_Size
+              := Lines (I).Line_End - Lines (I).Line_Start + 1;
+         begin
+            if Len > Max then
+               Max := Len;
+            end if;
+         end;
+      end loop;
+      return Max;
+   end Max_Length;
 
    --  ------------------------------
    --  Check if Lines (From..To) are of the same length.
@@ -318,6 +345,38 @@ package body SPDX_Tool.Files is
    end Common_End_Length;
 
    --  ------------------------------
+   --  Find the common length of spaces at beginning of each line
+   --  between From and To.  We don't need to have identical length
+   --  for each line.
+   --  ------------------------------
+   function Common_Start_Length (Lines  : in Line_Array;
+                                 Buffer : in Buffer_Type;
+                                 From   : in Positive;
+                                 To     : in Positive) return Buffer_Size is
+      Line_Length : constant Buffer_Size := Max_Length (Lines, From, To);
+      Len         : Buffer_Size := 0;
+   begin
+      while Len < Line_Length loop
+         for I in From .. To loop
+            declare
+               Pos : constant Buffer_Index
+                 := Lines (I).Style.Text_Start + Len;
+            begin
+               --  Ignore lines which are not a comment or too short.
+               if Lines (I).Comment /= NO_COMMENT
+                 and then Pos <= Lines (I).Line_End
+                 and then not Is_Space (Buffer (Pos))
+               then
+                  return Len;
+               end if;
+            end;
+         end loop;
+         Len := Len + 1;
+      end loop;
+      return Len;
+   end Common_Start_Length;
+
+   --  ------------------------------
    --  Identify boundaries of a license with a boxed presentation.
    --  Having identified such boxed presentation, update the lines Text_Last
    --  position to indicate the last position of the text for each line
@@ -328,6 +387,7 @@ package body SPDX_Tool.Files is
                             Boxed  : out Boolean) is
       Limit  : constant Natural := (Lines'Length / 2);
       Common : Buffer_Size;
+      Common_Start : Buffer_Size;
    begin
       for I in Lines'First .. Limit loop
          if Lines (I).Comment /= NO_COMMENT then
@@ -337,9 +397,11 @@ package body SPDX_Tool.Files is
                then
                   Boxed := True;
                   Common := Common_End_Length (Lines, Buffer, I, J);
+                  Common_Start := Common_Start_Length (Lines, Buffer, I, J);
                   for K in I .. J loop
                      Lines (K).Style.Boxed := True;
                      Lines (K).Style.Text_Last := Lines (K).Style.Last - Common;
+                     Lines (K).Style.Text_Start := Lines (K).Style.Text_Start + Common_Start;
                   end loop;
                   return;
                end if;

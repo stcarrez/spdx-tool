@@ -54,6 +54,11 @@ package SPDX_Tool.Files is
    end record;
    type Line_Array is array (Positive range <>) of Line_Type;
 
+   --  Compute maximum length of lines between From..To as byte count.
+   function Max_Length (Lines : in Line_Array;
+                        From  : in Positive;
+                        To    : in Positive) return Buffer_Size;
+
    --  Check if Lines (From..To) are of the same length.
    function Is_Same_Length (Lines : in Line_Array;
                             From  : in Positive;
@@ -75,6 +80,15 @@ package SPDX_Tool.Files is
                                From   : in Positive;
                                To     : in Positive) return Buffer_Size
      with Pre => Is_Same_Length (Lines, From, To);
+
+   --  Find the common length of spaces at beginning of each line
+   --  between From and To.  We don't need to have identical length
+   --  for each line.
+   function Common_Start_Length (Lines  : in Line_Array;
+                                 Buffer : in Buffer_Type;
+                                 From   : in Positive;
+                                 To     : in Positive) return Buffer_Size
+     with Pre => From <= To;
 
    --  Identify boundaries of a license with a boxed presentation.
    --  Having identified such boxed presentation, update the lines Text_Last
