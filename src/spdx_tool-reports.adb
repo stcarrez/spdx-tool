@@ -191,7 +191,9 @@ package body SPDX_Tool.Reports is
       Print_Occurences (Printer, Styles, Set, -("Mime type"));
    end Print_Mimes;
 
+   --  ------------------------------
    --  Print the languages used and their associated number of files.
+   --  ------------------------------
    procedure Print_Languages (Printer : in out PT.Printer_Type'Class;
                               Styles  : in Style_Configuration;
                               Files   : in SPDX_Tool.Infos.File_Map) is
@@ -204,5 +206,43 @@ package body SPDX_Tool.Reports is
       end loop;
       Print_Occurences (Printer, Styles, Set, -("Language"));
    end Print_Languages;
+
+   procedure Print_License_Text (Printer : in out PT.Printer_Type'Class;
+                                 Styles  : in Style_Configuration;
+                                 Text    : in Infos.License_Text) is
+      Last    : constant Natural := Natural (Text.Len);
+      Content : String (1 .. Last);
+      for Content'Address use Text.Content'Address;
+
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Pos   : Natural := 1;
+      First : Natural;
+   begin
+      loop
+         First := Pos;
+         while Pos <= Content'Last
+           and then not Is_Eol (Text.Content (Buffer_Index (Pos)))
+         loop
+            Pos := Pos + 1;
+         end loop;
+         Writer.Put_UTF8 (Content (First .. Pos - 1));
+         Writer.New_Line;
+         Pos := Pos + 2;
+         exit when Pos > Content'Last;
+      end loop;
+   end Print_License_Text;
+
+   --  Print the license texts content found in header files.
+   procedure Print_Texts (Printer : in out PT.Printer_Type'Class;
+                          Styles  : in Style_Configuration;
+                          Files   : in SPDX_Tool.Infos.File_Map) is
+      use type Infos.License_Text_Access;
+   begin
+      for File of Files loop
+         if not File.Filtered and then File.Text /= null then
+            Print_License_Text (Printer, Styles, File.Text.all);
+         end if;
+      end loop;
+   end Print_Texts;
 
 end SPDX_Tool.Reports;
