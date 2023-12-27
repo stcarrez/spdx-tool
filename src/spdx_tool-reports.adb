@@ -215,8 +215,8 @@ package body SPDX_Tool.Reports is
       for Content'Address use Text.Content'Address;
 
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
-      Pos   : Natural := 1;
-      First : Natural;
+      Pos    : Natural := 1;
+      First  : Natural;
    begin
       loop
          First := Pos;
@@ -227,7 +227,7 @@ package body SPDX_Tool.Reports is
          end loop;
          Writer.Put_UTF8 (Content (First .. Pos - 1));
          Writer.New_Line;
-         Pos := Pos + 2;
+         Pos := Pos + 1;
          exit when Pos > Content'Last;
       end loop;
    end Print_License_Text;
