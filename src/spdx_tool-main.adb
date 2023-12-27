@@ -86,6 +86,11 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--files",
                         Help   => -("List files grouped by license name"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Print'Access,
+                        Switch => "-p",
+                        Long_Switch => "--print-license",
+                        Help   => -("Print license found in header files"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Languages'Access,
                         Long_Switch => "--languages",
                         Help   => -("Identify languages used in files"));
@@ -177,6 +182,12 @@ procedure SPDX_Tool.Main is
          end if;
          SPDX_Tool.Reports.Print_Languages (Driver, Styles, Files);
       end if;
+      if Opt_Print then
+         if Opt_Check or else Opt_Files or else Opt_Mimes then
+            Writer.New_Line;
+         end if;
+         SPDX_Tool.Reports.Print_Texts (Driver, Styles, Files);
+      end if;
    end Print_Report;
 
    procedure Report_Summary is new SPDX_Tool.Licenses.Report (Print_Report);
@@ -214,7 +225,7 @@ begin
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       return;
    end if;
-   if not Opt_Files and not Opt_Check and not Opt_Update then
+   if not Opt_Files and not Opt_Check and not Opt_Update and not Opt_Print then
       Opt_Check := True;
    end if;
    declare
