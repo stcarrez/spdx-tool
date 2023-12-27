@@ -53,6 +53,7 @@ private
    Opt_Mimes     : aliased Boolean := False;
    Opt_Languages : aliased Boolean := False;
    Opt_No_Color  : aliased Boolean := False;
+   Opt_Print     : aliased Boolean := False;
    Opt_Tasks     : aliased Integer := 1;
 
    LF    : constant Byte := 16#0A#;
