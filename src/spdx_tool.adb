@@ -51,6 +51,17 @@ package body SPDX_Tool is
       return Pos;
    end Skip_Spaces;
 
+   function Skip_Backward_Spaces (Buffer : in Buffer_Type;
+                                  First  : in Buffer_Index;
+                                  Last   : in Buffer_Index) return Buffer_Index is
+      Pos : Buffer_Index := Last;
+   begin
+      while Pos >= First and then Is_Space (Buffer (Pos)) loop
+         Pos := Pos - 1;
+      end loop;
+      return Pos;
+   end Skip_Backward_Spaces;
+
    function Skip_Presentation (Buffer : in Buffer_Type;
                                First  : in Buffer_Index;
                                Last   : in Buffer_Index) return Buffer_Index is

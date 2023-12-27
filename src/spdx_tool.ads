@@ -93,6 +93,14 @@ private
      and then First >= Buffer'First
      and then Last <= Buffer'Last;
 
+   --  Find backward index of the first non white space before last.
+   function Skip_Backward_Spaces (Buffer : in Buffer_Type;
+                                  First  : in Buffer_Index;
+                                  Last   : in Buffer_Index) return Buffer_Index
+     with Pre => First <= Last
+     and then First >= Buffer'First
+     and then Last <= Buffer'Last;
+
    --  Skip an optional presentation marker at beginning of a line.
    --  Presentation markers include '*', '-' and may be repeated several times.
    --  Then, spaces are skipped.  Example of presentation:
