@@ -16,21 +16,14 @@ project-files = ["spdx_tool.gpr"]
 
 [[depends-on]]
 utilada = "^2.6.0"
-
-[[depends-on]]
+sciada = "~0.1.0"
 spdx = "~0.2.0"
+ansiada = "^1.0.0"
+intl = "^1.0.0"
+printer_toolkitada = "~0.1.0"
 
 # [configuration]
 # disabled = true
-
-[[depends-on]]
-ansiada = "^1.0.0"
-
-[[depends-on]]
-intl = "^1.0.0"
-
-[[depends-on]]
-printer_toolkitada = "~0.1.0"
 
 [depends-on."case(os)".linux]
 magicada = "^1"
