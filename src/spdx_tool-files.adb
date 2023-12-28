@@ -235,9 +235,6 @@ package body SPDX_Tool.Files is
                   Style.Start := First;
                   Style.Text_Start := First;
                end if;
-               if Style.Text_Last < Style.Text_Start then
-                     Style.Text_Last := Style.Text_Start - 1;
-               end if;
             else
                Find_Comment (Buf.Data, First, Pos, Style);
                if Style.Mode = START_COMMENT then
@@ -245,8 +242,12 @@ package body SPDX_Tool.Files is
                   if Last > First then
                      Style.Mode := LINE_BLOCK_COMMENT;
                      Style.Trailer := Block_Comments (Style.Index).Comment_End.Value.Len;
+                     Style.Text_Last := Last - Style.Trailer;
                   end if;
                end if;
+            end if;
+            if Style.Text_Last < Style.Text_Start then
+               Style.Text_Last := Style.Text_Start - 1;
             end if;
             Style.Length := Printable_Length (Buf.Data, First, Pos);
             File.Lines (Line_No).Style := Style;
@@ -305,8 +306,9 @@ package body SPDX_Tool.Files is
                             To    : in Positive) return Boolean is
       Line_Length : constant Natural := Lines (From).Style.Length;
    begin
-      return (for all I in From + 1 .. To =>
-                Lines (I).Style.Length = Line_Length);
+      return Line_Length > 0
+        and then (for all I in From + 1 .. To =>
+                    Lines (I).Style.Length = Line_Length);
    end Is_Same_Length;
 
    --  ------------------------------
@@ -375,6 +377,19 @@ package body SPDX_Tool.Files is
       end loop;
       return Len;
    end Common_Start_Length;
+
+   --  ------------------------------
+   --  Check if the comment line is only a presentation line: it is either
+   --  empty or contains the same presentation character.
+   --  ------------------------------
+   function Is_Presentation_Line (Lines  : in Line_Array;
+                                  Buffer : in Buffer_Type;
+                                  Line   : in Positive) return Boolean is
+      Info : Comment_Info renames Lines (Line).Style;
+   begin
+      return (for all I in Info.Text_Start .. Info.Text_Last
+                => Is_Space_Or_Punctuation (Buffer (I)));
+   end Is_Presentation_Line;
 
    --  ------------------------------
    --  Identify boundaries of a license with a boxed presentation.
@@ -527,47 +542,62 @@ package body SPDX_Tool.Files is
                              File    : in File_Type;
                              License : in Infos.License_Info)
                              return Infos.License_Text_Access is
-      First_Line : Natural;
-      Last_Line  : Natural;
-      Size       : Buffer_Size;
+      Buf             : constant Buffer_Accessor := File.Buffer.Value;
+      First_Line      : Natural;
+      Last_Line       : Natural;
+      Size, Len, Skip : Buffer_Size;
    begin
       if License.Match /= Infos.NONE then
          First_Line := License.First_Line;
          Last_Line := License.Last_Line;
       else
          First_Line := 1;
-         Last_Line := File.Count;
          while First_Line > Last_Line
            and then File.Lines (First_Line).Comment = NO_COMMENT
          loop
             First_Line := First_Line + 1;
          end loop;
-         while Last_Line > First_Line
-           and then File.Lines (Last_Line).Comment = NO_COMMENT
+         Last_Line := First_Line + 1;
+         while Last_Line <= File.Count
+           and then File.Lines (Last_Line).Comment /= NO_COMMENT
          loop
-            Last_Line := Last_Line - 1;
+            Last_Line := Last_Line + 1;
          end loop;
+         Last_Line := Last_Line - 1;
+         if Is_Presentation_Line (File.Lines, Buf.Data, First_Line) then
+            First_Line := First_Line + 1;
+         end if;
+         if Is_Presentation_Line (File.Lines, Buf.Data, Last_Line) then
+            Last_Line := Last_Line - 1;
+         end if;
       end if;
       if First_Line > Last_Line then
          return null;
       end if;
+      Skip := Common_Start_Length (File.Lines, Buf.Data, First_Line, Last_Line);
       Size := Buffer_Size (Last_Line - First_Line + 1);
       for I in First_Line .. Last_Line loop
-         Size := Size + File.Lines (I).Style.Text_Last
+         Len := File.Lines (I).Style.Text_Last
            - File.Lines (I).Style.Text_Start + 1;
+         if Len > Skip then
+            Len := Len - Skip;
+         end if;
+         Size := Size + Len;
       end loop;
       declare
-         Buf   : constant Buffer_Accessor := File.Buffer.Value;
          Text  : constant Infos.License_Text_Access := new Infos.License_Text (Len => Size);
          Pos   : Buffer_Index := 1;
          Start : Buffer_Index;
          Last  : Buffer_Index;
-         Len   : Buffer_Size;
       begin
          for I in First_Line .. Last_Line loop
             Start := File.Lines (I).Style.Text_Start;
             Last := File.Lines (I).Style.Text_Last;
             Len := Last - Start + 1;
+            if Len > Skip then
+               Start := Start + Skip;
+               Len := Len - Skip;
+            end if;
             Text.Content (Pos .. Pos + Len - 1) := Buf.Data (Start .. Last);
             Pos := Pos + Len;
             Text.Content (Pos) := LF;

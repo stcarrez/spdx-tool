@@ -90,6 +90,12 @@ package SPDX_Tool.Files is
                                  To     : in Positive) return Buffer_Size
      with Pre => From <= To;
 
+   --  Check if the comment line is only a presentation line: it is either
+   --  empty or contains the same presentation character.
+   function Is_Presentation_Line (Lines  : in Line_Array;
+                                  Buffer : in Buffer_Type;
+                                  Line   : in Positive) return Boolean;
+
    --  Identify boundaries of a license with a boxed presentation.
    --  Having identified such boxed presentation, update the lines Text_Last
    --  position to indicate the last position of the text for each line
