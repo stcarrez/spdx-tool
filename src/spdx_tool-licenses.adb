@@ -122,7 +122,14 @@ package body SPDX_Tool.Licenses is
 
       if not Opt_No_Builtin then
          for Name of Files.Names loop
-            Manager.Load_License (Name.all, Files.Get_Content (Name.all).all);
+            declare
+               Content : constant access constant Buffer_Type
+                 := Files.Get_Content (Name.all);
+            begin
+               if Content /= null and then Content'Length < 4096 then
+                  Manager.Load_License (Name.all, Content.all);
+               end if;
+            end;
          end loop;
       end if;
    end Configure;
@@ -211,9 +218,13 @@ package body SPDX_Tool.Licenses is
       end if;
    end Load_License;
 
-   procedure Load_License (Manager : in out License_Manager;
-                           Name    : in String;
-                           Content : in Buffer_Type) is
+   Token_Count : Natural := 0;
+
+   procedure Parse_License (Content : in Buffer_Type;
+                            From    : in Buffer_Index;
+                            Root    : in out Token_Access;
+                            Current : in Token_Access;
+                            License : in UString) is
       procedure Next_Token (Token : out Token_Kind);
       function Find_Token (Word : in Buffer_Type) return Token_Access;
       procedure Append_Token (Token : in Token_Access);
@@ -227,10 +238,11 @@ package body SPDX_Tool.Licenses is
       BEGIN_OPTIONAL : constant String := "<<beginOptional>>";
       END_OPTIONAL   : constant String := "<<endOptional>>";
 
-      Pos   : Buffer_Index := Content'First;
-      First : Buffer_Index;
-      Tok   : Token_Kind;
-      Token, Previous : Token_Access;
+      Pos      : Buffer_Index := From;
+      First    : Buffer_Index;
+      Tok      : Token_Kind;
+      Token    : Token_Access;
+      Previous : Token_Access := Current;
 
       procedure Next_Token (Token : out Token_Kind) is
          Match : Buffer_Index;
@@ -274,7 +286,7 @@ package body SPDX_Tool.Licenses is
          Item : Token_Access;
       begin
          if Previous = null then
-            Item := Manager.Tokens;
+            Item := Root;
          else
             Item := Previous.Next;
          end if;
@@ -289,13 +301,14 @@ package body SPDX_Tool.Licenses is
 
       procedure Append_Token (Token : in Token_Access) is
       begin
+         Token_Count := Token_Count + 1;
          Token.Previous := Previous;
          if Previous = null then
-            if Manager.Tokens = null then
-               Manager.Tokens := Token;
+            if Root = null then
+               Root := Token;
             else
-               Token.Alternate := Manager.Tokens.Alternate;
-               Manager.Tokens.Alternate := Token;
+               Token.Alternate := Root.Alternate;
+               Root.Alternate := Token;
             end if;
          elsif Previous.Next = null then
             Previous.Next := Token;
@@ -416,7 +429,9 @@ package body SPDX_Tool.Licenses is
       --  <<endOptional>>
       procedure Parse_Optional is
          Match    : Buffer_Index;
+         Current  : constant Token_Access := Previous;
          Optional : Optional_Token_Access;
+         Has_Tokens : Boolean := False;
       begin
          Optional := new Optional_Token_Type '(Len => 0,
                                                Previous => null,
@@ -433,6 +448,11 @@ package body SPDX_Tool.Licenses is
                   Token := Optional.all'Access;
                   Append_Token (Token);
                   Previous := Token;
+                  --  Build a subtree without the token that describe
+                  --  the optional section.
+                  --  if Has_Tokens then
+                  --   Parse_License (Content, Pos, Root, Current, License);
+                  --  end if;
                   return;
                end if;
             end loop;
@@ -467,10 +487,19 @@ package body SPDX_Tool.Licenses is
             else
                Token.Previous.Next := Token;
             end if;
+
+            --  Append_Token (Token);
+            --  Previous := Token;
+            --  Has_Tokens := True;
          end loop;
          Token := Optional.all'Access;
          Append_Token (Token);
          Previous := Token;
+         --  Build a subtree without the token that describe
+         --  the optional section.
+         --  if Has_Tokens then
+         --   Parse_License (Content, Pos, Root, Current, License);
+         --  end if;
       end Parse_Optional;
 
       procedure Parse_Copyright is
@@ -495,28 +524,16 @@ package body SPDX_Tool.Licenses is
          Previous := Token;
       end Parse_Token;
 
-      License_Tag : UString;
-
       procedure Finish is
          Token : Token_Access;
       begin
          Token := new Final_Token_Type '(Len => 0,
-                                         License => License_Tag,
+                                         License => License,
                                          others => <>);
          Append_Token (Token);
       end Finish;
 
-      Match : Buffer_Index;
    begin
-      Match := Next_With (Content, Pos, SPDX_License_Tag);
-      if Match > Pos then
-         Match := Skip_Spaces (Content, Match, Content'Last);
-         Pos := Find_Eol (Content, Match);
-         License_Tag := To_UString (Content (Match .. Pos - 1));
-      else
-         License_Tag := To_UString (Name);
-      end if;
-
       --  <<beginOptional>>
       --  <<endOptional>>
       --  <<var...>>
@@ -553,6 +570,31 @@ package body SPDX_Tool.Licenses is
          exit when Pos = Content'Last;
       end loop;
       Finish;
+   end Parse_License;
+
+   procedure Load_License (Manager : in out License_Manager;
+                           Name    : in String;
+                           Content : in Buffer_Type) is
+      Pos         : Buffer_Index := Content'First;
+      Match       : Buffer_Index;
+      License_Tag : UString;
+      Count : constant Natural := Token_Count;
+   begin
+      Match := Next_With (Content, Pos, SPDX_License_Tag);
+      if Match > Pos then
+         Match := Skip_Spaces (Content, Match, Content'Last);
+         Pos := Find_Eol (Content, Match);
+         License_Tag := To_UString (Content (Match .. Pos - 1));
+      else
+         License_Tag := To_UString (Name);
+      end if;
+      Parse_License (Content, Pos, Manager.Tokens, null, License_Tag);
+      Log.Info ("License {0} => {1} tokens", To_String (License_Tag),
+                Natural'Image (Token_Count - Count));
+
+   exception
+      when E : others =>
+         Log.Error ("Exception ", E);
    end Load_License;
 
    --  ------------------------------
@@ -1068,6 +1110,9 @@ package body SPDX_Tool.Licenses is
       File.License := Result.Info;
       File.Mime := Data.Ident.Mime;
       File.Language := Data.Language;
+      if Opt_Print then
+         File.Text := File_Mgr.Extract_License (Data, File.License);
+      end if;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          declare
             Name : constant String := To_String (File.License.Name);
@@ -1240,8 +1285,8 @@ package body SPDX_Tool.Licenses is
       begin
          for Line in 1 .. File.Count loop
             if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
-               Start := File.Lines (Line).Style.Start;
-               Last  := File.Lines (Line).Style.Last;
+               Start := File.Lines (Line).Style.Text_Start;
+               Last  := File.Lines (Line).Style.Text_Last;
                Add_Line (Buf.Data (Start .. Last), Line);
                if Max_Line < Line then
                   Max_Line := Line;
