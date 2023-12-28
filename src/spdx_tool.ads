@@ -73,7 +73,7 @@ private
                            | Character'Pos (':') | Character'Pos (',')
                            | Character'Pos ('.') | Character'Pos (';')
                            | Character'Pos ('!') | Character'Pos ('(')
-                           | Character'Pos (')'));
+                           | Character'Pos (')') | Character'Pos ('-'));
 
    function Is_Eol
      (C : Byte)
