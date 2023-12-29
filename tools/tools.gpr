@@ -6,11 +6,11 @@ with "spdx_tool.gpr";
 with "../spdx_tool_config.gpr";
 project Tools is
 
-   for Source_Dirs use (".");
+   for Source_Dirs use ("src");
    for Object_Dir use "../obj/" & Spdx_Tool_Config.Build_Profile;
    for Create_Missing_Dirs use "True";
    for Exec_Dir use "../bin";
-   for Main use ("genlangmap.adb");
+   for Main use ("genlangmap.adb", "gendecisiontree.adb");
 
    package Builder  renames Spdx_Tool.Builder;
    package Compiler renames Spdx_Tool.Compiler;

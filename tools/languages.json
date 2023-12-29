@@ -3388,5 +3388,12 @@
       "extensions":[
          ".aru"
       ]
+   },
+   {
+      "name":"ALI file",
+      "type":"data",
+      "extensions":[
+         ".ali"
+      ]
    }
 ]
