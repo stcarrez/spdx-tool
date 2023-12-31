@@ -978,17 +978,6 @@ package body SPDX_Tool.Licenses is
                Pos.Pos := Lines (Pos.Line).Style.Start;
             end if;
             Last := Lines (Pos.Line).Style.Last;
-            if Current = null and then Pos.Pos <= Last then
-               Pos.Pos := Skip_Spaces (Content, Pos.Pos, Last);
-               if Pos.Pos <= Last then
-                  First.Pos := Next_With (Content, Pos.Pos, SPDX_License_Tag);
-                  if First.Pos > Pos.Pos then
-                     Result.Info := Extract_SPDX (Lines, Content, First.Line, First.Pos);
-                     Result.Last := null;
-                     return Result;
-                  end if;
-               end if;
-            end if;
             while Pos.Pos <= Last and then First.Line = Pos.Line loop
                Pos.Pos := Skip_Spaces (Content, Pos.Pos, Last);
                exit when Pos.Pos > Last;
@@ -1031,6 +1020,40 @@ package body SPDX_Tool.Licenses is
       return Result;
    end Find_License;
 
+   --  ------------------------------
+   --  Find in the header comment an SPDX license tag.
+   --  ------------------------------
+   function Find_SPDX_License (Content : in Buffer_Type;
+                               Lines   : in SPDX_Tool.Files.Line_Array)
+                               return License_Match is
+      Result : License_Match;
+      Pos    : Buffer_Index;
+      Last   : Buffer_Index;
+   begin
+      Result.Info.First_Line := Lines'First;
+      Result.Info.Last_Line := Lines'Last;
+      for Line in Lines'Range loop
+         if Lines (Line).Style.Style /= SPDX_Tool.Files.NO_COMMENT then
+            Pos := Lines (Line).Style.Start;
+            Last := Lines (Line).Style.Last;
+            if Pos <= Last then
+               Pos := Skip_Spaces (Content, Pos, Last);
+               if Pos <= Last then
+                  Pos := Next_With (Content, Pos, SPDX_License_Tag);
+                  if Pos > Pos then
+                     Result.Info := Extract_SPDX (Lines, Content, Line, Pos);
+                     Result.Last := null;
+                     return Result;
+                  end if;
+               end if;
+            end if;
+         end if;
+      end loop;
+      Result.Info.Match := Infos.UNKNOWN_LICENSE;
+      Result.Last := null;
+      return Result;
+   end Find_SPDX_License;
+
    function Find_License (Manager : in License_Manager;
                           File    : in SPDX_Tool.Files.File_Type)
                           return License_Match is
@@ -1042,6 +1065,10 @@ package body SPDX_Tool.Licenses is
       if File.Cmt_Style = SPDX_Tool.Files.NO_COMMENT then
          Result.Info.Match := Infos.NONE;
          return Result;
+      end if;
+      Match := Find_SPDX_License (Buf.Data, File.Lines (1 .. File.Count));
+      if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+         return Match;
       end if;
       while Line <= File.Count loop
          if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then

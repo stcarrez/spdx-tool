@@ -381,6 +381,11 @@ private
       Depth : Natural := 0;
    end record;
 
+   --  Find in the header comment an SPDX license tag.
+   function Find_SPDX_License (Content : in Buffer_Type;
+                               Lines   : in SPDX_Tool.Files.Line_Array)
+                               return License_Match;
+
    function Find_License (Manager : in License_Manager;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
