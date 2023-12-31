@@ -538,8 +538,7 @@ package body SPDX_Tool.Files is
    --  When no license text was clearly identified, extract the text
    --  found in the header comment.
    --  ------------------------------
-   function Extract_License (Manager : in File_Manager;
-                             File    : in File_Type;
+   function Extract_License (File    : in File_Type;
                              License : in Infos.License_Info)
                              return Infos.License_Text_Access is
       Buf             : constant Buffer_Accessor := File.Buffer.Value;
@@ -606,6 +605,36 @@ package body SPDX_Tool.Files is
          return Text;
       end;
    end Extract_License;
+
+   --  ------------------------------
+   --  Extract from the header the list of tokens used.  Such list
+   --  can be used by the license decision tree to find a matching license.
+   --  We could extract more tokens such as tokens which are not really part
+   --  of the license header but this is not important as the decision tree
+   --  tries to find a best match.
+   --  ------------------------------
+   procedure Extract_Tokens (File    : in File_Type;
+                             Tokens  : in out SPDX_Tool.Buffer_Sets.Set) is
+      Buf   : constant Buffer_Accessor := File.Buffer.Value;
+      Pos   : Buffer_Index;
+      First : Buffer_Index;
+      Last  : Buffer_Index;
+   begin
+      for Line of File.Lines (1 .. File.Count) loop
+         if Line.Comment /= NO_COMMENT then
+            Pos := Line.Style.Text_Start;
+            Last := Line.Style.Text_Last;
+            while Pos <= Last loop
+               First := Skip_Spaces (Buf.Data, Pos, Last);
+               exit when First > Last;
+               Pos := Next_Space (Buf.Data, First, Last);
+               if First <= Pos - 1 then
+                  Tokens.Include (Buf.Data (First .. Pos - 1));
+               end if;
+            end loop;
+         end if;
+      end loop;
+   end Extract_Tokens;
 
    --  ------------------------------
    --  Initialize the file manager and prepare the libmagic library.

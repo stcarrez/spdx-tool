@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------
 
 with Util.Streams.Files;
+with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Magic_Manager;
 package SPDX_Tool.Files is
@@ -143,10 +144,17 @@ package SPDX_Tool.Files is
    --  Extract from the header the license text that was found.
    --  When no license text was clearly identified, extract the text
    --  found in the header comment.
-   function Extract_License (Manager : in File_Manager;
-                             File    : in File_Type;
+   function Extract_License (File    : in File_Type;
                              License : in Infos.License_Info)
                              return Infos.License_Text_Access;
+
+   --  Extract from the header the list of tokens used.  Such list
+   --  can be used by the license decision tree to find a matching license.
+   --  We could extract more tokens such as tokens which are not really part
+   --  of the license header but this is not important as the decision tree
+   --  tries to find a best match.
+   procedure Extract_Tokens (File    : in File_Type;
+                             Tokens  : in out SPDX_Tool.Buffer_Sets.Set);
 
    --  Check if the license is using some boxed presentation.
    procedure Boxed_License (Lines  : in Line_Array;
