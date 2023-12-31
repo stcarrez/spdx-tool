@@ -189,18 +189,15 @@ procedure Gendecisiontree is
       end;
    end Decision_Tree;
 
-   L_Idx   : License_Index := 0;
-   Manager : SPDX_Tool.Licenses.License_Manager (1);
-   List    : Set;
+   List     : Set;
 begin
    --  Load the licenses from the static content and identify its tokens.
-   for Name of SPDX_Tool.Licenses.Files.Names loop
-      Manager.Load_License (Name.all, Licenses (L_Idx));
-      if SPDX_Tool.Licenses.Is_Loaded (Licenses (L_Idx)) then
-         SPDX_Tool.Licenses.Collect_License_Tokens (Licenses (L_Idx));
-         List.Insert (L_Idx);
+   for License in Licenses'Range loop
+      SPDX_Tool.Licenses.Load_License (License, Licenses (License));
+      if SPDX_Tool.Licenses.Is_Loaded (Licenses (License)) then
+         SPDX_Tool.Licenses.Collect_License_Tokens (Licenses (License));
+         List.Insert (License);
       end if;
-      L_Idx := L_Idx + 1;
    end loop;
 
    --  Generate decision tree by identifying the best token that split
