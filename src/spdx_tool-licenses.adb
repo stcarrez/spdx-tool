@@ -649,8 +649,13 @@ package body SPDX_Tool.Licenses is
       Name    : constant Name_Access := Files.Names (License);
       Content : constant access constant Buffer_Type
         := Files.Get_Content (Name.all);
+      Pos     : constant Natural := Util.Strings.Index (Name.all, '/');
    begin
-      Into.Name := To_UString (Files.Names (License).all);
+      if Pos > 0 then
+         Into.Name := To_UString (Name (Pos + 1 .. Name'Last));
+      else
+         Into.Name := To_UString (Name.all);
+      end if;
       Parse_License (Content.all, Content'First, Into.Root, null, Into.Name);
    end Load_License;
 
