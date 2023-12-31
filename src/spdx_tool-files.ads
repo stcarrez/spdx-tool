@@ -9,6 +9,8 @@ with SPDX_Tool.Infos;
 with SPDX_Tool.Magic_Manager;
 package SPDX_Tool.Files is
 
+   type Content_Access is access constant String;
+
    type Identification is record
       Mime     : UString;
       Language : UString;
