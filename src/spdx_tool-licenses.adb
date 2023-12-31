@@ -466,9 +466,8 @@ package body SPDX_Tool.Licenses is
       --  <<endOptional>>
       procedure Parse_Optional is
          Match    : Buffer_Index;
-         Current  : constant Token_Access := Previous;
+         --  Current  : constant Token_Access := Previous;
          Optional : Optional_Token_Access;
-         Has_Tokens : Boolean := False;
       begin
          Optional := new Optional_Token_Type '(Len => 0,
                                                Previous => null,
@@ -811,10 +810,10 @@ package body SPDX_Tool.Licenses is
                       Next    : out Token_Access) is
       Last  : constant Buffer_Index := Content'Last;
       --  Start : constant Positive := Positive (From);
-      End_Pos : Positive;
+      --  End_Pos : Positive;
       --  First : Buffer_Index := From;
       Pos   : Line_Pos := (Line => From.Line, Pos => To);
-      Check : Token_Access := Token.Next;
+      Check : constant Token_Access := Token.Next;
    begin
       if Check = null then
          Result := From;
@@ -829,7 +828,7 @@ package body SPDX_Tool.Licenses is
       end if;
       while Pos.Pos < Last loop
          declare
-            End_Pos : constant Line_Pos := Pos;
+            --  End_Pos : constant Line_Pos := Pos;
             First   : constant Line_Pos
               := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos + 1));
             End_Line : Buffer_Index;
@@ -991,8 +990,7 @@ package body SPDX_Tool.Licenses is
       Result := From;
    end Match;
 
-   function Find_License (Manager : in License_Manager;
-                          Root    : in Token_Access;
+   function Find_License (Root    : in Token_Access;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
                           return License_Match is
@@ -1114,8 +1112,7 @@ package body SPDX_Tool.Licenses is
       return Node;
    end Find_Builtin_License;
 
-   function Find_License (Manager : in License_Manager;
-                          License : in License_Index;
+   function Find_License (License : in License_Index;
                           File    : in SPDX_Tool.Files.File_Type)
                           return License_Match is
       Token : Token_Access;
@@ -1132,7 +1129,7 @@ package body SPDX_Tool.Licenses is
       begin
          while Line <= File.Count loop
             if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
-               Match := Find_License (Manager, Token, Buf.Data,
+               Match := Find_License (Token, Buf.Data,
                                       File.Lines (Line .. File.Count));
                if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                   return Match;
@@ -1174,7 +1171,7 @@ package body SPDX_Tool.Licenses is
          Node := Find_Builtin_License (Tokens);
          if Node /= null then
             for License of Node.Licenses loop
-               Match := Manager.Find_License (License, File);
+               Match := Find_License (License, File);
                if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                   return Match;
                end if;
@@ -1186,8 +1183,8 @@ package body SPDX_Tool.Licenses is
       end if;
       while Line <= File.Count loop
          if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
-            Match := Find_License (Manager, Manager.Tokens, Buf.Data,
-                                    File.Lines (Line .. File.Count));
+            Match := Find_License (Manager.Tokens, Buf.Data,
+                                   File.Lines (Line .. File.Count));
             if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                return Match;
             end if;

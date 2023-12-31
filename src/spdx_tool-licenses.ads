@@ -394,8 +394,7 @@ private
                                Lines   : in SPDX_Tool.Files.Line_Array)
                                return License_Match;
 
-   function Find_License (Manager : in License_Manager;
-                          Root    : in Token_Access;
+   function Find_License (Root    : in Token_Access;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
                           return License_Match;
