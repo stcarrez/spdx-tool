@@ -3,12 +3,6 @@
 --  License templates extracted from https://github.com/spdx/license-list-data.git
 package SPDX_Tool.Licenses.Files is
 
-   type Content_Access is access constant Buffer_Type;
-
-   type Name_Access is access constant String;
-
-   type Name_Array is array (Natural range <>) of Name_Access;
-
    Names : constant Name_Array;
 
    --  Returns the data stream with the given name or null.
