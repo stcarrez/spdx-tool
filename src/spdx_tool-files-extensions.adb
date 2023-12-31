@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.3.0
+--  Advanced Resource Embedder 1.4.0
 --  SPDX-License-Identifier: Apache-2.0
 --  Extensions mapping generated from extensions.json
 with Interfaces; use Interfaces;

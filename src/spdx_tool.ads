@@ -42,8 +42,6 @@ package SPDX_Tool is
 
    type Name_Access is access constant String;
 
-   type Name_Array is array (Natural range <>) of Name_Access;
-
 private
 
    procedure Configure_Logs (Debug : Boolean; Verbose : Boolean);

@@ -1054,6 +1054,31 @@ package body SPDX_Tool.Licenses is
       return Result;
    end Find_SPDX_License;
 
+   --  ------------------------------
+   --  Find a license from the license decision tree.
+   --  ------------------------------
+   function Find_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
+                          return Decision_Node_Access is
+      Node : Decision_Node_Access := SPDX_Tool.Licenses.Decisions.Root;
+   begin
+      while Node /= null loop
+         exit when Node.Length = 0;
+         if Node.Length = 0 then
+            for I of Node.Licenses loop
+               Log.Error ("Found license {0}",
+                          SPDX_Tool.Licenses.Files.Names (I).all);
+            end loop;
+            exit;
+         end if;
+         if Tokens.Contains (Node.Token) then
+            Node := Node.Left;
+         else
+            Node := Node.Right;
+         end if;
+      end loop;
+      return Node;
+   end Find_License;
+
    function Find_License (Manager : in License_Manager;
                           File    : in SPDX_Tool.Files.File_Type)
                           return License_Match is
@@ -1061,6 +1086,8 @@ package body SPDX_Tool.Licenses is
       Result  : License_Match := (Last => null, Depth => 0, others => <>);
       Match   : License_Match;
       Line    : Positive := 1;
+      Tokens  : SPDX_Tool.Buffer_Sets.Set;
+      Node    : Decision_Node_Access;
    begin
       if File.Cmt_Style = SPDX_Tool.Files.NO_COMMENT then
          Result.Info.Match := Infos.NONE;
@@ -1070,6 +1097,8 @@ package body SPDX_Tool.Licenses is
       if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          return Match;
       end if;
+      SPDX_Tool.Files.Extract_Tokens (File, Tokens);
+      Node := Find_License (Tokens);
       while Line <= File.Count loop
          if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
             Match := Find_License (Manager, Buf.Data,
@@ -1163,7 +1192,7 @@ package body SPDX_Tool.Licenses is
       File.Mime := Data.Ident.Mime;
       File.Language := Data.Language;
       if Opt_Print then
-         File.Text := File_Mgr.Extract_License (Data, File.License);
+         File.Text := SPDX_Tool.Files.Extract_License (Data, File.License);
       end if;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          declare

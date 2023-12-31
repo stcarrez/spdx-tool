@@ -1,8 +1,9 @@
---  Advanced Resource Embedder 1.3.0
+--  Advanced Resource Embedder 1.4.0
 --  SPDX-License-Identifier: Apache-2.0
 --  License templates extracted from https://github.com/spdx/license-list-data.git
 package SPDX_Tool.Licenses.Files is
 
+   Names_Count : constant := 603;
    Names : constant Name_Array;
 
    --  Returns the data stream with the given name or null.

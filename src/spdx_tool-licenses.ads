@@ -46,6 +46,8 @@ package SPDX_Tool.Licenses is
    end record;
    type License_Index is new Natural;
 
+   type Name_Array is array (License_Index range <>) of Name_Access;
+
    function Is_Loaded (License : in License_Template)
                        return Boolean is (License.Root /= null);
 
@@ -334,6 +336,10 @@ private
       Token    : Buffer_Type (1 .. Length);
       Licenses : License_Index_Array (1 .. Size);
    end record;
+
+   --  Find a license from the license decision tree.
+   function Find_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
+                          return Decision_Node_Access;
 
    type License_Manager_Access is access all License_Manager;
 
