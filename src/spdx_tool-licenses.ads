@@ -149,6 +149,8 @@ package SPDX_Tool.Licenses is
    procedure Report (Manager : in out License_Manager);
 
 private
+   procedure Load_License (License : in License_Index;
+                           Into    : in out License_Template);
 
    procedure Load_License (Manager : in out License_Manager;
                            Name    : in String;
@@ -338,7 +340,7 @@ private
    end record;
 
    --  Find a license from the license decision tree.
-   function Find_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
+   function Find_Builtin_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
                           return Decision_Node_Access;
 
    type License_Manager_Access is access all License_Manager;
@@ -393,6 +395,7 @@ private
                                return License_Match;
 
    function Find_License (Manager : in License_Manager;
+                          Root    : in Token_Access;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array)
                           return License_Match;
