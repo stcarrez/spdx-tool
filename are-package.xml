@@ -2,7 +2,8 @@
 
   <resource name='SPDX_Tool.Licenses.Files'
             format='binary'
-            type='access constant Buffer_Type'>
+            type='access constant Buffer_Type'
+	    index-type='License_Index'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
     <header>--  License templates extracted from https://github.com/spdx/license-list-data.git</header>
 
