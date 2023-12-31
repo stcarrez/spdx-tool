@@ -143,16 +143,6 @@ package body SPDX_Tool.Licenses is
          Manager.Started := True;
       end if;
       Manager.Job := Job;
-
-      if not Opt_No_Builtin then
-         for Name of Files.Names loop
-            declare
-               License : License_Template;
-            begin
-               Manager.Load_License (Name.all, License);
-            end;
-         end loop;
-      end if;
    end Configure;
 
    --  ------------------------------
@@ -210,25 +200,11 @@ package body SPDX_Tool.Licenses is
                for Buffer'Address use Content'Address;
                L : License_Template;
             begin
-               Manager.Load_License (Name, Buffer, L);
+               Load_License (Name, Buffer, L);
             end;
          end if;
       end;
    end Load_Jsonld_License;
-
-   --  ------------------------------
-   --  Load the builtin license template.
-   --  ------------------------------
-   procedure Load_License (Manager : in out License_Manager;
-                           Name    : in String;
-                           License : in out License_Template) is
-      Content : constant access constant Buffer_Type
-        := Files.Get_Content (Name);
-   begin
-      if Content /= null and then Content'Length < 4096 then
-         Manager.Load_License (Name, Content.all, License);
-      end if;
-   end Load_License;
 
    --  ------------------------------
    --  Load the license template from the given path.
@@ -250,7 +226,7 @@ package body SPDX_Tool.Licenses is
          begin
             File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
             File.Read (Into => Buffer, Last => Last);
-            Manager.Load_License (Name, Buffer (1 .. Last), License);
+            Load_License (Name, Buffer (1 .. Last), License);
          end;
       end if;
    end Load_License;
@@ -619,8 +595,7 @@ package body SPDX_Tool.Licenses is
       end loop;
    end Collect_License_Tokens;
 
-   procedure Load_License (Manager : in out License_Manager;
-                           Name    : in String;
+   procedure Load_License (Name    : in String;
                            Content : in Buffer_Type;
                            License : in out License_Template) is
       Pos   : Buffer_Index := Content'First;

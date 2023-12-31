@@ -109,14 +109,12 @@ package SPDX_Tool.Licenses is
    procedure Save_License (License : in License_Type;
                            Path    : in String);
 
+   procedure Load_License (License : in License_Index;
+                           Into    : in out License_Template);
+
    --  Load the license template from the given path.
    procedure Load_License (Manager : in out License_Manager;
                            Path    : in String);
-
-   --  Load the builtin license template.
-   procedure Load_License (Manager : in out License_Manager;
-                           Name    : in String;
-                           License : in out License_Template);
 
    procedure Load_Jsonld_License (Manager : in out License_Manager;
                                   Path    : in String);
@@ -149,11 +147,8 @@ package SPDX_Tool.Licenses is
    procedure Report (Manager : in out License_Manager);
 
 private
-   procedure Load_License (License : in License_Index;
-                           Into    : in out License_Template);
 
-   procedure Load_License (Manager : in out License_Manager;
-                           Name    : in String;
+   procedure Load_License (Name    : in String;
                            Content : in Buffer_Type;
                            License : in out License_Template);
 
