@@ -14,7 +14,7 @@ project Spdx_Tool is
    
    Use_MagicAda : Yes_No := external ("USE_MAGICADA", "no");
 
-   for Source_Dirs use ("src/", "config/");
+   for Source_Dirs use ("src/", "src/generated", "config/");
 
    case Use_MagicAda is
       when "yes" =>
