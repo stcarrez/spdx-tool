@@ -16,6 +16,7 @@ with Util.Files.Walk;
 with Util.Strings.Sets;
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
+with SPDX_Tool.Buffer_Sets;
 private with Util.Executors;
 private with Util.Concurrent.Counters;
 package SPDX_Tool.Licenses is
@@ -35,9 +36,30 @@ package SPDX_Tool.Licenses is
    Only_Languages   : aliased GNAT.Strings.String_Access;
    Opt_No_Builtin   : aliased Boolean := False;
 
+   type Token_Type (Len : Buffer_Size) is tagged limited private;
+   type Token_Access is access all Token_Type'Class;
+
+   type License_Template is record
+      Root   : Token_Access;
+      Name   : UString;
+      Tokens : SPDX_Tool.Buffer_Sets.Set;
+   end record;
+   type License_Index is new Natural;
+
+   function Is_Loaded (License : in License_Template)
+                       return Boolean is (License.Root /= null);
+
+   --  Collect in the Tokens set, the list of tokens used by the license text.
+   procedure Collect_License_Tokens (License : in out License_Template)
+     with Pre => Is_Loaded (License);
+
+   type License_Template_Array is array (License_Index range <>) of License_Template;
+
    package Count_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (Key_Type     => String,
       Element_Type => Natural);
+
+   type Content_Access is access constant Buffer_Type;
 
    type Job_Type is (READ_LICENSES, UPDATE_LICENSES, LOAD_LICENSES);
 
@@ -89,6 +111,11 @@ package SPDX_Tool.Licenses is
    procedure Load_License (Manager : in out License_Manager;
                            Path    : in String);
 
+   --  Load the builtin license template.
+   procedure Load_License (Manager : in out License_Manager;
+                           Name    : in String;
+                           License : in out License_Template);
+
    procedure Load_Jsonld_License (Manager : in out License_Manager;
                                   Path    : in String);
 
@@ -123,7 +150,8 @@ private
 
    procedure Load_License (Manager : in out License_Manager;
                            Name    : in String;
-                           Content : in Buffer_Type);
+                           Content : in Buffer_Type;
+                           License : in out License_Template);
 
    package AF renames Ada.Finalization;
 
@@ -189,8 +217,7 @@ private
    --  - spaces are ignored,
    --  - punctuation must match,
    --  - Copyright, (c) and "©" are considered identical,
-   type Token_Type is tagged;
-   type Token_Access is access all Token_Type'Class;
+
    type License_Access is access all License_Type;
 
    type Token_Kind is (TOK_WORD,
@@ -296,6 +323,16 @@ private
       Template     : UString;
       OSI_Approved : Boolean := False;
       FSF_Libre    : Boolean := False;
+   end record;
+
+   type License_Index_Array is array (Positive range <>) of License_Index;
+   type Decision_Node;
+   type Decision_Node_Access is access constant Decision_Node;
+   type Decision_Node (Length : Buffer_Size; Size : Natural) is record
+      Left     : Decision_Node_Access;
+      Right    : Decision_Node_Access;
+      Token    : Buffer_Type (1 .. Length);
+      Licenses : License_Index_Array (1 .. Size);
    end record;
 
    type License_Manager_Access is access all License_Manager;

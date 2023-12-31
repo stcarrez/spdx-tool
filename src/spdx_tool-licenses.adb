@@ -14,6 +14,7 @@ with Util.Log.Loggers;
 with Util.Streams.Files;
 
 with SPDX_Tool.Licenses.Files;
+with SPDX_Tool.Licenses.Decisions;
 package body SPDX_Tool.Licenses is
 
    use type SPDX_Tool.Files.Comment_Style;
@@ -123,12 +124,9 @@ package body SPDX_Tool.Licenses is
       if not Opt_No_Builtin then
          for Name of Files.Names loop
             declare
-               Content : constant access constant Buffer_Type
-                 := Files.Get_Content (Name.all);
+               License : License_Template;
             begin
-               if Content /= null and then Content'Length < 4096 then
-                  Manager.Load_License (Name.all, Content.all);
-               end if;
+               Manager.Load_License (Name.all, License);
             end;
          end loop;
       end if;
@@ -187,12 +185,27 @@ package body SPDX_Tool.Licenses is
                Content : String := To_String (License.Template);
                Buffer  : Buffer_Type (1 .. Content'Length);
                for Buffer'Address use Content'Address;
+               L : License_Template;
             begin
-               Manager.Load_License (Name, Buffer);
+               Manager.Load_License (Name, Buffer, L);
             end;
          end if;
       end;
    end Load_Jsonld_License;
+
+   --  ------------------------------
+   --  Load the builtin license template.
+   --  ------------------------------
+   procedure Load_License (Manager : in out License_Manager;
+                           Name    : in String;
+                           License : in out License_Template) is
+      Content : constant access constant Buffer_Type
+        := Files.Get_Content (Name);
+   begin
+      if Content /= null and then Content'Length < 4096 then
+         Manager.Load_License (Name, Content.all, License);
+      end if;
+   end Load_License;
 
    --  ------------------------------
    --  Load the license template from the given path.
@@ -210,10 +223,11 @@ package body SPDX_Tool.Licenses is
             File   : Util.Streams.Files.File_Stream;
             Buffer : Buffer_Type (1 .. 4096);
             Last   : Ada.Streams.Stream_Element_Offset;
+            License : License_Template;
          begin
             File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
             File.Read (Into => Buffer, Last => Last);
-            Manager.Load_License (Name, Buffer (1 .. Last));
+            Manager.Load_License (Name, Buffer (1 .. Last), License);
          end;
       end if;
    end Load_License;
@@ -572,24 +586,35 @@ package body SPDX_Tool.Licenses is
       Finish;
    end Parse_License;
 
+   procedure Collect_License_Tokens (License : in out License_Template) is
+      Token : Token_Access := License.Root;
+   begin
+      while Token /= null loop
+         if Token.Kind = TOK_WORD then
+            License.Tokens.Include (Token.Content);
+         end if;
+         Token := Token.Next;
+      end loop;
+   end Collect_License_Tokens;
+
    procedure Load_License (Manager : in out License_Manager;
                            Name    : in String;
-                           Content : in Buffer_Type) is
-      Pos         : Buffer_Index := Content'First;
-      Match       : Buffer_Index;
-      License_Tag : UString;
+                           Content : in Buffer_Type;
+                           License : in out License_Template) is
+      Pos   : Buffer_Index := Content'First;
+      Match : Buffer_Index;
       Count : constant Natural := Token_Count;
    begin
       Match := Next_With (Content, Pos, SPDX_License_Tag);
       if Match > Pos then
          Match := Skip_Spaces (Content, Match, Content'Last);
          Pos := Find_Eol (Content, Match);
-         License_Tag := To_UString (Content (Match .. Pos - 1));
+         License.Name := To_UString (Content (Match .. Pos - 1));
       else
-         License_Tag := To_UString (Name);
+         License.Name := To_UString (Name);
       end if;
-      Parse_License (Content, Pos, Manager.Tokens, null, License_Tag);
-      Log.Info ("License {0} => {1} tokens", To_String (License_Tag),
+      Parse_License (Content, Pos, License.Root, null, License.Name);
+      Log.Info ("License {0} => {1} tokens", To_String (License.Name),
                 Natural'Image (Token_Count - Count));
 
    exception
