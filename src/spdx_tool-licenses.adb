@@ -222,11 +222,10 @@ package body SPDX_Tool.Licenses is
             File   : Util.Streams.Files.File_Stream;
             Buffer : Buffer_Type (1 .. 4096);
             Last   : Ada.Streams.Stream_Element_Offset;
-            License : License_Template;
          begin
             File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
             File.Read (Into => Buffer, Last => Last);
-            Load_License (Name, Buffer (1 .. Last), License);
+            Load_License (Name, Buffer (1 .. Last), Manager.Licenses);
          end;
       end if;
    end Load_License;
@@ -1071,25 +1070,22 @@ package body SPDX_Tool.Licenses is
    --  Find a license from the license decision tree.
    --  ------------------------------
    function Find_Builtin_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
-                          return Decision_Node_Access is
-      Node : Decision_Node_Access := SPDX_Tool.Licenses.Decisions.Root;
+                          return Decision_Array_Access is
+      Node   : Decision_Node_Access := SPDX_Tool.Licenses.Decisions.Root;
+      Result : Decision_Array_Access (1 .. 20);
+      Depth  : Natural := 0;
    begin
       while Node /= null loop
+         Depth := Depth + 1;
+         Result (Depth) := Node;
          exit when Node.Length = 0;
-         if Node.Length = 0 then
-            for I of Node.Licenses loop
-               Log.Error ("Found license {0}",
-                          SPDX_Tool.Licenses.Files.Names (I).all);
-            end loop;
-            exit;
-         end if;
          if Tokens.Contains (Node.Token) then
             Node := Node.Left;
          else
             Node := Node.Right;
          end if;
       end loop;
-      return Node;
+      return Result (1 .. Depth);
    end Find_Builtin_License;
 
    function Find_License (License : in License_Index;
@@ -1148,22 +1144,22 @@ package body SPDX_Tool.Licenses is
       end if;
       SPDX_Tool.Files.Extract_Tokens (File, Tokens);
       if not Opt_No_Builtin then
-         Node := Find_Builtin_License (Tokens);
-         if Node /= null then
-            for License of Node.Licenses loop
-               Match := Find_License (License, File);
-               if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-                  return Match;
-               end if;
+         declare
+            Nodes : constant Decision_Array_Access := Find_Builtin_License (Tokens);
+         begin
+            for Node of reverse Nodes loop
+               for License of Node.Licenses loop
+                  Match := Find_License (License, File);
+                  if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                     return Match;
+                  end if;
+               end loop;
             end loop;
-         end if;
-         if Node = null then
-            null;
-         end if;
+         end;
       end if;
       while Line <= File.Count loop
          if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
-            Match := Find_License (Manager.Tokens, Buf.Data,
+            Match := Find_License (Manager.Licenses.Root, Buf.Data,
                                    File.Lines (Line .. File.Count));
             if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                return Match;

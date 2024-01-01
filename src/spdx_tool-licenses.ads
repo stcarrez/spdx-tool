@@ -333,10 +333,11 @@ private
       Token    : Buffer_Type (1 .. Length);
       Licenses : License_Index_Array (1 .. Size);
    end record;
+   type Decision_Array_Access is array (Positive range <>) of Decision_Node_Access;
 
    --  Find a license from the license decision tree.
    function Find_Builtin_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
-                          return Decision_Node_Access;
+                          return Decision_Array_Access;
 
    type License_Manager_Access is access all License_Manager;
 
@@ -367,7 +368,6 @@ private
       Started  : Boolean := False;
       Job      : Job_Type := READ_LICENSES;
       Stats    : License_Stats;
-      Tokens   : Token_Access;
       Mgr_Idx  : Util.Concurrent.Counters.Counter;
       File_Mgr : File_Manager_Array (1 .. Count);
       Executor : Executor_Manager (Count);
@@ -376,6 +376,7 @@ private
       Exclude_Filters : Util.Strings.Sets.Set;
       Include_Languages : Util.Strings.Sets.Set;
       Exclude_Languages : Util.Strings.Sets.Set;
+      Licenses : License_Template;
    end record;
 
    type License_Match is record
