@@ -38,8 +38,8 @@ procedure Gendecisiontree is
                                  Array_Type      => SPDX_Tool.Buffer_Type,
                                  Occurrence_Type => Set);
 
-   License_Count : constant License_Index := SPDX_Tool.Licenses.Files.Names'Length;
-   Licenses      : SPDX_Tool.Licenses.License_Template_Array (0 .. License_Count);
+   License_Count : constant License_Index := SPDX_Tool.Licenses.Files.Names_Count;
+   Licenses      : SPDX_Tool.Licenses.License_Template_Array (0 .. License_Count - 1);
    Node_Idx      : Natural := 0;
 
    procedure Print_Node (Token     : in Buffer_Type;
@@ -211,7 +211,7 @@ begin
    Ada.Text_IO.Put_Line ("with SPDX_Tool.Licenses.Files;");
    Ada.Text_IO.Put_Line ("private package SPDX_Tool.Licenses.Decisions is");
    Ada.Text_IO.Put_Line ("   Licenses : License_Template_Array "
-                         & "(1 .. SPDX_Tool.Licenses.Files.Names_Count);");
+                         & "(0 .. SPDX_Tool.Licenses.Files.Names_Count - 1);");
    Decision_Tree (List);
    Ada.Text_IO.Put ("   Root : constant Decision_Node_Access := N");
    Ada.Text_IO.Put (Util.Strings.Image (Node_Idx));
