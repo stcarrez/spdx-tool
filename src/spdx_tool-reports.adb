@@ -7,18 +7,30 @@
 with Util.Strings;
 with PT.Texts;
 with PT.Charts;
-with SCI.Occurrences.Arrays;
+with SCI.Occurrences.Finites;
 package body SPDX_Tool.Reports is
 
    use type SPDX_Tool.Infos.License_Kind;
 
-   package Occurrences is
-     new SCI.Occurrences.Arrays (Element_Type => Character,
-                                 Index_Type => Positive,
-                                 Array_Type => String,
-                                 Occurrence_Type => Natural);
+   function "<" (Left, Right : UString) return Boolean
+                 renames Ada.Strings.Unbounded."<";
+   function "=" (Left, Right : UString) return Boolean
+                 renames Ada.Strings.Unbounded."=";
 
-   function Length (Item : String) return Natural is (Item'Length);
+   type License_Tag is record
+      Name : UString;
+      SPDX : Boolean := False;
+   end record;
+
+   function "<" (Left, Right : License_Tag)
+                 return Boolean is (Left.Name < Right.Name
+                                    or else (Left.SPDX < Right.SPDX and then Left.Name = Right.Name));
+
+   package Occurrences is
+     new SCI.Occurrences.Finites (Element_Type => License_Tag,
+                                  Occurrence_Type => Natural);
+
+   function Length (Item : License_Tag) return Natural is (Length (Item.Name));
    procedure List_Occurrences is new Occurrences.List;
    function Sum is new Occurrences.Sum;
    function Longest is new Occurrences.Longest (Length);
@@ -33,7 +45,7 @@ package body SPDX_Tool.Reports is
    procedure Draw_Percent_Bar is
      new PT.Charts.Draw_Bar (Natural);
 
-   function Get_License (Info : in Infos.License_Info) return String;
+   function Get_License (Info : in Infos.License_Info) return License_Tag;
 
    procedure Print_Occurences (Printer : in out PT.Printer_Type'Class;
                                Styles  : in Style_Configuration;
@@ -42,14 +54,16 @@ package body SPDX_Tool.Reports is
 
    To_Digit : constant array (0 .. 9) of Character := "0123456789";
 
-   function Get_License (Info : in Infos.License_Info) return String is
+   function Get_License (Info : in Infos.License_Info) return License_Tag is
    begin
-      if Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-         return To_String (Info.Name);
+      if Info.Match = Infos.SPDX_LICENSE then
+         return (Info.Name, True);
+      elsif Info.Match = Infos.TEMPLATE_LICENSE then
+         return (Info.Name, False);
       elsif Info.Match = Infos.UNKNOWN_LICENSE then
-         return -("Unknown");
+         return (To_UString (-("Unknown")), False);
       else
-         return -("None");
+         return (To_UString (-("None")), False);
       end if;
    end Get_License;
 
@@ -73,7 +87,7 @@ package body SPDX_Tool.Reports is
                                Title   : in String) is
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
       Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Writer, 0);
-      Fields : PT.Texts.Field_Array (1 .. 4);
+      Fields : PT.Texts.Field_Array (1 .. 5);
       List   : Occurrences.Vector;
    begin
       List_Occurrences (Set, List);
@@ -82,31 +96,36 @@ package body SPDX_Tool.Reports is
          Max    : constant PT.X_Type := PT.X_Type (Longest (List));
       begin
          Writer.Create_Field (Fields (1), Styles.Title, 0.0);
-         Writer.Create_Field (Fields (2), Styles.Title, 10.0);
+         Writer.Create_Field (Fields (2), Styles.Title, 5.0);
          Writer.Create_Field (Fields (3), Styles.Title, 10.0);
-         Writer.Create_Field (Fields (4), Styles.Title, 20.0);
+         Writer.Create_Field (Fields (4), Styles.Title, 10.0);
+         Writer.Create_Field (Fields (5), Styles.Title, 20.0);
          Writer.Set_Bottom_Right_Padding (Fields (3), (W => 2, H => 0));
          Writer.Set_Max_Dimension (Fields (1), (W => Max, H => 0));
          Writer.Set_Justify (Fields (1), PT.J_LEFT);
          Writer.Set_Justify (Fields (2), PT.J_RIGHT);
          Writer.Set_Justify (Fields (3), PT.J_RIGHT);
+         Writer.Set_Justify (Fields (4), PT.J_RIGHT);
 
          Writer.Layout_Fields (Fields);
 
          Writer.Put (Fields (1), Title);
-         Writer.Put (Fields (2), -("Count"));
-         Writer.Put (Fields (3), -("Ratio"));
+         Writer.Put (Fields (2), -("SPDX"));
+         Writer.Put (Fields (3), -("Count"));
+         Writer.Put (Fields (4), -("Ratio"));
          Writer.New_Line;
 
          Writer.Set_Style (Fields (1), Styles.Default);
          Writer.Set_Style (Fields (2), Styles.Default);
          Writer.Set_Style (Fields (3), Styles.Default);
+         Writer.Set_Style (Fields (4), Styles.Default);
          for Item of List loop
-            Writer.Put (Fields (1), Item.Element);
-            Writer.Put (Fields (2), Item.Occurrence'Image);
-            Writer.Put (Fields (3), Format_Percent (Item.Occurrence, Total));
+            Writer.Put (Fields (1), To_String (Item.Element.Name));
+            Writer.Put (Fields (2), (if Item.Element.SPDX then "*" else " "));
+            Writer.Put (Fields (3), Item.Occurrence'Image);
+            Writer.Put (Fields (4), Format_Percent (Item.Occurrence, Total));
             if Styles.With_Progress then
-               Draw_Percent_Bar (Chart, Writer.Get_Box (Fields (4)),
+               Draw_Percent_Bar (Chart, Writer.Get_Box (Fields (5)),
                                  Value => Item.Occurrence,
                                  Min   => 0,
                                  Max   => Total,
@@ -169,13 +188,13 @@ package body SPDX_Tool.Reports is
          Writer.Layout_Fields (File_Fields);
 
          for Item of List loop
-            Writer.Put (License_Fields (1), Item.Element);
+            Writer.Put (License_Fields (1), To_String (Item.Element.Name));
             Writer.Put (License_Fields (2), Item.Occurrence'Image);
             Writer.New_Line;
 
             for File of Files loop
                declare
-                  L : constant String := Get_License (File.License);
+                  L : constant License_Tag := Get_License (File.License);
                begin
                   if Item.Element = L then
                      Writer.Put (File_Fields (1), "");
@@ -198,7 +217,7 @@ package body SPDX_Tool.Reports is
    begin
       for File of Files loop
          if not File.Filtered then
-            Add (Set, To_String (File.Mime), 1);
+            Add (Set, (File.Mime, False), 1);
          end if;
       end loop;
       Print_Occurences (Printer, Styles, Set, -("Mime type"));
@@ -214,7 +233,7 @@ package body SPDX_Tool.Reports is
    begin
       for File of Files loop
          if not File.Filtered then
-            Add (Set, To_String (File.Language), 1);
+            Add (Set, (File.Language, False), 1);
          end if;
       end loop;
       Print_Occurences (Printer, Styles, Set, -("Language"));
