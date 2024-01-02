@@ -20,7 +20,7 @@ with PT.Texts;
 with PT.Colors;
 
 with SPDX_Tool.Infos;
-with SPDX_Tool.Licenses;
+with SPDX_Tool.Licenses.Manager;
 with SPDX_Tool.Reports;
 procedure SPDX_Tool.Main is
 
@@ -30,9 +30,11 @@ procedure SPDX_Tool.Main is
    use type GNAT.Strings.String_Access;
    use type AD.File_Kind;
 
+   subtype License_Manager is SPDX_Tool.Licenses.Manager.License_Manager;
+
    procedure Setup;
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map);
-   procedure Read_Licenses (Manager : in out SPDX_Tool.Licenses.License_Manager;
+   procedure Read_Licenses (Manager : in out License_Manager;
                             Path    : in String);
 
    Log : constant Util.Log.Loggers.Logger :=
@@ -190,13 +192,14 @@ procedure SPDX_Tool.Main is
       end if;
    end Print_Report;
 
-   procedure Report_Summary is new SPDX_Tool.Licenses.Report (Print_Report);
+   procedure Report_Summary is
+     new SPDX_Tool.Licenses.Manager.Report (Print_Report);
 
-   procedure Read_Licenses (Manager : in out SPDX_Tool.Licenses.License_Manager;
+   procedure Read_Licenses (Manager : in out License_Manager;
                             Path    : in String) is
       Filter : Util.Files.Walk.Filter_Type;
    begin
-      Manager.Configure (Licenses.LOAD_LICENSES);
+      Manager.Configure (Licenses.Manager.LOAD_LICENSES);
       Filter.Include ("*.jsonld");
       Filter.Include ("*.txt");
       Filter.Exclude ("*");
@@ -229,7 +232,7 @@ begin
       Opt_Check := True;
    end if;
    declare
-      Manager : SPDX_Tool.Licenses.License_Manager (Opt_Tasks);
+      Manager : License_Manager (Opt_Tasks);
       Filter  : Util.Files.Walk.Filter_Type;
    begin
       if Licenses.Only_Licenses /= null then
@@ -258,9 +261,9 @@ begin
          Read_Licenses (Manager, Licenses.License_Dir.all);
       end if;
       if Opt_Update then
-         Manager.Configure (Licenses.UPDATE_LICENSES);
+         Manager.Configure (Licenses.Manager.UPDATE_LICENSES);
       else
-         Manager.Configure (Licenses.READ_LICENSES);
+         Manager.Configure (Licenses.Manager.READ_LICENSES);
       end if;
       Filter.Exclude (".git");
       loop

@@ -35,6 +35,11 @@ package body SPDX_Tool.Reports is
 
    function Get_License (Info : in Infos.License_Info) return String;
 
+   procedure Print_Occurences (Printer : in out PT.Printer_Type'Class;
+                               Styles  : in Style_Configuration;
+                               Set     : in Occurrences.Set;
+                               Title   : in String);
+
    To_Digit : constant array (0 .. 9) of Character := "0123456789";
 
    function Get_License (Info : in Infos.License_Info) return String is
@@ -218,6 +223,7 @@ package body SPDX_Tool.Reports is
    procedure Print_License_Text (Printer : in out PT.Printer_Type'Class;
                                  Styles  : in Style_Configuration;
                                  Text    : in Infos.License_Text) is
+      pragma Unreferenced (Styles);
       Last    : constant Natural := Natural (Text.Len);
       Content : String (1 .. Last);
       for Content'Address use Text.Content'Address;

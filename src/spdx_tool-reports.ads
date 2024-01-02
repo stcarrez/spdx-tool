@@ -42,4 +42,7 @@ package SPDX_Tool.Reports is
                           Styles  : in Style_Configuration;
                           Files   : in SPDX_Tool.Infos.File_Map);
 
+   procedure Print_License_Text (Printer : in out PT.Printer_Type'Class;
+                                 Styles  : in Style_Configuration;
+                                 Text    : in Infos.License_Text);
 end SPDX_Tool.Reports;
