@@ -8,7 +8,7 @@ with GNAT.Source_Info;
 with Util.Test_Caller;
 with SPDX_Tool.Files;
 with SPDX_Tool.Licenses.Manager;
-package body SPDX_Tool.Licenses.Tests is
+package body SPDX_Tool.Licenses.Manager.Tests is
 
    procedure Check_License (T        : in out Test;
                             Filename : in String;
@@ -70,4 +70,4 @@ package body SPDX_Tool.Licenses.Tests is
       Check_License (T, "gpl-2.0-or-bsd.c", "standard/LGPL-2.1+.txt", "GPL-2.0+ OR BSD-3-Clause");
    end Test_Find_License_SPDX;
 
-end SPDX_Tool.Licenses.Tests;
+end SPDX_Tool.Licenses.Manager.Tests;

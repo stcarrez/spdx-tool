@@ -6,7 +6,7 @@
 
 with SPDX_Tool.Tests;
 with SPDX_Tool.Files.Tests;
-with SPDX_Tool.Licenses.Tests;
+with SPDX_Tool.Licenses.Manager.Tests;
 package body SPDX_Tool.Testsuite is
 
    Tests : aliased Util.Tests.Test_Suite;
@@ -15,7 +15,7 @@ package body SPDX_Tool.Testsuite is
    begin
       --  Executed in reverse order
       SPDX_Tool.Tests.Add_Tests (Tests'Access);
-      SPDX_Tool.Licenses.Tests.Add_Tests (Tests'Access);
+      SPDX_Tool.Licenses.Manager.Tests.Add_Tests (Tests'Access);
       SPDX_Tool.Files.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
    end Suite;

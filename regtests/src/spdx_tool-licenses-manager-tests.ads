@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------
 
 with Util.Tests;
-package SPDX_Tool.Licenses.Tests is
+package SPDX_Tool.Licenses.Manager.Tests is
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite);
 
@@ -16,4 +16,4 @@ package SPDX_Tool.Licenses.Tests is
    procedure Test_Find_License_Var (T : in out Test);
    procedure Test_Find_License_SPDX (T : in out Test);
 
-end SPDX_Tool.Licenses.Tests;
+end SPDX_Tool.Licenses.Manager.Tests;
