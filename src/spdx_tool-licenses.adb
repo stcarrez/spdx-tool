@@ -886,6 +886,7 @@ package body SPDX_Tool.Licenses is
             end loop;
          end if;
          if First.Line = Pos.Line then
+            exit when Pos.Line = To;
             Pos.Line := Pos.Line + 1;
          end if;
       end loop;
