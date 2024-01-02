@@ -15,6 +15,8 @@ package body SPDX_Tool.Files.Tests is
      new Util.Assertions.Assert_Equals_T (Value_Type => Comment_Mode);
    procedure Assert_Equals is
      new Util.Assertions.Assert_Equals_T (Value_Type => Buffer_Index);
+   procedure Assert_Equals is
+     new Util.Assertions.Assert_Equals_T (Value_Type => Infos.Line_Count);
 
    package Caller is new Util.Test_Caller (Test, "SPDX_Tool.Languages");
 
@@ -58,8 +60,8 @@ package body SPDX_Tool.Files.Tests is
          Info : File_Type (100);
       begin
          Manager.Open (Info, Path);
-         Util.Tests.Assert_Equals (T, 17, Info.Count,
-                                   "Invalid number of lines");
+         Assert_Equals (T, 17, Info.Count,
+                        "Invalid number of lines");
          Assert_Equals (T, ADA_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
       end;
@@ -69,8 +71,8 @@ package body SPDX_Tool.Files.Tests is
       begin
          Manager.Open (Info, Util.Tests.Get_Path
                     ("regtests/files/identify/gpl-3.0-1.sub"));
-         Util.Tests.Assert_Equals (T, 29, Info.Count,
-                                   "Invalid number of lines");
+         Assert_Equals (T, 29, Info.Count,
+                        "Invalid number of lines");
          Assert_Equals (T, SHELL_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
       end;
@@ -80,12 +82,12 @@ package body SPDX_Tool.Files.Tests is
       begin
          Manager.Open (Info, Util.Tests.Get_Path
                     ("regtests/files/identify/gnat-3.0.ads"));
-         Util.Tests.Assert_Equals (T, 24, Info.Count,
-                                   "Invalid number of lines");
+         Assert_Equals (T, 24, Info.Count,
+                        "Invalid number of lines");
          Assert_Equals (T, ADA_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
 
-         for I in 1 .. 24 loop
+         for I in Infos.Line_Number (1) .. 24 loop
             Assert_Equals (T, LINE_COMMENT, Info.Lines (I).Comment,
                            "Invalid identification at" & I'Image);
          end loop;
@@ -96,12 +98,12 @@ package body SPDX_Tool.Files.Tests is
       begin
          Manager.Open (Info, Util.Tests.Get_Path
                     ("regtests/files/identify/gpl-2.0-1.C"));
-         Util.Tests.Assert_Equals (T, 35, Info.Count,
-                                   "Invalid number of lines");
+         Assert_Equals (T, 35, Info.Count,
+                        "Invalid number of lines");
          Assert_Equals (T, CPP_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
 
-         for I in 1 .. 35 loop
+         for I in Infos.Line_Number (1) .. 35 loop
             Assert_Equals (T, LINE_COMMENT, Info.Lines (I).Comment,
                            "Invalid identification at" & I'Image);
          end loop;
@@ -120,8 +122,8 @@ package body SPDX_Tool.Files.Tests is
          Info : File_Type (100);
       begin
          Manager.Open (Info, Path);
-         Util.Tests.Assert_Equals (T, 16, Info.Count,
-                                   "Invalid number of lines");
+         Assert_Equals (T, 16, Info.Count,
+                        "Invalid number of lines");
          Assert_Equals (T, C_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
@@ -151,8 +153,8 @@ package body SPDX_Tool.Files.Tests is
       begin
          Manager.Open (Info, Util.Tests.Get_Path
                     ("regtests/files/identify/apache-2.0-3.c"));
-         Util.Tests.Assert_Equals (T, 16, Info.Count,
-                                   "Invalid number of lines");
+         Assert_Equals (T, 16, Info.Count,
+                        "Invalid number of lines");
          Assert_Equals (T, C_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
@@ -189,8 +191,8 @@ package body SPDX_Tool.Files.Tests is
       begin
          Manager.Open (Info, Util.Tests.Get_Path
                     ("regtests/files/identify/lgpl-2.1.ml"));
-         Util.Tests.Assert_Equals (T, 16, Info.Count,
-                                   "Invalid number of lines");
+         Assert_Equals (T, 16, Info.Count,
+                        "Invalid number of lines");
          Assert_Equals (T, OCAML_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
          Assert_Equals (T, LINE_BLOCK_COMMENT, Info.Lines (1).Comment,
@@ -220,8 +222,8 @@ package body SPDX_Tool.Files.Tests is
       begin
          Manager.Open (Info, Util.Tests.Get_Path
                     ("regtests/files/identify/lgpl-2.1.java"));
-         Util.Tests.Assert_Equals (T, 18, Info.Count,
-                                   "Invalid number of lines");
+         Assert_Equals (T, 18, Info.Count,
+                        "Invalid number of lines");
          Assert_Equals (T, C_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
