@@ -169,10 +169,10 @@ package body SPDX_Tool.Licenses.Manager is
       Buf     : constant Buffer_Accessor := File.Buffer.Value;
       Result  : License_Match := (Last => null, Depth => 0, others => <>);
       Match   : License_Match;
-      Line    : Positive := 1;
+      Line    : Line_Number := 1;
       Tokens  : SPDX_Tool.Buffer_Sets.Set;
    begin
-      if File.Cmt_Style = SPDX_Tool.Files.NO_COMMENT then
+      if File.Cmt_Style = SPDX_Tool.Files.NO_COMMENT or else File.Count = 0 then
          Result.Info.Match := Infos.NONE;
          return Result;
       end if;
@@ -195,7 +195,7 @@ package body SPDX_Tool.Licenses.Manager is
             end loop;
          end;
       end if;
-      while Line <= File.Count loop
+      loop
          if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
             Match := Find_License (Manager.Licenses.Root, Buf.Data,
                                    File.Lines, Line, File.Count);
@@ -210,6 +210,7 @@ package body SPDX_Tool.Licenses.Manager is
                end if;
             end if;
          end if;
+         exit when Line = File.Count;
          Line := Line + 1;
       end loop;
       return Result;
@@ -358,7 +359,7 @@ package body SPDX_Tool.Licenses.Manager is
                else
                   Log.Info ("{0} is {1}: {2} lines no comment", File.Path,
                             To_String (Data.Ident.Mime),
-                            Util.Strings.Image (Data.Count));
+                            Image (Data.Count));
                   Manager.Stats.Increment (To_String (Data.Ident.Mime));
                end if;
             else
@@ -369,7 +370,7 @@ package body SPDX_Tool.Licenses.Manager is
                else
                   Log.Info ("{0} is {1}: {2} lines {3} cmt", File.Path,
                             To_String (Data.Ident.Mime),
-                            Util.Strings.Image (Data.Count),
+                            Image (Data.Count),
                             Util.Strings.Image (Cmt_Count));
                   Manager.Stats.Increment ("unknown " & To_String (Data.Ident.Mime));
                   Manager.Stats.Add_Header (Data);

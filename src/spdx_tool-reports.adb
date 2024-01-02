@@ -100,7 +100,7 @@ package body SPDX_Tool.Reports is
          Writer.Create_Field (Fields (3), Styles.Title, 10.0);
          Writer.Create_Field (Fields (4), Styles.Title, 10.0);
          Writer.Create_Field (Fields (5), Styles.Title, 20.0);
-         Writer.Set_Bottom_Right_Padding (Fields (3), (W => 2, H => 0));
+         Writer.Set_Bottom_Right_Padding (Fields (4), (W => 2, H => 0));
          Writer.Set_Max_Dimension (Fields (1), (W => Max, H => 0));
          Writer.Set_Justify (Fields (1), PT.J_LEFT);
          Writer.Set_Justify (Fields (2), PT.J_RIGHT);

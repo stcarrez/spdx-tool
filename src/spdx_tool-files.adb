@@ -206,7 +206,7 @@ package body SPDX_Tool.Files is
          Pos     : Buffer_Index := Buf.Data'First;
          First   : Buffer_Index;
          Last    : Buffer_Index;
-         Line_No : Natural := 0;
+         Line_No : Infos.Line_Count := 0;
          Style   : Comment_Info := (NO_COMMENT, Mode => NO_COMMENT, others => <>);
       begin
          File.File.Read (Into => Buf.Data, Last => Len);
@@ -282,8 +282,8 @@ package body SPDX_Tool.Files is
    --  Compute maximum length of lines between From..To as byte count.
    --  ------------------------------
    function Max_Length (Lines : in Line_Array;
-                        From  : in Positive;
-                        To    : in Positive) return Buffer_Size is
+                        From  : in Infos.Line_Number;
+                        To    : in Infos.Line_Number) return Buffer_Size is
       Max : Buffer_Size := 0;
    begin
       for I in From .. To loop
@@ -303,8 +303,8 @@ package body SPDX_Tool.Files is
    --  Check if Lines (From..To) are of the same length.
    --  ------------------------------
    function Is_Same_Length (Lines : in Line_Array;
-                            From  : in Positive;
-                            To    : in Positive) return Boolean is
+                            From  : in Infos.Line_Number;
+                            To    : in Infos.Line_Number) return Boolean is
       Line_Length : constant Natural := Lines (From).Style.Length;
    begin
       return Line_Length > 0
@@ -318,8 +318,8 @@ package body SPDX_Tool.Files is
    --  ------------------------------
    function Is_Same_Byte (Lines  : in Line_Array;
                           Buffer : in Buffer_Type;
-                          From   : in Positive;
-                          To     : in Positive;
+                          From   : in Infos.Line_Number;
+                          To     : in Infos.Line_Number;
                           Offset : in Buffer_Size) return Boolean is
       C : constant Byte := Buffer (Lines (From).Line_End - Offset);
    begin
@@ -332,8 +332,8 @@ package body SPDX_Tool.Files is
    --  ------------------------------
    function Common_End_Length (Lines  : in Line_Array;
                                Buffer : in Buffer_Type;
-                               From   : in Positive;
-                               To     : in Positive) return Buffer_Size is
+                               From   : in Infos.Line_Number;
+                               To     : in Infos.Line_Number) return Buffer_Size is
       Line_Length : constant Buffer_Size :=
         Lines (From).Line_End - Lines (From).Line_Start;
       Len : Buffer_Size := 0;
@@ -354,8 +354,8 @@ package body SPDX_Tool.Files is
    --  ------------------------------
    function Common_Start_Length (Lines  : in Line_Array;
                                  Buffer : in Buffer_Type;
-                                 From   : in Positive;
-                                 To     : in Positive) return Buffer_Size is
+                                 From   : in Infos.Line_Number;
+                                 To     : in Infos.Line_Number) return Buffer_Size is
       Line_Length : constant Buffer_Size := Max_Length (Lines, From, To);
       Len         : Buffer_Size := 0;
    begin
@@ -385,7 +385,7 @@ package body SPDX_Tool.Files is
    --  ------------------------------
    function Is_Presentation_Line (Lines  : in Line_Array;
                                   Buffer : in Buffer_Type;
-                                  Line   : in Positive) return Boolean is
+                                  Line   : in Infos.Line_Number) return Boolean is
       Info : Comment_Info renames Lines (Line).Style;
    begin
       return (for all I in Info.Text_Start .. Info.Text_Last
@@ -401,7 +401,7 @@ package body SPDX_Tool.Files is
    procedure Boxed_License (Lines  : in out Line_Array;
                             Buffer : in Buffer_Type;
                             Boxed  : out Boolean) is
-      Limit  : constant Natural := (Lines'Length / 2);
+      Limit  : constant Infos.Line_Count := (Lines'Length / 2);
       Common : Buffer_Size;
       Common_Start : Buffer_Size;
    begin
@@ -428,8 +428,8 @@ package body SPDX_Tool.Files is
 
    procedure Boxed_License (Lines  : in Line_Array;
                             Buffer : in Buffer_Type;
-                            First  : in Positive;
-                            Last   : in Positive;
+                            First  : in Infos.Line_Number;
+                            Last   : in Infos.Line_Number;
                             Spaces : out Natural;
                             Boxed  : out Boolean;
                             Length : out Natural) is
@@ -451,7 +451,7 @@ package body SPDX_Tool.Files is
             end if;
          end if;
       end loop;
-      Spaces := (Spaces + Last - First) / (Last - First + 1);
+      --  Spaces := (Spaces + Last - First) / (Last - First + 1);
       if Length > Spaces then
          Length := Length - Spaces - 1;
       end if;
@@ -460,8 +460,8 @@ package body SPDX_Tool.Files is
    procedure Save (Manager : in File_Manager;
                    File    : in out File_Type;
                    Path    : in String;
-                   First   : in Natural;
-                   Last    : in Natural;
+                   First   : in Infos.Line_Number;
+                   Last    : in Infos.Line_Number;
                    License : in String) is
       Buf       : constant Buffer_Accessor := File.Buffer.Value;
       Tmp_Path  : constant String := Path & ".tmp";
@@ -543,8 +543,8 @@ package body SPDX_Tool.Files is
                              License : in Infos.License_Info)
                              return Infos.License_Text_Access is
       Buf             : constant Buffer_Accessor := File.Buffer.Value;
-      First_Line      : Natural;
-      Last_Line       : Natural;
+      First_Line      : Infos.Line_Count;
+      Last_Line       : Infos.Line_Count;
       Size, Len, Skip : Buffer_Size;
    begin
       if License.Match /= Infos.NONE then
@@ -552,6 +552,7 @@ package body SPDX_Tool.Files is
          Last_Line := License.Last_Line;
       else
          First_Line := 1;
+         Last_Line := File.Count;
          while First_Line > Last_Line
            and then File.Lines (First_Line).Comment = NO_COMMENT
          loop

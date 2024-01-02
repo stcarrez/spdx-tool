@@ -26,7 +26,7 @@ package body SPDX_Tool.Licenses is
 
    function Extract_SPDX (Lines   : in SPDX_Tool.Files.Line_Array;
                           Content : in Buffer_Type;
-                          Line    : in Positive;
+                          Line    : in Infos.Line_Number;
                           From    : in Buffer_Index) return Infos.License_Info;
    function Find_Header (List : UBO.Object) return UBO.Object;
    function Find_Value (Info : UBO.Object; Name : String) return Boolean;
@@ -35,6 +35,10 @@ package body SPDX_Tool.Licenses is
    --  Protect concurrent loading of license templates.
    protected License_Tree is
       function Get_License (License : in License_Index) return Token_Access;
+      ------------------
+      -- Load_License --
+      ------------------
+
       procedure Load_License (License : in License_Index;
                               Token   : out Token_Access);
    end License_Tree;
@@ -767,7 +771,7 @@ package body SPDX_Tool.Licenses is
 
    function Extract_SPDX (Lines   : in SPDX_Tool.Files.Line_Array;
                           Content : in Buffer_Type;
-                          Line    : in Positive;
+                          Line    : in Infos.Line_Number;
                           From    : in Buffer_Index) return Infos.License_Info is
       Is_Boxed : Boolean;
       Spaces, Length : Natural;
@@ -829,8 +833,8 @@ package body SPDX_Tool.Licenses is
    function Find_License (Root    : in Token_Access;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array;
-                          From    : in Positive;
-                          To      : in Positive)
+                          From    : in Line_Number;
+                          To      : in Line_Number)
                           return License_Match is
       Current : Token_Access := null;
       Result  : License_Match;
@@ -961,7 +965,7 @@ package body SPDX_Tool.Licenses is
          Buf     : constant Buffer_Accessor := File.Buffer.Value;
          Result  : License_Match := (Last => null, Depth => 0, others => <>);
          Match   : License_Match;
-         Line    : Positive := 1;
+         Line    : Infos.Line_Number := 1;
       begin
          while Line <= File.Count loop
             if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
@@ -978,6 +982,7 @@ package body SPDX_Tool.Licenses is
                   end if;
                end if;
             end if;
+            exit when Line = File.Count;
             Line := Line + 1;
          end loop;
          return Result;
@@ -1000,7 +1005,7 @@ package body SPDX_Tool.Licenses is
          end if;
       end Increment;
 
-      procedure Add_Line (Line : in Buffer_Type; Line_Number : Positive) is
+      procedure Add_Line (Line : in Buffer_Type; Line_Number : Infos.Line_Number) is
          procedure Process (Item : in out Line_Maps.Map);
 
          procedure Process (Item : in out Line_Maps.Map) is
@@ -1015,7 +1020,7 @@ package body SPDX_Tool.Licenses is
 
          S : Line_Maps.Map;
       begin
-         while Natural (Lines.Length) < Line_Number loop
+         while Infos.Line_Count (Lines.Length) < Line_Number loop
             Lines.Append (S);
          end loop;
          Lines.Update_Element (Line_Number, Process'Access);

@@ -10,6 +10,8 @@ with SPDX_Tool.Infos;
 with SPDX_Tool.Magic_Manager;
 package SPDX_Tool.Files is
 
+   use type Infos.Line_Count;
+
    type Content_Access is access constant String;
 
    type Identification is record
@@ -56,33 +58,33 @@ package SPDX_Tool.Files is
       Line_End   : Buffer_Size := 0;
       Tokens     : SPDX_Tool.Buffer_Sets.Set;
    end record;
-   type Line_Array is array (Positive range <>) of Line_Type;
+   type Line_Array is array (Infos.Line_Number range <>) of Line_Type;
 
    --  Compute maximum length of lines between From..To as byte count.
    function Max_Length (Lines : in Line_Array;
-                        From  : in Positive;
-                        To    : in Positive) return Buffer_Size;
+                        From  : in Infos.Line_Number;
+                        To    : in Infos.Line_Number) return Buffer_Size;
 
    --  Check if Lines (From..To) are of the same length.
    function Is_Same_Length (Lines : in Line_Array;
-                            From  : in Positive;
-                            To    : in Positive) return Boolean
+                            From  : in Infos.Line_Number;
+                            To    : in Infos.Line_Number) return Boolean
      with Pre => From <= To;
 
    --  Check if we have the same byte for every line starting from the
    --  end of the line with the given offset.
    function Is_Same_Byte (Lines  : in Line_Array;
                           Buffer : in Buffer_Type;
-                          From   : in Positive;
-                          To     : in Positive;
+                          From   : in Infos.Line_Number;
+                          To     : in Infos.Line_Number;
                           Offset : in Buffer_Size) return Boolean
      with Pre => Is_Same_Length (Lines, From, To);
 
    --  Find the common length at end of each line between From and To.
    function Common_End_Length (Lines  : in Line_Array;
                                Buffer : in Buffer_Type;
-                               From   : in Positive;
-                               To     : in Positive) return Buffer_Size
+                               From   : in Infos.Line_Number;
+                               To     : in Infos.Line_Number) return Buffer_Size
      with Pre => Is_Same_Length (Lines, From, To);
 
    --  Find the common length of spaces at beginning of each line
@@ -90,15 +92,15 @@ package SPDX_Tool.Files is
    --  for each line.
    function Common_Start_Length (Lines  : in Line_Array;
                                  Buffer : in Buffer_Type;
-                                 From   : in Positive;
-                                 To     : in Positive) return Buffer_Size
+                                 From   : in Infos.Line_Number;
+                                 To     : in Infos.Line_Number) return Buffer_Size
      with Pre => From <= To;
 
    --  Check if the comment line is only a presentation line: it is either
    --  empty or contains the same presentation character.
    function Is_Presentation_Line (Lines  : in Line_Array;
                                   Buffer : in Buffer_Type;
-                                  Line   : in Positive) return Boolean;
+                                  Line   : in Infos.Line_Number) return Boolean;
 
    --  Identify boundaries of a license with a boxed presentation.
    --  Having identified such boxed presentation, update the lines Text_Last
@@ -108,11 +110,11 @@ package SPDX_Tool.Files is
                             Buffer : in Buffer_Type;
                             Boxed  : out Boolean);
 
-   type File_Type (Max_Lines : Positive) is limited record
+   type File_Type (Max_Lines : Infos.Line_Count) is limited record
       File         : Util.Streams.Files.File_Stream;
       Buffer       : Buffer_Ref;
       Last_Offset  : Buffer_Size;
-      Count        : Natural := 0;
+      Count        : Infos.Line_Count := 0;
       Ident        : Identification;
       Cmt_Style    : Comment_Style := NO_COMMENT;
       Lines        : Line_Array (1 .. Max_Lines);
@@ -138,8 +140,8 @@ package SPDX_Tool.Files is
    procedure Save (Manager : in File_Manager;
                    File    : in out File_Type;
                    Path    : in String;
-                   First   : in Natural;
-                   Last    : in Natural;
+                   First   : in Infos.Line_Number;
+                   Last    : in Infos.Line_Number;
                    License : in String);
 
    --  Extract from the header the license text that was found.
@@ -166,8 +168,8 @@ package SPDX_Tool.Files is
    --  Check if the license is using some boxed presentation.
    procedure Boxed_License (Lines  : in Line_Array;
                             Buffer : in Buffer_Type;
-                            First  : in Positive;
-                            Last   : in Positive;
+                            First  : in Infos.Line_Number;
+                            Last   : in Infos.Line_Number;
                             Spaces : out Natural;
                             Boxed  : out Boolean;
                             Length : out Natural) with

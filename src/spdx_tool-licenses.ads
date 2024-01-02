@@ -28,12 +28,16 @@ package SPDX_Tool.Licenses is
    Only_Languages   : aliased GNAT.Strings.String_Access;
    Opt_No_Builtin   : aliased Boolean := False;
 
+   subtype Line_Count is SPDX_Tool.Infos.Line_Count;
+   subtype Line_Number is SPDX_Tool.Infos.Line_Number;
+   subtype Line_Array is SPDX_Tool.Files.Line_Array;
+   use type SPDX_Tool.Infos.Line_Number;
+   function Image (Line : Line_Count) return String renames SPDX_Tool.Infos.Image;
+
    type Line_Pos is record
-      Line : Positive := 1;
+      Line : Line_Number := 1;
       Pos  : Buffer_Index;
    end record;
-
-   subtype Line_Array is SPDX_Tool.Files.Line_Array;
 
    type Token_Type (Len : Buffer_Size) is tagged limited private;
    type Token_Access is access all Token_Type'Class;
@@ -123,7 +127,7 @@ private
     (Element_Type    => Line_Stat, "<" => "<", "=" => "=");
 
    package Line_Vectors is new Ada.Containers.Vectors
-    (Index_Type => Positive, Element_Type => Line_Maps.Map, "=" => Line_Maps."=");
+    (Index_Type => Line_Number, Element_Type => Line_Maps.Map, "=" => Line_Maps."=");
 
    protected type License_Stats is
 
@@ -139,7 +143,7 @@ private
       Map   : Count_Maps.Map;
       Lines : Line_Vectors.Vector;
       Unknown_Count : Natural := 0;
-      Max_Line : Natural := 0;
+      Max_Line : Line_Count := 0;
    end License_Stats;
 
    function Skip_Spaces (Content : in Buffer_Type;
@@ -295,8 +299,8 @@ private
    function Find_License (Root    : in Token_Access;
                           Content : in Buffer_Type;
                           Lines   : in SPDX_Tool.Files.Line_Array;
-                          From    : in Positive;
-                          To      : in Positive)
+                          From    : in Line_Number;
+                          To      : in Line_Number)
                           return License_Match;
 
 end SPDX_Tool.Licenses;

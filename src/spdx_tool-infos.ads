@@ -5,8 +5,18 @@
 -----------------------------------------------------------------------
 
 with Ada.Containers.Indefinite_Ordered_Maps;
+with Util.Strings;
 
 package SPDX_Tool.Infos is
+
+   MAX_LINES : constant := 100;
+
+   type Line_Count is new Natural range 0 .. MAX_LINES;
+
+   subtype Line_Number is Line_Count range 1 .. Line_Count'Last;
+
+   function Image (Line : in Line_Count)
+                   return String is (Util.Strings.Image (Natural (Line)));
 
    --  Identifies the license implementation found:
    --  - SPDX_LICENSE indicates we found a license tag (strongest identification),
@@ -21,8 +31,8 @@ package SPDX_Tool.Infos is
 
    --  Information about the license that was identified in the file.
    type License_Info is record
-      First_Line : Natural := 0;
-      Last_Line  : Natural := 0;
+      First_Line : Line_Count := 0;
+      Last_Line  : Line_Count := 0;
       Name       : UString;
       Match      : License_Kind := NONE;
    end record;
