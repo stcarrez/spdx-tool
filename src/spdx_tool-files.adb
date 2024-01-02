@@ -257,6 +257,7 @@ package body SPDX_Tool.Files is
                if File.Cmt_Style = NO_COMMENT then
                   File.Cmt_Style := Style.Style;
                end if;
+               Extract_Line_Tokens (Buf.Data, File.Lines (Line_No));
             else
                File.Lines (Line_No).Comment := NO_COMMENT;
             end if;
@@ -433,7 +434,7 @@ package body SPDX_Tool.Files is
                             Boxed  : out Boolean;
                             Length : out Natural) is
       Line_Length : constant Buffer_Size :=
-        Lines (First).Line_End - Lines (First).Line_Start;
+        Lines (First).Line_End - Lines (First).Line_Start + 1;
       Pos : Buffer_Index;
    begin
       Spaces := 0;
@@ -452,7 +453,7 @@ package body SPDX_Tool.Files is
       end loop;
       Spaces := (Spaces + Last - First) / (Last - First + 1);
       if Length > Spaces then
-         Length := Length - Spaces;
+         Length := Length - Spaces - 1;
       end if;
    end Boxed_License;
 
@@ -605,6 +606,26 @@ package body SPDX_Tool.Files is
          return Text;
       end;
    end Extract_License;
+
+   --  ------------------------------
+   --  Extract from the given line in the comment the list of tokens used.
+   --  Such list can be used by the license decision tree to find a matching license.
+   --  ------------------------------
+   procedure Extract_Line_Tokens (Buffer : in Buffer_Type;
+                                  Line   : in out Line_Type) is
+      Last  : constant Buffer_Index := Line.Style.Text_Last;
+      Pos   : Buffer_Index := Line.Style.Text_Start;
+      First : Buffer_Index;
+   begin
+      while Pos <= Last loop
+         First := Skip_Spaces (Buffer, Pos, Last);
+         exit when First > Last;
+         Pos := Next_Space (Buffer, First, Last);
+         if First <= Pos - 1 then
+            Line.Tokens.Include (Buffer (First .. Pos - 1));
+         end if;
+      end loop;
+   end Extract_Line_Tokens;
 
    --  ------------------------------
    --  Extract from the header the list of tokens used.  Such list

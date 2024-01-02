@@ -54,6 +54,7 @@ package SPDX_Tool.Files is
       Style      : Comment_Info;
       Line_Start : Buffer_Index := 1;
       Line_End   : Buffer_Size := 0;
+      Tokens     : SPDX_Tool.Buffer_Sets.Set;
    end record;
    type Line_Array is array (Positive range <>) of Line_Type;
 
@@ -147,6 +148,12 @@ package SPDX_Tool.Files is
    function Extract_License (File    : in File_Type;
                              License : in Infos.License_Info)
                              return Infos.License_Text_Access;
+
+   --  Extract from the given line in the comment the list of tokens used.
+   --  Such list can be used by the license decision tree to find a matching license.
+   procedure Extract_Line_Tokens (Buffer : in Buffer_Type;
+                                  Line   : in out Line_Type)
+     with Pre => Line.Comment /= NO_COMMENT;
 
    --  Extract from the header the list of tokens used.  Such list
    --  can be used by the license decision tree to find a matching license.
