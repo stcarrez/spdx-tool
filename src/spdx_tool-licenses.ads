@@ -28,8 +28,26 @@ package SPDX_Tool.Licenses is
    Only_Languages   : aliased GNAT.Strings.String_Access;
    Opt_No_Builtin   : aliased Boolean := False;
 
+   type Line_Pos is record
+      Line : Positive := 1;
+      Pos  : Buffer_Index;
+   end record;
+
+   subtype Line_Array is SPDX_Tool.Files.Line_Array;
+
    type Token_Type (Len : Buffer_Size) is tagged limited private;
    type Token_Access is access all Token_Type'Class;
+
+   type License_Match is record
+      Info  : Infos.License_Info;
+      Last  : Token_Access;
+      Depth : Natural := 0;
+   end record;
+
+   --  Find in the header comment an SPDX license tag.
+   function Find_SPDX_License (Content : in Buffer_Type;
+                               Lines   : in SPDX_Tool.Files.Line_Array)
+                               return License_Match;
 
    type License_Template is record
       Root   : Token_Access;
@@ -87,8 +105,6 @@ private
                             Current : in Token_Access;
                             License : in UString);
 
-   package AF renames Ada.Finalization;
-
    type Line_Stat (Len : Buffer_Size) is record
       Count    : Positive := 1;
       Content  : Buffer_Type (1 .. Len);
@@ -126,16 +142,10 @@ private
       Max_Line : Natural := 0;
    end License_Stats;
 
-   type Line_Pos is record
-      Line : Positive := 1;
-      Pos  : Buffer_Index;
-   end record;
-
-   subtype Line_Array is SPDX_Tool.Files.Line_Array;
-
    function Skip_Spaces (Content : in Buffer_Type;
                          Lines   : in Line_Array;
-                         From    : in Line_Pos) return Line_Pos;
+                         From    : in Line_Pos;
+                         To      : in Line_Pos) return Line_Pos;
 
    --  The license templates are read within a tree of tokens.  To find a
    --  license match, the license text in the source file header is split in
@@ -175,7 +185,7 @@ private
                     Content : in Buffer_Type;
                     Lines   : in Line_Array;
                     From    : in Line_Pos;
-                    Last    : in Buffer_Index;
+                    Last    : in Line_Pos;
                     Result  : out Line_Pos;
                     Next    : out Token_Access);
 
@@ -183,7 +193,7 @@ private
                       Content : in Buffer_Type;
                       Lines   : in Line_Array;
                       From    : in Line_Pos;
-                      To      : in Buffer_Index;
+                      To      : in Line_Pos;
                       Result  : out Line_Pos;
                       Next    : out Token_Access);
 
@@ -206,7 +216,7 @@ private
                       Content : in Buffer_Type;
                       Lines   : in Line_Array;
                       From    : in Line_Pos;
-                      To      : in Buffer_Index;
+                      To      : in Line_Pos;
                       Result  : out Line_Pos;
                       Next    : out Token_Access);
 
@@ -225,7 +235,7 @@ private
                       Content : in Buffer_Type;
                       Lines   : in Line_Array;
                       From    : in Line_Pos;
-                      To      : in Buffer_Index;
+                      To      : in Line_Pos;
                       Result  : out Line_Pos;
                       Next    : out Token_Access);
 
@@ -243,7 +253,7 @@ private
                       Content : in Buffer_Type;
                       Lines   : in Line_Array;
                       From    : in Line_Pos;
-                      To      : in Buffer_Index;
+                      To      : in Line_Pos;
                       Result  : out Line_Pos;
                       Next    : out Token_Access);
 
@@ -278,24 +288,15 @@ private
    function Find_Builtin_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
                           return Decision_Array_Access;
 
-   type License_Match is record
-      Info  : Infos.License_Info;
-      Last  : Token_Access;
-      Depth : Natural := 0;
-   end record;
-
-   --  Find in the header comment an SPDX license tag.
-   function Find_SPDX_License (Content : in Buffer_Type;
-                               Lines   : in SPDX_Tool.Files.Line_Array)
-                               return License_Match;
-
    function Find_License (License : in License_Index;
                           File    : in SPDX_Tool.Files.File_Type)
                           return License_Match;
 
    function Find_License (Root    : in Token_Access;
                           Content : in Buffer_Type;
-                          Lines   : in SPDX_Tool.Files.Line_Array)
+                          Lines   : in SPDX_Tool.Files.Line_Array;
+                          From    : in Positive;
+                          To      : in Positive)
                           return License_Match;
 
 end SPDX_Tool.Licenses;

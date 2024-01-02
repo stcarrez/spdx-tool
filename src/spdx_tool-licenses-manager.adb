@@ -198,7 +198,7 @@ package body SPDX_Tool.Licenses.Manager is
       while Line <= File.Count loop
          if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
             Match := Find_License (Manager.Licenses.Root, Buf.Data,
-                                   File.Lines (Line .. File.Count));
+                                   File.Lines, Line, File.Count);
             if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                return Match;
             end if;

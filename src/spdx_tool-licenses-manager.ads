@@ -1,5 +1,5 @@
 -- --------------------------------------------------------------------
---  spdx_tool-licenses -- licenses information
+--  spdx_tool-licenses-manager -- licenses manager
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -80,8 +80,6 @@ package SPDX_Tool.Licenses.Manager is
    procedure Report (Manager : in out License_Manager);
 
 private
-
-   package AF renames Ada.Finalization;
 
    type License_Manager_Access is access all License_Manager;
 
