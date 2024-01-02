@@ -64,9 +64,9 @@ package body SPDX_Tool.Files is
        Is_Block      => True)
      );
 
-   function Block_Comment_Length (Index : Comment_Index) return Natural is
-     (Natural (Block_Comments (Index).Comment_Start.Value.Len
-      + Block_Comments (Index).Comment_End.Value.Len));
+   function Block_Comment_Length (Index : Comment_Index) return Buffer_Size is
+     (Block_Comments (Index).Comment_Start.Value.Len
+      + Block_Comments (Index).Comment_End.Value.Len);
 
    procedure Find_Comment (Buffer : in Buffer_Type;
                            From   : in Buffer_Index;
@@ -438,10 +438,10 @@ package body SPDX_Tool.Files is
       Pos : Buffer_Index;
    begin
       Spaces := 0;
-      Boxed := True;
+      Boxed := False;
       Length := Natural (Line_Length);
       for I in First .. Last loop
-         if Lines (I).Line_End - Lines (I).Line_Start /= Line_Length then
+         if Lines (I).Style.Boxed then
             Boxed := False;
          end if;
          if Lines (I).Style.Start < Lines (I).Style.Last then
@@ -469,21 +469,19 @@ package body SPDX_Tool.Files is
       Output    : Util.Streams.Files.File_Stream;
       First_Pos : Buffer_Index;
       Next_Pos  : Buffer_Index;
-      Spaces    : Natural;
-      Is_Boxed  : Boolean;
-      Length    : Natural;
+      Spaces    : Buffer_Size;
+      Length    : Buffer_Size;
    begin
       Log.Info ("Writing license {0} in {1}", License, Path);
 
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
-      Boxed_License (File.Lines, Buf.Data, First, Last, Spaces, Is_Boxed, Length);
 
       if File.Lines (First).Comment = LINE_COMMENT then
          First_Pos := File.Lines (First).Style.Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
-         if Is_Boxed then
+         if File.Lines (First).Style.Boxed then
             Next_Pos := File.Lines (Last).Style.Last;
             while Next_Pos > First_Pos
               and then not Is_Space (Buf.Data (Next_Pos - 1))
@@ -508,16 +506,15 @@ package body SPDX_Tool.Files is
          Next_Pos := File.Lines (Last).Style.Last + 1;
       end if;
 
-      if Spaces > 0 then
-         while Spaces > 0 loop
-            Output.Write (" ");
-            Spaces := Spaces - 1;
-         end loop;
-      end if;
+      Spaces := Common_Start_Length (File.Lines, Buf.Data, First, Last);
+      for I in 1 .. Spaces loop
+         Output.Write (" ");
+      end loop;
       Output.Write ("SPDX-License-Identifier: " & License);
-      if Is_Boxed then
-         Spaces := Length - License'Length - String '("SPDX-License-Identifier: ")'Length;
-         Spaces := Spaces - Block_Comment_Length (File.Lines (Last).Style.Index) + 1;
+      if File.Lines (First).Style.Boxed then
+         Length := Max_Length (File.Lines, First, Last);
+         Spaces := Length - License'Length - String '("SPDX-License-Identifier: ")'Length - Spaces;
+         Spaces := Spaces - Block_Comment_Length (File.Lines (Last).Style.Index);
          while Spaces > 0 loop
             Output.Write (" ");
             Spaces := Spaces - 1;
