@@ -61,6 +61,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       --  License contains variable part.
       --  Check_License (T, "apache-2.0-2.ads", "standard/Apache-2.0.txt", "Apache-2.0");
       Check_License (T, "lgpl-2.1.c", "standard/LGPL-2.1+.txt", "LGPL-2.1+");
+      Check_License (T, "bsd-3-clause.c", "standard/BSD-3-Clause.txt", "BSD-3-Clause");
    end Test_Find_License_Var;
 
    procedure Test_Find_License_SPDX (T : in out Test) is
