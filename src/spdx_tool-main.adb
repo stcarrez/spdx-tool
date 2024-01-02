@@ -93,6 +93,11 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--print-license",
                         Help   => -("Print license found in header files"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Identify'Access,
+                        Switch => "-i",
+                        Long_Switch => "--identify",
+                        Help   => -("Identify the license and only print the SPDX license"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Languages'Access,
                         Long_Switch => "--languages",
                         Help   => -("Identify languages used in files"));
@@ -228,6 +233,9 @@ begin
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       return;
    end if;
+   if Opt_Identify then
+      Opt_No_Color := True;
+   end if;
    if not Opt_Files and not Opt_Check and not Opt_Update and not Opt_Print then
       Opt_Check := True;
    end if;
@@ -286,7 +294,6 @@ begin
       begin
          Manager.Print_Header;
       end;
-      --  SPDX_Tool.Files.Report;
    end;
 
 exception

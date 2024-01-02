@@ -3,7 +3,7 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-
+with Ada.Containers;
 with Util.Strings;
 with PT.Texts;
 with PT.Charts;
@@ -11,6 +11,7 @@ with SCI.Occurrences.Finites;
 package body SPDX_Tool.Reports is
 
    use type SPDX_Tool.Infos.License_Kind;
+   use type Ada.Containers.Count_Type;
 
    function "<" (Left, Right : UString) return Boolean
                  renames Ada.Strings.Unbounded."<";
@@ -86,14 +87,21 @@ package body SPDX_Tool.Reports is
                                Set     : in Occurrences.Set;
                                Title   : in String) is
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
-      Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Writer, 0);
-      Fields : PT.Texts.Field_Array (1 .. 5);
       List   : Occurrences.Vector;
    begin
       List_Occurrences (Set, List);
+      if Opt_Identify then
+         if List.Length > 0 then
+            Writer.Put_UTF8 (To_String (List.First_Element.Element.Name));
+         end if;
+         Writer.New_Line;
+         return;
+      end if;
       declare
          Total  : constant Natural := Sum (List, 0);
          Max    : constant PT.X_Type := PT.X_Type (Longest (List));
+         Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Writer, 0);
+         Fields : PT.Texts.Field_Array (1 .. 5);
       begin
          Writer.Create_Field (Fields (1), Styles.Title, 0.0);
          Writer.Create_Field (Fields (2), Styles.Title, 5.0);
