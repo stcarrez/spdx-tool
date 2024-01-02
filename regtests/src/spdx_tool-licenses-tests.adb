@@ -7,6 +7,7 @@
 with GNAT.Source_Info;
 with Util.Test_Caller;
 with SPDX_Tool.Files;
+with SPDX_Tool.Licenses.Manager;
 package body SPDX_Tool.Licenses.Tests is
 
    procedure Check_License (T        : in out Test;
@@ -35,7 +36,7 @@ package body SPDX_Tool.Licenses.Tests is
                             Source   : in String := GNAT.Source_Info.File;
                             Line     : in Natural := GNAT.Source_Info.Line) is
       Path    : constant String := Util.Tests.Get_Path ("regtests/files/identify/" & Filename);
-      Manager : License_Manager (1);
+      Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
       File    : SPDX_Tool.Files.File_Type (100);
       Result  : License_Match;
    begin
