@@ -170,6 +170,8 @@ procedure SPDX_Tool.Main is
       Driver.Set_Flush (PT.Drivers.Texts.GNAT_IO.Flush'Access);
       if Opt_Check then
          SPDX_Tool.Reports.Print_Licenses (Driver, Styles, Files);
+      elsif Opt_Identify then
+         SPDX_Tool.Reports.Print_Identify (Driver, Styles, Files);
       end if;
       if Opt_Files then
          if Opt_Check then
@@ -236,7 +238,7 @@ begin
    if Opt_Identify then
       Opt_No_Color := True;
    end if;
-   if not Opt_Files and not Opt_Check and not Opt_Update and not Opt_Print then
+   if not Opt_Files and not Opt_Check and not Opt_Update and not Opt_Print and not Opt_Identify then
       Opt_Check := True;
    end if;
    declare

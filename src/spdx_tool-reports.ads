@@ -37,6 +37,11 @@ package SPDX_Tool.Reports is
                               Styles  : in Style_Configuration;
                               Files   : in SPDX_Tool.Infos.File_Map);
 
+   --  Print the license name with the file name as prefix.
+   procedure Print_Identify (Printer : in out PT.Printer_Type'Class;
+                             Styles  : in Style_Configuration;
+                             Files   : in SPDX_Tool.Infos.File_Map);
+
    --  Print the license texts content found in header files.
    procedure Print_Texts (Printer : in out PT.Printer_Type'Class;
                           Styles  : in Style_Configuration;
@@ -45,4 +50,5 @@ package SPDX_Tool.Reports is
    procedure Print_License_Text (Printer : in out PT.Printer_Type'Class;
                                  Styles  : in Style_Configuration;
                                  Text    : in Infos.License_Text);
+
 end SPDX_Tool.Reports;

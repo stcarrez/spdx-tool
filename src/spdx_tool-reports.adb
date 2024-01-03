@@ -90,13 +90,6 @@ package body SPDX_Tool.Reports is
       List   : Occurrences.Vector;
    begin
       List_Occurrences (Set, List);
-      if Opt_Identify then
-         if List.Length > 0 then
-            Writer.Put_UTF8 (To_String (List.First_Element.Element.Name));
-         end if;
-         Writer.New_Line;
-         return;
-      end if;
       declare
          Total  : constant Natural := Sum (List, 0);
          Max    : constant PT.X_Type := PT.X_Type (Longest (List));
@@ -246,6 +239,37 @@ package body SPDX_Tool.Reports is
       end loop;
       Print_Occurences (Printer, Styles, Set, -("Language"));
    end Print_Languages;
+
+   function Visible_File_Count (Files : in SPDX_Tool.Infos.File_Map) return Natural is
+      Count : Natural := 0;
+   begin
+      for File of Files loop
+         if not File.Filtered then
+            Count := Count + 1;
+         end if;
+      end loop;
+      return Count;
+   end Visible_File_Count;
+
+   --  ------------------------------
+   --  Print the license name with the file name as prefix.
+   --  ------------------------------
+   procedure Print_Identify (Printer : in out PT.Printer_Type'Class;
+                             Styles  : in Style_Configuration;
+                             Files   : in SPDX_Tool.Infos.File_Map) is
+      Visible_Files : constant Natural := Visible_File_Count (Files);
+      Writer        : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+   begin
+      for File of Files loop
+         if not File.Filtered then
+            if Visible_Files > 1 then
+               Writer.Put_UTF8 (File.Path & ": ");
+            end if;
+            Writer.Put_UTF8 (To_String (File.License.Name));
+            Writer.New_Line;
+         end if;
+      end loop;
+   end Print_Identify;
 
    procedure Print_License_Text (Printer : in out PT.Printer_Type'Class;
                                  Styles  : in Style_Configuration;
