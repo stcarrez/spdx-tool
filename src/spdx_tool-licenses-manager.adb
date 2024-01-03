@@ -10,6 +10,7 @@ with Util.Strings.Tokenizers;
 with Util.Log.Loggers;
 with Util.Streams.Files;
 
+with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Buffer_Sets;
 package body SPDX_Tool.Licenses.Manager is
 
@@ -183,13 +184,17 @@ package body SPDX_Tool.Licenses.Manager is
       SPDX_Tool.Files.Extract_Tokens (File, Tokens);
       if not Opt_No_Builtin then
          declare
+            Map   : License_Index_Map (0 .. Licenses.Files.Names_Count) := (others => False);
             Nodes : constant Decision_Array_Access := Find_Builtin_License (Tokens);
          begin
             for Node of reverse Nodes loop
                for License of Node.Licenses loop
-                  Match := Find_License (License, File);
-                  if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-                     return Match;
+                  if not Map (License) then
+                     Match := Find_License (License, File);
+                     if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                        return Match;
+                     end if;
+                     Map (License) := True;
                   end if;
                end loop;
             end loop;

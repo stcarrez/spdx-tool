@@ -278,6 +278,8 @@ private
    end record;
 
    type License_Index_Array is array (Positive range <>) of License_Index;
+   type License_Index_Map is array (License_Index range <>) of Boolean;
+
    type Decision_Node;
    type Decision_Node_Access is access constant Decision_Node;
    type Decision_Node (Length : Buffer_Size; Size : Natural) is record

@@ -35,9 +35,6 @@ package body SPDX_Tool.Licenses is
    --  Protect concurrent loading of license templates.
    protected License_Tree is
       function Get_License (License : in License_Index) return Token_Access;
-      ------------------
-      -- Load_License --
-      ------------------
 
       procedure Load_License (License : in License_Index;
                               Token   : out Token_Access);
@@ -57,6 +54,7 @@ package body SPDX_Tool.Licenses is
          end if;
          Token := Decisions.Licenses (License).Root;
       end Load_License;
+
    end License_Tree;
 
    function Find_Header (List : UBO.Object) return UBO.Object is
