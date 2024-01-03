@@ -25,6 +25,8 @@ package body SPDX_Tool.Tests is
                        Test_Report_Only_Licenses_Files'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --ignore-licenses",
                        Test_Report_Ignore_Licenses_Files'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --identify",
+                       Test_Identify'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -84,5 +86,14 @@ package body SPDX_Tool.Tests is
       Util.Tests.Assert_Matches (T, ".*regtests/expect/replace-mit-1.tex.*",
                                  Result, "missing file");
    end Test_Report_Ignore_Licenses_Files;
+
+   procedure Test_Identify (T : in out Test) is
+      Result : UString;
+   begin
+      T.Execute (Tool & " --identify regtests/files/identify/bsd-3-clause.c",
+                 Result, 0);
+      Util.Tests.Assert_Matches (T, "BSD-3-Clause", Result,
+                                "Identify failed");
+   end Test_Identify;
 
 end SPDX_Tool.Tests;
