@@ -21,11 +21,13 @@ package body SPDX_Tool.Reports is
    type License_Tag is record
       Name : UString;
       SPDX : Boolean := False;
+      Rate : Infos.Confidence_Type;
    end record;
 
    function "<" (Left, Right : License_Tag)
-                 return Boolean is (Left.Name < Right.Name
-                                    or else (Left.SPDX < Right.SPDX and then Left.Name = Right.Name));
+                 return Boolean is
+     (Left.Name < Right.Name
+      or else (Left.SPDX < Right.SPDX and then Left.Name = Right.Name));
 
    package Occurrences is
      new SCI.Occurrences.Finites (Element_Type => License_Tag,
@@ -58,13 +60,15 @@ package body SPDX_Tool.Reports is
    function Get_License (Info : in Infos.License_Info) return License_Tag is
    begin
       if Info.Match = Infos.SPDX_LICENSE then
-         return (Info.Name, True);
+         return (Info.Name, True, 1.0);
       elsif Info.Match = Infos.TEMPLATE_LICENSE then
-         return (Info.Name, False);
+         return (Info.Name, False, 1.0);
+      elsif Info.Match = Infos.GUESSED_LICENSE then
+         return (Info.Name, False, Info.Confidence);
       elsif Info.Match = Infos.UNKNOWN_LICENSE then
-         return (To_UString (-("Unknown")), False);
+         return (To_UString (-("Unknown")), False, 0.0);
       else
-         return (To_UString (-("None")), False);
+         return (To_UString (-("None")), False, 0.0);
       end if;
    end Get_License;
 
@@ -218,7 +222,7 @@ package body SPDX_Tool.Reports is
    begin
       for File of Files loop
          if not File.Filtered then
-            Add (Set, (File.Mime, False), 1);
+            Add (Set, (File.Mime, False, 1.0), 1);
          end if;
       end loop;
       Print_Occurences (Printer, Styles, Set, -("Mime type"));
@@ -234,7 +238,7 @@ package body SPDX_Tool.Reports is
    begin
       for File of Files loop
          if not File.Filtered then
-            Add (Set, (File.Language, False), 1);
+            Add (Set, (File.Language, False, 1.0), 1);
          end if;
       end loop;
       Print_Occurences (Printer, Styles, Set, -("Language"));

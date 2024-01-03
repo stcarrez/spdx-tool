@@ -13,6 +13,7 @@ with GNAT.Regpat;
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Buffer_Sets;
+private with Util.Measures;
 package SPDX_Tool.Licenses is
 
    SPDX_License_Tag : constant String := "SPDX-License-Identifier:";
@@ -96,6 +97,8 @@ package SPDX_Tool.Licenses is
 
    function Get_Name (License : License_Type) return String;
    function Get_Template (License : License_Type) return String;
+
+   procedure Performance_Report;
 
 private
 
@@ -304,5 +307,12 @@ private
                           From    : in Line_Number;
                           To      : in Line_Number)
                           return License_Match;
+
+   function Guess_License (Nodes   : in Decision_Array_Access;
+                           Tokens  : in SPDX_Tool.Buffer_Sets.Set) return License_Match;
+
+   procedure Report (Stamp : in out Util.Measures.Stamp;
+                     Title : in String;
+                     Count : in Positive := 1);
 
 end SPDX_Tool.Licenses;

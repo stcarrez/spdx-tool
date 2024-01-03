@@ -297,6 +297,7 @@ begin
          Manager.Print_Header;
       end;
    end;
+   SPDX_Tool.Licenses.Performance_Report;
 
 exception
    when GNAT.Command_Line.Exit_From_Command_Line |

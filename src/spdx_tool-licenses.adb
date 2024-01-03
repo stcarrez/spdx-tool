@@ -3,6 +3,7 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
+with Ada.Text_IO;
 
 with Util.Files;
 with Util.Strings;
@@ -11,6 +12,9 @@ with Util.Beans.Objects.Iterators;
 with Util.Serialize.IO.JSON;
 with Util.Log.Loggers;
 
+with SCI.Numbers;
+with SCI.Similarities.Indefinite_Ordered_Sets;
+
 with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Licenses.Decisions;
 package body SPDX_Tool.Licenses is
@@ -18,11 +22,26 @@ package body SPDX_Tool.Licenses is
    use type SPDX_Tool.Files.Comment_Style;
    use type SPDX_Tool.Files.Comment_Mode;
    use type SPDX_Tool.Infos.License_Kind;
+   subtype Confidence_Type is SPDX_Tool.Infos.Confidence_Type;
+   use type SPDX_Tool.Infos.Confidence_Type;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
 
    package UBO renames Util.Beans.Objects;
+
+   --  ??? Mul and Div seem necessary as "*" and "/" fail to instantiate
+   function Mul (Left, Right : Confidence_Type) return Confidence_Type is (Left * Right);
+   function Div (Left, Right : Confidence_Type) return Confidence_Type is (Left / Right);
+   function From_Float (Value : Float) return Confidence_Type is (Confidence_Type (Value));
+   function From_Integer (Value : Integer) return Confidence_Type is (Confidence_Type (Value));
+
+   package Confidence_Number is
+     new SCI.Numbers.Number (Confidence_Type, "*" => Mul, "/" => Div);
+   package Confidence_Conversion is
+     new SCI.Numbers.Conversion (Confidence_Number);
+   package Token_Similarities is
+      new SCI.Similarities.Indefinite_Ordered_Sets (SPDX_Tool.Buffer_Sets, Confidence_Conversion);
 
    function Extract_SPDX (Lines   : in SPDX_Tool.Files.Line_Array;
                           Content : in Buffer_Type;
@@ -51,6 +70,9 @@ package body SPDX_Tool.Licenses is
       begin
          if Decisions.Licenses (License).Root = null then
             Load_License (License, Decisions.Licenses (License));
+            if Is_Loaded (Decisions.Licenses (License)) then
+               Collect_License_Tokens (Decisions.Licenses (License));
+            end if;
          end if;
          Token := Decisions.Licenses (License).Root;
       end Load_License;
@@ -771,23 +793,15 @@ package body SPDX_Tool.Licenses is
                           Content : in Buffer_Type;
                           Line    : in Infos.Line_Number;
                           From    : in Buffer_Index) return Infos.License_Info is
-      Is_Boxed : Boolean;
-      Spaces, Length : Natural;
-      Pos  : Buffer_Index := From;
-      Last : Buffer_Index := Lines (Line).Style.Last;
-      Result  : Infos.License_Info;
+      Pos    : Buffer_Index := From;
+      Last   : Buffer_Index := Lines (Line).Style.Last;
+      Result : Infos.License_Info;
    begin
       if Lines (Line).Comment = SPDX_Tool.Files.LINE_BLOCK_COMMENT then
          Last := Last - Lines (Line).Style.Trailer;
       end if;
-      if Lines'First = Lines'Last then
-         Is_Boxed := False;
-      else
-         SPDX_Tool.Files.Boxed_License (Lines, Content, Lines'First, Lines'Last,
-                                        Spaces, Is_Boxed, Length);
-      end if;
       Pos := Skip_Spaces (Content, From, Last);
-      if Is_Boxed then
+      if Lines (Line).Style.Boxed then
          while Last > Pos and then not Is_Space (Content (Last)) loop
             Last := Last - 1;
          end loop;
@@ -988,6 +1002,45 @@ package body SPDX_Tool.Licenses is
       end;
    end Find_License;
 
+   function Guess_License (Nodes   : in Decision_Array_Access;
+                           Tokens  : in SPDX_Tool.Buffer_Sets.Set) return License_Match is
+      Map   : License_Index_Map (0 .. Licenses.Files.Names_Count) := (others => False);
+      Guess : License_Index := 0;
+      Confidence : Confidence_Type := 0.0;
+      C : Confidence_Type;
+      Result  : License_Match := (Last => null, Depth => 0, others => <>);
+      Stamp   : Util.Measures.Stamp;
+   begin
+      for Node of reverse Nodes loop
+         for License of Node.Licenses loop
+            if not Map (License) then
+               C := Token_Similarities.Tversky (Decisions.Licenses (License).Tokens,
+                                                Tokens,
+                                                0.75, 0.25);
+               if C >= Confidence then
+                  Log.Info ("Confidence with {0}: {1} *",
+                         SPDX_Tool.Licenses.Files.Names (License).all,
+                         C'Image);
+                  Guess := License;
+                  Confidence := C;
+               else
+                  Log.Info ("Confidence with {0}: {1}",
+                            SPDX_Tool.Licenses.Files.Names (License).all,
+                            C'Image);
+               end if;
+               Map (License) := True;
+            end if;
+         end loop;
+      end loop;
+      if Confidence >= 0.7 then
+         Result.Info.Match := Infos.GUESSED_LICENSE;
+         Result.Info.Confidence := Confidence;
+         Result.Info.Name := To_UString (SPDX_Tool.Licenses.Files.Names (Guess).all);
+         SPDX_Tool.Licenses.Report (Stamp, "Guess license");
+      end if;
+      return Result;
+   end Guess_License;
+
    protected body  License_Stats is
 
       procedure Increment (Name : in String) is
@@ -1084,5 +1137,19 @@ package body SPDX_Tool.Licenses is
       end Print_Header;
 
    end License_Stats;
+
+   Perf : Util.Measures.Measure_Set;
+
+   procedure Performance_Report is
+   begin
+      Util.Measures.Write (Perf, "spdx-tool", Ada.Text_IO.Standard_Output);
+   end Performance_Report;
+
+   procedure Report (Stamp : in out Util.Measures.Stamp;
+                     Title : in String;
+                     Count : in Positive := 1) is
+   begin
+      Util.Measures.Report (Perf, Stamp, Title, Count);
+   end Report;
 
 end SPDX_Tool.Licenses;
