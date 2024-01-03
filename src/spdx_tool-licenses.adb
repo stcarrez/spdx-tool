@@ -50,6 +50,18 @@ package body SPDX_Tool.Licenses is
    function Find_Header (List : UBO.Object) return UBO.Object;
    function Find_Value (Info : UBO.Object; Name : String) return Boolean;
    function Find_Value (Info : UBO.Object; Name : String) return UString;
+   function Get_License_Name (License : in License_Index) return String;
+
+   function Get_License_Name (License : in License_Index) return String is
+      Name    : constant Name_Access := Files.Names (License);
+      Pos     : constant Natural := Util.Strings.Index (Name.all, '/');
+   begin
+      if Pos > 0 then
+         return Name (Pos + 1 .. Name'Last);
+      else
+         return Name.all;
+      end if;
+   end Get_License_Name;
 
    --  Protect concurrent loading of license templates.
    protected License_Tree is
@@ -552,13 +564,8 @@ package body SPDX_Tool.Licenses is
       Name    : constant Name_Access := Files.Names (License);
       Content : constant access constant Buffer_Type
         := Files.Get_Content (Name.all);
-      Pos     : constant Natural := Util.Strings.Index (Name.all, '/');
    begin
-      if Pos > 0 then
-         Into.Name := To_UString (Name (Pos + 1 .. Name'Last));
-      else
-         Into.Name := To_UString (Name.all);
-      end if;
+      Into.Name := To_UString (Get_License_Name (License));
       Parse_License (Content.all, Content'First, Into.Root, null, Into.Name);
    end Load_License;
 
@@ -1035,7 +1042,7 @@ package body SPDX_Tool.Licenses is
       if Confidence >= 0.7 then
          Result.Info.Match := Infos.GUESSED_LICENSE;
          Result.Info.Confidence := Confidence;
-         Result.Info.Name := To_UString (SPDX_Tool.Licenses.Files.Names (Guess).all);
+         Result.Info.Name := To_UString (Get_License_Name (Guess));
          SPDX_Tool.Licenses.Report (Stamp, "Guess license");
       end if;
       return Result;
