@@ -29,12 +29,16 @@ package SPDX_Tool.Infos is
                          UNKNOWN_LICENSE,
                          NONE);
 
+   --  The confidence of guessing the license.
+   type Confidence_Type is delta 0.001 range 0.0 .. 1.0;
+
    --  Information about the license that was identified in the file.
    type License_Info is record
       First_Line : Line_Count := 0;
       Last_Line  : Line_Count := 0;
       Name       : UString;
       Match      : License_Kind := NONE;
+      Confidence : Confidence_Type := 1.0;
    end record;
 
    --  Holds the license text found in the header of the file
