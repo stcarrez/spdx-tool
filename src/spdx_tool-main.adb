@@ -37,6 +37,8 @@ procedure SPDX_Tool.Main is
    procedure Save_Report (Files : in SPDX_Tool.Infos.File_Map);
    procedure Read_Licenses (Manager : in out License_Manager;
                             Path    : in String);
+   function Is_Empty (Arg : in GNAT.Strings.String_Access)
+                   return Boolean is (Arg = null or else Arg.all = "");
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Main");
@@ -212,10 +214,10 @@ procedure SPDX_Tool.Main is
 
    procedure Save_Report (Files : in SPDX_Tool.Infos.File_Map) is
    begin
-      if SPDX_Tool.Reports.Json_Path /= null then
+      if not Is_Empty (SPDX_Tool.Reports.Json_Path) then
          SPDX_Tool.Reports.Write_Json (SPDX_Tool.Reports.Json_Path.all, Files);
       end if;
-      if SPDX_Tool.Reports.Xml_Path /= null then
+      if not Is_Empty (SPDX_Tool.Reports.Xml_Path) then
          SPDX_Tool.Reports.Write_Xml (SPDX_Tool.Reports.Xml_Path.all, Files);
       end if;
    end Save_Report;
@@ -316,7 +318,9 @@ begin
          end;
       end loop;
       Manager.Wait;
-      if SPDX_Tool.Reports.Json_Path /= null or else SPDX_Tool.Reports.Xml_Path /= null then
+      if not Is_Empty (SPDX_Tool.Reports.Json_Path)
+        or else not Is_Empty (SPDX_Tool.Reports.Xml_Path)
+      then
          Save_Summary (Manager);
       else
          Report_Summary (Manager);
