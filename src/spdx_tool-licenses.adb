@@ -655,8 +655,8 @@ package body SPDX_Tool.Licenses is
                return;
             end if;
             if Pos.Pos >= End_Line then
+               exit when First.Line = To.Line;
                Pos.Line := First.Line + 1;
-               exit when Pos.Line > Lines'Last;
                exit when Lines (Pos.Line).Comment = SPDX_Tool.Files.NO_COMMENT;
                Pos.Pos := Lines (Pos.Line).Style.Start - 1;
             else
@@ -921,16 +921,18 @@ package body SPDX_Tool.Licenses is
    --  Find in the header comment an SPDX license tag.
    --  ------------------------------
    function Find_SPDX_License (Content : in Buffer_Type;
-                               Lines   : in SPDX_Tool.Files.Line_Array)
+                               Lines   : in SPDX_Tool.Files.Line_Array;
+                               From    : in Line_Number;
+                               To      : in Line_Number)
                                return License_Match is
       Result : License_Match;
       Pos    : Buffer_Index;
       Last   : Buffer_Index;
       First  : Buffer_Index;
    begin
-      Result.Info.First_Line := Lines'First;
-      Result.Info.Last_Line := Lines'Last;
-      for Line in Lines'Range loop
+      Result.Info.First_Line := From;
+      Result.Info.Last_Line := To;
+      for Line in From .. To loop
          if Lines (Line).Style.Style /= SPDX_Tool.Files.NO_COMMENT then
             Pos := Lines (Line).Style.Start;
             Last := Lines (Line).Style.Last;
@@ -975,7 +977,9 @@ package body SPDX_Tool.Licenses is
    end Find_Builtin_License;
 
    function Find_License (License : in License_Index;
-                          File    : in SPDX_Tool.Files.File_Type)
+                          File    : in SPDX_Tool.Files.File_Type;
+                          From    : in Line_Number;
+                          To      : in Line_Number)
                           return License_Match is
       Token : Token_Access;
       Stamp : Util.Measures.Stamp;
@@ -988,12 +992,12 @@ package body SPDX_Tool.Licenses is
          Buf     : constant Buffer_Accessor := File.Buffer.Value;
          Result  : License_Match := (Last => null, Depth => 0, others => <>);
          Match   : License_Match;
-         Line    : Infos.Line_Number := 1;
+         Line    : Infos.Line_Number := From;
       begin
-         while Line <= File.Count loop
+         while Line <= To loop
             if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
                Match := Find_License (Token, Buf.Data,
-                                      File.Lines, Line, File.Count);
+                                      File.Lines, Line, To);
                if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                   return Match;
                end if;
@@ -1005,13 +1009,15 @@ package body SPDX_Tool.Licenses is
                   end if;
                end if;
             end if;
-            exit when Line = File.Count;
+            exit when Line = To;
             Line := Line + 1;
          end loop;
          Report (Stamp, "Find license (no match)");
          return Result;
       end;
    end Find_License;
+
+   MIN_CONFIDENCE : constant := 700 * Confidence_Type'Small;
 
    function Guess_License (Nodes   : in Decision_Array_Access;
                            Tokens  : in SPDX_Tool.Buffer_Sets.Set) return License_Match is
@@ -1043,7 +1049,7 @@ package body SPDX_Tool.Licenses is
             end if;
          end loop;
       end loop;
-      if Confidence >= 0.7 then
+      if Confidence >= MIN_CONFIDENCE then
          Result.Info.Match := Infos.GUESSED_LICENSE;
          Result.Info.Confidence := Confidence;
          Result.Info.Name := To_UString (Get_License_Name (Guess));

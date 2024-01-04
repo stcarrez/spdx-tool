@@ -49,11 +49,6 @@ package SPDX_Tool.Licenses is
       Depth : Natural := 0;
    end record;
 
-   --  Find in the header comment an SPDX license tag.
-   function Find_SPDX_License (Content : in Buffer_Type;
-                               Lines   : in SPDX_Tool.Files.Line_Array)
-                               return License_Match;
-
    type License_Template is record
       Root   : Token_Access;
       Name   : UString;
@@ -297,8 +292,17 @@ private
    function Find_Builtin_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
                           return Decision_Array_Access;
 
+   --  Find in the header comment an SPDX license tag.
+   function Find_SPDX_License (Content : in Buffer_Type;
+                               Lines   : in SPDX_Tool.Files.Line_Array;
+                               From    : in Line_Number;
+                               To      : in Line_Number)
+                               return License_Match;
+
    function Find_License (License : in License_Index;
-                          File    : in SPDX_Tool.Files.File_Type)
+                          File    : in SPDX_Tool.Files.File_Type;
+                          From    : in Line_Number;
+                          To      : in Line_Number)
                           return License_Match;
 
    function Find_License (Root    : in Token_Access;

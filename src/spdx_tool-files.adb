@@ -426,37 +426,6 @@ package body SPDX_Tool.Files is
       end loop;
    end Boxed_License;
 
-   procedure Boxed_License (Lines  : in Line_Array;
-                            Buffer : in Buffer_Type;
-                            First  : in Infos.Line_Number;
-                            Last   : in Infos.Line_Number;
-                            Spaces : out Natural;
-                            Boxed  : out Boolean;
-                            Length : out Natural) is
-      Line_Length : constant Buffer_Size :=
-        Lines (First).Line_End - Lines (First).Line_Start + 1;
-      Pos : Buffer_Index;
-   begin
-      Spaces := 0;
-      Boxed := False;
-      Length := Natural (Line_Length);
-      for I in First .. Last loop
-         if Lines (I).Style.Boxed then
-            Boxed := False;
-         end if;
-         if Lines (I).Style.Start < Lines (I).Style.Last then
-            Pos := Skip_Spaces (Buffer, Lines (I).Style.Start, Lines (I).Style.Last);
-            if Pos /= Lines (I).Style.Start then
-               Spaces := Spaces + Natural (Pos - Lines (I).Style.Start);
-            end if;
-         end if;
-      end loop;
-      --  Spaces := (Spaces + Last - First) / (Last - First + 1);
-      if Length > Spaces then
-         Length := Length - Spaces - 1;
-      end if;
-   end Boxed_License;
-
    procedure Save (Manager : in File_Manager;
                    File    : in out File_Type;
                    Path    : in String;

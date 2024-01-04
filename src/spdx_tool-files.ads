@@ -165,16 +165,6 @@ package SPDX_Tool.Files is
    procedure Extract_Tokens (File    : in File_Type;
                              Tokens  : in out SPDX_Tool.Buffer_Sets.Set);
 
-   --  Check if the license is using some boxed presentation.
-   procedure Boxed_License (Lines  : in Line_Array;
-                            Buffer : in Buffer_Type;
-                            First  : in Infos.Line_Number;
-                            Last   : in Infos.Line_Number;
-                            Spaces : out Natural;
-                            Boxed  : out Boolean;
-                            Length : out Natural) with
-     Pre => First < Last;
-
 private
 
    type Language_Type is record

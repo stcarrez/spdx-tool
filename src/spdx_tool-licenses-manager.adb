@@ -12,7 +12,6 @@ with Util.Streams.Files;
 
 with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Buffer_Sets;
-with SPDX_Tool.Licenses.Decisions;
 package body SPDX_Tool.Licenses.Manager is
 
    use type SPDX_Tool.Files.Comment_Style;
@@ -179,7 +178,7 @@ package body SPDX_Tool.Licenses.Manager is
          Result.Info.Match := Infos.NONE;
          return Result;
       end if;
-      Match := Find_SPDX_License (Buf.Data, File.Lines (1 .. File.Count));
+      Match := Find_SPDX_License (Buf.Data, File.Lines, 1, File.Count);
       if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          return Match;
       end if;
@@ -192,7 +191,7 @@ package body SPDX_Tool.Licenses.Manager is
             for Node of reverse Nodes loop
                for License of Node.Licenses loop
                   if not Map (License) then
-                     Match := Find_License (License, File);
+                     Match := Find_License (License, File, 1, File.Count);
                      if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                         SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
                         return Match;
@@ -305,7 +304,8 @@ package body SPDX_Tool.Licenses.Manager is
       if Opt_Print then
          File.Text := SPDX_Tool.Files.Extract_License (Data, File.License);
       end if;
-      if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE | Infos.GUESSED_LICENSE then
+      if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE | Infos.GUESSED_LICENSE
+      then
          declare
             Name : constant String := To_String (File.License.Name);
          begin
