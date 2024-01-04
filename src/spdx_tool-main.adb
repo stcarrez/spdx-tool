@@ -34,6 +34,7 @@ procedure SPDX_Tool.Main is
 
    procedure Setup;
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map);
+   procedure Save_Report (Files : in SPDX_Tool.Infos.File_Map);
    procedure Read_Licenses (Manager : in out License_Manager;
                             Path    : in String);
 
@@ -137,6 +138,16 @@ procedure SPDX_Tool.Main is
                         Argument => "PATH",
                         Help   => -("Export the licenses in the directory"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Reports.Json_Path'Access,
+                        Long_Switch => "--output-json=",
+                        Argument => "PATH",
+                        Help   => -("Generic a JSON report with licenses and files"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Reports.Xml_Path'Access,
+                        Long_Switch => "--output-xml=",
+                        Argument => "PATH",
+                        Help   => -("Generic a XML report with licenses and files"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Tasks'Access,
                         Switch => "-t:",
                         Long_Switch => "--thread=",
@@ -199,8 +210,20 @@ procedure SPDX_Tool.Main is
       end if;
    end Print_Report;
 
+   procedure Save_Report (Files : in SPDX_Tool.Infos.File_Map) is
+   begin
+      if SPDX_Tool.Reports.Json_Path /= null then
+         SPDX_Tool.Reports.Write_Json (SPDX_Tool.Reports.Json_Path.all, Files);
+      end if;
+      if SPDX_Tool.Reports.Xml_Path /= null then
+         SPDX_Tool.Reports.Write_Xml (SPDX_Tool.Reports.Xml_Path.all, Files);
+      end if;
+   end Save_Report;
+
    procedure Report_Summary is
      new SPDX_Tool.Licenses.Manager.Report (Print_Report);
+   procedure Save_Summary is
+     new SPDX_Tool.Licenses.Manager.Report (Save_Report);
 
    procedure Read_Licenses (Manager : in out License_Manager;
                             Path    : in String) is
@@ -238,7 +261,8 @@ begin
    if Opt_Identify then
       Opt_No_Color := True;
    end if;
-   if not Opt_Files and not Opt_Check and not Opt_Update and not Opt_Print and not Opt_Identify then
+   if not Opt_Files and not Opt_Check and not Opt_Update and not Opt_Print and not Opt_Identify
+   then
       Opt_Check := True;
    end if;
    declare
@@ -292,7 +316,11 @@ begin
          end;
       end loop;
       Manager.Wait;
-      Report_Summary (Manager);
+      if SPDX_Tool.Reports.Json_Path /= null or else SPDX_Tool.Reports.Xml_Path /= null then
+         Save_Summary (Manager);
+      else
+         Report_Summary (Manager);
+      end if;
       begin
          Manager.Print_Header;
       end;

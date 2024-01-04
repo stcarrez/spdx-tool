@@ -4,7 +4,13 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Containers;
+with Ada.Streams.Stream_IO;
 with Util.Strings;
+with Util.Streams.Texts;
+with Util.Streams.Buffered;
+with Util.Streams.Files;
+with Util.Serialize.IO.JSON;
+--  with Util.Serialize.IO.XML;
 with PT.Texts;
 with PT.Charts;
 with SCI.Occurrences.Finites;
@@ -42,6 +48,7 @@ package body SPDX_Tool.Reports is
 
    function Format_Percent (Dv    : in Natural;
                             Value : in Natural) return String;
+   function Visible_File_Count (Files : in SPDX_Tool.Infos.File_Map) return Natural;
 
    function "-" (Left, Right : Natural) return PT.W_Type is
      (PT.W_Type (Natural '(Left - Right)));
@@ -55,6 +62,10 @@ package body SPDX_Tool.Reports is
                                Styles  : in Style_Configuration;
                                Set     : in Occurrences.Set;
                                Title   : in String);
+
+   --  Write a JSON/XML report with the license and files that were identified.
+   procedure Write_Report (Output : in out Util.Serialize.IO.JSON.Output_Stream;
+                           Files  : in SPDX_Tool.Infos.File_Map);
 
    To_Digit : constant array (0 .. 9) of Character := "0123456789";
 
@@ -310,7 +321,9 @@ package body SPDX_Tool.Reports is
       end loop;
    end Print_License_Text;
 
+   --  ------------------------------
    --  Print the license texts content found in header files.
+   --  ------------------------------
    procedure Print_Texts (Printer : in out PT.Printer_Type'Class;
                           Styles  : in Style_Configuration;
                           Files   : in SPDX_Tool.Infos.File_Map) is
@@ -322,5 +335,101 @@ package body SPDX_Tool.Reports is
          end if;
       end loop;
    end Print_Texts;
+
+   --  ------------------------------
+   --  Write a JSON/XML report with the license and files that were identified.
+   --  ------------------------------
+   procedure Write_Report (Output : in out Util.Serialize.IO.JSON.Output_Stream;
+                           Files  : in SPDX_Tool.Infos.File_Map) is
+      Set  : Occurrences.Set;
+      List : Occurrences.Vector;
+   begin
+      Output.Start_Document;
+      Output.Start_Entity ("info");
+      Output.Start_Entity ("licenses");
+      for File of Files loop
+         if not File.Filtered then
+            Add (Set, Get_License (File.License), 1);
+         end if;
+      end loop;
+      List_Occurrences (Set, List);
+      for Item of List loop
+         Output.Start_Entity (To_String (Item.Element.Name));
+         Output.Write_Entity ("spdx", Item.Element.SPDX);
+         Output.Start_Array ("files");
+         for File of Files loop
+            declare
+               L : constant License_Tag := Get_License (File.License);
+            begin
+               if Item.Element = L then
+                  Output.Write_Entity ("", File.Path);
+               end if;
+            end;
+         end loop;
+         Output.End_Array ("files");
+         Output.End_Entity (To_String (Item.Element.Name));
+      end loop;
+      Output.End_Entity ("licenses");
+
+      Output.Start_Entity ("languages");
+      Set.Clear;
+      List.Clear;
+      for File of Files loop
+         if not File.Filtered then
+            Add (Set, (File.Language, False, 1.0), 1);
+         end if;
+      end loop;
+      List_Occurrences (Set, List);
+      for Item of List loop
+         Output.Start_Entity (To_String (Item.Element.Name));
+         Output.Start_Array ("files");
+         for File of Files loop
+            if Item.Element.Name = File.Language then
+               Output.Write_Entity ("", File.Path);
+            end if;
+         end loop;
+         Output.End_Array ("files");
+         Output.End_Entity (To_String (Item.Element.Name));
+      end loop;
+
+      Output.End_Entity ("languages");
+      Output.End_Entity ("info");
+      Output.End_Document;
+      Output.Flush;
+   end Write_Report;
+
+   --  ------------------------------
+   --  Write a JSON report with the license and files that were identified.
+   --  ------------------------------
+   procedure Write_Json (Path  : in String;
+                         Files : in SPDX_Tool.Infos.File_Map) is
+      File   : aliased Util.Streams.Files.File_Stream;
+      Buffer : aliased Util.Streams.Buffered.Output_Buffer_Stream;
+      Print  : aliased Util.Streams.Texts.Print_Stream;
+      Output : Util.Serialize.IO.JSON.Output_Stream;
+   begin
+      File.Create (Mode => Ada.Streams.Stream_IO.Out_File, Name => Path);
+      Buffer.Initialize (Output => File'Unchecked_Access, Size => 10000);
+      Print.Initialize (Buffer'Unchecked_Access);
+      Output.Initialize (Print'Unchecked_Access);
+      Write_Report (Output, Files);
+   end Write_Json;
+
+   --  ------------------------------
+   --  Write a XML report with the license and files that were identified.
+   --  ------------------------------
+   procedure Write_Xml (Path  : in String;
+                         Files : in SPDX_Tool.Infos.File_Map) is
+      File   : aliased Util.Streams.Files.File_Stream;
+      Buffer : aliased Util.Streams.Buffered.Output_Buffer_Stream;
+      Print  : aliased Util.Streams.Texts.Print_Stream;
+      --  Output : Util.Serialize.IO.XML.Output_Stream;
+   begin
+      File.Create (Mode => Ada.Streams.Stream_IO.Out_File, Name => Path);
+      Buffer.Initialize (Output => File'Unchecked_Access, Size => 10000);
+      Print.Initialize (Buffer'Unchecked_Access);
+      --  Output.Initialize (Print'Unchecked_Access);
+      --  Write_Report (Output, Files);
+   end Write_Xml;
 
 end SPDX_Tool.Reports;

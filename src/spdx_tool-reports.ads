@@ -3,10 +3,13 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-
+with GNAT.Strings;
 with SPDX_Tool.Infos;
 with PT.Drivers;
 package SPDX_Tool.Reports is
+
+   Json_Path      : aliased GNAT.Strings.String_Access;
+   Xml_Path       : aliased GNAT.Strings.String_Access;
 
    type Style_Configuration is record
       Title   : PT.Style_Type;
@@ -50,5 +53,11 @@ package SPDX_Tool.Reports is
    procedure Print_License_Text (Printer : in out PT.Printer_Type'Class;
                                  Styles  : in Style_Configuration;
                                  Text    : in Infos.License_Text);
+
+   --  Write a JSON report with the license and files that were identified.
+   procedure Write_Json (Path  : in String;
+                         Files : in SPDX_Tool.Infos.File_Map);
+   procedure Write_Xml (Path  : in String;
+                        Files : in SPDX_Tool.Infos.File_Map);
 
 end SPDX_Tool.Reports;
