@@ -12,6 +12,7 @@ package body SPDX_Tool.Reports is
 
    use type SPDX_Tool.Infos.License_Kind;
    use type Ada.Containers.Count_Type;
+   use type SPDX_Tool.Infos.Confidence_Type;
 
    function "<" (Left, Right : UString) return Boolean
                  renames Ada.Strings.Unbounded."<";
@@ -115,7 +116,7 @@ package body SPDX_Tool.Reports is
          Writer.Layout_Fields (Fields);
 
          Writer.Put (Fields (1), Title);
-         Writer.Put (Fields (2), -("SPDX"));
+         Writer.Put (Fields (2), -("Match"));
          Writer.Put (Fields (3), -("Count"));
          Writer.Put (Fields (4), -("Ratio"));
          Writer.New_Line;
@@ -126,7 +127,15 @@ package body SPDX_Tool.Reports is
          Writer.Set_Style (Fields (4), Styles.Default);
          for Item of List loop
             Writer.Put (Fields (1), To_String (Item.Element.Name));
-            Writer.Put (Fields (2), (if Item.Element.SPDX then "*" else " "));
+            if Item.Element.SPDX then
+               Writer.Put (Fields (2), "SPDX");
+            elsif Item.Element.Rate = 1.0 then
+               Writer.Put (Fields (2), "TMPL");
+            elsif Item.Element.Rate > 0.0 then
+               Writer.Put (Fields (2), Item.Element.Rate'Image (2 .. 5));
+            else
+               Writer.Put (Fields (2), " ");
+            end if;
             Writer.Put (Fields (3), Item.Occurrence'Image);
             Writer.Put (Fields (4), Format_Percent (Item.Occurrence, Total));
             if Styles.With_Progress then

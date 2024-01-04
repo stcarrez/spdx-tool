@@ -78,7 +78,8 @@ package body SPDX_Tool.Licenses is
       end Get_License;
 
       procedure Load_License (License : in License_Index;
-                             Token    : out Token_Access) is
+                              Token    : out Token_Access) is
+         Stamp : Util.Measures.Stamp;
       begin
          if Decisions.Licenses (License).Root = null then
             Load_License (License, Decisions.Licenses (License));
@@ -87,6 +88,7 @@ package body SPDX_Tool.Licenses is
             end if;
          end if;
          Token := Decisions.Licenses (License).Root;
+         Report (Stamp, "Load template license");
       end Load_License;
 
    end License_Tree;
@@ -976,6 +978,7 @@ package body SPDX_Tool.Licenses is
                           File    : in SPDX_Tool.Files.File_Type)
                           return License_Match is
       Token : Token_Access;
+      Stamp : Util.Measures.Stamp;
    begin
       Token := License_Tree.Get_License (License);
       if Token = null then
@@ -1005,6 +1008,7 @@ package body SPDX_Tool.Licenses is
             exit when Line = File.Count;
             Line := Line + 1;
          end loop;
+         Report (Stamp, "Find license (no match)");
          return Result;
       end;
    end Find_License;

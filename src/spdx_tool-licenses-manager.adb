@@ -200,9 +200,11 @@ package body SPDX_Tool.Licenses.Manager is
                      Map (License) := True;
                   end if;
                end loop;
+               exit;
             end loop;
             Match := Guess_License (Nodes, Tokens);
             if Match.Info.Match = Infos.GUESSED_LICENSE then
+               SPDX_Tool.Licenses.Report (Stamp, "Find license guessed");
                return Match;
             end if;
          end;
