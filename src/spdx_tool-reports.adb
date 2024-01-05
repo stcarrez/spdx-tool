@@ -10,7 +10,7 @@ with Util.Streams.Texts;
 with Util.Streams.Buffered;
 with Util.Streams.Files;
 with Util.Serialize.IO.JSON;
---  with Util.Serialize.IO.XML;
+with Util.Serialize.IO.XML;
 with PT.Texts;
 with PT.Charts;
 with SCI.Occurrences.Finites;
@@ -64,7 +64,7 @@ package body SPDX_Tool.Reports is
                                Title   : in String);
 
    --  Write a JSON/XML report with the license and files that were identified.
-   procedure Write_Report (Output : in out Util.Serialize.IO.JSON.Output_Stream;
+   procedure Write_Report (Output : in out Util.Serialize.IO.Output_Stream'Class;
                            Files  : in SPDX_Tool.Infos.File_Map);
 
    To_Digit : constant array (0 .. 9) of Character := "0123456789";
@@ -339,7 +339,7 @@ package body SPDX_Tool.Reports is
    --  ------------------------------
    --  Write a JSON/XML report with the license and files that were identified.
    --  ------------------------------
-   procedure Write_Report (Output : in out Util.Serialize.IO.JSON.Output_Stream;
+   procedure Write_Report (Output : in out Util.Serialize.IO.Output_Stream'Class;
                            Files  : in SPDX_Tool.Infos.File_Map) is
       Set  : Occurrences.Set;
       List : Occurrences.Vector;
@@ -423,13 +423,13 @@ package body SPDX_Tool.Reports is
       File   : aliased Util.Streams.Files.File_Stream;
       Buffer : aliased Util.Streams.Buffered.Output_Buffer_Stream;
       Print  : aliased Util.Streams.Texts.Print_Stream;
-      --  Output : Util.Serialize.IO.XML.Output_Stream;
+      Output : Util.Serialize.IO.XML.Output_Stream;
    begin
       File.Create (Mode => Ada.Streams.Stream_IO.Out_File, Name => Path);
       Buffer.Initialize (Output => File'Unchecked_Access, Size => 10000);
       Print.Initialize (Buffer'Unchecked_Access);
-      --  Output.Initialize (Print'Unchecked_Access);
-      --  Write_Report (Output, Files);
+      Output.Initialize (Print'Unchecked_Access);
+      Write_Report (Output, Files);
    end Write_Xml;
 
 end SPDX_Tool.Reports;
