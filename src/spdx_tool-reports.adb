@@ -57,6 +57,7 @@ package body SPDX_Tool.Reports is
      new PT.Charts.Draw_Bar (Natural);
 
    function Get_License (Info : in Infos.License_Info) return License_Tag;
+   function Image (Rate : in Infos.Confidence_Type) return String;
 
    procedure Print_Occurences (Printer : in out PT.Printer_Type'Class;
                                Styles  : in Style_Configuration;
@@ -83,6 +84,12 @@ package body SPDX_Tool.Reports is
          return (To_UString (-("None")), False, 0.0);
       end if;
    end Get_License;
+
+   function Image (Rate : in Infos.Confidence_Type) return String is
+      Result : constant String := Rate'Image;
+   begin
+      return Result (Result'First + 1 .. Result'Last);
+   end Image;
 
    --  ------------------------------
    --  Format a percent of DV on the value.
@@ -345,8 +352,8 @@ package body SPDX_Tool.Reports is
       List : Occurrences.Vector;
    begin
       Output.Start_Document;
-      Output.Start_Entity ("info");
-      Output.Start_Entity ("licenses");
+      Output.Start_Entity ("report");
+      Output.Start_Array ("licenses");
       for File of Files loop
          if not File.Filtered then
             Add (Set, Get_License (File.License), 1);
@@ -354,24 +361,26 @@ package body SPDX_Tool.Reports is
       end loop;
       List_Occurrences (Set, List);
       for Item of List loop
-         Output.Start_Entity (To_String (Item.Element.Name));
-         Output.Write_Entity ("spdx", Item.Element.SPDX);
+         Output.Start_Entity ("license");
+         Output.Write_Attribute ("name", To_String (Item.Element.Name));
+         Output.Write_Attribute ("spdx", Item.Element.SPDX);
+         Output.Write_Attribute ("confidence", Image (Item.Element.Rate));
          Output.Start_Array ("files");
          for File of Files loop
             declare
                L : constant License_Tag := Get_License (File.License);
             begin
                if Item.Element = L then
-                  Output.Write_Entity ("", File.Path);
+                  Output.Write_Entity ("file", File.Path);
                end if;
             end;
          end loop;
          Output.End_Array ("files");
-         Output.End_Entity (To_String (Item.Element.Name));
+         Output.End_Entity ("license");
       end loop;
-      Output.End_Entity ("licenses");
+      Output.End_Array ("licenses");
 
-      Output.Start_Entity ("languages");
+      Output.Start_Array ("languages");
       Set.Clear;
       List.Clear;
       for File of Files loop
@@ -381,19 +390,20 @@ package body SPDX_Tool.Reports is
       end loop;
       List_Occurrences (Set, List);
       for Item of List loop
-         Output.Start_Entity (To_String (Item.Element.Name));
+         Output.Start_Entity ("language");
+         Output.Write_Attribute ("name", To_String (Item.Element.Name));
          Output.Start_Array ("files");
          for File of Files loop
             if Item.Element.Name = File.Language then
-               Output.Write_Entity ("", File.Path);
+               Output.Write_Entity ("file", File.Path);
             end if;
          end loop;
          Output.End_Array ("files");
-         Output.End_Entity (To_String (Item.Element.Name));
+         Output.End_Entity ("language");
       end loop;
 
-      Output.End_Entity ("languages");
-      Output.End_Entity ("info");
+      Output.End_Array ("languages");
+      Output.End_Entity ("report");
       Output.End_Document;
       Output.Flush;
    end Write_Report;
@@ -429,6 +439,7 @@ package body SPDX_Tool.Reports is
       Buffer.Initialize (Output => File'Unchecked_Access, Size => 10000);
       Print.Initialize (Buffer'Unchecked_Access);
       Output.Initialize (Print'Unchecked_Access);
+      Output.Set_Indentation (2);
       Write_Report (Output, Files);
    end Write_Xml;
 
