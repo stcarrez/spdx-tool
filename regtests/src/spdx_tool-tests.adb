@@ -27,6 +27,10 @@ package body SPDX_Tool.Tests is
                        Test_Report_Ignore_Licenses_Files'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --identify",
                        Test_Identify'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --output-json",
+                       Test_Json_Report'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --output-xml",
+                       Test_Xml_Report'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -95,5 +99,21 @@ package body SPDX_Tool.Tests is
       Util.Tests.Assert_Matches (T, "BSD-3-Clause", Result,
                                 "Identify failed");
    end Test_Identify;
+
+   procedure Test_Json_Report (T : in out Test) is
+      Path : constant String
+        := Util.Tests.Get_Test_Path ("report.json");
+      Result : UString;
+   begin
+      T.Execute (Tool & " --output-json " & Path & " regtests", Result, 0);
+   end Test_Json_Report;
+
+   procedure Test_Xml_Report (T : in out Test) is
+      Path : constant String
+        := Util.Tests.Get_Test_Path ("report.xml");
+      Result : UString;
+   begin
+      T.Execute (Tool & " --output-xml " & Path & " regtests", Result, 0);
+   end Test_Xml_Report;
 
 end SPDX_Tool.Tests;
