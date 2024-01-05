@@ -3,6 +3,7 @@ with "utilada_base.gpr";
 with "utilada_conf.gpr";
 with "utilada_core.gpr";
 with "utilada_sys.gpr";
+with "utilada_xml.gpr";
 with "sciada.gpr";
 with "spdx_tool_config.gpr";
 with "printer_toolkitada";
