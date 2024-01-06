@@ -1,0 +1,95 @@
+.\"
+.TH SPDX-TOOL 1 "Jan 6, 2024" "SPDX License Tool"
+.SH NAME
+spdx-tool - SPDX license management tool
+.SH SYNOPSIS
+.B spdx-tool
+[ -v ] [-vv] [-vv] [-V]
+[-t
+.I count
+] [--no-color]
+ [-c | --check] [-u | --update] [-i | --identify] [-f | --files]
+ [-m | --mimes] [-p | --print-license]
+ [--ignore-licenses
+.I spdx-name1,spdx-name2,...
+]
+ [--only-licenses
+.I spdx-name1,spdx-name2,...
+]
+ [--ignore-languages
+.I lang1,lang2,...
+]
+ [--only-languages
+.I lang1,lang2,...
+]
+ [--output-json
+.I file
+] [--output-xml
+.I file
+]
+ [--license
+.I file
+]
+.I files|directories
+.br
+.SH DESCRIPTION
+\fIspdx-tool\fR scans the source files to identify licenses and allows to
+update them in order to use the SPDX license format.  It can be used to:
+.\"
+.IP \(bu 4
+identify the license used in source files of a project,
+.\"
+.IP \(bu 4
+produce a JSON/XML report for the licenses found with the list of files,
+.\"
+.IP \(bu 4
+replace a license header by the SPDX license tag header.
+.\"
+.\"
+.PP
+.SH OPTIONS
+The following options are recognized by \fIspdx-tool\fR:
+.TP 5
+-V
+Prints the
+.I spdx-tool
+version.
+.TP 5
+-v
+Enable the verbose mode.
+.TP 5
+-vv
+Enable debugging output.
+.TP 5
+-t
+.I count
+Defines the number of threads for the encryption and decryption process.
+By default, it uses the number of system CPU cores.
+.TP 5
+--no-color
+Disable colors in output.
+.TP 5
+--check
+Check and gather licenses used in source files.  The report indicates a list of license with their SPDX name,
+the number of files found and the overall ratio of files per-license.
+.TP 5
+--files
+Check and gather licenses used in source files.  The report indicates the list of files grouped by the
+license SPDX name.
+.TP 5
+--languages
+Produce a report with the list of files grouped by the language identified.  It can be used to identify
+and understand why some files have no license header.
+.TP 5
+--mimes
+Produce a report with the list of files grouped by the mime type that is identified.  This option is
+useful to understand why some files have no license header.
+
+.SH SEE ALSO
+\fIfile(1)\fR
+.\"
+.\"
+.SH AUTHOR
+Written by Stephane Carrez.
+.\"
+
