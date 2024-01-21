@@ -122,8 +122,8 @@ private
    function Next_Space (Buffer : in Buffer_Type;
                         First  : in Buffer_Index;
                         Last   : in Buffer_Index) return Buffer_Index
-     with Pre => First <= Last
-     and then First >= Buffer'First
+     with Pre => -- First <= Last
+     First >= Buffer'First
      and then Last <= Buffer'Last;
 
    --  Move to the next position after the text if the buffer matches.

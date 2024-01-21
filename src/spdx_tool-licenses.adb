@@ -81,13 +81,14 @@ package body SPDX_Tool.Licenses is
                               Token    : out Token_Access) is
          Stamp : Util.Measures.Stamp;
       begin
-         if Decisions.Licenses (License).Root = null then
-            Load_License (License, Decisions.Licenses (License));
-            if Is_Loaded (Decisions.Licenses (License)) then
-               Collect_License_Tokens (Decisions.Licenses (License));
+         Token := Decisions.Licenses (License).Root;
+         if Token = null then
+            Load_License (License, Decisions.Licenses (License), Token);
+            if Token /= null then
+               Collect_License_Tokens (Token, Decisions.Licenses (License).Tokens);
+               Decisions.Licenses (License).Root := Token;
             end if;
          end if;
-         Token := Decisions.Licenses (License).Root;
          Report (Stamp, "Load template license");
       end Load_License;
 
@@ -526,12 +527,13 @@ package body SPDX_Tool.Licenses is
       Finish;
    end Parse_License;
 
-   procedure Collect_License_Tokens (License : in out License_Template) is
-      Token : Token_Access := License.Root;
+   procedure Collect_License_Tokens (License : in Token_Access;
+                                     Tokens  : in out Buffer_Sets.Set) is
+      Token : Token_Access := License;
    begin
       while Token /= null loop
          if Token.Kind = TOK_WORD then
-            License.Tokens.Include (Token.Content);
+            Tokens.Include (Token.Content);
          end if;
          Token := Token.Next;
       end loop;
@@ -562,13 +564,15 @@ package body SPDX_Tool.Licenses is
    end Load_License;
 
    procedure Load_License (License : in License_Index;
-                           Into    : in out License_Template) is
+                           Into    : in out License_Template;
+                           Tokens  : out Token_Access) is
       Name    : constant Name_Access := Files.Names (License);
       Content : constant access constant Buffer_Type
         := Files.Get_Content (Name.all);
    begin
       Into.Name := To_UString (Get_License_Name (License));
-      Parse_License (Content.all, Content'First, Into.Root, null, Into.Name);
+      Tokens := null;
+      Parse_License (Content.all, Content'First, Tokens, null, Into.Name);
    end Load_License;
 
    function Depth (Token : in Token_Type'Class) return Natural is
@@ -613,8 +617,8 @@ package body SPDX_Tool.Licenses is
                Result.Pos := Skip_Spaces (Content, Result.Pos, Last);
                exit when Result.Pos < Last;
             end if;
+            exit when Result.Line = To.Line;
             Result.Line := Result.Line + 1;
-            exit when Result.Line > Lines'Last;
             Result.Pos := Lines (Result.Line).Line_Start;
          end;
       end loop;
@@ -710,8 +714,8 @@ package body SPDX_Tool.Licenses is
                return;
             end if;
             if Pos.Pos >= End_Line then
+               exit when Pos.Line = To.Line;
                Pos.Line := First.Line + 1;
-               exit when Pos.Line > Lines'Last;
                Pos.Pos := Lines (Pos.Line).Style.Start;
             else
                Pos.Line := First.Line;

@@ -128,10 +128,11 @@ package body SPDX_Tool.Licenses.Manager is
    --  Called when a file is found during the directory tree walk.
    overriding
    procedure Scan_File (Manager : in out License_Manager;
-                        Path   : String) is
+                        Path    : in String) is
       use SPDX_Tool.Infos;
       Job   : License_Job_Type;
       Count : Natural;
+      First : Natural;
    begin
       Log.Info ("Scan file {0}", Path);
 
@@ -140,11 +141,16 @@ package body SPDX_Tool.Licenses.Manager is
             Manager.Load_License (Path);
 
          when others =>
-            Job.File := new File_Info '(Len => Path'Length,
-                                        Path => Path,
+            if Util.Strings.Starts_With (Path, "./") then
+               First := Path'First + 2;
+            else
+               First := Path'First;
+            end if;
+            Job.File := new File_Info '(Len  => Path'Last - First + 1,
+                                        Path => Path (First .. Path'Last),
                                         others => <>);
             Job.Manager := Manager.Manager;
-            Manager.Files.Insert (Path, Job.File);
+            Manager.Files.Insert (Path (First .. Path'Last), Job.File);
             Manager.Executor.Execute (Job);
             Count := Manager.Executor.Get_Count;
             if Count > Manager.Max_Fill then
@@ -199,7 +205,7 @@ package body SPDX_Tool.Licenses.Manager is
                      Map (License) := True;
                   end if;
                end loop;
-               exit;
+               --  exit;
             end loop;
             Match := Guess_License (Nodes, Tokens);
             if Match.Info.Match = Infos.GUESSED_LICENSE then

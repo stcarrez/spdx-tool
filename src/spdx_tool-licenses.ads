@@ -62,8 +62,8 @@ package SPDX_Tool.Licenses is
                        return Boolean is (License.Root /= null);
 
    --  Collect in the Tokens set, the list of tokens used by the license text.
-   procedure Collect_License_Tokens (License : in out License_Template)
-     with Pre => Is_Loaded (License);
+   procedure Collect_License_Tokens (License : in Token_Access;
+                                     Tokens  : in out Buffer_Sets.Set);
 
    type License_Template_Array is array (License_Index range <>) of License_Template;
 
@@ -88,7 +88,8 @@ package SPDX_Tool.Licenses is
                            Path    : in String);
 
    procedure Load_License (License : in License_Index;
-                           Into    : in out License_Template);
+                           Into    : in out License_Template;
+                           Tokens  : out Token_Access);
 
    function Get_Name (License : License_Type) return String;
    function Get_Template (License : License_Type) return String;

@@ -71,6 +71,14 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--no-color",
                         Help   => -("Disable colors in output"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Tasks'Access,
+                        Switch => "-t:",
+                        Long_Switch => "--thread=",
+                        Argument => "COUNT",
+                        Initial  => Opt_Tasks,
+                        Help   => -("Number of threads to process the files")
+                        & Default_Tasks);
+      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Check'Access,
                         Switch => "-c",
                         Long_Switch => "--check",
@@ -149,14 +157,7 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--output-xml=",
                         Argument => "PATH",
                         Help   => -("Generic a XML report with licenses and files"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Tasks'Access,
-                        Switch => "-t:",
-                        Long_Switch => "--thread=",
-                        Argument => "COUNT",
-                        Initial  => Opt_Tasks,
-                        Help   => -("Number of threads to process the files")
-                         & Default_Tasks);
+
    end Setup;
 
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
