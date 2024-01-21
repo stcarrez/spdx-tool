@@ -9,6 +9,8 @@ ifeq ($(BUILD),debug)
 MAKE_ARGS=-- -XBUILD=debug
 endif
 
+PREFIX=/usr/local
+
 build:
 	alr build $(MAKE_ARGS)
 	cd tools && alr build $(MAKE_ARGS)
@@ -29,3 +31,6 @@ test: build-tests
 clean:
 	alr clean
 	rm -rf obj bin lib
+
+install:
+	alr exec gprinstall -- -p --mode=usage --prefix=${PREFIX} -q -Pspdx_tool.gpr
