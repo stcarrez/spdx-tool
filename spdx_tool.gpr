@@ -47,7 +47,7 @@ project Spdx_Tool is
 
    package Install is
       for Artifacts (".") use ("share");
-      for Artifacts ("share/man/man1/spdx-tool.1") use ("man/man1/spdx-tool.1");
+      for Artifacts ("share/man") use ("man/man1");
    end Install;
 
 end Spdx_Tool;
