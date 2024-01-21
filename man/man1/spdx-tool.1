@@ -45,6 +45,47 @@ produce a JSON/XML report for the licenses found with the list of files,
 .IP \(bu 4
 replace a license header by the SPDX license tag header.
 .\"
+.PP
+The tool uses the license templates to identify
+the license used in source files.  The builtin repository contains arround 600 license templates
+and it can be completed by your own templates as long as you use the SPDX license description
+format described in
+\fIThe Software Package Data Exchange® (SPDX®) Specification Version 2.3\fP.
+.\"
+.PP
+The spdx-tool scans the directory or files passed as parameter.  Directories are scanned recursively
+and the
+.I .gitignore
+file is first looked in each directory to take into account files which are ignored
+in the project.  For each file, the spdx-tool tries to:
+
+.\"
+.IP \(bu 4
+identify the language of the source file,
+.\"
+.IP \(bu 4
+extract the license header text at beginning of the source file,
+.\"
+.IP \(bu 4
+identify the license by using the following algorithms:
+.\"
+.IP \(bu 6
+look for a
+.I SPDX-License-Identifier
+tag, when it was found, the match report indicates
+. IR SPDX ,
+.\"
+.IP \(bu 6
+look for a template match from the license templates
+builtin repository or the templates configured for the tool.  When this succeeds, the match
+report indicates
+.IR TMPL ,
+.\"
+.IP \(bu 6
+guess the best matching license by computing the
+.I Tversky
+index (0..1) and reporting the repository license having the highest Tversky index.  The report will
+indicate the highest Tversky index found.
 .\"
 .PP
 .SH OPTIONS
@@ -86,7 +127,7 @@ Produce a report with the list of files grouped by the mime type that is identif
 useful to understand why some files have no license header.
 
 .SH SEE ALSO
-\fIfile(1)\fR
+.IR file (1)
 .\"
 .\"
 .SH AUTHOR

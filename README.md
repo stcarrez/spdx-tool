@@ -65,8 +65,9 @@ in the project.  For each file, the spdx-tool tries to:
     builtin repository or the templates configured for the tool.  When this succeeds, the match
     report indicates `TMPL`,
   * guess the best matching license by computing the [Tversky](https://en.wikipedia.org/wiki/Tversky_index)
-    index and reporting the repository license having the highest Tversky index.  The report will
+    index (0..1) and reporting the repository license having the highest Tversky index.  The report will
     indicate the highest Tversky index found.
+
 
 # References
 
