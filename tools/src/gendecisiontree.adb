@@ -193,9 +193,10 @@ procedure Gendecisiontree is
 begin
    --  Load the licenses from the static content and identify its tokens.
    for License in Licenses'Range loop
-      SPDX_Tool.Licenses.Load_License (License, Licenses (License));
+      SPDX_Tool.Licenses.Load_License (License, Licenses (License), Licenses (License).Root);
       if SPDX_Tool.Licenses.Is_Loaded (Licenses (License)) then
-         SPDX_Tool.Licenses.Collect_License_Tokens (Licenses (License));
+         SPDX_Tool.Licenses.Collect_License_Tokens (Licenses (License).Root,
+                                                    Licenses (License).Tokens);
          List.Insert (License);
       end if;
    end loop;
