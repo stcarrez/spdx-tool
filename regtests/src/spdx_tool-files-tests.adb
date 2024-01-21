@@ -358,7 +358,7 @@ package body SPDX_Tool.Files.Tests is
       Info : File_Type (100);
    begin
       Manager.Open (Info, Path);
-      Manager.Save (Info, Result, 22, 33, "MIT");
+      Manager.Save (Info, Result, 3, 22, "MIT");
       T.Assert (Ada.Directories.Exists (Path), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,

@@ -105,7 +105,13 @@ package body SPDX_Tool.Tests is
         := Util.Tests.Get_Test_Path ("report.json");
       Result : UString;
    begin
-      T.Execute (Tool & " --output-json " & Path & " regtests", Result, 0);
+      T.Execute (Tool & " --mimes --output-json " & Path & " regtests/files",
+                 Result, 0);
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/report.json"),
+         Test    => Path,
+         Message => "Invalid json report");
    end Test_Json_Report;
 
    procedure Test_Xml_Report (T : in out Test) is
@@ -113,7 +119,13 @@ package body SPDX_Tool.Tests is
         := Util.Tests.Get_Test_Path ("report.xml");
       Result : UString;
    begin
-      T.Execute (Tool & " --output-xml " & Path & " regtests", Result, 0);
+      T.Execute (Tool & " --mimes --output-xml " & Path & " regtests/files",
+                 Result, 0);
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/report.xml"),
+         Test    => Path,
+         Message => "Invalid XML report");
    end Test_Xml_Report;
 
 end SPDX_Tool.Tests;
