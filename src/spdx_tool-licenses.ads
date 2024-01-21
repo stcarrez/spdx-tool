@@ -28,6 +28,7 @@ package SPDX_Tool.Licenses is
    Ignore_Languages : aliased GNAT.Strings.String_Access;
    Only_Languages   : aliased GNAT.Strings.String_Access;
    Opt_No_Builtin   : aliased Boolean := False;
+   Opt_Perf_Report  : aliased Boolean := False;
 
    subtype Line_Count is SPDX_Tool.Infos.Line_Count;
    subtype Line_Number is SPDX_Tool.Infos.Line_Number;

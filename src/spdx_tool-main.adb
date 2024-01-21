@@ -157,7 +157,10 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--output-xml=",
                         Argument => "PATH",
                         Help   => -("Generic a XML report with licenses and files"));
-
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Opt_Perf_Report'Access,
+                        Long_Switch => "--print-perf-report",
+                        Help   => -("Print performance report (debugging)"));
    end Setup;
 
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
@@ -332,7 +335,9 @@ begin
          Manager.Print_Header;
       end;
    end;
-   SPDX_Tool.Licenses.Performance_Report;
+   if SPDX_Tool.Licenses.Opt_Perf_Report then
+      SPDX_Tool.Licenses.Performance_Report;
+   end if;
 
 exception
    when GNAT.Command_Line.Exit_From_Command_Line |
