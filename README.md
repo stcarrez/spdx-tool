@@ -6,27 +6,30 @@
 
 # TL;DR
 
-Identify licenses used in a project:
+## Identify licenses used in a project
 
 ```
 spdx-tool .
-License                    Count               Ratio
-Apache-2.0                   468                67.3  ━━━━━━━━━━━━━━━━━━━━━━━━━
-None                         194                27.9  ━━━━━━━━━━━━━━━━━━━━━━━━━
-ISC                           31                 4.4  ━━━━━━━━━━━━━━━━━━━━━━━━━
-BSD-3-Clause                   1                 0.1  ━━━━━━━━━━━━━━━━━━━━━━━━━
-FSFUL                          1                 0.1  ━━━━━━━━━━━━━━━━━━━━━━━━━
+License               Match          Count          Ratio
+Apache-2.0             TMPL             62           60.1
+None                                    34           33.0
+GPL-3.0-or-later       0.81              3            2.9
+GPL-2.0-or-later       0.86              2            1.9
+FSFUL                  TMPL              1            0.9
+NTP                    0.74              1            0.9
 ```
 
-Identify files matching a given license:
+## Identify files matching a given license
 
 ```
-spdx-tool --only-licenses=FSFUL -f .
+spdx-tool --only-licenses=FSFUL,NTP -f .
 FSFUL                                    1
-   ./configure
+   configure
+NTP                                      1
+   install-sh
 ```
 
-Replace the license header by the `SPDX-License-Identifier` header:
+## Replace the license header by the `SPDX-License-Identifier` header
 
 ```
 spdx-tool --only-licenses=Apache-2.0 --update src
@@ -38,5 +41,21 @@ spdx-tool --only-licenses=Apache-2.0 --update src
 
 # Overview
 
+spdx-tool scans the source files to identify licenses and allows to update them in order to use the
+SPDX license format.  It can be used to:
+
+* identify the license used in source files of a project,
+* produce a JSON/XML report for the licenses found with the list of files,
+* replace a license header by the [SPDX license](https://spdx.org/licenses/) tag equivalent.
+
+The tool uses the [license templates](https://github.com/spdx/license-list-data) to identify
+the license used in source files.  The builtin repository contains arround 600 license templates
+and it can be completed by your own templates as long as you use the SPDX license description
+format described in [The Software Package Data Exchange® (SPDX®) Specification Version 2.3](https://spdx.github.io/spdx-spec/v2.3/).
+
 # References
+
+* https://github.com/spdx/license-list-data
+* https://spdx.org
+* https://spdx.dev/learn/handling-license-info/
 
