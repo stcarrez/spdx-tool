@@ -145,17 +145,31 @@ package body SPDX_Tool.Files is
       return From;
    end Find_End_Comment;
 
+   function Get_Language_From_Extension (Path : in String) return String is
+      Ext  : constant String := Ada.Directories.Extension (Path);
+      Kind : access constant String := Extensions.Get_Mapping (Ext);
+   begin
+      if Kind /= null then
+         return Kind.all;
+      end if;
+      if Kind = null and then Util.Strings.Ends_With (Ext, "~") then
+         Kind := Extensions.Get_Mapping (Ext (Ext'First .. Ext'Last - 1));
+      end if;
+      if Kind /= null then
+         return Kind.all;
+      end if;
+      return "";
+   end Get_Language_From_Extension;
+
    --  Identify the language used by the given file.
    procedure Find_Language (Manager : in File_Manager;
                             File     : in out File_Type;
                             Path     : in String) is
-      Len  : constant Buffer_Size := File.Last_Offset;
-      Ext  : constant String := Ada.Directories.Extension (Path);
-      Kind : constant access constant String
-        := SPDX_Tool.Files.Extensions.Get_Mapping (Ext);
+      Len      : constant Buffer_Size := File.Last_Offset;
+      Language : constant String := Get_Language_From_Extension (Path);
    begin
-      if Kind /= null then
-         File.Language := To_UString (Kind.all);
+      if Language'Length > 0 then
+         File.Language := To_UString (Language);
       elsif Len = 0 then
          File.Language := To_UString ("Empty file");
          return;
@@ -167,7 +181,7 @@ package body SPDX_Tool.Files is
               := Manager.Magic_Manager.Identify (Buf.Data (Buf.Data'First .. Len));
          begin
             File.Ident.Mime := To_UString (Mime);
-            if Kind = null then
+            if Language'Length = 0 then
                if Util.Strings.Starts_With (Mime, "text/") then
                   File.Language := To_UString ("Text file");
                elsif Util.Strings.Starts_With (Mime, "image/") then

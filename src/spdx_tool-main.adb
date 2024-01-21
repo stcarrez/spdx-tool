@@ -264,7 +264,9 @@ begin
    if Opt_Identify then
       Opt_No_Color := True;
    end if;
-   if not Opt_Files and not Opt_Check and not Opt_Update and not Opt_Print and not Opt_Identify
+   if not Opt_Files and not Opt_Check and not Opt_Update
+     and not Opt_Print and not Opt_Identify
+     and not Opt_Languages
    then
       Opt_Check := True;
    end if;

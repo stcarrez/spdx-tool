@@ -165,6 +165,9 @@ package SPDX_Tool.Files is
    procedure Extract_Tokens (File    : in File_Type;
                              Tokens  : in out SPDX_Tool.Buffer_Sets.Set);
 
+   --  Guess the language based on the file extension.
+   function Get_Language_From_Extension (Path : in String) return String;
+
 private
 
    type Language_Type is record
