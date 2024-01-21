@@ -183,7 +183,17 @@ package body SPDX_Tool.Files is
             File.Ident.Mime := To_UString (Mime);
             if Language'Length = 0 then
                if Util.Strings.Starts_With (Mime, "text/") then
-                  File.Language := To_UString ("Text file");
+                  if Util.Strings.Starts_With (Mime, "text/x-shellscript") then
+                     File.Language := To_UString ("Shell");
+                  elsif Util.Strings.Starts_With (Mime, "text/x-m4") then
+                     File.Language := To_UString ("M4");
+                  elsif Util.Strings.Starts_With (Mime, "text/x-makefile") then
+                     File.Language := To_UString ("Makefile");
+                  elsif Util.Strings.Starts_With (Mime, "text/xml") then
+                     File.Language := To_UString ("XML");
+                  else
+                     File.Language := To_UString ("Text file");
+                  end if;
                elsif Util.Strings.Starts_With (Mime, "image/") then
                   File.Language := To_UString ("Image");
                elsif Util.Strings.Starts_With (Mime, "video/") then
