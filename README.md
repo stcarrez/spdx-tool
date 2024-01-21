@@ -53,6 +53,21 @@ the license used in source files.  The builtin repository contains arround 600 l
 and it can be completed by your own templates as long as you use the SPDX license description
 format described in [The Software Package Data Exchange® (SPDX®) Specification Version 2.3](https://spdx.github.io/spdx-spec/v2.3/).
 
+The spdx-tool scans the directory or files passed as parameter.  Directories are scanned recursively
+and the `.gitignore` file is first looked in each directory to take into account files which are ignored
+in the project.  For each file, the spdx-tool tries to:
+
+* identify the language of the source file,
+* extract the license header text at beginning of the source file,
+* identify the license by using the following algorithms:
+  * look for a `SPDX-License-Identifier` tag, when it was found, the match report indicates `SPDX`,
+  * look for a template match from the [license templates](https://github.com/spdx/license-list-data)
+    builtin repository or the templates configured for the tool.  When this succeeds, the match
+    report indicates `TMPL`,
+  * guess the best matching license by computing the [Tversky](https://en.wikipedia.org/wiki/Tversky_index)
+    index and reporting the repository license having the highest Tversky index.  The report will
+    indicate the highest Tversky index found.
+
 # References
 
 * https://github.com/spdx/license-list-data
