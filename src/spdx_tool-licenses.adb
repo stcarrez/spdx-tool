@@ -714,7 +714,7 @@ package body SPDX_Tool.Licenses is
                return;
             end if;
             if Pos.Pos >= End_Line then
-               exit when Pos.Line = To.Line;
+               exit when First.Line = To.Line;
                Pos.Line := First.Line + 1;
                Pos.Pos := Lines (Pos.Line).Style.Start;
             else

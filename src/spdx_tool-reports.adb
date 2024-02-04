@@ -131,7 +131,7 @@ package body SPDX_Tool.Reports is
          Writer.Set_Justify (Fields (3), PT.J_RIGHT);
          Writer.Set_Justify (Fields (4), PT.J_RIGHT);
 
-         Writer.Layout_Fields (Fields);
+         Writer.Layout_Fields (Fields, Max_Width => 80);
 
          Writer.Put (Fields (1), Title);
          Writer.Put (Fields (2), -("Match"));
