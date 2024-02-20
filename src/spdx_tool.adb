@@ -40,13 +40,97 @@ package body SPDX_Tool is
       Util.Log.Loggers.Initialize (Log_Config);
    end Configure_Logs;
 
+   --  ------------------------------
+   --  Check if there is a space in the buffer starting at `First` position
+   --  and return its length.  Returns 0 when there is no space.
+   --  ------------------------------
+   function Space_Length (Buffer : in Buffer_Type;
+                          First  : in Buffer_Index;
+                          Last   : in Buffer_Index) return Buffer_Size is
+   begin
+      if First > Last then
+         return 0;
+      end if;
+      case Buffer (First) is
+         when SPACE | TAB | LF | CR =>
+            return 1;
+
+            --  2 byte sequence: 0xA0
+         when 16#C2# =>
+            return (if First + 1 <= Last
+                    and then Buffer (First + 1) = 16#A0# then 2 else 0);
+
+            --  3 byte sequenes: 0x2000..0x200A
+         when 16#E2# =>
+            return (if First + 2 <= Last and then Buffer (First + 1) = 16#80#
+                    and then Buffer (First + 2) >= 16#82#
+                    and then Buffer (First + 2) <= 16#8A# then 3 else 0);
+
+            --  3 byte sequences: 0x3000
+         when 16#E3# =>
+            return (if First + 2 <= Last and then Buffer (First + 1) = 16#80#
+                    and then Buffer (First + 2) = 16#80# then 3 else 0);
+
+         when others =>
+            return 0;
+      end case;
+   end Space_Length;
+
+   --  ------------------------------
+   --  Check if there is a punctuation code in the buffer starting at `First` position
+   --  and return its length.  Returns 0 when there is no punctuation code.
+   --  ------------------------------
+   function Punctuation_Length (Buffer : in Buffer_Type;
+                                First  : in Buffer_Index;
+                                Last   : in Buffer_Index) return Buffer_Size is
+   begin
+      if First > Last then
+         return 0;
+      end if;
+      case Buffer (First) is
+         when Character'Pos (':') | Character'Pos (',') | Character'Pos ('.')
+            | Character'Pos (';') | Character'Pos ('!') | Character'Pos ('?')
+            | Character'Pos ('(') | Character'Pos (')') | Character'Pos ('[')
+            | Character'Pos (']') | Character'Pos ('`') | Character'Pos (''')
+            | Character'Pos ('"') | Character'Pos ('-') | Character'Pos ('+')
+            | Character'Pos ('*') | Character'Pos ('=') | Character'Pos ('<')
+            | Character'Pos ('>') | Character'Pos ('#') | Character'Pos ('$')
+            | Character'Pos ('%') | Character'Pos ('^') | Character'Pos ('&')
+            | Character'Pos ('@') | Character'Pos ('/') | Character'Pos ('\') =>
+            return 1;
+
+            --  2 byte sequence: 0xA0
+         when 16#C2# =>
+            return (if First + 1 <= Last
+                    and then Buffer (First + 1) = 16#A0# then 2 else 0);
+
+            --  3 byte sequenes: 0x2000..0x206F
+         when 16#E2# =>
+            return 3;
+
+            --  3 byte sequences: 0x3000..0x303F
+         when 16#E3# =>
+            return 3;
+
+            --  3 byte sequences: 0xFF00..0xFFEF
+         when 16#EF# =>
+            return 3;
+
+         when others =>
+            return 0;
+      end case;
+   end Punctuation_Length;
+
    function Skip_Spaces (Buffer : in Buffer_Type;
                          First  : in Buffer_Index;
                          Last   : in Buffer_Index) return Buffer_Index is
       Pos : Buffer_Index := First;
+      Len : Buffer_Size;
    begin
-      while Pos <= Last and then Is_Space (Buffer (Pos)) loop
-         Pos := Pos + 1;
+      while Pos <= Last loop
+         Len := Space_Length (Buffer, Pos, Last);
+         exit when Len = 0;
+         Pos := Pos + Len;
       end loop;
       return Pos;
    end Skip_Spaces;
@@ -83,12 +167,30 @@ package body SPDX_Tool is
                         First  : in Buffer_Index;
                         Last   : in Buffer_Index) return Buffer_Index is
       Pos : Buffer_Index := First;
+      Len : Buffer_Size;
    begin
-      if Pos <= Last and then not Is_Space (Buffer (Pos)) then
+      if Pos < Last and then not Is_Space (Buffer (Pos))
+        and then not Is_Utf8_Special_3 (Buffer (Pos))
+      then
          Pos := Pos + 1;
       end if;
-      while Pos <= Last and then not Is_Space_Or_Punctuation (Buffer (Pos)) loop
-         Pos := Pos + 1;
+      while Pos < Last loop
+         Len := Space_Length (Buffer, Pos, Last);
+         if Len > 0 then
+            return Pos - 1;
+         end if;
+         if Is_Space_Or_Punctuation (Buffer (Pos)) then
+            return Pos - 1;
+         --elsif Is_Utf8_Special_3 (Buffer (Pos)) then
+         --   return Pos - 1;
+         --elsif Is_Utf8_Special_2 (Buffer (Pos))
+         --  and then Pos + 1 <= Last
+         --  and then Buffer (Pos + 1) in 16#AB# | 16#A0# | 16#BB#
+         --then
+         --   return Pos - 1;
+         else
+            Pos := Pos + 1;
+         end if;
       end loop;
       return Pos;
    end Next_Space;

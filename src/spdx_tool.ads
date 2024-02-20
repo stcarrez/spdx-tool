@@ -102,6 +102,18 @@ private
                            | Character'Pos ('-')
                            | Character'Pos ('+'));
 
+   --  Check if there is a space in the buffer starting at `First` position
+   --  and return its length.  Returns 0 when there is no space.
+   function Space_Length (Buffer : in Buffer_Type;
+                          First  : in Buffer_Index;
+                          Last   : in Buffer_Index) return Buffer_Size;
+
+   --  Check if there is a punctuation code in the buffer starting at `First` position
+   --  and return its length.  Returns 0 when there is no punctuation code.
+   function Punctuation_Length (Buffer : in Buffer_Type;
+                                First  : in Buffer_Index;
+                                Last   : in Buffer_Index) return Buffer_Size;
+
    --  Find index of the first non white space after first and up to last.
    function Skip_Spaces (Buffer : in Buffer_Type;
                          First  : in Buffer_Index;
