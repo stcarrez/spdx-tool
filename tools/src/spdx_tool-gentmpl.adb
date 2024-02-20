@@ -221,6 +221,8 @@ begin
          Token_Id := Token_Id + 1;
       end loop;
    end;
+   Info.Counters.Cells.Clear;
+   Idx := 0;
    for I in 1 .. Arg_Count loop
       Scan (Ada.Command_Line.Argument (I));
    end loop;
