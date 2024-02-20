@@ -211,6 +211,19 @@ begin
    for I in 1 .. Arg_Count loop
       Scan (Ada.Command_Line.Argument (I));
    end loop;
+   declare
+      Tokens : Token_Counters.Token_Maps.Map := Info.Tokens;
+      Token_Id : Token_Index := 1;
+   begin
+      Info.Tokens.Clear;
+      for Iter in Tokens.Iterate loop
+         Info.Tokens.Insert (Token_Counters.Token_Maps.Key (Iter), Token_Id);
+         Token_Id := Token_Id + 1;
+      end loop;
+   end;
+   for I in 1 .. Arg_Count loop
+      Scan (Ada.Command_Line.Argument (I));
+   end loop;
    for Iter in Info.Tokens.Iterate loop
       declare
          K : constant Buffer_Type := Token_Counters.Token_Maps.Key (Iter);
