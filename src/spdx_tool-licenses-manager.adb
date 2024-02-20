@@ -12,6 +12,8 @@ with Util.Streams.Files;
 
 with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Buffer_Sets;
+with SPDX_Tool.Licenses.Reader;
+--  with SPDX_Tool.Licenses.Templates;
 package body SPDX_Tool.Licenses.Manager is
 
    use type SPDX_Tool.Files.Comment_Style;
@@ -60,9 +62,9 @@ package body SPDX_Tool.Licenses.Manager is
 
    procedure Load_Jsonld_License (Manager : in out License_Manager;
                                   Path    : in String) is
-      License : License_Type;
+      License : Reader.License_Type;
    begin
-      Load (License, Path);
+      Reader.Load (License, Path);
       if Length (License.Name) = 0 then
          Log.Error ("{0}: no license found", Path);
          return;
@@ -75,8 +77,8 @@ package body SPDX_Tool.Licenses.Manager is
            and then Export_Dir /= null
            and then Export_Dir.all /= ""
          then
-            Save_License (License,
-                          Util.Files.Compose (Export_Dir.all, Name & ".txt"));
+            Reader.Save_License (License,
+                                 Util.Files.Compose (Export_Dir.all, Name & ".txt"));
          else
             declare
                Content : String := To_String (License.Template);
