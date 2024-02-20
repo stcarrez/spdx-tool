@@ -7,9 +7,6 @@ with Ada.Text_IO;
 
 with Util.Files;
 with Util.Strings;
-with Util.Beans.Objects;
-with Util.Beans.Objects.Iterators;
-with Util.Serialize.IO.JSON;
 with Util.Log.Loggers;
 
 with SCI.Numbers;
@@ -28,8 +25,6 @@ package body SPDX_Tool.Licenses is
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
 
-   package UBO renames Util.Beans.Objects;
-
    --  ??? Mul and Div seem necessary as "*" and "/" fail to instantiate
    function Mul (Left, Right : Confidence_Type) return Confidence_Type is (Left * Right);
    function Div (Left, Right : Confidence_Type) return Confidence_Type is (Left / Right);
@@ -47,9 +42,6 @@ package body SPDX_Tool.Licenses is
                           Content : in Buffer_Type;
                           Line    : in Infos.Line_Number;
                           From    : in Buffer_Index) return Infos.License_Info;
-   function Find_Header (List : UBO.Object) return UBO.Object;
-   function Find_Value (Info : UBO.Object; Name : String) return Boolean;
-   function Find_Value (Info : UBO.Object; Name : String) return UString;
    function Get_License_Name (License : in License_Index) return String;
 
    function Get_License_Name (License : in License_Index) return String is
@@ -93,86 +85,6 @@ package body SPDX_Tool.Licenses is
       end Load_License;
 
    end License_Tree;
-
-   function Find_Header (List : UBO.Object) return UBO.Object is
-      Iter : UBO.Iterators.Iterator := UBO.Iterators.First (List);
-   begin
-      while UBO.Iterators.Has_Element (Iter) loop
-         declare
-            Item : constant UBO.Object := UBO.Iterators.Element (Iter);
-            Hdr  : constant UBO.Object
-              := UBO.Get_Value (Item, "spdx:standardLicenseTemplate");
-         begin
-            if not UBO.Is_Null (Hdr) then
-               return Item;
-            end if;
-         end;
-         UBO.Iterators.Next (Iter);
-      end loop;
-      return UBO.Null_Object;
-   end Find_Header;
-
-   function Find_Value (Info : UBO.Object; Name : String) return Boolean is
-      N : UBO.Object := UBO.Get_Value (Info, Name);
-   begin
-      if UBO.Is_Null (N) then
-         return False;
-      end if;
-      N := UBO.Get_Value (N, "@value");
-      if UBO.Is_Null (N) then
-         return False;
-      end if;
-      return UBO.To_Boolean (N);
-   end Find_Value;
-
-   function Find_Value (Info : UBO.Object; Name : String) return UString is
-      N : constant UBO.Object := UBO.Get_Value (Info, Name);
-   begin
-      if UBO.Is_Null (N) then
-         return To_UString ("");
-      else
-         return UBO.To_Unbounded_String (N);
-      end if;
-   end Find_Value;
-
-   procedure Load (License : in out License_Type;
-                   Path    : in String) is
-      Root, Graph, Info : Util.Beans.Objects.Object;
-   begin
-      Root := Util.Serialize.IO.JSON.Read (Path);
-      Graph := Util.Beans.Objects.Get_Value (Root, "@graph");
-      Info := Find_Header (Graph);
-      License.OSI_Approved := Find_Value (Info, "spdx:isOsiApproved");
-      License.FSF_Libre := Find_Value (Info, "spdx:isFsfLibre");
-      License.Name := Find_Value (Info, "spdx:licenseId");
-      License.Template := Find_Value (Info,
-                                      "spdx:standardLicenseHeaderTemplate");
-      if Length (License.Template) = 0 then
-         License.Template := Find_Value (Info, "spdx:standardLicenseTemplate");
-      end if;
-   end Load;
-
-   function Get_Name (License : License_Type) return String is
-   begin
-      return To_String (License.Name);
-   end Get_Name;
-
-   function Get_Template (License : License_Type) return String is
-   begin
-      return To_String (License.Template);
-   end Get_Template;
-
-   procedure Save_License (License : in License_Type;
-                           Path    : in String) is
-      Content : constant String := To_String (License.Template);
-      P : Natural := Content'First;
-   begin
-      while P < Content'Last and then Content (P) /= ASCII.LF loop
-         P := P + 1;
-      end loop;
-      Log.Debug ("{0}", Content (Content'First .. P - 1));
-      Util.Files.Write_File (Path, Content);
-   end Save_License;
 
    Token_Count : Natural := 0;
 
@@ -432,16 +344,17 @@ package body SPDX_Tool.Licenses is
                   end if;
                end loop;
             end if;
-            Token := new Token_Type '(Len => Pos - First,
+            Token := new Token_Type '(Len => Pos - First + 1,
                                       Previous => Token,
                                       Next => null,
                                       Alternate => null,
-                                      Content => Content (First .. Pos - 1));
+                                      Content => Content (First .. Pos));
             if Optional.Optional = null then
                Optional.Optional := Token;
             else
                Token.Previous.Next := Token;
             end if;
+            Pos := Pos + 1;
 
             --  Append_Token (Token);
             --  Previous := Token;
@@ -654,10 +567,11 @@ package body SPDX_Tool.Licenses is
             exit when Lines (First.Line).Comment = SPDX_Tool.Files.NO_COMMENT;
             End_Line := Lines (First.Line).Style.Last;
             Pos.Pos := Next_Space (Content, First.Pos, End_Line);
-            Match (Check, Content, Lines, First, (To.Line, Pos.Pos - 1), Result, Next);
+            Match (Check, Content, Lines, First, (To.Line, Pos.Pos), Result, Next);
             if Next /= null and then Result /= First then
                return;
             end if;
+            Pos.Pos := Pos.Pos + 1;
             if Pos.Pos >= End_Line then
                exit when First.Line = To.Line;
                Pos.Line := First.Line + 1;
@@ -709,10 +623,11 @@ package body SPDX_Tool.Licenses is
             exit when Lines (First.Line).Comment = SPDX_Tool.Files.NO_COMMENT;
             End_Line := Lines (First.Line).Style.Last;
             Pos.Pos := Next_Space (Content, First.Pos, End_Line);
-            Match (Check, Content, Lines, First, (To.Line, Pos.Pos - 1), Result, Next);
+            Match (Check, Content, Lines, First, (To.Line, Pos.Pos), Result, Next);
             if Next /= null and then Result /= First then
                return;
             end if;
+            Pos.Pos := Pos.Pos + 1;
             if Pos.Pos >= End_Line then
                exit when Pos.Line = To.Line;
                Pos.Line := First.Line + 1;
@@ -790,11 +705,12 @@ package body SPDX_Tool.Licenses is
             end if;
             End_Line := Lines (First.Line).Style.Last;
             Pos.Pos := Next_Space (Content, First.Pos, End_Line);
-            Check.Matches (Content, Lines, First, (To.Line, Pos.Pos - 1), Result, Next);
+            Check.Matches (Content, Lines, First, (To.Line, Pos.Pos), Result, Next);
             if Next = null and then Result = First then
                Result := From;
                return;
             end if;
+            Pos.Pos := Pos.Pos + 1;
             Check := Check.Next;
          end loop;
          Next := Token.Next;
@@ -885,10 +801,10 @@ package body SPDX_Tool.Licenses is
                Pos.Pos := Next_Space (Content, Pos.Pos, Last.Pos);
                if Current = null then
                   Match (Root, Content, Lines, First,
-                         (To, Pos.Pos - 1), Pos, Next_Token);
+                         (To, Pos.Pos), Pos, Next_Token);
                else
                   Match (Current, Content, Lines, First,
-                         (To, Pos.Pos - 1), Pos, Next_Token);
+                         (To, Pos.Pos), Pos, Next_Token);
                end if;
                if Next_Token = null then
                   if Current /= null then
@@ -908,6 +824,7 @@ package body SPDX_Tool.Licenses is
                   Result.Last := Current;
                   return Result;
                end if;
+               Pos.Pos := Pos.Pos + 1;
             end loop;
          end if;
          if First.Line = Pos.Line then
