@@ -612,9 +612,10 @@ package body SPDX_Tool.Files is
          First := Skip_Spaces (Buffer, Pos, Last);
          exit when First > Last;
          Pos := Next_Space (Buffer, First, Last);
-         if First <= Pos - 1 then
-            Line.Tokens.Include (Buffer (First .. Pos - 1));
+         if First <= Pos then
+            Line.Tokens.Include (Buffer (First .. Pos));
          end if;
+         Pos := Pos + 1;
       end loop;
    end Extract_Line_Tokens;
 
@@ -640,9 +641,10 @@ package body SPDX_Tool.Files is
                First := Skip_Spaces (Buf.Data, Pos, Last);
                exit when First > Last;
                Pos := Next_Space (Buf.Data, First, Last);
-               if First <= Pos - 1 then
-                  Tokens.Include (Buf.Data (First .. Pos - 1));
+               if First <= Pos then
+                  Tokens.Include (Buf.Data (First .. Pos));
                end if;
+               Pos := Pos + 1;
             end loop;
          end if;
       end loop;

@@ -55,9 +55,20 @@ package SPDX_Tool.Licenses is
       Name   : UString;
       Tokens : SPDX_Tool.Buffer_Sets.Set;
    end record;
-   type License_Index is new Natural;
 
    type Name_Array is array (License_Index range <>) of Name_Access;
+
+   type Token_Index is new Natural;
+   type Count_Type is new Natural;
+   type Token_Count_Type is record
+      Index : Token_Index;
+      Count : Count_Type;
+   end record;
+   type Token_Array is array (Positive range <>) of Token_Count_Type;
+   type Token_Array_Access is access constant Token_Array;
+   type Position is new Natural range 0 .. 255;
+   for Position'Size use 8;
+   type Position_Array is array (Positive range <>) of Position;
 
    function Is_Loaded (License : in License_Template)
                        return Boolean is (License.Root /= null);
@@ -80,20 +91,9 @@ package SPDX_Tool.Licenses is
       Name       : UString;
    end record;
 
-   type License_Type is tagged limited private;
-
-   procedure Load (License : in out License_Type;
-                   Path    : in String);
-
-   procedure Save_License (License : in License_Type;
-                           Path    : in String);
-
    procedure Load_License (License : in License_Index;
                            Into    : in out License_Template;
                            Tokens  : out Token_Access);
-
-   function Get_Name (License : License_Type) return String;
-   function Get_Template (License : License_Type) return String;
 
    procedure Performance_Report;
 
@@ -169,8 +169,6 @@ private
    --  - spaces are ignored,
    --  - punctuation must match,
    --  - Copyright, (c) and "©" are considered identical,
-
-   type License_Access is access all License_Type;
 
    type Token_Kind is (TOK_WORD,
                        TOK_COPYRIGHT,
@@ -269,13 +267,6 @@ private
    overriding
    function Kind (Token : in Final_Token_Type)
                   return Token_Kind is (TOK_LICENSE);
-
-   type License_Type is tagged limited record
-      Name         : UString;
-      Template     : UString;
-      OSI_Approved : Boolean := False;
-      FSF_Libre    : Boolean := False;
-   end record;
 
    type License_Index_Array is array (Positive range <>) of License_Index;
    type License_Index_Map is array (License_Index range <>) of Boolean;

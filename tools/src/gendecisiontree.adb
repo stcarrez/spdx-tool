@@ -18,8 +18,8 @@ procedure Gendecisiontree is
    use type SPDX_Tool.Buffer_Type;
    use type Ada.Containers.Count_Type;
    use type Ada.Text_IO.Count;
-   subtype License_Index is SPDX_Tool.Licenses.License_Index;
-   use type SPDX_Tool.Licenses.License_Index;
+   subtype License_Index is SPDX_Tool.License_Index;
+   use type SPDX_Tool.License_Index;
 
    package Index_Sets is
      new Ada.Containers.Ordered_Sets (Element_Type => License_Index);
