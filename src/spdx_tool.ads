@@ -42,6 +42,9 @@ package SPDX_Tool is
 
    type Name_Access is access constant String;
 
+   type License_Index is new Natural;
+   type Token_Index is new Positive;
+
 private
 
    procedure Configure_Logs (Debug : Boolean; Verbose : Boolean);
@@ -66,6 +69,16 @@ private
    OPEN_PAREN  : constant Byte := Character'Pos ('(');
    CLOSE_PAREN : constant Byte := Character'Pos (')');
 
+   --  UTF-8 special 3-byte codes that represent space or punctuation:
+   --  * General punctuation: 0x2000-0x206F            0xE2 0x80..0x81 0x80..0xBF
+   --  * Currency symbols: 0x20A0-0x20CF
+   --  * CJK Symbols and Punctuation: 0x3000-0x303F    0xE3 0x80 0x80..0xBF
+   --  * Halfwidth and Fullwidth Forms: 0xFF00-0xFFEF  0xEF 0xBC 0x9A
+   function Is_Utf8_Special_3 (C : Byte) return Boolean is (C in 16#E2# | 16#E3# | 16#EF#);
+
+   --  UTF-8 special 2-byte code
+   function Is_Utf8_Special_2 (C : Byte) return Boolean is (C in 16#C2#);
+
    function Is_Space
      (C : Byte)
       return Boolean is (C in SPACE | TAB | CR | LF);
@@ -76,7 +89,8 @@ private
                            | Character'Pos (':') | Character'Pos (',')
                            | Character'Pos ('.') | Character'Pos (';')
                            | Character'Pos ('!') | Character'Pos ('(')
-                           | Character'Pos (')') | Character'Pos ('-'));
+                           | Character'Pos (')') | Character'Pos ('-')
+                           | Character'Pos ('"') | Character'Pos ('''));
 
    function Is_Eol
      (C : Byte)
