@@ -179,15 +179,9 @@ package body SPDX_Tool is
          if Len > 0 then
             return Pos - 1;
          end if;
-         if Is_Space_Or_Punctuation (Buffer (Pos)) then
+         Len := Punctuation_Length (Buffer, Pos, Last);
+         if Len > 0 then
             return Pos - 1;
-         --elsif Is_Utf8_Special_3 (Buffer (Pos)) then
-         --   return Pos - 1;
-         --elsif Is_Utf8_Special_2 (Buffer (Pos))
-         --  and then Pos + 1 <= Last
-         --  and then Buffer (Pos + 1) in 16#AB# | 16#A0# | 16#BB#
-         --then
-         --   return Pos - 1;
          else
             Pos := Pos + 1;
          end if;

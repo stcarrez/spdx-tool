@@ -58,8 +58,6 @@ package SPDX_Tool.Licenses is
 
    type Name_Array is array (License_Index range <>) of Name_Access;
 
-   type Token_Index is new Natural;
-   type Count_Type is new Natural;
    type Token_Count_Type is record
       Index : Token_Index;
       Count : Count_Type;
@@ -68,7 +66,7 @@ package SPDX_Tool.Licenses is
    type Token_Array_Access is access constant Token_Array;
    type Position is new Natural range 0 .. 255;
    for Position'Size use 8;
-   type Position_Array is array (Positive range <>) of Position;
+   type Position_Array is array (Token_Index range <>) of Position;
 
    function Is_Loaded (License : in License_Template)
                        return Boolean is (License.Root /= null);

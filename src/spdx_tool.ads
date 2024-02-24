@@ -43,6 +43,7 @@ package SPDX_Tool is
    type Name_Access is access constant String;
 
    type License_Index is new Natural;
+   type Count_Type is new Natural;
    type Token_Index is new Positive;
 
 private
