@@ -3,12 +3,14 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-with Ada.Text_IO;
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Streams;
+with Ada.Streams.Stream_IO;
 with Ada.Directories;
 with Ada.Command_Line;
 with Util.Strings;
+with Util.Streams.Files;
+with Util.Streams.Texts;
+with Util.Streams.Buffered;
 with SPDX_Tool.Counter_Arrays;
 with SPDX_Tool.Licenses;
 with SPDX_Tool.Token_Counters;
@@ -31,8 +33,10 @@ procedure SPDX_Tool.Gentmpl is
    Idx      : License_Index := 0;
    Info     : SPDX_Tool.Token_Counters.Vectorizer_Type;
    Tokens   : Token_Maps.Map;
+   Output   : aliased Util.Streams.Files.File_Stream;
+   Writer   : aliased Util.Streams.Texts.Print_Stream;
 
-   function Increment (Value : in Natural) return Natural is
+   function Increment (Value : in Count_Type) return Count_Type is
    begin
       return Value + 1;
    end Increment;
@@ -75,20 +79,24 @@ procedure SPDX_Tool.Gentmpl is
       First : Buffer_Index;
       Len   : Buffer_Size;
    begin
-      while Pos <= Last loop
-         First := SPDX_Tool.Skip_Spaces (Buf.Data, Pos, Last);
-         exit when First > Last;
-
+      loop
+         loop
+            if Pos > Last then
+               return;
+            end if;
+            Len := SPDX_Tool.Punctuation_Length (Buf.Data, Pos, Last);
+            if Len = 0 then
+               Len := Space_Length (Buf.Data, Pos, Last);
+               exit when Len = 0;
+            end if;
+            Pos := Pos + Len;
+         end loop;
+         First := Pos;
          Pos := SPDX_Tool.Next_Space (Buf.Data, First, Last);
          if First <= Pos then
             Add_Token (Info, Idx, Buf.Data, First, Pos);
          end if;
          Pos := Pos + 1;
-         while Pos <= Last loop
-            Len := SPDX_Tool.Punctuation_Length (Buf.Data, Pos, Last);
-            exit when Len = 0;
-            Pos := Pos + Len;
-         end loop;
       end loop;
    end Split_Tokens;
 
@@ -123,29 +131,32 @@ procedure SPDX_Tool.Gentmpl is
       Row : Maps.Cursor := Info.Counters.Cells.Ceiling ((I, 1));
       Col : Natural := 0;
    begin
-      Ada.Text_IO.Put ("(");
+      Writer.Write ("(");
       while Maps.Has_Element (Row) loop
          declare
             K : constant Index_Type := Maps.Key (Row);
          begin
             exit when K.Row /= I;
             if Col > 80 then
-               Ada.Text_IO.Put_Line (",");
-               Ada.Text_IO.Put ("      ");
+               Writer.Write ("," & ASCII.LF);
+               Writer.Write ("      ");
                Col := 0;
             elsif Col > 0 then
-               Ada.Text_IO.Put (", ");
+               Writer.Write (", ");
             end if;
             Col := Col + 10;
-            Ada.Text_IO.Put ("(");
-            Ada.Text_IO.Put (Util.Strings.Image (Natural (K.Column)));
-            Ada.Text_IO.Put (",");
-            Ada.Text_IO.Put (Maps.Element (Row)'Image);
-            Ada.Text_IO.Put (")");
+            if K.Column > 1000 then
+               Col := Col + 2;
+            end if;
+            Writer.Write ("(");
+            Writer.Write (Util.Strings.Image (Natural (K.Column)));
+            Writer.Write (",");
+            Writer.Write (Maps.Element (Row)'Image);
+            Writer.Write (")");
          end;
          Maps.Next (Row);
       end loop;
-      Ada.Text_IO.Put_Line (");");
+      Writer.Write (");" & ASCII.LF);
    end Print_Token_Array;
 
    procedure Print_Token_Data is
@@ -155,58 +166,62 @@ procedure SPDX_Tool.Gentmpl is
       for Token of Tokens loop
          Len := Len + Token'Length;
       end loop;
-      Ada.Text_IO.Put ("   Tokens : constant Buffer_Type (1 ..");
-      Ada.Text_IO.Put (Len'Image);
-      Ada.Text_IO.Put (") := (");
+      Writer.Write ("   Tokens : constant Buffer_Type (1 ..");
+      Writer.Write (Len'Image);
+      Writer.Write (") := (");
       for Token of Tokens loop
          if Col > 0 then
-            Ada.Text_IO.Put_Line (",");
+            Writer.Write ("," & ASCII.LF);
          else
-            Ada.Text_IO.Put_Line ("");
+            Writer.Write ("" & ASCII.LF);
          end if;
-         Ada.Text_IO.Put ("      --  ");
-         Ada.Text_IO.Put_Line (To_String (To_UString (Token)));
+         Writer.Write ("      --  ");
+         Writer.Write (To_String (To_UString (Token)) & ASCII.LF);
          Col := 10;
          begin
-            Ada.Text_IO.Put ("     ");
+            Writer.Write ("     ");
             for C of Token loop
                if Col > 80 then
-                  Ada.Text_IO.Put_Line (",");
-                  Ada.Text_IO.Put ("     ");
+                  Writer.Write ("," & ASCII.LF);
+                  Writer.Write ("     ");
                   Col := 10;
                elsif Col > 10 then
-                  Ada.Text_IO.Put (",");
+                  Writer.Write (",");
                else
                   Col := 15;
                end if;
                Col := Col + 5;
-               Ada.Text_IO.Put (C'Image);
+               Writer.Write (C'Image);
             end loop;
          end;
       end loop;
-      Ada.Text_IO.Put_Line (");");
-      Ada.Text_IO.Put ("   Token_Pos : constant Position_Array := (");
+      Writer.Write (");" & ASCII.LF);
+      Writer.Write ("   Token_Pos : constant Position_Array := (");
       Col := 0;
       Len := 0;
       for Token of Tokens loop
          begin
             Len := Token'Length;
             if Col > 80 then
-               Ada.Text_IO.Put_Line (",");
-               Ada.Text_IO.Put ("      ");
+               Writer.Write ("," & ASCII.LF);
+               Writer.Write ("      ");
                Col := 0;
             elsif Col > 0 then
-               Ada.Text_IO.Put (",");
+               Writer.Write (",");
             end if;
             Col := Col + 5;
-            Ada.Text_IO.Put (Len'Image);
+            Writer.Write (Len'Image);
          end;
       end loop;
-      Ada.Text_IO.Put_Line (");");
+      Writer.Write (");" & ASCII.LF);
    end Print_Token_Data;
 
    Arg_Count : constant Natural := Ada.Command_Line.Argument_Count;
 begin
+   Output.Create
+     (Mode => Ada.Streams.Stream_IO.Out_File,
+      Name => "file.ads");
+   Writer.Initialize (Output'Unchecked_Access);
    Info.Counters.Default := 0;
    for I in 1 .. Arg_Count loop
       Scan (Ada.Command_Line.Argument (I));
@@ -240,18 +255,17 @@ begin
    --  and a right set which does not contain it.  Sometimes, it is possible
    --  that there is no such token and the leaf node will indicate several
    --  licenses.
-   Ada.Text_IO.Put_Line ("--  Generated by gendecisiontree.adb");
-   Ada.Text_IO.Put_Line ("--  Static license identification decision tree");
-   Ada.Text_IO.Put_Line ("--  Entire decision tree is stored in .rodata section");
-   Ada.Text_IO.Put_Line ("with SPDX_Tool.Licenses.Templates;");
-   Ada.Text_IO.Put_Line ("private package SPDX_Tool.Licenses.Templates is");
+   Writer.Write ("--  Generated by gendecisiontree.adb" & ASCII.LF);
+   Writer.Write ("--  Static license identification decision tree" & ASCII.LF);
+   Writer.Write ("--  Entire decision tree is stored in .rodata section" & ASCII.LF);
+   Writer.Write ("private package SPDX_Tool.Licenses.Templates is" & ASCII.LF);
    Print_Token_Data;
    for I in 0 .. Idx loop
-      Ada.Text_IO.Put ("   T" & Util.Strings.Image (Natural (I)) & " : aliased constant ");
-      Ada.Text_IO.Put_Line ("Token_Array :=");
-      Ada.Text_IO.Put ("      ");
+      Writer.Write ("   T" & Util.Strings.Image (Natural (I)) & " : aliased constant ");
+      Writer.Write ("Token_Array :=" & ASCII.LF);
+      Writer.Write ("      ");
       Print_Token_Array (I);
    end loop;
-   Ada.Text_IO.Put_Line ("   --  Count=" & Info.Last_Column'Image);
-   Ada.Text_IO.Put_Line ("end SPDX_Tool.Licenses.Templates;");
+   Writer.Write ("   --  Count=" & Info.Last_Column'Image & ASCII.LF);
+   Writer.Write ("end SPDX_Tool.Licenses.Templates;" & ASCII.LF);
 end SPDX_Tool.Gentmpl;
