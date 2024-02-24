@@ -106,6 +106,7 @@ package body SPDX_Tool.Licenses is
       BEGIN_OPTIONAL : constant String := "<<beginOptional>>";
       END_OPTIONAL   : constant String := "<<endOptional>>";
 
+      Last     : constant Buffer_Index := Content'Last;
       Pos      : Buffer_Index := From;
       First    : Buffer_Index;
       Tok      : Token_Kind;
@@ -115,6 +116,7 @@ package body SPDX_Tool.Licenses is
       procedure Next_Token (Token : out Token_Kind) is
          Match : Buffer_Index;
          Check : Buffer_Index := Pos;
+         Len   : Buffer_Size;
       begin
          while Check <= Content'Last loop
             if Content (Check) = Character'Pos ('<') then
@@ -140,9 +142,9 @@ package body SPDX_Tool.Licenses is
                   return;
                end if;
             elsif Check = Pos then
-               exit when Is_Space (Content (Check));
+               exit when Space_Length (Content, Check, Last) /= 0;
             else
-               exit when Is_Space_Or_Punctuation (Content (Check));
+               exit when Punctuation_Length (Content, Check, Last) /= 0;
             end if;
             Check := Check + 1;
          end loop;
@@ -299,6 +301,7 @@ package body SPDX_Tool.Licenses is
          Match    : Buffer_Index;
          --  Current  : constant Token_Access := Previous;
          Optional : Optional_Token_Access;
+         Len      : Buffer_Size;
       begin
          Optional := new Optional_Token_Type '(Len => 0,
                                                Previous => null,
@@ -308,10 +311,12 @@ package body SPDX_Tool.Licenses is
          Token := Optional.all'Access;
          while Pos <= Content'Last loop
 
-            --  Ignore white spaces betwen tokens.
-            while Is_Space (Content (Pos)) loop
-               Pos := Pos + 1;
-               if Pos > Content'Last then
+            --  Ignore white spaces between tokens.
+            loop
+               Len := Space_Length (Content, Pos, Last);
+               exit when Len = 0;
+               Pos := Pos + Len;
+               if Pos > Last then
                   Token := Optional.all'Access;
                   Append_Token (Token);
                   Previous := Token;
@@ -334,7 +339,7 @@ package body SPDX_Tool.Licenses is
             end if;
 
             First := Pos;
-            Pos := Next_Space (Content, Pos, Content'Last);
+            Pos := Next_Space (Content, Pos, Last);
             if Pos - First > END_OPTIONAL'Length then
                for I in First + 1 .. Pos loop
                   Match := Next_With (Content, I, END_OPTIONAL);
@@ -401,16 +406,19 @@ package body SPDX_Tool.Licenses is
          Append_Token (Token);
       end Finish;
 
+      Len  : Buffer_Size;
    begin
       --  <<beginOptional>>
       --  <<endOptional>>
       --  <<var...>>
-      while Pos <= Content'Last loop
+      while Pos <= Last loop
 
-         --  Ignore white spaces betwen tokens.
-         while Is_Space (Content (Pos)) loop
-            Pos := Pos + 1;
-            if Pos > Content'Last then
+         --  Ignore white spaces between tokens.
+         loop
+            Len := Space_Length (Content, Pos, Last);
+            exit when Len = 0;
+            Pos := Pos + Len;
+            if Pos > Last then
                Finish;
                return;
             end if;

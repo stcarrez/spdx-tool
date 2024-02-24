@@ -169,10 +169,14 @@ package body SPDX_Tool is
       Pos : Buffer_Index := First;
       Len : Buffer_Size;
    begin
-      if Pos < Last and then not Is_Space (Buffer (Pos))
-        and then not Is_Utf8_Special_3 (Buffer (Pos))
-      then
-         Pos := Pos + 1;
+      Len := Space_Length (Buffer, Pos, Last);
+      if Len = 0 then
+         Len := Punctuation_Length (Buffer, Pos, Last);
+         if Len > 0 then
+            Pos := Pos + Len;
+         else
+            Pos := Pos + 1;
+         end if;
       end if;
       while Pos < Last loop
          Len := Space_Length (Buffer, Pos, Last);
