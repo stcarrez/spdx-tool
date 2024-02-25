@@ -1,8 +1,27 @@
 <package>
 
+  <resource name='SPDX_Tool.Configs.Default'
+            format='string'
+	    var-access='true'
+	    content-only='true'
+	    no-type-declaration='true'
+            type='access constant String'>
+    <header>--  SPDX-License-Identifier: Apache-2.0</header>
+
+    <install mode='copy' strip-extension='yes'>
+      <fileset dir="share/spdx-tool">
+        <include name="default.toml"/>
+      </fileset>
+    </install>
+  </resource>
+
   <resource name='SPDX_Tool.Licenses.Files'
             format='binary'
             type='access constant Buffer_Type'
+	    content-only='true'
+	    name-access='true'
+	    list-access='true'
+	    no-type-declaration='true'
 	    index-type='License_Index'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
     <header>--  License templates extracted from https://github.com/spdx/license-list-data.git</header>
@@ -20,6 +39,9 @@
 
   <resource name='SPDX_Tool.Files.Extensions'
             format='map'
+	    name-access='true'
+	    list-access='true'
+	    no-type-declaration='true'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
     <header>--  Extensions mapping generated from extensions.json</header>
