@@ -22,6 +22,7 @@ spdx = "~0.2.0"
 ansiada = "^1.0.0"
 intl = "^1.0.1"
 printer_toolkitada = "~0.2.0"
+ada_toml = "~0.3.0"
 
 # [configuration]
 # disabled = true
