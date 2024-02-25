@@ -22,6 +22,7 @@ with PT.Colors;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Licenses.Manager;
 with SPDX_Tool.Reports;
+with SPDX_Tool.Configs;
 procedure SPDX_Tool.Main is
 
    package GC renames GNAT.Command_Line;
@@ -44,6 +45,7 @@ procedure SPDX_Tool.Main is
      Util.Log.Loggers.Create ("SPDX_Tool.Main");
 
    Command_Config    : GC.Command_Line_Configuration;
+   Tool_Config       : SPDX_Tool.Configs.Config_Type;
 
    procedure Setup is
       Default_Tasks : constant String := " (" & Util.Strings.Image (Opt_Tasks) & ")";
@@ -83,6 +85,11 @@ procedure SPDX_Tool.Main is
                         Switch => "-c",
                         Long_Switch => "--check",
                         Help   => -("Check and gather licenses used in source files"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Configs.Config_Path'Access,
+                        Long_Switch => "--config=",
+                        Argument => "PATH",
+                        Help   => -("Path of the spdx-tool configuration file"));
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Mimes'Access,
                         Switch => "-m",
@@ -250,6 +257,21 @@ procedure SPDX_Tool.Main is
       end if;
    end Read_Licenses;
 
+   procedure Load_Configuration is
+   begin
+      if Configs.Config_Path.all /= "" then
+         if not Ada.Directories.Exists (Configs.Config_Path.all) then
+            Log.Error (-("Configuration file '{0}' does not exist."),
+                       Configs.Config_Path.all);
+            Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+            raise GNAT.Command_Line.Exit_From_Command_Line;
+         end if;
+         Tool_Config.Read (Configs.Config_Path.all);
+      else
+         Tool_Config.Load_Default;
+      end if;
+   end Load_Configuration;
+
 begin
    Opt_Tasks := Integer (System.Multiprocessors.Number_Of_CPUs);
    Setup;
@@ -265,6 +287,7 @@ begin
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       return;
    end if;
+   Load_Configuration;
    if Opt_Identify then
       Opt_No_Color := True;
    end if;
@@ -341,7 +364,8 @@ begin
    end if;
 
 exception
-   when GNAT.Command_Line.Exit_From_Command_Line |
+   when SPDX_Tool.Configs.Error |
+        GNAT.Command_Line.Exit_From_Command_Line |
         GNAT.Command_Line.Invalid_Switch =>
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
