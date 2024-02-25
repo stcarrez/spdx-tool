@@ -21,7 +21,7 @@ build-tests:
 generate:
 	cd tools && alr build $(MAKE_ARGS)
 	bin/genlangmap tools/languages.json > tools/extensions.json
-	are --rule=are-package.xml -o src/generated --content-only --no-type-declaration --name-access --list-access .
+	are --rule=are-package.xml -o src/generated .
 	cd tools && alr build $(MAKE_ARGS)
 	bin/gendecisiontree > src/generated/spdx_tool-licenses-decisions.ads
 
