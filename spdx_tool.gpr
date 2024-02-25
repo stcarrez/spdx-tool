@@ -9,6 +9,7 @@ with "spdx_tool_config.gpr";
 with "printer_toolkitada";
 with "intl.gpr";
 with "magicada.gpr";
+with "ada_toml.gpr";
 project Spdx_Tool is
 
    type Yes_No is ("yes", "no");
