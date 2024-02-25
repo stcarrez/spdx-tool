@@ -110,15 +110,27 @@ private
       Started  : Boolean := False;
       Job      : Job_Type := READ_LICENSES;
       Stats    : License_Stats;
+
+      --  Filters to identify license files (ex: COPYING, LICENSE.txt, ...)
+      --  Filters to ignore files when looking at file headers.  The two filters
+      --  are configured from a configuration file.
+      License_Files_Filter : Util.Files.Walk.Filter_Type;
+      Ignore_Files_Filter  : Util.Files.Walk.Filter_Type;
+
+      --  Include/exclude licenses and languages.  These options are configured
+      --  from command line and affect how to produce reports and whether we
+      --  apply the update command.
+      Include_Filters      : Util.Strings.Sets.Set;
+      Exclude_Filters      : Util.Strings.Sets.Set;
+      Include_Languages    : Util.Strings.Sets.Set;
+      Exclude_Languages    : Util.Strings.Sets.Set;
+      Licenses             : License_Template;
+
+      Files    : SPDX_Tool.Infos.File_Map;
+
       Mgr_Idx  : Util.Concurrent.Counters.Counter;
       File_Mgr : File_Manager_Array (1 .. Count);
       Executor : Executor_Manager (Count);
-      Files    : SPDX_Tool.Infos.File_Map;
-      Include_Filters : Util.Strings.Sets.Set;
-      Exclude_Filters : Util.Strings.Sets.Set;
-      Include_Languages : Util.Strings.Sets.Set;
-      Exclude_Languages : Util.Strings.Sets.Set;
-      Licenses : License_Template;
    end record;
 
    function Find_License (Manager : in License_Manager;
