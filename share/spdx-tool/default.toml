@@ -1,0 +1,28 @@
+# Default configuration
+[default]
+color="yes"
+ignore=[
+"*.o",
+"*.a",
+"*.so",
+"*.lib",
+"*.md",
+"*.log",
+"*.pem",
+"*.txt"
+]
+
+[license-files]
+MIT=[ "MIT.txt", "MIT-LICENSE.txt", "LICENSE.txt" ]
+GPL-3=[ "COPYING3", "COPYING3.LIB" ]
+GPL-2=[ "COPYING", "COPYING.LIB", "GPL-LICENSE.txt" ]
+Apache-2= [ "LICENSE", "LICENSE.txt" ]
+
+[languages]
+Markdown=[ "*.md" ]
+Makefile=[ "Makefile", "Imakefile" ]
+
+[comments]
+Makefile="shell"
+Markdown="none"
+
