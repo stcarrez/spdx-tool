@@ -19,13 +19,15 @@ package SPDX_Tool.Infos is
                    return String is (Util.Strings.Image (Natural (Line)));
 
    --  Identifies the license implementation found:
+   --  - LICENSE_FILE means the file corresponds to a license file,
    --  - SPDX_LICENSE indicates we found a license tag (strongest identification),
    --  - the TEMPLATE_LICENSE means we found a match in some license template,
    --  - the GUESSED_LICENSE means no exact match was found but some similarities exists,
    --  - the UNKNOWN_LICENSE means we found some header comment but didn't match
    --    any license.
    --  - NONE indicates there was no comment holding any license.
-   type License_Kind is (SPDX_LICENSE,
+   type License_Kind is (LICENSE_FILE,
+                         SPDX_LICENSE,
                          TEMPLATE_LICENSE,
                          GUESSED_LICENSE,
                          UNKNOWN_LICENSE,
