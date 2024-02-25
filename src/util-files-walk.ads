@@ -74,6 +74,16 @@ package Util.Files.Walk is
    type Filter_Context_Type is limited private;
 
    --  Called when a directory is found during a directory tree walk.
+   --  The default implementation checks for a configuration file to ignore
+   --  files (a .gitignore) and builds a new filter to scan the sub-tree.
+   --  Once the filter is created, it calls Scan_Directory to proceed with
+   --  the scan.
+   procedure Scan_Subdir (Walker  : in out Walker_Type;
+                          Path    : String;
+                          Filter  : Filter_Context_Type) with
+     Pre => Path'Length > 0 and then Ada.Directories.Exists (Path);
+
+   --  Called by Scan_Subdir when a directory was found.
    --  The default implementation scans the directory for files and directories
    --  matching the filter.  It can be overriden to implement specific
    --  behaviors.
@@ -158,6 +168,10 @@ private
 
    function Match (Filter : Filter_Info_Type;
                    Name   : String) return Pattern_Access;
+   function Match (Pattern : Pattern_Access;
+                   Name    : String) return Pattern_Access;
+   function Match_Sibling (Filter : access Filter_Info_Type;
+                           Name   : String) return Pattern_Access;
 
    type Filter_Context_Type is limited record
       Filter  : access Filter_Info_Type;
@@ -170,9 +184,5 @@ private
    end record;
 
    type Walker_Type is limited new AF.Limited_Controlled with null record;
-
-   procedure Scan (Walker  : in out Walker_Type;
-                   Path    : String;
-                   Filter  : Filter_Context_Type);
 
 end Util.Files.Walk;
