@@ -28,8 +28,26 @@ package body SPDX_Tool.Licenses.Manager is
 
    --  Configure the license manager.
    procedure Configure (Manager : in out License_Manager;
+                        Config  : in SPDX_Tool.Configs.Config_Type;
                         Job     : in Job_Type) is
+      procedure Set_Ignore (Pattern : in String) is
+      begin
+         if Pattern'Length > 0 then
+            if Pattern (Pattern'First) = '!' then
+               Log.Debug ("Include pattern {0}",
+                          Pattern (Pattern'First + 1 .. Pattern'Last));
+               Manager.Ignore_Files_Filter.Include
+                 (Pattern (Pattern'First + 1 .. Pattern'Last));
+            else
+               Log.Debug ("Exclude pattern {0}", Pattern);
+               Manager.Ignore_Files_Filter.Exclude (Pattern);
+            end if;
+         end if;
+      end Set_Ignore;
    begin
+      Configs.Configure (Config,
+                         Configs.Names.IGNORE,
+                         Set_Ignore'Access);
       if not Manager.Started then
          if Opt_Mimes then
             for I in Manager.File_Mgr'Range loop

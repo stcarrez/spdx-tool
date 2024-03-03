@@ -4,9 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
-with Ada.Containers.Indefinite_Ordered_Maps;
 with GNAT.Strings;
-with Util.Strings;
 with TOML;
 
 package SPDX_Tool.Configs is
@@ -20,8 +18,9 @@ package SPDX_Tool.Configs is
    end Sections;
 
    package Names is
-      COLOR           : constant String := "color";
-      IGNORE          : constant String := "ignore";
+      COLOR               : constant String := "color";
+      IGNORE              : constant String := "ignore";
+      NO_BUILTIN_LICENSES : constant String := "no-builtin-licenses";
    end Names;
 
    Config_Path     : aliased GNAT.Strings.String_Access;
@@ -36,10 +35,15 @@ package SPDX_Tool.Configs is
    procedure Read (Into : in out Config_Type;
                    Path : in String);
 
+   procedure Configure (From    : in Config_Type;
+                        Name    : in String;
+                        Process : not null access procedure (Value : in String));
+
 private
 
    type Config_Type is tagged limited record
-      Main : TOML.TOML_Value;
+      Main    : TOML.TOML_Value;
+      Default : TOML.TOML_Value;
    end record;
 
 end SPDX_Tool.Configs;

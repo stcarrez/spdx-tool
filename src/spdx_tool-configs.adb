@@ -5,10 +5,13 @@
 -----------------------------------------------------------------------
 
 with Util.Log.Loggers;
+with Util.Strings;
 with TOML.File_IO;
 with TOML.Generic_Parse;
 with SPDX_Tool.Configs.Default;
 package body SPDX_Tool.Configs is
+
+   use type TOML.Any_Value_Kind;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Configs");
@@ -19,15 +22,19 @@ package body SPDX_Tool.Configs is
 
    procedure Get (Stream : in out Default_Input_Stream;
                   EOF    : out Boolean;
+                  Byte   : out Character);
+
+   procedure Get (Stream : in out Default_Input_Stream;
+                  EOF    : out Boolean;
                   Byte   : out Character) is
    begin
-      if Stream.Pos >= SPDX_Tool.Configs.Default.Default'Last then
+      if Stream.Pos >= SPDX_Tool.Configs.Default.default'Last then
          EOF := True;
          Byte := ' ';
       else
          Stream.Pos := Stream.Pos + 1;
          EOF := False;
-         Byte := SPDX_Tool.Configs.Default.Default (Stream.Pos);
+         Byte := SPDX_Tool.Configs.Default.default (Stream.Pos);
       end if;
    end Get;
 
@@ -52,6 +59,9 @@ package body SPDX_Tool.Configs is
                     To_String (Result.Message));
       else
          Into.Main := Result.Value;
+         if Into.Main.Has (Sections.DEFAULT) then
+            Into.Default := Into.Main.Get (Sections.DEFAULT);
+         end if;
       end if;
    end Load_Default;
 
@@ -61,7 +71,7 @@ package body SPDX_Tool.Configs is
    begin
       Log.Info ("Reading configuration file '{0}'", Path);
       declare
-         Result : TOML.Read_Result := TOML.File_IO.Load_File (Path);
+         Result : constant TOML.Read_Result := TOML.File_IO.Load_File (Path);
       begin
          if not Result.Success then
             Log.Error (-("Invalid configuration file:"), Path);
@@ -72,7 +82,39 @@ package body SPDX_Tool.Configs is
             raise Error;
          end if;
          Into.Main := Result.Value;
+         if Into.Main.Has (Sections.DEFAULT) then
+            Into.Default := Into.Main.Get (Sections.DEFAULT);
+         end if;
       end;
    end Read;
+
+   procedure Configure (From    : in Config_Type;
+                        Name    : in String;
+                        Process : not null access procedure (Value : in String)) is
+      Value : TOML.TOML_Value;
+   begin
+      Log.Debug ("Configure with {0}", Name);
+
+      if not From.Default.Has (Name) then
+         return;
+      end if;
+
+      Value := From.Default.Get (Name);
+      if Value.Kind = TOML.TOML_String then
+         Process (Value.As_String);
+      elsif Value.Kind = TOML.TOML_Array then
+         declare
+            Len  : constant Natural := TOML.Length (Value);
+            Item : TOML.TOML_Value;
+         begin
+            for I in 1 .. Len loop
+               Item := TOML.Item (Value, I);
+               if Item.Kind = TOML.TOML_String then
+                  Process (Item.As_String);
+               end if;
+            end loop;
+         end;
+      end if;
+   end Configure;
 
 end SPDX_Tool.Configs;

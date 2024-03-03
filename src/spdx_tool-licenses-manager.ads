@@ -10,6 +10,7 @@ with Util.Files.Walk;
 with Util.Strings.Sets;
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
+with SPDX_Tool.Configs;
 private with Util.Executors;
 private with Util.Concurrent.Counters;
 package SPDX_Tool.Licenses.Manager is
@@ -23,6 +24,7 @@ package SPDX_Tool.Licenses.Manager is
 
    --  Configure the license manager.
    procedure Configure (Manager : in out License_Manager;
+                        Config  : in SPDX_Tool.Configs.Config_Type;
                         Job     : in Job_Type);
 
    --  Load the license templates defined in the directory for the license

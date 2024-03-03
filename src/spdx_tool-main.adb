@@ -33,6 +33,7 @@ procedure SPDX_Tool.Main is
 
    subtype License_Manager is SPDX_Tool.Licenses.Manager.License_Manager;
 
+   procedure Load_Configuration;
    procedure Setup;
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map);
    procedure Save_Report (Files : in SPDX_Tool.Infos.File_Map);
@@ -243,7 +244,7 @@ procedure SPDX_Tool.Main is
                             Path    : in String) is
       Filter : Util.Files.Walk.Filter_Type;
    begin
-      Manager.Configure (Licenses.Manager.LOAD_LICENSES);
+      Manager.Configure (Tool_Config, Licenses.Manager.LOAD_LICENSES);
       Filter.Include ("*.jsonld");
       Filter.Include ("*.txt");
       Filter.Exclude ("*");
@@ -327,9 +328,9 @@ begin
          Read_Licenses (Manager, Licenses.License_Dir.all);
       end if;
       if Opt_Update then
-         Manager.Configure (Licenses.Manager.UPDATE_LICENSES);
+         Manager.Configure (Tool_Config, Licenses.Manager.UPDATE_LICENSES);
       else
-         Manager.Configure (Licenses.Manager.READ_LICENSES);
+         Manager.Configure (Tool_Config, Licenses.Manager.READ_LICENSES);
       end if;
       Filter.Exclude (".git");
       loop
