@@ -150,12 +150,19 @@ package body SPDX_Tool.Licenses.Manager is
    procedure Scan_File (Manager : in out License_Manager;
                         Path    : in String) is
       use SPDX_Tool.Infos;
+      use type Util.Files.Walk.Filter_Result;
       Job   : License_Job_Type;
       Count : Natural;
       First : Natural;
+      Filter : Util.Files.Walk.Filter_Result;
    begin
-      Log.Info ("Scan file {0}", Path);
+      Filter := Manager.Ignore_Files_Filter.Match (Path);
+      if Filter = Util.Files.Walk.Excluded then
+         Log.Info ("Excluded file {0}", Path);
+         return;
+      end if;
 
+      Log.Info ("Scan file {0}", Path);
       case Manager.Job is
          when LOAD_LICENSES =>
             Manager.Load_License (Path);
