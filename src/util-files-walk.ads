@@ -16,11 +16,48 @@ private with GNAT.Regexp;
 --  `.gitignore` file.  The package defines the `Filter_Type` tagged type
 --  to represent and control the exclusion or inclusion filters and a second
 --  tagged type `Walker_Type` to walk the directory tree.
+--
+--  The `Filter_Type` provides two operations to add patterns in the filter
+--  and one operation to check against a path whether it matches a pattern.
+--  A pattern can contain fixed paths, wildcards or regular expressions.
+--  Similar to `.gitignore` rules, a pattern which starts with a `/` will
+--  define a pattern that must match the complete path.  Otherwise, the pattern
+--  is a recursive pattern.  Example of pattern setup:
+--
+--     Filter : Util.Files.Walk.Filter_Type;
+--     ...
+--     Filter.Exclude ("*.o");
+--     Filter.Exclude ("/alire/");
+--     Filter.Include ("/docs/*");
+--
+--  The `Match` function looks in the filter for a match.  The path could be
+--  included, excluded or not found.  For example, the following paths will
+--  match:
+--
+--  | Operation                    | Result         |
+--  | ---------------------------- | -------------- |
+--  | Filter.Match ("test.o")      | Walk.Excluded  |
+--  | Filter.Match ("test.a")      | Walk.Not_Found |
+--  | Filter.Match ("docs/test.o") | Walk.Included  |
+--  | Filter.Match ("alire/")      | Walk.Included  |
+--  | Filter.Match ("test/alire")  | Walk.Not_Found |
+--
+--  To scan a directory tree, the `Walker_Type` must have some of its operations
+--  overriden:
+--
+--  * The `Scan_File` should be overriden to be notified when a file is found
+--    and handle it.
+--  * The `Scan_Directory` should be overriden to be notified when a directory
+--    is entered.
+--  * The `Get_Ignore_Path` is called when entering a new directory.  It can
+--    be overriden to indicate a path of a file which contains some patterns
+--    to be ignored (ex: the `.gitignore` file).
 package Util.Files.Walk is
 
    package AF renames Ada.Finalization;
 
    type Filter_Type is limited new AF.Limited_Controlled with private;
+   type Filter_Result is (Not_Found, Included, Excluded);
 
    --  Add a new pattern to include files or directories in the walk.
    procedure Include (Filter  : in out Filter_Type;
@@ -31,6 +68,10 @@ package Util.Files.Walk is
    procedure Exclude (Filter  : in out Filter_Type;
                       Pattern : String) with
      Pre => Pattern'Length > 0;
+
+   --  Check if a path matches the included or excluded patterns.
+   function Match (Filter : in Filter_Type;
+                   Path   : in String) return Filter_Result;
 
    overriding
    procedure Finalize (Filter : in out Filter_Type);
@@ -139,7 +180,13 @@ private
    function Is_Matched (Pattern : Pattern_Type;
                         Name    : String) return Boolean is (Pattern.Wildcard);
 
-   type Name_Pattern_Type (Len : Positive) is new Pattern_Type with record
+   function Is_Pattern (Pattern : Pattern_Type;
+                        Name    : String) return Boolean is (False);
+
+   function Find_Pattern (Node : in Pattern_Access;
+                          Name : in String) return Pattern_Access;
+
+   type Name_Pattern_Type (Len : Natural) is new Pattern_Type with record
       Name : String (1 .. Len);
    end record;
 
@@ -147,6 +194,10 @@ private
    function Is_Matched (Pattern : Name_Pattern_Type;
                         Name    : String)
                         return Boolean is (Pattern.Name = Name);
+
+   overriding
+   function Is_Pattern (Pattern : Name_Pattern_Type;
+                        Name    : String) return Boolean is (Pattern.Name = Name);
 
    type Regex_Pattern_Type is new Pattern_Type with record
       Regex : GNAT.Regexp.Regexp;
