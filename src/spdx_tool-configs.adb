@@ -167,6 +167,8 @@ package body SPDX_Tool.Configs is
    procedure Configure (From    : in Config_Type;
                         Process : not null access
                          procedure (Config : in Language_Configuration)) is
+      procedure Configure_Language (Name  : in String;
+                                    Table : in TOML.TOML_Value);
 
       procedure Configure_Language (Name  : in String;
                                     Table : in TOML.TOML_Value) is

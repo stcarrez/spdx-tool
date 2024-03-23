@@ -201,7 +201,7 @@ package body Util.Files.Walk is
          begin
             if Name /= "." and then Name /= ".." then
                declare
-                  Result : Filter_Result := Match (Filter, Name);
+                  Result : constant Filter_Result := Match (Filter, Name);
                begin
                   --  Log.Debug ("{0} => {1}",
                   --             AD.Full_Name (Ent), Result.Match'Image);

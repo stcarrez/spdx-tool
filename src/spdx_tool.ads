@@ -29,9 +29,13 @@ package SPDX_Tool is
 
    subtype UString is Ada.Strings.Unbounded.Unbounded_String;
 
-   function To_UString (S : String) return UString renames Ada.Strings.Unbounded.To_Unbounded_String;
-   function To_String (S : UString) return String renames Ada.Strings.Unbounded.To_String;
-   function Length (S : UString) return Natural renames Ada.Strings.Unbounded.Length;
+   function To_UString (S : String) return UString
+      renames Ada.Strings.Unbounded.To_Unbounded_String;
+   function To_String (S : UString) return String
+      renames Ada.Strings.Unbounded.To_String;
+   function Length (S : UString) return Natural
+      renames Ada.Strings.Unbounded.Length;
+
    function To_Buffer (S : UString) return Buffer_Type;
 
    function "-" (M : in String) return String renames Intl."-";

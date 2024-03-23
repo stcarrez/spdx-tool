@@ -25,10 +25,14 @@ package body SPDX_Tool.Licenses.Manager is
 
    File_Mgr : SPDX_Tool.Files.File_Manager_Access := null with Thread_Local_Storage;
 
+   --  ------------------------------
    --  Configure the license manager.
+   --  ------------------------------
    procedure Configure (Manager : in out License_Manager;
                         Config  : in SPDX_Tool.Configs.Config_Type;
                         Job     : in Job_Type) is
+      procedure Set_Ignore (Pattern : in String);
+
       procedure Set_Ignore (Pattern : in String) is
       begin
          if Pattern'Length > 0 then
@@ -333,7 +337,8 @@ package body SPDX_Tool.Licenses.Manager is
       Result := Manager.Find_License (Data);
       File.License := Result.Info;
       if Opt_Print then
-         File.Text := SPDX_Tool.Languages.Extract_License (Data.Lines, Data.Buffer.Value.Data, File.License);
+         File.Text := SPDX_Tool.Languages.Extract_License
+            (Data.Lines, Data.Buffer.Value.Data, File.License);
       end if;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE | Infos.GUESSED_LICENSE
       then
@@ -387,8 +392,6 @@ package body SPDX_Tool.Licenses.Manager is
             end;
          end if;
          declare
-            use SPDX_Tool.Files;
-
             Cmt_Count : Natural := 0;
          begin
             for I in Data.Lines'Range loop

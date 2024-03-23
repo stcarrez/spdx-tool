@@ -288,6 +288,8 @@ package body SPDX_Tool.Reports is
    procedure Print_Identify (Printer : in out PT.Printer_Type'Class;
                              Styles  : in Style_Configuration;
                              Files   : in SPDX_Tool.Infos.File_Map) is
+      pragma Unreferenced (Styles);
+
       Visible_Files : constant Natural := Visible_File_Count (Files);
       Writer        : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
    begin

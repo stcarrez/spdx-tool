@@ -5,11 +5,7 @@
 -----------------------------------------------------------------------
 
 with Ada.Unchecked_Deallocation;
-with Util.Log.Loggers;
 package body Util.Files.Filters is
-
-   Log : constant Util.Log.Loggers.Logger :=
-     Util.Log.Loggers.Create ("Util.Files.Filters");
 
    procedure Free is
      new Ada.Unchecked_Deallocation (Object => Element_Type,
@@ -22,6 +18,7 @@ package body Util.Files.Filters is
                                      Path      : in String) return Pattern_Access;
    function Match_Pattern (Root : in Pattern_Access;
                            Path : in String) return Pattern_Access;
+   function Get_Result (Pattern : in Pattern_Access) return Filter_Result;
 
    function Get_Value (Result : in Filter_Result) return Element_Type is
    begin
