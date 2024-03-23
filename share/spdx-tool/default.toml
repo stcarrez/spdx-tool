@@ -9,7 +9,8 @@ ignore=[
 "*.md",
 "*.log",
 "*.pem",
-"*.txt"
+"*.txt",
+"*~"
 ]
 
 [license-files]
@@ -23,6 +24,8 @@ Markdown=[ "*.md" ]
 Makefile=[ "Makefile", "Imakefile" ]
 
 [comments]
-Makefile="shell"
-Markdown="none"
+Shell={ start="#" }
+Ada={ start="--" }
+C={ block-start="/*", block-end="*/" }
+
 
