@@ -40,6 +40,14 @@ package body SPDX_Tool is
       Util.Log.Loggers.Initialize (Log_Config);
    end Configure_Logs;
 
+   function To_Buffer (S : UString) return Buffer_Type is
+      Result : String := To_String (S);
+      Data   : Buffer_Type (Buffer_Index (Result'First) .. Buffer_Index (Result'Last));
+      for Data'Address use Result'Address;
+   begin
+      return Data;
+   end To_Buffer;
+
    --  ------------------------------
    --  Check if there is a space in the buffer starting at `First` position
    --  and return its length.  Returns 0 when there is no space.
@@ -174,11 +182,13 @@ package body SPDX_Tool is
          Len := Punctuation_Length (Buffer, Pos, Last);
          if Len > 0 then
             Pos := Pos + Len;
+         elsif Pos = Last then
+            return Pos;
          else
             Pos := Pos + 1;
          end if;
       end if;
-      while Pos < Last loop
+      while Pos <= Last loop
          Len := Space_Length (Buffer, Pos, Last);
          if Len > 0 then
             return Pos - 1;
@@ -190,7 +200,7 @@ package body SPDX_Tool is
             Pos := Pos + 1;
          end if;
       end loop;
-      return Pos;
+      return Pos - 1;
    end Next_Space;
 
    --  ------------------------------
