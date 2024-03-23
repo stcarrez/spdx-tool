@@ -4,452 +4,81 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Streams.Stream_IO;
-with Ada.Directories;
 
 with Util.Log.Loggers;
 with Util.Files;
-with Util.Strings;
-with SPDX_Tool.Files.Extensions;
 package body SPDX_Tool.Files is
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Files");
 
-   use type Infos.License_Kind;
+   use type SPDX_Tool.Languages.Analyzer_Access;
 
-   procedure Find_Comment (Buffer : in Buffer_Type;
-                           From   : in Buffer_Index;
-                           Last   : in Buffer_Index;
-                           Result : out Comment_Info);
-   function Find_End_Comment (Buffer   : in Buffer_Type;
-                              From     : in Buffer_Index;
-                              Last     : in Buffer_Index;
-                              Language : in Language_Type) return Buffer_Index;
-
-   Line_Comments : constant Language_Array :=
-     ((Style         => ADA_COMMENT,
-       Comment_Start => Create_Buffer ("--"),
-       Comment_End   => Null_Buffer,
-       Is_Block      => False),
-      (Style         => CPP_COMMENT,
-       Comment_Start => Create_Buffer ("//"),
-       Comment_End   => Null_Buffer,
-       Is_Block      => False),
-      (Style         => SHELL_COMMENT,
-       Comment_Start => Create_Buffer ("#"),
-       Comment_End   => Null_Buffer,
-       Is_Block      => False),
-      (Style         => LATEX_COMMENT,
-       Comment_Start => Create_Buffer ("%%"),
-       Comment_End   => Null_Buffer,
-       Is_Block      => False),
-      (Style         => LATEX_COMMENT,
-       Comment_Start => Create_Buffer ("%"),
-       Comment_End   => Null_Buffer,
-       Is_Block      => False)
-     );
-
-   Block_Comments : constant Language_Array :=
-     ((Style         => C_COMMENT,
-       Comment_Start => Create_Buffer ("/*"),
-       Comment_End   => Create_Buffer ("*/"),
-       Is_Block      => True),
-      (Style         => XML_COMMENT,
-       Comment_Start => Create_Buffer ("<!--"),
-       Comment_End   => Create_Buffer ("-->"),
-       Is_Block      => True),
-      (Style         => OCAML_COMMENT,
-       Comment_Start => Create_Buffer ("(*"),
-       Comment_End   => Create_Buffer ("*)"),
-       Is_Block      => True)
-     );
-
-   function Block_Comment_Length (Index : Comment_Index) return Buffer_Size is
-     (Block_Comments (Index).Comment_Start.Value.Len
-      + Block_Comments (Index).Comment_End.Value.Len);
-
-   procedure Find_Comment (Buffer : in Buffer_Type;
-                           From   : in Buffer_Index;
-                           Last   : in Buffer_Index;
-                           Result : out Comment_Info) is
-      Pos : Buffer_Index := From;
-   begin
-      --  Look first for a line comment
-      for Index in Line_Comments'Range loop
-         declare
-            Comment : Language_Type renames Line_Comments (Index);
-            Cmt : constant Buffer_Accessor := Comment.Comment_Start.Value;
-         begin
-            if From + Cmt.Len <= Last
-              and then Buffer (From .. From + Cmt.Len - 1) = Cmt.Data
-            then
-               Result := (Style   => Comment.Style,
-                          Start   => From + Cmt.Len,
-                          Last    => From,
-                          Head    => From,
-                          Text_Start => From + Cmt.Len,
-                          Text_Last  => Skip_Backward_Spaces (Buffer, From, Last),
-                          Trailer => 0,
-                          Length  => 0,
-                          Index   => Index,
-                          Mode    => LINE_COMMENT,
-                          Boxed   => False);
-               return;
-            end if;
-         end;
-      end loop;
-      while Pos <= Last loop
-         for Index in Block_Comments'Range loop
-            declare
-               Comment : Language_Type renames Block_Comments (Index);
-               Cmt : constant Buffer_Accessor := Comment.Comment_Start.Value;
-            begin
-               if Pos + Cmt.Len <= Last
-                  and then Buffer (Pos .. Pos + Cmt.Len - 1) = Cmt.Data
-               then
-                  Result := (Style   => Comment.Style,
-                             Start   => From + Cmt.Len,
-                             Last    => From,
-                             Head    => From,
-                             Text_Start => From + Cmt.Len,
-                             Text_Last  => Skip_Backward_Spaces (Buffer, From, Last),
-                             Trailer => 0,
-                             Length  => 0,
-                             Index   => Index,
-                             Mode    => START_COMMENT,
-                             Boxed   => False);
-                  return;
-               end if;
-            end;
-         end loop;
-         Pos := Pos + 1;
-      end loop;
-      Result := (NO_COMMENT, others => <>);
-   end Find_Comment;
-
-   function Find_End_Comment (Buffer   : in Buffer_Type;
-                              From     : in Buffer_Index;
-                              Last     : in Buffer_Index;
-                              Language : in Language_Type) return Buffer_Index is
-      Cmt : constant Buffer_Accessor := Language.Comment_End.Value;
-      Pos : Buffer_Index := From;
-   begin
-      while Pos <= Last loop
-         if Pos + Cmt.Len <= Last
-            and then Buffer (Pos .. Pos + Cmt.Len - 1) = Cmt.Data
-         then
-            return Pos + Cmt.Len - 1;
-         end if;
-         Pos := Pos + 1;
-      end loop;
-      return From;
-   end Find_End_Comment;
-
-   function Get_Language_From_Extension (Path : in String) return String is
-      Ext  : constant String := Ada.Directories.Extension (Path);
-      Kind : access constant String := Extensions.Get_Mapping (Ext);
-   begin
-      if Kind /= null then
-         return Kind.all;
-      end if;
-      if Kind = null and then Util.Strings.Ends_With (Ext, "~") then
-         Kind := Extensions.Get_Mapping (Ext (Ext'First .. Ext'Last - 1));
-      end if;
-      if Kind /= null then
-         return Kind.all;
-      end if;
-      return "";
-   end Get_Language_From_Extension;
-
+   --  ------------------------------
    --  Identify the language used by the given file.
-   procedure Find_Language (Manager : in File_Manager;
-                            File     : in out File_Type;
-                            Path     : in String) is
-      Len      : constant Buffer_Size := File.Last_Offset;
-      Language : constant String := Get_Language_From_Extension (Path);
+   --  ------------------------------
+   procedure Find_Mime_Type (Manager : in File_Manager;
+                             File    : in out SPDX_Tool.Infos.File_Info;
+                             Buffer  : in Buffer_Type) is
    begin
-      if Language'Length > 0 then
-         File.Language := To_UString (Language);
-      elsif Len = 0 then
-         File.Language := To_UString ("Empty file");
-         return;
-      end if;
-      if Len > 0 and then Manager.Magic_Manager.Is_Initialized then
+      if Buffer'Length > 0 and then Manager.Magic_Manager.Is_Initialized then
          declare
-            Buf  : constant Buffer_Accessor := File.Buffer.Value;
             Mime : constant String
-              := Manager.Magic_Manager.Identify (Buf.Data (Buf.Data'First .. Len));
+              := Manager.Magic_Manager.Identify (Buffer);
          begin
-            File.Ident.Mime := To_UString (Mime);
-            if Language'Length = 0 then
-               if Util.Strings.Starts_With (Mime, "text/") then
-                  if Util.Strings.Starts_With (Mime, "text/x-shellscript") then
-                     File.Language := To_UString ("Shell");
-                  elsif Util.Strings.Starts_With (Mime, "text/x-m4") then
-                     File.Language := To_UString ("M4");
-                  elsif Util.Strings.Starts_With (Mime, "text/x-makefile") then
-                     File.Language := To_UString ("Makefile");
-                  elsif Util.Strings.Starts_With (Mime, "text/xml") then
-                     File.Language := To_UString ("XML");
-                  else
-                     File.Language := To_UString ("Text file");
-                  end if;
-               elsif Util.Strings.Starts_With (Mime, "image/") then
-                  File.Language := To_UString ("Image");
-               elsif Util.Strings.Starts_With (Mime, "video/") then
-                  File.Language := To_UString ("Video");
-               elsif Util.Strings.Starts_With (Mime, "application/pdf") then
-                  File.Language := To_UString ("PDF");
-               elsif Util.Strings.Starts_With (Mime, "application/zip") then
-                  File.Language := To_UString ("ZIP");
-               elsif Util.Strings.Starts_With (Mime, "application/x-tar") then
-                  File.Language := To_UString ("TAR");
-               end if;
-            end if;
+            File.Mime := To_UString (Mime);
          end;
       end if;
 
    exception
       when others =>
-         Log.Error (-("cannot identify mime type for '{0}'"), Path);
-   end Find_Language;
+         Log.Error (-("cannot identify mime type for '{0}'"), File.Path);
+   end Find_Mime_Type;
 
-   procedure Open (Manager  : in File_Manager;
-                   File     : in out File_Type;
-                   Path     : in String) is
+   --  ------------------------------
+   --  Open the file and read the first data block (4K) to identify the
+   --  language and comment headers.
+   --  ------------------------------
+   procedure Open (Manager   : in File_Manager;
+                   Data      : in out File_Type;
+                   File      : in out SPDX_Tool.Infos.File_Info;
+                   Languages : in SPDX_Tool.Languages.Language_Manager) is
    begin
-      Log.Debug ("Open file {0}", Path);
+      Log.Debug ("Open file {0}", File.Path);
 
-      File.File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
-      File.Buffer := Create_Buffer (4096);
-      File.Count := 0;
-      File.Cmt_Style := NO_COMMENT;
+      Data.File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => File.Path);
+      Data.Buffer := Create_Buffer (4096);
+      Data.Count := 0;
       declare
-         Buf     : constant Buffer_Accessor := File.Buffer.Value;
-         Len     : Buffer_Size;
-         Pos     : Buffer_Index := Buf.Data'First;
-         First   : Buffer_Index;
-         Last    : Buffer_Index;
-         Line_No : Infos.Line_Count := 0;
-         Style   : Comment_Info := (NO_COMMENT, Mode => NO_COMMENT, others => <>);
+         Buf      : constant Buffer_Accessor := Data.Buffer.Value;
+         Analyzer : SPDX_Tool.Languages.Analyzer_Access;
+         Len      : Buffer_Size;
       begin
-         File.File.Read (Into => Buf.Data, Last => Len);
-         File.Last_Offset := Len;
-         Manager.Find_Language (File, Path);
-         while Pos <= Len loop
-            First := Pos;
-            Line_No := Line_No + 1;
-            File.Lines (Line_No).Line_Start := First;
-            Pos := Find_Eol (Buf.Data (Pos .. Len), Pos);
-            if Style.Mode in START_COMMENT | BLOCK_COMMENT then
-               Style.Start := First;
-               Style.Text_Start := First;
-               Style.Text_Last := Pos - 1;
-               Last := Find_End_Comment (Buf.Data, First, Pos, Block_Comments (Style.Index));
-               if Last > First then
-                  Style.Mode := END_COMMENT;
-                  Style.Trailer := Block_Comments (Style.Index).Comment_End.Value.Len;
-                  Style.Text_Last := Last - Style.Trailer;
-               else
-                  Style.Mode := BLOCK_COMMENT;
-                  Last := Pos;
+         Data.File.Read (Into => Buf.Data, Last => Len);
+         Data.Last_Offset := Len;
+         Manager.Find_Mime_Type (File, Buf.Data (Buf.Data'First .. Len));
+         Languages.Find_Language (File, Buf.Data (Buf.Data'First .. Len), Analyzer);
+         if Analyzer /= null then
+            Analyzer.all.Find_Comments (Buf.Data (Buf.Data'First .. Len), Data.Lines, Data.Count);
+            for Line of Data.Lines (1 .. Data.Count) loop
+               if Line.Style.Mode /= NO_COMMENT then
+                  Data.Cmt_Style := Line.Style.Mode;
+                  exit;
                end if;
-               if First < Last then
-                  First := Skip_Presentation (Buf.Data, First, Last);
-                  Style.Start := First;
-                  Style.Text_Start := First;
-               end if;
-            else
-               Find_Comment (Buf.Data, First, Pos, Style);
-               if Style.Mode = START_COMMENT then
-                  Last := Find_End_Comment (Buf.Data, First, Pos, Block_Comments (Style.Index));
-                  if Last > First then
-                     Style.Mode := LINE_BLOCK_COMMENT;
-                     Style.Trailer := Block_Comments (Style.Index).Comment_End.Value.Len;
-                     Style.Text_Last := Last - Style.Trailer;
-                  end if;
-               end if;
-            end if;
-            if Style.Text_Last < Style.Text_Start then
-               Style.Text_Last := Style.Text_Start - 1;
-            end if;
-            Style.Length := Printable_Length (Buf.Data, First, Pos);
-            File.Lines (Line_No).Style := Style;
-            if Style.Style /= NO_COMMENT then
-               File.Lines (Line_No).Comment := Style.Mode;
-               File.Lines (Line_No).Style.Last := Pos - 1;
-               if File.Cmt_Style = NO_COMMENT then
-                  File.Cmt_Style := Style.Style;
-               end if;
-               Extract_Line_Tokens (Buf.Data, File.Lines (Line_No));
-            else
-               File.Lines (Line_No).Comment := NO_COMMENT;
-            end if;
-            File.Lines (Line_No).Line_End := Pos - 1;
-            exit when Line_No = File.Max_Lines or else Pos > Len;
-            if Buf.Data (Pos) = CR
-              and then Pos + 1 <= Len
-              and then Buf.Data (Pos + 1) = LF
-            then
-               Pos := Pos + 2;
-            else
-               Pos := Pos + 1;
-            end if;
-         end loop;
-         File.Count := Line_No;
-         Boxed_License (File.Lines (File.Lines'First .. Line_No),
-                        Buf.Data, File.Boxed);
+            end loop;
+         else
+            Data.Count := 0;
+            Data.Cmt_Style := NO_COMMENT;
+         end if;
+         SPDX_Tool.Languages.Boxed_License (Data.Lines (Data.Lines'First .. Data.Count),
+                                            Buf.Data, Data.Boxed);
       end;
    end Open;
 
    --  ------------------------------
-   --  Compute maximum length of lines between From..To as byte count.
+   --  Save the file to replace the header license template by the corresponding
+   --  SPDX license header.
    --  ------------------------------
-   function Max_Length (Lines : in Line_Array;
-                        From  : in Infos.Line_Number;
-                        To    : in Infos.Line_Number) return Buffer_Size is
-      Max : Buffer_Size := 0;
-   begin
-      for I in From .. To loop
-         declare
-            Len : constant Buffer_Size
-              := Lines (I).Line_End - Lines (I).Line_Start + 1;
-         begin
-            if Len > Max then
-               Max := Len;
-            end if;
-         end;
-      end loop;
-      return Max;
-   end Max_Length;
-
-   --  ------------------------------
-   --  Check if Lines (From..To) are of the same length.
-   --  ------------------------------
-   function Is_Same_Length (Lines : in Line_Array;
-                            From  : in Infos.Line_Number;
-                            To    : in Infos.Line_Number) return Boolean is
-      Line_Length : constant Natural := Lines (From).Style.Length;
-   begin
-      return Line_Length > 0
-        and then (for all I in From + 1 .. To =>
-                    Lines (I).Style.Length = Line_Length);
-   end Is_Same_Length;
-
-   --  ------------------------------
-   --  Check if we have the same byte for every line starting from the
-   --  end of the line with the given offset.
-   --  ------------------------------
-   function Is_Same_Byte (Lines  : in Line_Array;
-                          Buffer : in Buffer_Type;
-                          From   : in Infos.Line_Number;
-                          To     : in Infos.Line_Number;
-                          Offset : in Buffer_Size) return Boolean is
-      C : constant Byte := Buffer (Lines (From).Line_End - Offset);
-   begin
-      return (for all I in From + 1 .. To =>
-                Buffer (Lines (I).Line_End - Offset) = C);
-   end Is_Same_Byte;
-
-   --  ------------------------------
-   --  Find the common length at end of each line between From and To.
-   --  ------------------------------
-   function Common_End_Length (Lines  : in Line_Array;
-                               Buffer : in Buffer_Type;
-                               From   : in Infos.Line_Number;
-                               To     : in Infos.Line_Number) return Buffer_Size is
-      Line_Length : constant Buffer_Size :=
-        Lines (From).Line_End - Lines (From).Line_Start;
-      Len : Buffer_Size := 0;
-   begin
-      while Len < Line_Length loop
-         if not Is_Same_Byte (Lines, Buffer, From, To, Len) then
-            exit;
-         end if;
-         Len := Len + 1;
-      end loop;
-      return Len;
-   end Common_End_Length;
-
-   --  ------------------------------
-   --  Find the common length of spaces at beginning of each line
-   --  between From and To.  We don't need to have identical length
-   --  for each line.
-   --  ------------------------------
-   function Common_Start_Length (Lines  : in Line_Array;
-                                 Buffer : in Buffer_Type;
-                                 From   : in Infos.Line_Number;
-                                 To     : in Infos.Line_Number) return Buffer_Size is
-      Line_Length : constant Buffer_Size := Max_Length (Lines, From, To);
-      Len         : Buffer_Size := 0;
-   begin
-      while Len < Line_Length loop
-         for I in From .. To loop
-            declare
-               Pos : constant Buffer_Index
-                 := Lines (I).Style.Text_Start + Len;
-            begin
-               --  Ignore lines which are not a comment or too short.
-               if Lines (I).Comment /= NO_COMMENT
-                 and then Pos <= Lines (I).Line_End
-                 and then not Is_Space (Buffer (Pos))
-               then
-                  return Len;
-               end if;
-            end;
-         end loop;
-         Len := Len + 1;
-      end loop;
-      return Len;
-   end Common_Start_Length;
-
-   --  ------------------------------
-   --  Check if the comment line is only a presentation line: it is either
-   --  empty or contains the same presentation character.
-   --  ------------------------------
-   function Is_Presentation_Line (Lines  : in Line_Array;
-                                  Buffer : in Buffer_Type;
-                                  Line   : in Infos.Line_Number) return Boolean is
-      Info : Comment_Info renames Lines (Line).Style;
-   begin
-      return (for all I in Info.Text_Start .. Info.Text_Last
-                => Is_Space_Or_Punctuation (Buffer (I)));
-   end Is_Presentation_Line;
-
-   --  ------------------------------
-   --  Identify boundaries of a license with a boxed presentation.
-   --  Having identified such boxed presentation, update the lines Text_Last
-   --  position to indicate the last position of the text for each line
-   --  to ignore the boxed presentation.
-   --  ------------------------------
-   procedure Boxed_License (Lines  : in out Line_Array;
-                            Buffer : in Buffer_Type;
-                            Boxed  : out Boolean) is
-      Limit  : constant Infos.Line_Count := (Lines'Length / 2);
-      Common : Buffer_Size;
-      Common_Start : Buffer_Size;
-   begin
-      for I in Lines'First .. Limit loop
-         if Lines (I).Comment /= NO_COMMENT then
-            for J in reverse I + 3 .. Lines'Last loop
-               if Lines (J).Comment /= NO_COMMENT
-                 and then Is_Same_Length (Lines, I, J)
-               then
-                  Boxed := True;
-                  Common := Common_End_Length (Lines, Buffer, I, J);
-                  Common_Start := Common_Start_Length (Lines, Buffer, I, J);
-                  for K in I .. J loop
-                     Lines (K).Style.Boxed := True;
-                     Lines (K).Style.Text_Last := Lines (K).Style.Last - Common;
-                     Lines (K).Style.Text_Start := Lines (K).Style.Text_Start + Common_Start;
-                  end loop;
-                  return;
-               end if;
-            end loop;
-         end if;
-      end loop;
-   end Boxed_License;
-
    procedure Save (Manager : in File_Manager;
                    File    : in out File_Type;
                    Path    : in String;
@@ -475,7 +104,7 @@ package body SPDX_Tool.Files is
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
          if File.Lines (First).Style.Boxed then
-            Next_Pos := File.Lines (Last).Style.Last;
+            Next_Pos := File.Lines (Last).Style.Text_Last;
             while Next_Pos > First_Pos
               and then not Is_Space (Buf.Data (Next_Pos - 1))
             loop
@@ -499,15 +128,16 @@ package body SPDX_Tool.Files is
          Next_Pos := File.Lines (Last).Style.Last + 1;
       end if;
 
-      Spaces := Common_Start_Length (File.Lines, Buf.Data, First, Last);
+      Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
       for I in 1 .. Spaces loop
          Output.Write (" ");
       end loop;
       Output.Write ("SPDX-License-Identifier: " & License);
       if File.Lines (First).Style.Boxed then
-         Length := Max_Length (File.Lines, First, Last);
+         Length := Languages.Max_Length (File.Lines, First, Last);
          Spaces := Length - License'Length - String '("SPDX-License-Identifier: ")'Length - Spaces;
-         Spaces := Spaces - Block_Comment_Length (File.Lines (Last).Style.Index);
+         Spaces := Spaces - (File.Lines (First).Style.Start - File.Lines (First).Line_Start);
+         Spaces := Spaces - (File.Lines (Last).Line_End - Next_Pos + 1);
          while Spaces > 0 loop
             Output.Write (" ");
             Spaces := Spaces - 1;
@@ -523,101 +153,6 @@ package body SPDX_Tool.Files is
       Output.Close;
       Util.Files.Rename (Old_Name => Tmp_Path, New_Name => Path);
    end Save;
-
-   --  ------------------------------
-   --  Extract from the header the license text that was found.
-   --  When no license text was clearly identified, extract the text
-   --  found in the header comment.
-   --  ------------------------------
-   function Extract_License (File    : in File_Type;
-                             License : in Infos.License_Info)
-                             return Infos.License_Text_Access is
-      Buf             : constant Buffer_Accessor := File.Buffer.Value;
-      First_Line      : Infos.Line_Count;
-      Last_Line       : Infos.Line_Count;
-      Size, Len, Skip : Buffer_Size;
-   begin
-      if License.Match /= Infos.NONE then
-         First_Line := License.First_Line;
-         Last_Line := License.Last_Line;
-      else
-         First_Line := 1;
-         Last_Line := File.Count;
-         while First_Line > Last_Line
-           and then File.Lines (First_Line).Comment = NO_COMMENT
-         loop
-            First_Line := First_Line + 1;
-         end loop;
-         Last_Line := First_Line + 1;
-         while Last_Line <= File.Count
-           and then File.Lines (Last_Line).Comment /= NO_COMMENT
-         loop
-            Last_Line := Last_Line + 1;
-         end loop;
-         Last_Line := Last_Line - 1;
-         if Is_Presentation_Line (File.Lines, Buf.Data, First_Line) then
-            First_Line := First_Line + 1;
-         end if;
-         if Is_Presentation_Line (File.Lines, Buf.Data, Last_Line) then
-            Last_Line := Last_Line - 1;
-         end if;
-      end if;
-      if First_Line > Last_Line then
-         return null;
-      end if;
-      Skip := Common_Start_Length (File.Lines, Buf.Data, First_Line, Last_Line);
-      Size := Buffer_Size (Last_Line - First_Line + 1);
-      for I in First_Line .. Last_Line loop
-         Len := File.Lines (I).Style.Text_Last
-           - File.Lines (I).Style.Text_Start + 1;
-         if Len > Skip then
-            Len := Len - Skip;
-         end if;
-         Size := Size + Len;
-      end loop;
-      declare
-         Text  : constant Infos.License_Text_Access := new Infos.License_Text (Len => Size);
-         Pos   : Buffer_Index := 1;
-         Start : Buffer_Index;
-         Last  : Buffer_Index;
-      begin
-         for I in First_Line .. Last_Line loop
-            Start := File.Lines (I).Style.Text_Start;
-            Last := File.Lines (I).Style.Text_Last;
-            Len := Last - Start + 1;
-            if Len > Skip then
-               Start := Start + Skip;
-               Len := Len - Skip;
-            end if;
-            Text.Content (Pos .. Pos + Len - 1) := Buf.Data (Start .. Last);
-            Pos := Pos + Len;
-            Text.Content (Pos) := LF;
-            Pos := Pos + 1;
-         end loop;
-         return Text;
-      end;
-   end Extract_License;
-
-   --  ------------------------------
-   --  Extract from the given line in the comment the list of tokens used.
-   --  Such list can be used by the license decision tree to find a matching license.
-   --  ------------------------------
-   procedure Extract_Line_Tokens (Buffer : in Buffer_Type;
-                                  Line   : in out Line_Type) is
-      Last  : constant Buffer_Index := Line.Style.Text_Last;
-      Pos   : Buffer_Index := Line.Style.Text_Start;
-      First : Buffer_Index;
-   begin
-      while Pos <= Last loop
-         First := Skip_Spaces (Buffer, Pos, Last);
-         exit when First > Last;
-         Pos := Next_Space (Buffer, First, Last);
-         if First <= Pos then
-            Line.Tokens.Include (Buffer (First .. Pos));
-         end if;
-         Pos := Pos + 1;
-      end loop;
-   end Extract_Line_Tokens;
 
    --  ------------------------------
    --  Extract from the header the list of tokens used.  Such list

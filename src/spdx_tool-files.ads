@@ -8,117 +8,21 @@ with Util.Streams.Files;
 with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Magic_Manager;
+with SPDX_Tool.Languages;
 package SPDX_Tool.Files is
 
    use type Infos.Line_Count;
-
-   type Content_Access is access constant String;
-
-   type Identification is record
-      Mime     : UString;
-      Language : UString;
-   end record;
-
-   type Comment_Style is (NO_COMMENT,
-                          ADA_COMMENT,
-                          C_COMMENT,
-                          CPP_COMMENT,
-                          SHELL_COMMENT,
-                          LATEX_COMMENT,
-                          XML_COMMENT,
-                          OCAML_COMMENT);
-
-   type Comment_Mode is (NO_COMMENT,
-                         LINE_COMMENT,
-                         LINE_BLOCK_COMMENT,
-                         START_COMMENT,
-                         BLOCK_COMMENT,
-                         END_COMMENT);
-
-   type Comment_Index is new Natural;
-
-   type Comment_Info is record
-      Style      : Comment_Style := NO_COMMENT;
-      Start      : Buffer_Index := 1;
-      Last       : Buffer_Index := 1;
-      Head       : Buffer_Index := 1;
-      Text_Start : Buffer_Index := 1;
-      Text_Last  : Buffer_Index := 1;
-      Trailer    : Buffer_Size := 0;
-      Length     : Natural := 0;
-      Index      : Comment_Index := 0;
-      Mode       : Comment_Mode := NO_COMMENT;
-      Boxed      : Boolean := False;
-   end record;
-
-   type Line_Type is record
-      Comment    : Comment_Mode := NO_COMMENT;
-      Style      : Comment_Info;
-      Line_Start : Buffer_Index := 1;
-      Line_End   : Buffer_Size := 0;
-      Tokens     : SPDX_Tool.Buffer_Sets.Set;
-   end record;
-   type Line_Array is array (Infos.Line_Number range <>) of Line_Type;
-
-   --  Compute maximum length of lines between From..To as byte count.
-   function Max_Length (Lines : in Line_Array;
-                        From  : in Infos.Line_Number;
-                        To    : in Infos.Line_Number) return Buffer_Size;
-
-   --  Check if Lines (From..To) are of the same length.
-   function Is_Same_Length (Lines : in Line_Array;
-                            From  : in Infos.Line_Number;
-                            To    : in Infos.Line_Number) return Boolean
-     with Pre => From <= To;
-
-   --  Check if we have the same byte for every line starting from the
-   --  end of the line with the given offset.
-   function Is_Same_Byte (Lines  : in Line_Array;
-                          Buffer : in Buffer_Type;
-                          From   : in Infos.Line_Number;
-                          To     : in Infos.Line_Number;
-                          Offset : in Buffer_Size) return Boolean
-     with Pre => Is_Same_Length (Lines, From, To);
-
-   --  Find the common length at end of each line between From and To.
-   function Common_End_Length (Lines  : in Line_Array;
-                               Buffer : in Buffer_Type;
-                               From   : in Infos.Line_Number;
-                               To     : in Infos.Line_Number) return Buffer_Size
-     with Pre => Is_Same_Length (Lines, From, To);
-
-   --  Find the common length of spaces at beginning of each line
-   --  between From and To.  We don't need to have identical length
-   --  for each line.
-   function Common_Start_Length (Lines  : in Line_Array;
-                                 Buffer : in Buffer_Type;
-                                 From   : in Infos.Line_Number;
-                                 To     : in Infos.Line_Number) return Buffer_Size
-     with Pre => From <= To;
-
-   --  Check if the comment line is only a presentation line: it is either
-   --  empty or contains the same presentation character.
-   function Is_Presentation_Line (Lines  : in Line_Array;
-                                  Buffer : in Buffer_Type;
-                                  Line   : in Infos.Line_Number) return Boolean;
-
-   --  Identify boundaries of a license with a boxed presentation.
-   --  Having identified such boxed presentation, update the lines Text_Last
-   --  position to indicate the last position of the text for each line
-   --  to ignore the boxed presentation.
-   procedure Boxed_License (Lines  : in out Line_Array;
-                            Buffer : in Buffer_Type;
-                            Boxed  : out Boolean);
+   use all type Languages.Comment_Mode;
+   subtype Comment_Mode is Languages.Comment_Mode;
+   subtype Line_Array is Languages.Line_Array;
 
    type File_Type (Max_Lines : Infos.Line_Count) is limited record
       File         : Util.Streams.Files.File_Stream;
       Buffer       : Buffer_Ref;
       Last_Offset  : Buffer_Size;
       Count        : Infos.Line_Count := 0;
-      Ident        : Identification;
-      Cmt_Style    : Comment_Style := NO_COMMENT;
+      Cmt_Style    : Comment_Mode := Languages.NO_COMMENT;
       Lines        : Line_Array (1 .. Max_Lines);
-      Language     : UString;
       Boxed        : Boolean;
    end record;
 
@@ -131,9 +35,10 @@ package SPDX_Tool.Files is
 
    --  Open the file and read the first data block (4K) to identify the
    --  language and comment headers.
-   procedure Open (Manager  : in File_Manager;
-                   File     : in out File_Type;
-                   Path     : in String);
+   procedure Open (Manager   : in File_Manager;
+                   Data      : in out File_Type;
+                   File      : in out SPDX_Tool.Infos.File_Info;
+                   Languages : in SPDX_Tool.Languages.Language_Manager);
 
    --  Save the file to replace the header license template by the corresponding
    --  SPDX license header.
@@ -144,19 +49,6 @@ package SPDX_Tool.Files is
                    Last    : in Infos.Line_Number;
                    License : in String);
 
-   --  Extract from the header the license text that was found.
-   --  When no license text was clearly identified, extract the text
-   --  found in the header comment.
-   function Extract_License (File    : in File_Type;
-                             License : in Infos.License_Info)
-                             return Infos.License_Text_Access;
-
-   --  Extract from the given line in the comment the list of tokens used.
-   --  Such list can be used by the license decision tree to find a matching license.
-   procedure Extract_Line_Tokens (Buffer : in Buffer_Type;
-                                  Line   : in out Line_Type)
-     with Pre => Line.Comment /= NO_COMMENT;
-
    --  Extract from the header the list of tokens used.  Such list
    --  can be used by the license decision tree to find a matching license.
    --  We could extract more tokens such as tokens which are not really part
@@ -165,32 +57,15 @@ package SPDX_Tool.Files is
    procedure Extract_Tokens (File    : in File_Type;
                              Tokens  : in out SPDX_Tool.Buffer_Sets.Set);
 
-   --  Guess the language based on the file extension.
-   function Get_Language_From_Extension (Path : in String) return String;
-
 private
-
-   type Language_Type is record
-      Style         : Comment_Style;
-      Comment_Start : Buffer_Ref;
-      Comment_End   : Buffer_Ref;
-      Is_Block      : Boolean;
-   end record;
-   type Language_Array is array (Comment_Index range <>) of Language_Type;
-
-   type Identifier is tagged limited null record;
-
-   procedure Identify (Plugin : in Identifier;
-                       File   : in out File_Type;
-                       Result : out Identification) is null;
 
    type File_Manager is tagged limited record
       Magic_Manager : SPDX_Tool.Magic_Manager.Magic_Manager;
    end record;
 
-   --  Identify the language used by the given file.
-   procedure Find_Language (Manager : in File_Manager;
-                            File    : in out File_Type;
-                            Path    : in String);
+   --  Identify the file mime type.
+   procedure Find_Mime_Type (Manager : in File_Manager;
+                             File    : in out SPDX_Tool.Infos.File_Info;
+                             Buffer  : in Buffer_Type);
 
 end SPDX_Tool.Files;
