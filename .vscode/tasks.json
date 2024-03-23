@@ -1,0 +1,22 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "make clean",
+			"problemMatcher": [
+					"$ada"
+			],
+			"label": "Clean project",
+	},
+	{
+			"type": "gprbuild",
+			"projectFile": "${config:ada.projectFile}",
+			"problemMatcher": [
+				"$ada"
+			],
+			"group": "build",
+			"label": "ada: Build current project"
+		}
+	]
+}
