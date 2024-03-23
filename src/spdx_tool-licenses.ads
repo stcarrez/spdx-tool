@@ -13,6 +13,7 @@ with GNAT.Regpat;
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Buffer_Sets;
+with SPDX_Tool.Languages;
 private with Util.Measures;
 package SPDX_Tool.Licenses is
 
@@ -32,7 +33,7 @@ package SPDX_Tool.Licenses is
 
    subtype Line_Count is SPDX_Tool.Infos.Line_Count;
    subtype Line_Number is SPDX_Tool.Infos.Line_Number;
-   subtype Line_Array is SPDX_Tool.Files.Line_Array;
+   subtype Line_Array is SPDX_Tool.Languages.Line_Array;
    use type SPDX_Tool.Infos.Line_Number;
    function Image (Line : Line_Count) return String renames SPDX_Tool.Infos.Image;
 
@@ -285,7 +286,7 @@ private
 
    --  Find in the header comment an SPDX license tag.
    function Find_SPDX_License (Content : in Buffer_Type;
-                               Lines   : in SPDX_Tool.Files.Line_Array;
+                               Lines   : in SPDX_Tool.Languages.Line_Array;
                                From    : in Line_Number;
                                To      : in Line_Number)
                                return License_Match;
@@ -298,7 +299,7 @@ private
 
    function Find_License (Root    : in Token_Access;
                           Content : in Buffer_Type;
-                          Lines   : in SPDX_Tool.Files.Line_Array;
+                          Lines   : in SPDX_Tool.Languages.Line_Array;
                           From    : in Line_Number;
                           To      : in Line_Number)
                           return License_Match;

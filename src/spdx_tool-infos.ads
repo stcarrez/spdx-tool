@@ -53,7 +53,8 @@ package SPDX_Tool.Infos is
 
    --  Information collected for a file.  An instance is created for each
    --  file that is scanned and put in a File_Maps.  The file is analyzed
-   --  by a separate thread which populates the `License` and `Mime` info.
+   --  by a separate thread which populates the `Language`, `Mime` and
+   --  `License` info.
    type File_Info (Len : Natural) is record
       License  : License_Info;
       Mime     : UString;

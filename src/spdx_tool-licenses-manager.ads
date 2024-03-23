@@ -11,6 +11,7 @@ with Util.Strings.Sets;
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
+private with SPDX_Tool.Languages;
 private with Util.Executors;
 private with Util.Concurrent.Counters;
 package SPDX_Tool.Licenses.Manager is
@@ -107,11 +108,12 @@ private
 
    type License_Manager (Count : Task_Count) is
    limited new UFW.Walker_Type with record
-      Manager  : License_Manager_Access;
-      Max_Fill : Natural := 0;
-      Started  : Boolean := False;
-      Job      : Job_Type := READ_LICENSES;
-      Stats    : License_Stats;
+      Manager   : License_Manager_Access;
+      Languages : SPDX_Tool.Languages.Language_Manager;
+      Max_Fill  : Natural := 0;
+      Started   : Boolean := False;
+      Job       : Job_Type := READ_LICENSES;
+      Stats     : License_Stats;
 
       --  Filters to identify license files (ex: COPYING, LICENSE.txt, ...)
       --  Filters to ignore files when looking at file headers.  The two filters

@@ -16,8 +16,7 @@ with SPDX_Tool.Licenses.Reader;
 --  with SPDX_Tool.Licenses.Templates;
 package body SPDX_Tool.Licenses.Manager is
 
-   use type SPDX_Tool.Files.Comment_Style;
-   use type SPDX_Tool.Files.Comment_Mode;
+   use type SPDX_Tool.Languages.Comment_Mode;
    use type SPDX_Tool.Infos.License_Kind;
    use type GNAT.Strings.String_Access;
 
@@ -48,6 +47,7 @@ package body SPDX_Tool.Licenses.Manager is
       Configs.Configure (Config,
                          Configs.Names.IGNORE,
                          Set_Ignore'Access);
+      Manager.Languages.Initialize (Config);
       if not Manager.Started then
          if Opt_Mimes then
             for I in Manager.File_Mgr'Range loop
@@ -150,11 +150,11 @@ package body SPDX_Tool.Licenses.Manager is
    procedure Scan_File (Manager : in out License_Manager;
                         Path    : in String) is
       use SPDX_Tool.Infos;
-      use type Util.Files.Walk.Filter_Result;
+      use type Util.Files.Walk.Filter_Mode;
       Job   : License_Job_Type;
       Count : Natural;
       First : Natural;
-      Filter : Util.Files.Walk.Filter_Result;
+      Filter : Util.Files.Walk.Filter_Mode;
    begin
       Filter := Manager.Ignore_Files_Filter.Match (Path);
       if Filter = Util.Files.Walk.Excluded then
@@ -207,7 +207,7 @@ package body SPDX_Tool.Licenses.Manager is
       Tokens  : SPDX_Tool.Buffer_Sets.Set;
       Stamp   : Util.Measures.Stamp;
    begin
-      if File.Cmt_Style = SPDX_Tool.Files.NO_COMMENT or else File.Count = 0 then
+      if File.Cmt_Style = SPDX_Tool.Languages.NO_COMMENT or else File.Count = 0 then
          Result.Info.Match := Infos.NONE;
          return Result;
       end if;
@@ -242,7 +242,7 @@ package body SPDX_Tool.Licenses.Manager is
          end;
       end if;
       loop
-         if File.Lines (Line).Comment /= SPDX_Tool.Files.NO_COMMENT then
+         if File.Lines (Line).Comment /= SPDX_Tool.Languages.NO_COMMENT then
             Match := Find_License (Manager.Licenses.Root, Buf.Data,
                                    File.Lines, Line, File.Count);
             if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
@@ -329,13 +329,11 @@ package body SPDX_Tool.Licenses.Manager is
       Data   : SPDX_Tool.Files.File_Type (100);
       Result : License_Match;
    begin
-      File_Mgr.Open (Data, File.Path);
+      File_Mgr.Open (Data, File, Manager.Languages);
       Result := Manager.Find_License (Data);
       File.License := Result.Info;
-      File.Mime := Data.Ident.Mime;
-      File.Language := Data.Language;
       if Opt_Print then
-         File.Text := SPDX_Tool.Files.Extract_License (Data, File.License);
+         File.Text := SPDX_Tool.Languages.Extract_License (Data.Lines, Data.Buffer.Value.Data, File.License);
       end if;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE | Infos.GUESSED_LICENSE
       then
@@ -394,7 +392,7 @@ package body SPDX_Tool.Licenses.Manager is
             Cmt_Count : Natural := 0;
          begin
             for I in Data.Lines'Range loop
-               if Data.Lines (I).Comment /= NO_COMMENT then
+               if Data.Lines (I).Comment /= Languages.NO_COMMENT then
                   Cmt_Count := Cmt_Count + 1;
                end if;
             end loop;
@@ -405,9 +403,9 @@ package body SPDX_Tool.Licenses.Manager is
                   Log.Info ("{0}: {1} (ignored)", File.Path, No_License);
                else
                   Log.Info ("{0} is {1}: {2} lines no comment", File.Path,
-                            To_String (Data.Ident.Mime),
+                            To_String (File.Language),
                             Image (Data.Count));
-                  Manager.Stats.Increment (To_String (Data.Ident.Mime));
+                  Manager.Stats.Increment (To_String (File.Mime));
                end if;
             else
                File.License.Name := To_UString (Unknown_License);
@@ -416,10 +414,10 @@ package body SPDX_Tool.Licenses.Manager is
                   Log.Info ("{0}: {1} (ignored)", File.Path, Unknown_License);
                else
                   Log.Info ("{0} is {1}: {2} lines {3} cmt", File.Path,
-                            To_String (Data.Ident.Mime),
+                            To_String (File.Language),
                             Image (Data.Count),
                             Util.Strings.Image (Cmt_Count));
-                  Manager.Stats.Increment ("unknown " & To_String (Data.Ident.Mime));
+                  Manager.Stats.Increment ("unknown " & To_String (File.Mime));
                   Manager.Stats.Add_Header (Data);
                end if;
             end if;
