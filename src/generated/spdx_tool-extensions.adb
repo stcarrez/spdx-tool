@@ -3,7 +3,7 @@
 --  Extensions mapping generated from extensions.json
 with Interfaces; use Interfaces;
 
-package body SPDX_Tool.Files.Extensions is
+package body SPDX_Tool.Extensions is
    function Hash (S : String) return Natural;
 
    P : constant array (0 .. 8) of Natural :=
@@ -2413,4 +2413,4 @@ package body SPDX_Tool.Files.Extensions is
       return (if Names (H).all = Name then Contents (H) else null);
    end Get_Mapping;
 
-end SPDX_Tool.Files.Extensions;
+end SPDX_Tool.Extensions;
