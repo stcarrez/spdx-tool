@@ -37,7 +37,7 @@
     </install>
   </resource>
 
-  <resource name='SPDX_Tool.Files.Extensions'
+  <resource name='SPDX_Tool.Extensions'
             format='map'
 	    name-access='true'
 	    list-access='true'
