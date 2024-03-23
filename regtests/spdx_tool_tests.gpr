@@ -9,7 +9,7 @@ with "utilada_unit.gpr";
 project Spdx_Tool_Tests is
 
    for Source_Dirs use ("src/");
-   for Object_Dir use "../obj/spdx_tool/regtests/" & Project'Library_Kind;
+   for Object_Dir use "../obj/spdx_tool/regtests/";
    for Create_Missing_Dirs use "True";
    for Exec_Dir use "../bin";
    for Main use ("spdx_tool-harness.adb");
