@@ -10,7 +10,6 @@ with Ada.Command_Line;
 with Util.Strings;
 with Util.Streams.Files;
 with Util.Streams.Texts;
-with Util.Streams.Buffered;
 with SPDX_Tool.Counter_Arrays;
 with SPDX_Tool.Licenses;
 with SPDX_Tool.Token_Counters;
@@ -25,6 +24,13 @@ procedure SPDX_Tool.Gentmpl is
    procedure Print_Token_Data;
    procedure Print_Token_Array (I : in License_Index);
    procedure Scan (Path : in String);
+   procedure Split_Tokens (Content : in String);
+   procedure Add_Token (Into : in out SPDX_Tool.Token_Counters.Vectorizer_Type;
+                        Idx  : in License_Index;
+                        Buf  : in Buffer_Type;
+                        From : in Buffer_Index;
+                        To   : in Buffer_Index);
+   function Increment (Value : in Count_Type) return Count_Type;
 
    package Token_Maps is
      new Ada.Containers.Indefinite_Ordered_Maps (Key_Type => Token_Index,
@@ -227,7 +233,7 @@ begin
       Scan (Ada.Command_Line.Argument (I));
    end loop;
    declare
-      Tokens : Token_Counters.Token_Maps.Map := Info.Tokens;
+      Tokens   : constant Token_Counters.Token_Maps.Map := Info.Tokens;
       Token_Id : Token_Index := 1;
    begin
       Info.Tokens.Clear;
