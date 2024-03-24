@@ -7,7 +7,8 @@ with Ada.Directories;
 
 with Util.Log.Loggers;
 with Util.Files;
-with Util.Strings;
+with Util.Strings.Vectors;
+with Util.Strings.Split;
 with SPDX_Tool.Extensions;
 package body SPDX_Tool.Languages is
 
@@ -95,7 +96,7 @@ package body SPDX_Tool.Languages is
                Pos := Pos + Len;
                while Pos + Len_End <= Last loop
                   if Buffer (Pos .. Pos + Len_End - 1) = Analyzer.Comment_End then
-                     Comment.Mode := BLOCK_COMMENT;
+                     Comment.Mode := LINE_BLOCK_COMMENT;
                      Comment.Trailer := Len_End;
                      Comment.Text_Last := Pos - Len_End + 1;
                      exit;
@@ -118,14 +119,19 @@ package body SPDX_Tool.Languages is
                            Last     : in Buffer_Index;
                            Comment  : in out Comment_Info) is
    begin
-      if Comment.Mode = START_COMMENT then
+      if comment.Analyzer /= null and then Comment.Mode in START_COMMENT | BLOCK_COMMENT then
          Comment.Analyzer.Find_Comment (Buffer, From, Last, Comment);
       else
+         Comment.Analyzer := null;
          for Current of Analyzer.Analyzers loop
-            Current.Find_Comment (Buffer, From, Last, Comment);
-            if Comment.Mode /= NO_COMMENT then
-               Comment.Analyzer := Current;
-               return;
+            if Current /= null then
+               Current.Find_Comment (Buffer, From, Last, Comment);
+               if Comment.Mode /= NO_COMMENT then
+                  if Comment.Analyzer = null then
+                     Comment.Analyzer := Current;
+                  end if;
+                  return;
+               end if;
             end if;
          end loop;
       end if;
@@ -532,34 +538,56 @@ package body SPDX_Tool.Languages is
       return null;
    end Create_Analyzer;
 
+   function Find_Analyzer (Manager : in Language_Manager;
+                           Name    : in String) return Analyzer_Access is
+      Pos : constant Language_Maps.Cursor := Manager.Languages.Find (Name);
+   begin
+      if Language_Maps.Has_Element (Pos) then
+         return Language_Maps.Element (Pos).Analyzer;
+      else
+         return null;
+      end if;
+   end Find_Analyzer;
+
    --  ------------------------------
    --  Initialize the language manager with the given configuration.
    --  ------------------------------
    procedure Initialize (Manager : in out Language_Manager;
                          Config  : in SPDX_Tool.Configs.Config_Type) is
       procedure Set_Comments (Conf : in Comment_Configuration);
-      procedure Set_Language (Conf  : in Language_Configuration);
-      procedure Add_Builtin (Language  : in String;
-                             Start_Cmt : in String;
-                             End_Cmt   : in String := "");
+      procedure Set_Language (Conf : in Language_Configuration);
+      procedure Add_Builtin (Language     : in String;
+                             Start_Cmt    : in String;
+                             End_Cmt      : in String := "";
+                             Alternatives : in String := "");
 
       procedure Set_Comments (Conf : in Comment_Configuration) is
+         Lang : constant String := To_String (Conf.Language);
+         Pos  : constant Language_Maps.Cursor := Manager.Languages.Find (Lang);
       begin
-         Manager.Languages.Include (To_String (Conf.Language), (null, Conf));
+         if not Language_Maps.Has_Element (Pos) then
+            Manager.Languages.Include (Lang, (null, Conf));
+         end if;
       end Set_Comments;
 
-      procedure Set_Language (Conf  : in Language_Configuration) is
+      procedure Set_Language (Conf : in Language_Configuration) is
+         Language : constant String := To_String (Conf.Language);
+         Comment  : constant String := To_String (Conf.Comment);
       begin
          for Pattern of Conf.Extensions loop
             Manager.File_Mapper.Insert (Pattern   => Pattern,
                                         Recursive => True,
-                                        Value     => To_String (Conf.Language));
+                                        Value     => Language);
          end loop;
+         if Comment'Length > 0 then
+            Add_Builtin (Language, "", "", Comment);
+         end if;
       end Set_Language;
 
-      procedure Add_Builtin (Language  : in String;
-                             Start_Cmt : in String;
-                             End_Cmt   : in String := "") is
+      procedure Add_Builtin (Language     : in String;
+                             Start_Cmt    : in String;
+                             End_Cmt      : in String := "";
+                             Alternatives : in String := "") is
          Conf : Comment_Configuration;
       begin
          Conf.Language := To_UString (Language);
@@ -569,27 +597,84 @@ package body SPDX_Tool.Languages is
             Conf.Block_Start := To_UString (Start_Cmt);
             Conf.Block_End := To_UString (End_Cmt);
          end if;
+         Conf.Alternative := To_UString (Alternatives);
          Set_Comments (Conf);
       end Add_Builtin;
+
+      MAX_RECURSE : constant := 10;
+
+      procedure Setup_Language (Name    : in String;
+                                Lang    : in Language_Maps.Reference_Type;
+                                Recurse : in Positive) is
+         Names : constant Util.Strings.Vectors.Vector
+            := Util.Strings.Split (To_String (Lang.Config.Alternative), ",");
+         Result : Combined_Analyzer_Access;
+      begin
+         Result := new Combined_Analyzer_Type '(Count => Positive (Names.Length),
+                                                others => <>);
+         for I in 1 .. Result.Count loop
+            declare
+               Lang : constant String := Names.Element (I);
+               Pos  : constant Language_Maps.Cursor := Manager.Languages.Find (Lang);
+            begin
+               if not Language_Maps.Has_Element (Pos) then
+                  Log.Error ("Language {0}: invalid comment style {1}",
+                             Name, Lang);
+               else
+                  declare
+                     Ref_Lang : constant Language_Maps.Reference_Type
+                        := Manager.Languages.Reference (Pos);
+                  begin
+                     if Ref_Lang.Analyzer = null then
+                        if Recurse > MAX_RECURSE then
+                           Log.Error ("Too many recursive depend {0}", Name);
+                        elsif Length (Ref_Lang.Config.Alternative) = 0 then
+                           Log.Error ("Invalid language {0}", Lang);
+                        else
+                           Setup_Language (Lang, Ref_Lang, Recurse + 1);
+                        end if;
+                     end if;
+                     Result.Analyzers (I) := Ref_Lang.Analyzer;
+                  end;
+               end if;
+            end;
+         end loop;
+         Lang.Analyzer := Result.all'Access;
+      end Setup_Language;
    begin
       Add_Builtin ("Ada", "--");
-      Add_Builtin ("C++", "//");
+      Add_Builtin ("C-line", "//");
       Add_Builtin ("Shell", "#");
       Add_Builtin ("Latex", "%%");
-      Add_Builtin ("C", "/*", "*/");
+      Add_Builtin ("C-block", "/*", "*/");
       Add_Builtin ("XML", "<!--", "-->");
       Add_Builtin ("OCaml", "(*", "*)");
+      Add_Builtin ("Erlang", "%%");
+      Add_Builtin ("C-style", "", "", "C-line,C-block");
       Configs.Configure (Config,
                          Set_Comments'Access);
       Configs.Configure (Config,
                          Set_Language'Access);
 
-      --  Build the language analyzers.
+      --  Build the basic line or block comment language analyzers.
       for Iter in Manager.Languages.Iterate loop
          declare
             Lang : constant Language_Maps.Reference_Type := Manager.Languages.Reference (Iter);
          begin
-            Lang.Analyzer := Manager.Create_Analyzer (Lang.Config);
+            if Length (Lang.Config.Alternative) = 0 then
+               Lang.Analyzer := Manager.Create_Analyzer (Lang.Config);
+            end if;
+         end;
+      end loop;
+
+      --  Build language analyzer that depend on other analyzers.
+      for Iter in Manager.Languages.Iterate loop
+         declare
+            Lang : constant Language_Maps.Reference_Type := Manager.Languages.Reference (Iter);
+         begin
+            if Length (Lang.Config.Alternative) > 0 then
+               Setup_Language (Language_Maps.Key (Iter), Lang, 1);
+            end if;
          end;
       end loop;
    end Initialize;

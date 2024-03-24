@@ -188,6 +188,7 @@ private
    type Combined_Analyzer_Type (Count : Positive) is new Analyzer_Type with record
       Analyzers : Analyzer_Array (1 .. Count);
    end record;
+   type Combined_Analyzer_Access is access all Combined_Analyzer_Type;
 
    overriding
    procedure Find_Comment (Analyzer : in Combined_Analyzer_Type;
@@ -219,5 +220,8 @@ private
 
    function Create_Analyzer (Manager : in Language_Manager;
                              Conf    : in Comment_Configuration) return Analyzer_Access;
+
+   function Find_Analyzer (Manager : in Language_Manager;
+                           Name    : in String) return Analyzer_Access;
 
 end SPDX_Tool.Languages;
