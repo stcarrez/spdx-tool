@@ -10,20 +10,20 @@ private
        & "efault]" & ASCII.LF & "color=""yes""" & ASCII.LF & "ignore=[" & ASCII.LF
        & """*.o""," & ASCII.LF & """*.a""," & ASCII.LF & """*.so""," & ASCII.LF & """"
        & "*.lib""," & ASCII.LF & """*.md""," & ASCII.LF & """*.log""," & ASCII.LF
-       & """*.pem""," & ASCII.LF & """*.txt""," & ASCII.LF & """*~""" & ASCII.LF & "]"
-       & ASCII.LF & ASCII.LF & "[license-files]" & ASCII.LF & "MIT=[ ""MIT.txt"""
-       & ", ""MIT-LICENSE.txt"", ""LICENSE.txt"" ]" & ASCII.LF & "GPL-3=[ ""COPYIN"
-       & "G3"", ""COPYING3.LIB"" ]" & ASCII.LF & "GPL-2=[ ""COPYING"", ""COPYING.L"
-       & "IB"", ""GPL-LICENSE.txt"" ]" & ASCII.LF & "Apache-2= [ ""LICENSE"", ""LI"
-       & "CENSE.txt"" ]" & ASCII.LF & ASCII.LF & "[comments]" & ASCII.LF & "Shell"
-       & "={ start=""#"" }" & ASCII.LF & "Ada={ start=""--"" }" & ASCII.LF & ASCII.LF
-       & ASCII.LF & "[languages]" & ASCII.LF & "Markdown=[ ""*.md"" ]" & ASCII.LF
-       & "Makefile=[ ""Makefile"", ""Imakefile"", { comment=""Shell"" } ]" & ASCII.LF
-       & "Ada=[ ""*.ads"", ""*.adb"", ""*gpb"", { comment=""Ada"" } ]" & ASCII.LF
-       & "C=[ ""*.c"", ""*.h"", { comment=""C-style"" }]" & ASCII.LF & """C++""=[ "
-       & """*.cc"", ""*.CC"", ""*.C"", ""*.h"", { comment=""C-style"" }]" & ASCII.LF
-       & "Java=[ ""*.java"", { comment=""C-style"" }]" & ASCII.LF & "Configure=[ """
-       & "config.sub"", ""*.in"", ""config.guess"", { comment=""Shell"" }]" & ASCII.LF
-       & ASCII.LF & ASCII.LF;
+       & """*.pem""," & ASCII.LF & """*.txt""," & ASCII.LF & """*.json""," & ASCII.LF
+       & """*.rst""," & ASCII.LF & """*~""" & ASCII.LF & "]" & ASCII.LF & ASCII.LF
+       & "[license-files]" & ASCII.LF & "MIT=[ ""MIT.txt"", ""MIT-LICENSE.txt"", """
+       & "LICENSE.txt"" ]" & ASCII.LF & "GPL-3=[ ""COPYING3"", ""COPYING3.LIB"" ]" & ASCII.LF
+       & "GPL-2=[ ""COPYING"", ""COPYING.LIB"", ""GPL-LICENSE.txt"" ]" & ASCII.LF
+       & "Apache-2= [ ""LICENSE"", ""LICENSE.txt"" ]" & ASCII.LF & ASCII.LF & "[c"
+       & "omments]" & ASCII.LF & "Shell={ start=""#"" }" & ASCII.LF & "Ada={ start"
+       & "=""--"" }" & ASCII.LF & ASCII.LF & ASCII.LF & "[languages]" & ASCII.LF
+       & "Markdown=[ ""*.md"" ]" & ASCII.LF & "Makefile=[ ""Makefile"", ""Imakefil"
+       & "e"", { comment=""Shell"" } ]" & ASCII.LF & "Ada=[ ""*.ads"", ""*.adb"", "
+       & """*gpb"", { comment=""Ada"" } ]" & ASCII.LF & "C=[ ""*.c"", ""*.h"", { c"
+       & "omment=""C-style"" }]" & ASCII.LF & """C++""=[ ""*.cc"", ""*.CC"", ""*.C"
+       & """, ""*.h"", { comment=""C-style"" }]" & ASCII.LF & "Java=[ ""*.java"", "
+       & "{ comment=""C-style"" }]" & ASCII.LF & "Configure=[ ""config.sub"", ""*."
+       & "in"", ""config.guess"", { comment=""Shell"" }]" & ASCII.LF & ASCII.LF & ASCII.LF;
 
 end SPDX_Tool.Configs.Default;
