@@ -10,6 +10,8 @@ ignore=[
 "*.log",
 "*.pem",
 "*.txt",
+"*.json",
+"*.rst",
 "*~"
 ]
 
