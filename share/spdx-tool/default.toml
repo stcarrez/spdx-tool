@@ -19,13 +19,18 @@ GPL-3=[ "COPYING3", "COPYING3.LIB" ]
 GPL-2=[ "COPYING", "COPYING.LIB", "GPL-LICENSE.txt" ]
 Apache-2= [ "LICENSE", "LICENSE.txt" ]
 
-[languages]
-Markdown=[ "*.md" ]
-Makefile=[ "Makefile", "Imakefile" ]
-
 [comments]
 Shell={ start="#" }
 Ada={ start="--" }
-C={ block-start="/*", block-end="*/" }
+
+
+[languages]
+Markdown=[ "*.md" ]
+Makefile=[ "Makefile", "Imakefile", { comment="Shell" } ]
+Ada=[ "*.ads", "*.adb", "*gpb", { comment="Ada" } ]
+C=[ "*.c", "*.h", { comment="C-style" }]
+"C++"=[ "*.cc", "*.CC", "*.C", "*.h", { comment="C-style" }]
+Java=[ "*.java", { comment="C-style" }]
+Configure=[ "config.sub", "*.in", "config.guess", { comment="Shell" }]
 
 
