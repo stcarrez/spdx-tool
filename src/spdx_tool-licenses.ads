@@ -289,7 +289,8 @@ private
                                Lines   : in SPDX_Tool.Languages.Line_Array;
                                From    : in Line_Number;
                                To      : in Line_Number)
-                               return License_Match;
+                               return License_Match
+      with Pre => From <= To;
 
    function Find_License (License : in License_Index;
                           File    : in SPDX_Tool.Files.File_Type;

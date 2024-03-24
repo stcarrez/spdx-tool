@@ -860,18 +860,16 @@ package body SPDX_Tool.Licenses is
       Result.Info.First_Line := From;
       Result.Info.Last_Line := To;
       for Line in From .. To loop
-         if Lines (Line).Style.Mode /= NO_COMMENT then
-            Pos := Lines (Line).Style.Text_Start;
-            Last := Lines (Line).Style.Text_Last;
-            if Pos <= Last then
-               First := Skip_Spaces (Content, Pos, Last);
-               if First <= Last then
-                  Pos := Next_With (Content, First, SPDX_License_Tag);
-                  if Pos > First then
-                     Result.Info := Extract_SPDX (Lines, Content, Line, Pos);
-                     Result.Last := null;
-                     return Result;
-                  end if;
+         Pos := Lines (Line).Style.Text_Start;
+         Last := Lines (Line).Style.Text_Last;
+         if Pos <= Last then
+            First := Skip_Spaces (Content, Pos, Last);
+            if First <= Last then
+               Pos := Next_With (Content, First, SPDX_License_Tag);
+               if Pos > First then
+                  Result.Info := Extract_SPDX (Lines, Content, Line, Pos);
+                  Result.Last := null;
+                  return Result;
                end if;
             end if;
          end if;

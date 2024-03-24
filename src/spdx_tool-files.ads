@@ -11,16 +11,17 @@ with SPDX_Tool.Magic_Manager;
 with SPDX_Tool.Languages;
 package SPDX_Tool.Files is
 
-   use type Infos.Line_Count;
    use all type Languages.Comment_Mode;
    subtype Comment_Mode is Languages.Comment_Mode;
    subtype Line_Array is Languages.Line_Array;
+   subtype Line_Number is Infos.Line_Number;
+   subtype Line_Count is Infos.Line_Count;
 
    type File_Type (Max_Lines : Infos.Line_Count) is limited record
       File         : Util.Streams.Files.File_Stream;
       Buffer       : Buffer_Ref;
       Last_Offset  : Buffer_Size;
-      Count        : Infos.Line_Count := 0;
+      Count        : Line_Count := 0;
       Cmt_Style    : Comment_Mode := Languages.NO_COMMENT;
       Lines        : Line_Array (1 .. Max_Lines);
       Boxed        : Boolean;
@@ -45,8 +46,8 @@ package SPDX_Tool.Files is
    procedure Save (Manager : in File_Manager;
                    File    : in out File_Type;
                    Path    : in String;
-                   First   : in Infos.Line_Number;
-                   Last    : in Infos.Line_Number;
+                   First   : in Line_Number;
+                   Last    : in Line_Number;
                    License : in String);
 
    --  Extract from the header the list of tokens used.  Such list
@@ -55,6 +56,8 @@ package SPDX_Tool.Files is
    --  of the license header but this is not important as the decision tree
    --  tries to find a best match.
    procedure Extract_Tokens (File    : in File_Type;
+                             First   : in Line_Number;
+                             Last    : in Line_Number;
                              Tokens  : in out SPDX_Tool.Buffer_Sets.Set);
 
 private

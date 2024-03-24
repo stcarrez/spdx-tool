@@ -67,7 +67,13 @@ package body SPDX_Tool.Languages is
          begin
             Comment.Start := Pos;
             Comment.Head := Pos;
-            Comment.Text_Start := Pos;
+            if Pos <= Last - 1 then
+               --  Ignore a ' * ' or ' + ' presentation in code blocks.
+               Comment.Text_Start := Skip_Presentation (Buffer, Pos, Last - 1);
+            else
+               --  Empty line
+               Comment.Text_Start := Pos;
+            end if;
             Comment.Text_Last := Last - 1;
             while Pos + Len <= Last loop
                if Buffer (Pos .. Pos + Len - 1) = Analyzer.Comment_End then

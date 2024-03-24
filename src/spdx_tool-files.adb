@@ -162,22 +162,24 @@ package body SPDX_Tool.Files is
    --  tries to find a best match.
    --  ------------------------------
    procedure Extract_Tokens (File    : in File_Type;
+                             First   : in Line_Number;
+                             Last    : in Line_Number;
                              Tokens  : in out SPDX_Tool.Buffer_Sets.Set) is
-      Buf   : constant Buffer_Accessor := File.Buffer.Value;
-      Pos   : Buffer_Index;
-      First : Buffer_Index;
-      Last  : Buffer_Index;
+      Buf       : constant Buffer_Accessor := File.Buffer.Value;
+      Pos       : Buffer_Index;
+      First_Pos : Buffer_Index;
+      Last_Pos  : Buffer_Index;
    begin
-      for Line of File.Lines (1 .. File.Count) loop
+      for Line of File.Lines (First .. Last) loop
          if Line.Comment /= NO_COMMENT then
             Pos := Line.Style.Text_Start;
-            Last := Line.Style.Text_Last;
-            while Pos <= Last loop
-               First := Skip_Spaces (Buf.Data, Pos, Last);
-               exit when First > Last;
-               Pos := Next_Space (Buf.Data, First, Last);
-               if First <= Pos then
-                  Tokens.Include (Buf.Data (First .. Pos));
+            Last_Pos := Line.Style.Text_Last;
+            while Pos <= Last_Pos loop
+               First_Pos := Skip_Spaces (Buf.Data, Pos, Last_Pos);
+               exit when First_Pos > Last_Pos;
+               Pos := Next_Space (Buf.Data, First_Pos, Last_Pos);
+               if First_Pos <= Pos then
+                  Tokens.Include (Buf.Data (First_Pos .. Pos));
                end if;
                Pos := Pos + 1;
             end loop;
