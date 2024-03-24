@@ -212,6 +212,7 @@ private
    type Language_Manager is tagged limited record
       File_Mapper   : Language_Mappers.Filter_Type;
       Languages     : Language_Maps.Map;
+      Default       : Combined_Analyzer_Access;
    end record;
 
    function Guess_Language (Manager : in Language_Manager;

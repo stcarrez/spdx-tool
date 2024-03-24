@@ -99,7 +99,7 @@ package body SPDX_Tool.Files is
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
 
       if File.Lines (First).Comment = LINE_COMMENT then
-         First_Pos := File.Lines (First).Style.Start;
+         First_Pos := File.Lines (First).Style.Text_Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
@@ -115,17 +115,17 @@ package body SPDX_Tool.Files is
          end if;
 
       elsif File.Lines (First).Comment = LINE_BLOCK_COMMENT then
-         First_Pos := File.Lines (First).Style.Start;
+         First_Pos := File.Lines (First).Style.Text_Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
-         Next_Pos := File.Lines (Last).Style.Last - 1;
+         Next_Pos := File.Lines (Last).Style.Text_Last - 1;
       else
-         First_Pos := File.Lines (First).Style.Start;
+         First_Pos := File.Lines (First).Style.Text_Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
-         Next_Pos := File.Lines (Last).Style.Last + 1;
+         Next_Pos := File.Lines (Last).Style.Text_Last + 1;
       end if;
 
       Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
@@ -136,7 +136,7 @@ package body SPDX_Tool.Files is
       if File.Lines (First).Style.Boxed then
          Length := Languages.Max_Length (File.Lines, First, Last);
          Spaces := Length - License'Length - String '("SPDX-License-Identifier: ")'Length - Spaces;
-         Spaces := Spaces - (File.Lines (First).Style.Start - File.Lines (First).Line_Start);
+         Spaces := Spaces - (File.Lines (First).Style.Text_Start - File.Lines (First).Line_Start);
          Spaces := Spaces - (File.Lines (Last).Line_End - Next_Pos + 1);
          while Spaces > 0 loop
             Output.Write (" ");

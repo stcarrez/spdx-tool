@@ -255,6 +255,9 @@ package body SPDX_Tool.Languages is
          if Language_Maps.Has_Element (Pos) then
             Analyzer := Language_Maps.Element (Pos).Analyzer;
             Log.Info ("{0}: language {1} with analyzer", File.Path, Language);
+         elsif Manager.Default /= null then
+            Analyzer := Manager.Default.all'Access;
+            Log.Info ("{0}: language {1} with default analyzer", File.Path, Language);
          else
             Analyzer := null;
             Log.Info ("{0}: language {1} without analyzer", File.Path, Language);
@@ -595,6 +598,9 @@ package body SPDX_Tool.Languages is
                              Start_Cmt    : in String;
                              End_Cmt      : in String := "";
                              Alternatives : in String := "");
+      procedure Setup_Language (Name    : in String;
+                                Lang    : in Language_Maps.Reference_Type;
+                                Recurse : in Positive);
 
       procedure Set_Comments (Conf : in Comment_Configuration) is
          Lang : constant String := To_String (Conf.Language);
@@ -676,11 +682,13 @@ package body SPDX_Tool.Languages is
          end loop;
          Lang.Analyzer := Result.all'Access;
       end Setup_Language;
+
+      Basic_Analyzer_Count : Natural := 0;
    begin
       Add_Builtin ("Ada", "--");
       Add_Builtin ("C-line", "//");
       Add_Builtin ("Shell", "#");
-      Add_Builtin ("Latex", "%%");
+      Add_Builtin ("Latex", "%");
       Add_Builtin ("C-block", "/*", "*/");
       Add_Builtin ("XML", "<!--", "-->");
       Add_Builtin ("OCaml", "(*", "*)");
@@ -698,6 +706,7 @@ package body SPDX_Tool.Languages is
          begin
             if Length (Lang.Config.Alternative) = 0 then
                Lang.Analyzer := Manager.Create_Analyzer (Lang.Config);
+               Basic_Analyzer_Count := Basic_Analyzer_Count + 1;
             end if;
          end;
       end loop;
@@ -712,6 +721,23 @@ package body SPDX_Tool.Languages is
             end if;
          end;
       end loop;
+
+      Manager.Default := new Combined_Analyzer_Type '(Count => Basic_Analyzer_Count, others => <>);
+      Basic_Analyzer_Count := 0;
+      for Iter in Manager.Languages.Iterate loop
+         declare
+            Lang : constant Language_Maps.Reference_Type := Manager.Languages.Reference (Iter);
+         begin
+            if Length (Lang.Config.Alternative) = 0
+               and then Lang.Analyzer /= null
+               and then Basic_Analyzer_Count <= Manager.Default.Count
+            then
+               Basic_Analyzer_Count := Basic_Analyzer_Count + 1;
+               Manager.Default.Analyzers (Basic_Analyzer_Count) := Lang.Analyzer;
+            end if;
+         end;
+      end loop;
+
    end Initialize;
 
 end SPDX_Tool.Languages;
