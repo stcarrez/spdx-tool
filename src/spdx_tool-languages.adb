@@ -125,7 +125,7 @@ package body SPDX_Tool.Languages is
                            Last     : in Buffer_Index;
                            Comment  : in out Comment_Info) is
    begin
-      if comment.Analyzer /= null and then Comment.Mode in START_COMMENT | BLOCK_COMMENT then
+      if Comment.Analyzer /= null and then Comment.Mode in START_COMMENT | BLOCK_COMMENT then
          Comment.Analyzer.Find_Comment (Buffer, From, Last, Comment);
       else
          Comment.Analyzer := null;
@@ -201,7 +201,36 @@ package body SPDX_Tool.Languages is
             return  "TAR";
          end if;
       end;
-
+      declare
+         Line_Count  : Natural := 0;
+         Text_Count  : Natural := 0;
+         Bin_Count   : Natural := 0;
+         Pound_Cmt   : Natural := 0;
+         Column      : Natural := 0;
+      begin
+         for Byte of Buffer loop
+            if Byte in LF | CR then
+               Line_Count := Line_Count + 1;
+               Column := 0;
+            elsif Byte in 16#20# .. 16#80# then
+               if Column = 0 then
+                  if Byte = Character'Pos ('#') then
+                     Pound_Cmt := Pound_Cmt + 1;
+                  end if;
+               end if;
+               Text_Count := Text_Count + 1;
+               Column := Column + 1;
+            elsif not (Byte in SPACE | TAB) then
+               Bin_Count := Bin_Count + 1;
+               Column := Column + 1;
+            end if;
+         end loop;
+         if Bin_Count = 0 and then Line_Count > 0
+            and then Pound_Cmt > 0 and then Text_Count > 0
+         then
+            return "Shell";
+         end if;
+      end;
       return "";
    end Guess_Language;
 
