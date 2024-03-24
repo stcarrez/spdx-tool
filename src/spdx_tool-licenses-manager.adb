@@ -213,7 +213,7 @@ package body SPDX_Tool.Licenses.Manager is
                            Last    : out Line_Number) is
    begin
       First := Lines'First;
-      while First <= Count loop
+      while First < Count loop
          if Lines (First).Style.Mode /= Languages.NO_COMMENT
            and then not Languages.Is_Presentation_Line (Lines, Buf, First)
          then
