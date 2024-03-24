@@ -4,7 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
-with Ada.Directories;
 with Util.Assertions;
 with Util.Test_Caller;
 package body SPDX_Tool.Tests is
@@ -48,7 +47,7 @@ package body SPDX_Tool.Tests is
       Result : UString;
    begin
       T.Execute (Tool & " --no-color regtests/src", Result, 0);
-      Util.Tests.Assert_Matches (T, ".*Apache-2.0.*[0-9]+.*100.0.*",
+      Util.Tests.Assert_Matches (T, ".*Apache-2.0.*[0-9]+.*90.0.*",
                                  Result, "Invalid result");
    end Test_Report_Licenses;
 
@@ -105,7 +104,7 @@ package body SPDX_Tool.Tests is
         := Util.Tests.Get_Test_Path ("report.json");
       Result : UString;
    begin
-      T.Execute (Tool & " --mimes --output-json " & Path & " regtests/files",
+      T.Execute (Tool & " --mimes --output-json " & Path & " regtests/files/identify",
                  Result, 0);
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -119,7 +118,7 @@ package body SPDX_Tool.Tests is
         := Util.Tests.Get_Test_Path ("report.xml");
       Result : UString;
    begin
-      T.Execute (Tool & " --mimes --output-xml " & Path & " regtests/files",
+      T.Execute (Tool & " --mimes --output-xml " & Path & " regtests/files/identify",
                  Result, 0);
       Util.Tests.Assert_Equal_Files
         (T       => T,

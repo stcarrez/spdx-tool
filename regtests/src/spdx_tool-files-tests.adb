@@ -148,23 +148,31 @@ package body SPDX_Tool.Files.Tests is
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
                         "Invalid identification at 1");
-         Assert_Equals (T, 3, Info.Lines (1).Style.Start,
+         Assert_Equals (T, 1, Info.Lines (1).Style.Start,
                         "Invalid start at 1");
-         Assert_Equals (T, 32, Info.Lines (1).Style.Last,
-                        "Invalid last at 1");
+         Assert_Equals (T, 3, Info.Lines (1).Style.Text_Start,
+                        "Invalid text start at 1");
+         Assert_Equals (T, 32, Info.Lines (1).Style.Text_Last,
+                        "Invalid text last at 1");
 
          Assert_Equals (T, BLOCK_COMMENT, Info.Lines (2).Comment,
                         "Invalid identification at 2");
-         Assert_Equals (T, 37, Info.Lines (2).Style.Start,
+         Assert_Equals (T, 34, Info.Lines (2).Style.Start,
                         "Invalid start at 2");
-         Assert_Equals (T, 90, Info.Lines (2).Style.Last,
+         Assert_Equals (T, 37, Info.Lines (2).Style.Text_Start,
+                        "Invalid start at 2");
+         Assert_Equals (T, 90, Info.Lines (2).Style.Text_Last,
                         "Invalid last at 2");
 
          Assert_Equals (T, END_COMMENT, Info.Lines (15).Comment,
                         "Invalid identification at 15");
-         Assert_Equals (T, 665, Info.Lines (15).Style.Start,
+         Assert_Equals (T, 662, Info.Lines (15).Style.Start,
+                        "Invalid start at 15");
+         Assert_Equals (T, 665, Info.Lines (15).Style.Text_Start,
                         "Invalid start at 15");
          Assert_Equals (T, 738, Info.Lines (15).Style.Last,
+                        "Invalid last at 25");
+         Assert_Equals (T, 736, Info.Lines (15).Style.Text_Last,
                         "Invalid last at 25");
       end;
 
@@ -180,28 +188,36 @@ package body SPDX_Tool.Files.Tests is
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
                         "Invalid identification at 1");
-         Assert_Equals (T, 3, Info.Lines (1).Style.Start,
+         Assert_Equals (T, 1, Info.Lines (1).Style.Start,
+                        "Invalid start at 1");
+         Assert_Equals (T, 3, Info.Lines (1).Style.Text_Start,
                         "Invalid start at 1");
          Assert_Equals (T, 39, Info.Lines (1).Style.Last,
                         "Invalid last at 1");
 
          Assert_Equals (T, BLOCK_COMMENT, Info.Lines (2).Comment,
                         "Invalid identification at 2");
-         Assert_Equals (T, 45, Info.Lines (2).Style.Start,
+         Assert_Equals (T, 41, Info.Lines (2).Style.Start,
+                        "Invalid start at 2");
+         Assert_Equals (T, 45, Info.Lines (2).Style.Text_Start,
                         "Invalid start at 2");
          Assert_Equals (T, 102, Info.Lines (2).Style.Last,
                         "Invalid last at 2");
 
          Assert_Equals (T, BLOCK_COMMENT, Info.Lines (15).Comment,
                         "Invalid identification at 15");
-         Assert_Equals (T, 699, Info.Lines (15).Style.Start,
+         Assert_Equals (T, 695, Info.Lines (15).Style.Start,
+                        "Invalid start at 15");
+         Assert_Equals (T, 699, Info.Lines (15).Style.Text_Start,
                         "Invalid start at 15");
          Assert_Equals (T, 728, Info.Lines (15).Style.Last,
                         "Invalid last at 15");
 
          Assert_Equals (T, END_COMMENT, Info.Lines (16).Comment,
                         "Invalid identification at 16");
-         Assert_Equals (T, 731, Info.Lines (16).Style.Start,
+         Assert_Equals (T, 730, Info.Lines (16).Style.Start,
+                        "Invalid start at 16");
+         Assert_Equals (T, 731, Info.Lines (16).Style.Text_Start,
                         "Invalid start at 16");
          Assert_Equals (T, 731, Info.Lines (16).Style.Last,
                         "Invalid last at 16");
@@ -220,21 +236,27 @@ package body SPDX_Tool.Files.Tests is
                         "Invalid comment style");
          Assert_Equals (T, LINE_BLOCK_COMMENT, Info.Lines (1).Comment,
                         "Invalid identification at 1");
-         Assert_Equals (T, 3, Info.Lines (1).Style.Start,
+         Assert_Equals (T, 1, Info.Lines (1).Style.Start,
+                        "Invalid start at 1");
+         Assert_Equals (T, 3, Info.Lines (1).Style.Text_Start,
                         "Invalid start at 1");
          Assert_Equals (T, 76, Info.Lines (1).Style.Last,
                         "Invalid last at 1");
 
          Assert_Equals (T, LINE_BLOCK_COMMENT, Info.Lines (2).Comment,
                         "Invalid identification at 2");
-         Assert_Equals (T, 80, Info.Lines (2).Style.Start,
+         Assert_Equals (T, 78, Info.Lines (2).Style.Start,
+                        "Invalid start at 2");
+         Assert_Equals (T, 80, Info.Lines (2).Style.Text_Start,
                         "Invalid start at 2");
          Assert_Equals (T, 153, Info.Lines (2).Style.Last,
                         "Invalid last at 2");
 
          Assert_Equals (T, LINE_BLOCK_COMMENT, Info.Lines (15).Comment,
                         "Invalid identification at 15");
-         Assert_Equals (T, 1081, Info.Lines (15).Style.Start,
+         Assert_Equals (T, 1079, Info.Lines (15).Style.Start,
+                        "Invalid start at 15");
+         Assert_Equals (T, 1081, Info.Lines (15).Style.Text_Start,
                         "Invalid start at 15");
          Assert_Equals (T, 1154, Info.Lines (15).Style.Last,
                         "Invalid last at 15");
@@ -251,28 +273,36 @@ package body SPDX_Tool.Files.Tests is
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Style.Mode,
                         "Invalid identification at 1");
-         Assert_Equals (T, 3, Info.Lines (1).Style.Start,
+         Assert_Equals (T, 1, Info.Lines (1).Style.Start,
+                        "Invalid start at 1");
+         Assert_Equals (T, 3, Info.Lines (1).Style.Text_Start,
                         "Invalid start at 1");
          Assert_Equals (T, 2, Info.Lines (1).Style.Last,
                         "Invalid last at 1");
 
          Assert_Equals (T, BLOCK_COMMENT, Info.Lines (2).Style.Mode,
                         "Invalid identification at 2");
-         Assert_Equals (T, 8, Info.Lines (2).Style.Start,
+         Assert_Equals (T, 4, Info.Lines (2).Style.Start,
+                        "Invalid start at 2");
+         Assert_Equals (T, 8, Info.Lines (2).Style.Text_Start,
                         "Invalid start at 2");
          Assert_Equals (T, 30, Info.Lines (2).Style.Last,
                         "Invalid last at 2");
 
          Assert_Equals (T, BLOCK_COMMENT, Info.Lines (3).Style.Mode,
                         "Invalid identification at 3");
-         Assert_Equals (T, 36, Info.Lines (3).Style.Start,
+         Assert_Equals (T, 32, Info.Lines (3).Style.Start,
+                        "Invalid start at 3");
+         Assert_Equals (T, 36, Info.Lines (3).Style.Text_Start,
                         "Invalid start at 3");
          Assert_Equals (T, 68, Info.Lines (3).Style.Last,
                         "Invalid last at 3");
 
          Assert_Equals (T, END_COMMENT, Info.Lines (18).Style.Mode,
                         "Invalid identification at 18");
-         Assert_Equals (T, 806, Info.Lines (18).Style.Start,
+         Assert_Equals (T, 804, Info.Lines (18).Style.Start,
+                        "Invalid start at 18");
+         Assert_Equals (T, 806, Info.Lines (18).Style.Text_Start,
                         "Invalid start at 18");
          Assert_Equals (T, 806, Info.Lines (18).Style.Last,
                         "Invalid last at 18");
