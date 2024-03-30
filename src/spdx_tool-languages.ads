@@ -8,6 +8,7 @@ with Util.Files.Filters;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Configs;
+with Util.Strings.Vectors;
 private with Ada.Strings.Hash;
 private with Ada.Containers.Indefinite_Hashed_Maps;
 package SPDX_Tool.Languages is
@@ -17,6 +18,7 @@ package SPDX_Tool.Languages is
       new Util.Files.Filters (Element_Type => String);
 
    use type Infos.Line_Count;
+   subtype File_Info is Infos.File_Info;
 
    type Analyzer_Type is limited interface;
    type Analyzer_Access is access all Analyzer_Type'Class;
@@ -157,6 +159,28 @@ private
 
    subtype Comment_Configuration is Configs.Comment_Configuration;
    subtype Language_Configuration is Configs.Language_Configuration;
+
+   type Detector_Result is record
+      Languages : Util.Strings.Vectors.Vector;
+   end record;
+
+   --  Update the language detection result with the language and the given confidence.
+   --  Confidence are added
+   procedure Set_Language (Result     : in out Detector_Result;
+                           Language   : in String;
+                           Confidence : in Natural := 1);
+
+   type Detector_Type is limited interface;
+   type Detector_Access is access all Detector_Type'Class;
+
+   --  Detect the language of the file.  The detection can be based file name,
+   --  or file content as well as past detections from previous detectors.
+   --  We stop calling the detectors when they found a language with a
+   --  higher confidence.
+   procedure Detect (Detector : in Detector_Type;
+                     File     : in File_Info;
+                     Buffer   : in Buffer_Type;
+                     Result   : in out Detector_Result) is abstract;
 
    --  Analyzer for line oriented comments.
    type Line_Analyzer_Type (Len : Buffer_Size) is new Analyzer_Type with record

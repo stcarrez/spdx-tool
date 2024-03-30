@@ -10,6 +10,9 @@ with Util.Files;
 with Util.Strings.Vectors;
 with Util.Strings.Split;
 with SPDX_Tool.Extensions;
+with SPDX_Tool.Languages.Extensions;
+with SPDX_Tool.Languages.Mimes;
+with SPDX_Tool.Languages.Shell;
 package body SPDX_Tool.Languages is
 
    Log : constant Util.Log.Loggers.Logger :=
@@ -17,6 +20,17 @@ package body SPDX_Tool.Languages is
 
    use type Infos.License_Kind;
    use all type Language_Mappers.Match_Result;
+
+   Extension_Detector : Extensions.Extension_Detector_Type;
+   Mime_Detector      : Mimes.Mime_Detector_Type;
+   Shell_Detector     : Shell.Shell_Detector_Type;
+
+   procedure Set_Language (Result     : in out Detector_Result;
+                           Language   : in String;
+                           Confidence : in Natural := 1) is
+   begin
+      Result.Languages.Append (Language);
+   end Set_Language;
 
    overriding
    procedure Find_Comment (Analyzer : in Line_Analyzer_Type;
@@ -145,13 +159,13 @@ package body SPDX_Tool.Languages is
 
    function Get_Language_From_Extension (Path : in String) return String is
       Ext  : constant String := Ada.Directories.Extension (Path);
-      Kind : access constant String := Extensions.Get_Mapping (Ext);
+      Kind : access constant String := SPDX_Tool.Extensions.Get_Mapping (Ext);
    begin
       if Kind /= null then
          return Kind.all;
       end if;
       if Kind = null and then Util.Strings.Ends_With (Ext, "~") then
-         Kind := Extensions.Get_Mapping (Ext (Ext'First .. Ext'Last - 1));
+         Kind := SPDX_Tool.Extensions.Get_Mapping (Ext (Ext'First .. Ext'Last - 1));
       end if;
       if Kind /= null then
          return Kind.all;
@@ -693,6 +707,7 @@ package body SPDX_Tool.Languages is
       Add_Builtin ("XML", "<!--", "-->");
       Add_Builtin ("OCaml", "(*", "*)");
       Add_Builtin ("Erlang", "%%");
+      Add_Builtin ("Lisp", ";;");
       Add_Builtin ("C-style", "", "", "C-line,C-block");
       Configs.Configure (Config,
                          Set_Comments'Access);
