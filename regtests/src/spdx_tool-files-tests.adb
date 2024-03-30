@@ -12,7 +12,7 @@ with SPDX_Tool.Languages;
 package body SPDX_Tool.Files.Tests is
 
    use SPDX_Tool.Languages;
-   use SPDX_Tool.Infos;
+   subtype File_Info is Infos.File_Info;
 
    --  procedure Assert_Equals is
    --  new Util.Assertions.Assert_Equals_T (Value_Type => Comment_Style);

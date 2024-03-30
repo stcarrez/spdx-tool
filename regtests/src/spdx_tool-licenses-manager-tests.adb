@@ -16,6 +16,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
 
    use SPDX_Tool.Infos;
    use SPDX_Tool.Languages;
+   subtype File_Info is Infos.File_Info;
 
    procedure Check_License (T        : in out Test;
                             Filename : in String;
