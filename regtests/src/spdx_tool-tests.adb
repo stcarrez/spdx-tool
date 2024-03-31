@@ -4,7 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
-with Util.Assertions;
 with Util.Test_Caller;
 package body SPDX_Tool.Tests is
 
@@ -57,7 +56,7 @@ package body SPDX_Tool.Tests is
       T.Execute (Tool & " --no-color -f regtests/src", Result, 0);
       Util.Tests.Assert_Matches (T, ".*Apache-2.0.*",
                                  Result, "wrong license");
-      Util.Tests.Assert_Matches (T, ".*regtests/src/spdx_tool-files-tests.adb.*",
+      Util.Tests.Assert_Matches (T, ".*regtests/src/spdx_tool-files-manager-tests.adb.*",
                                  Result, "missing file");
       Util.Tests.Assert_Matches (T, ".*regtests/src/spdx_tool-tests.ads.*",
                                  Result, "missing file");
