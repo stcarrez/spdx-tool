@@ -15,7 +15,7 @@ with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Licenses.Decisions;
 package body SPDX_Tool.Licenses is
 
-   use all type SPDX_Tool.Languages.Comment_Mode;
+   use all type SPDX_Tool.Files.Comment_Mode;
    use type SPDX_Tool.Infos.License_Kind;
    subtype Confidence_Type is SPDX_Tool.Infos.Confidence_Type;
    use type SPDX_Tool.Infos.Confidence_Type;
@@ -920,7 +920,7 @@ package body SPDX_Tool.Licenses is
          Line    : Infos.Line_Number := From;
       begin
          while Line <= To loop
-            if File.Lines (Line).Comment /= SPDX_Tool.Languages.NO_COMMENT then
+            if File.Lines (Line).Comment /= NO_COMMENT then
                Match := Find_License (Token, Buf.Data,
                                       File.Lines, Line, To);
                if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then

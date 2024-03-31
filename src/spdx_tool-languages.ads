@@ -6,9 +6,9 @@
 
 with Util.Files.Filters;
 with SPDX_Tool.Infos;
-with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Configs;
 with Util.Strings.Vectors;
+with SPDX_Tool.Files;
 private with Ada.Strings.Hash;
 private with Ada.Containers.Indefinite_Hashed_Maps;
 package SPDX_Tool.Languages is
@@ -18,19 +18,14 @@ package SPDX_Tool.Languages is
       new Util.Files.Filters (Element_Type => String);
 
    use type Infos.Line_Count;
+   use all type Files.Comment_Mode;
    subtype File_Info is Infos.File_Info;
+   subtype Line_Array is Files.Line_Array;
+   subtype Line_Type is Files.Line_Type;
+   subtype File_Type is Files.File_Type;
 
    type Analyzer_Type is limited interface;
    type Analyzer_Access is access all Analyzer_Type'Class;
-
-   type Comment_Mode is (NO_COMMENT,
-                         LINE_COMMENT,
-                         LINE_BLOCK_COMMENT,
-                         START_COMMENT,
-                         BLOCK_COMMENT,
-                         END_COMMENT);
-
-   type Comment_Index is new Natural;
 
    type Comment_Info is record
       Analyzer   : Analyzer_Access;
@@ -41,7 +36,7 @@ package SPDX_Tool.Languages is
       Text_Last  : Buffer_Index := 1;
       Trailer    : Buffer_Size := 0;
       Length     : Natural := 0;
-      Mode       : Comment_Mode := NO_COMMENT;
+      Mode       : Files.Comment_Mode := NO_COMMENT;
       Boxed      : Boolean := False;
    end record;
 
@@ -57,15 +52,6 @@ package SPDX_Tool.Languages is
                            Last     : in Buffer_Index;
                            Comment  : in out Comment_Info) is abstract
       with Pre'Class => From <= Last and then From >= Buffer'First and then Last <= Buffer'Last;
-
-   type Line_Type is record
-      Comment    : Comment_Mode := NO_COMMENT;
-      Style      : Comment_Info;
-      Line_Start : Buffer_Index := 1;
-      Line_End   : Buffer_Size := 0;
-      Tokens     : SPDX_Tool.Buffer_Sets.Set;
-   end record;
-   type Line_Array is array (Infos.Line_Number range <>) of Line_Type;
 
    --  Compute maximum length of lines between From..To as byte count.
    function Max_Length (Lines : in Line_Array;
@@ -117,35 +103,21 @@ package SPDX_Tool.Languages is
                             Buffer : in Buffer_Type;
                             Boxed  : out Boolean);
 
-   type Language_Manager is tagged limited private;
-
-   --  Initialize the language manager with the given configuration.
-   procedure Initialize (Manager : in out Language_Manager;
-                         Config  : in SPDX_Tool.Configs.Config_Type);
-
    --  Extract from the given line in the comment the list of tokens used.
    --  Such list can be used by the license decision tree to find a matching license.
    procedure Extract_Line_Tokens (Buffer : in Buffer_Type;
                                   Line   : in out Line_Type)
-     with Pre => Line.Comment /= NO_COMMENT
+     with Pre => Line.Comment /= Files.NO_COMMENT
        and then Line.Style.Text_Start >= Buffer'First
        and then Line.Style.Text_Last <= Buffer'Last;
 
    --  Guess the language based on the file extension.
    function Get_Language_From_Extension (Path : in String) return String;
 
-   --  Identify the language used by the given file.  The identification can be
-   --  made by looking at the file extension, the mime type or by looking at
-   --  the first 4K block of the file.
-   procedure Find_Language (Manager  : in Language_Manager;
-                            File     : in out SPDX_Tool.Infos.File_Info;
-                            Buffer   : in Buffer_Type;
-                            Analyzer : out Analyzer_Access);
-
    procedure Find_Comments (Analyzer : in Analyzer_Type'Class;
                             Buffer   : in Buffer_Type;
                             Lines    : in out Line_Array;
-                            Count    : out Infos.Line_Count);
+                            Count    : in Infos.Line_Count);
 
    --  Extract from the header the license text that was found.
    --  When no license text was clearly identified, extract the text
@@ -154,6 +126,12 @@ package SPDX_Tool.Languages is
                              Buffer  : in Buffer_Type;
                              License : in Infos.License_Info)
                              return Infos.License_Text_Access;
+
+   --  Find lines in the buffer and setup the line array with indexes giving
+   --  the start and end position of each line.
+   procedure Find_Lines (Buffer   : in Buffer_Type;
+                         Lines    : in out Line_Array;
+                         Count    : out Infos.Line_Count);
 
 private
 
@@ -170,6 +148,9 @@ private
                            Language   : in String;
                            Confidence : in Natural := 1);
 
+   --  Get the language that was resolved.
+   function Get_Language (Result : in Detector_Result) return String;
+
    type Detector_Type is limited interface;
    type Detector_Access is access all Detector_Type'Class;
 
@@ -179,7 +160,7 @@ private
    --  higher confidence.
    procedure Detect (Detector : in Detector_Type;
                      File     : in File_Info;
-                     Buffer   : in Buffer_Type;
+                     Content  : in File_Type;
                      Result   : in out Detector_Result) is abstract;
 
    --  Analyzer for line oriented comments.
@@ -232,21 +213,5 @@ private
                                                  Element_Type => Language_Descriptor,
                                                  Hash         => Ada.Strings.Hash,
                                                  Equivalent_Keys => "=");
-
-   type Language_Manager is tagged limited record
-      File_Mapper   : Language_Mappers.Filter_Type;
-      Languages     : Language_Maps.Map;
-      Default       : Combined_Analyzer_Access;
-   end record;
-
-   function Guess_Language (Manager : in Language_Manager;
-                            File    : in SPDX_Tool.Infos.File_Info;
-                            Buffer  : in Buffer_Type) return String;
-
-   function Create_Analyzer (Manager : in Language_Manager;
-                             Conf    : in Comment_Configuration) return Analyzer_Access;
-
-   function Find_Analyzer (Manager : in Language_Manager;
-                           Name    : in String) return Analyzer_Access;
 
 end SPDX_Tool.Languages;

@@ -8,10 +8,10 @@ with Ada.Directories;
 
 with Util.Files.Walk;
 with Util.Strings.Sets;
-with SPDX_Tool.Files;
+with SPDX_Tool.Files.Manager;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
-private with SPDX_Tool.Languages;
+private with SPDX_Tool.Languages.Manager;
 private with Util.Executors;
 private with Util.Concurrent.Counters;
 package SPDX_Tool.Licenses.Manager is
@@ -75,7 +75,7 @@ package SPDX_Tool.Licenses.Manager is
 
    --  Analyze the content to find license information in the header comment.
    procedure Analyze (Manager  : in out License_Manager;
-                      File_Mgr : in out SPDX_Tool.Files.File_Manager;
+                      File_Mgr : in out SPDX_Tool.Files.Manager.File_Manager;
                       File     : in out SPDX_Tool.Infos.File_Info);
 
    generic
@@ -104,12 +104,12 @@ private
    subtype Executor_Manager_Access is Executors.Executor_Manager_Access;
 
    type File_Manager_Array is array (Positive range <>)
-     of aliased SPDX_Tool.Files.File_Manager;
+     of aliased SPDX_Tool.Files.Manager.File_Manager;
 
    type License_Manager (Count : Task_Count) is
    limited new UFW.Walker_Type with record
       Manager   : License_Manager_Access;
-      Languages : SPDX_Tool.Languages.Language_Manager;
+      Languages : SPDX_Tool.Languages.Manager.Language_Manager;
       Max_Fill  : Natural := 0;
       Started   : Boolean := False;
       Job       : Job_Type := READ_LICENSES;
@@ -154,6 +154,6 @@ private
    procedure Finalize (Manager : in out License_Manager);
 
    function Get_File_Manager (Manager : in out License_Manager)
-                              return SPDX_Tool.Files.File_Manager_Access;
+                              return SPDX_Tool.Files.Manager.File_Manager_Access;
 
 end SPDX_Tool.Licenses.Manager;

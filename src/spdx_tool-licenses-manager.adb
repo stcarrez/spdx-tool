@@ -16,14 +16,14 @@ with SPDX_Tool.Licenses.Reader;
 --  with SPDX_Tool.Licenses.Templates;
 package body SPDX_Tool.Licenses.Manager is
 
-   use type SPDX_Tool.Languages.Comment_Mode;
+   use all type SPDX_Tool.Files.Comment_Mode;
    use type SPDX_Tool.Infos.License_Kind;
    use type GNAT.Strings.String_Access;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
 
-   File_Mgr : SPDX_Tool.Files.File_Manager_Access := null with Thread_Local_Storage;
+   File_Mgr : SPDX_Tool.Files.Manager.File_Manager_Access := null with Thread_Local_Storage;
 
    --  ------------------------------
    --  Configure the license manager.
@@ -214,7 +214,7 @@ package body SPDX_Tool.Licenses.Manager is
    begin
       First := Lines'First;
       while First < Count loop
-         if Lines (First).Style.Mode /= Languages.NO_COMMENT
+         if Lines (First).Style.Mode /= NO_COMMENT
            and then not Languages.Is_Presentation_Line (Lines, Buf, First)
          then
             exit;
@@ -223,7 +223,7 @@ package body SPDX_Tool.Licenses.Manager is
       end loop;
       Last := First;
       while Last + 1 <= Count loop
-         if Lines (Last + 1).Style.Mode = Languages.NO_COMMENT then
+         if Lines (Last + 1).Style.Mode = NO_COMMENT then
             exit;
          end if;
          Last := Last + 1;
@@ -245,7 +245,7 @@ package body SPDX_Tool.Licenses.Manager is
       First_Line : Line_Number;
       Last_Line  : Line_Number;
    begin
-      if File.Cmt_Style = SPDX_Tool.Languages.NO_COMMENT or else File.Count = 0 then
+      if File.Cmt_Style = NO_COMMENT or else File.Count = 0 then
          Result.Info.Match := Infos.NONE;
          return Result;
       end if;
@@ -283,7 +283,7 @@ package body SPDX_Tool.Licenses.Manager is
          end;
       end if;
       loop
-         if File.Lines (Line).Comment /= SPDX_Tool.Languages.NO_COMMENT then
+         if File.Lines (Line).Comment /= NO_COMMENT then
             Match := Find_License (Manager.Licenses.Root, Buf.Data,
                                    File.Lines, Line, File.Count);
             if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
@@ -365,7 +365,7 @@ package body SPDX_Tool.Licenses.Manager is
    end Analyze;
 
    procedure Analyze (Manager  : in out License_Manager;
-                      File_Mgr : in out SPDX_Tool.Files.File_Manager;
+                      File_Mgr : in out SPDX_Tool.Files.Manager.File_Manager;
                       File     : in out SPDX_Tool.Infos.File_Info) is
       Data   : SPDX_Tool.Files.File_Type (100);
       Result : License_Match;
@@ -432,7 +432,7 @@ package body SPDX_Tool.Licenses.Manager is
             Cmt_Count : Natural := 0;
          begin
             for I in Data.Lines'Range loop
-               if Data.Lines (I).Comment /= Languages.NO_COMMENT then
+               if Data.Lines (I).Comment /= NO_COMMENT then
                   Cmt_Count := Cmt_Count + 1;
                end if;
             end loop;
@@ -478,7 +478,7 @@ package body SPDX_Tool.Licenses.Manager is
    end Finalize;
 
    function Get_File_Manager (Manager : in out License_Manager)
-                              return SPDX_Tool.Files.File_Manager_Access is
+                              return SPDX_Tool.Files.Manager.File_Manager_Access is
       Value : Integer;
    begin
       Util.Concurrent.Counters.Increment (Manager.Mgr_Idx, Value);
@@ -486,7 +486,7 @@ package body SPDX_Tool.Licenses.Manager is
    end Get_File_Manager;
 
    procedure Execute (Job : in out License_Job_Type) is
-      use type SPDX_Tool.Files.File_Manager_Access;
+      use type SPDX_Tool.Files.Manager.File_Manager_Access;
    begin
       if File_Mgr = null then
          File_Mgr := Job.Manager.Get_File_Manager;

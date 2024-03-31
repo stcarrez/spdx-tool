@@ -7,23 +7,14 @@ with Ada.Directories;
 
 with Util.Log.Loggers;
 with Util.Files;
-with Util.Strings.Vectors;
-with Util.Strings.Split;
 with SPDX_Tool.Extensions;
-with SPDX_Tool.Languages.Extensions;
-with SPDX_Tool.Languages.Mimes;
-with SPDX_Tool.Languages.Shell;
+
 package body SPDX_Tool.Languages is
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Languages");
 
    use type Infos.License_Kind;
-   use all type Language_Mappers.Match_Result;
-
-   Extension_Detector : Extensions.Extension_Detector_Type;
-   Mime_Detector      : Mimes.Mime_Detector_Type;
-   Shell_Detector     : Shell.Shell_Detector_Type;
 
    procedure Set_Language (Result     : in out Detector_Result;
                            Language   : in String;
@@ -31,6 +22,16 @@ package body SPDX_Tool.Languages is
    begin
       Result.Languages.Append (Language);
    end Set_Language;
+
+   --  Get the language that was resolved.
+   function Get_Language (Result : in Detector_Result) return String is
+   begin
+      if not Result.Languages.Is_Empty then
+         return Result.Languages.First_Element;
+      else
+         return "";
+      end if;
+   end Get_Language;
 
    overriding
    procedure Find_Comment (Analyzer : in Line_Analyzer_Type;
@@ -173,134 +174,27 @@ package body SPDX_Tool.Languages is
       return "";
    end Get_Language_From_Extension;
 
-   function Guess_Language (Manager : in Language_Manager;
-                            File    : in SPDX_Tool.Infos.File_Info;
-                            Buffer  : in Buffer_Type) return String is
-      Match : constant Language_Mappers.Filter_Result := Manager.File_Mapper.Match (File.Path);
-   begin
-      if Match.Match = Language_Mappers.Found then
-         return Language_Mappers.Get_Value (Match);
-      end if;
-      declare
-         Language : constant String := Get_Language_From_Extension (File.Path);
-      begin
-         if Language'Length > 0 then
-            return Language;
-         end if;
-      end;
-      declare
-         Mime : constant String := To_String (File.Mime);
-      begin
-         if Util.Strings.Starts_With (Mime, "text/") then
-            if Util.Strings.Starts_With (Mime, "text/x-shellscript") then
-               return "Shell";
-            elsif Util.Strings.Starts_With (Mime, "text/x-m4") then
-               return "M4";
-            elsif Util.Strings.Starts_With (Mime, "text/x-makefile") then
-               return  "Makefile";
-            elsif Util.Strings.Starts_With (Mime, "text/xml") then
-               return  "XML";
-            else
-               return "Text file";
-            end if;
-         elsif Util.Strings.Starts_With (Mime, "image/") then
-            return "Image";
-         elsif Util.Strings.Starts_With (Mime, "video/") then
-            return "Video";
-         elsif Util.Strings.Starts_With (Mime, "application/pdf") then
-            return  "PDF";
-         elsif Util.Strings.Starts_With (Mime, "application/zip") then
-            return  "ZIP";
-         elsif Util.Strings.Starts_With (Mime, "application/x-tar") then
-            return  "TAR";
-         end if;
-      end;
-      declare
-         Line_Count  : Natural := 0;
-         Text_Count  : Natural := 0;
-         Bin_Count   : Natural := 0;
-         Pound_Cmt   : Natural := 0;
-         Column      : Natural := 0;
-      begin
-         for Byte of Buffer loop
-            if Byte in LF | CR then
-               Line_Count := Line_Count + 1;
-               Column := 0;
-            elsif Byte in 16#20# .. 16#80# then
-               if Column = 0 then
-                  if Byte = Character'Pos ('#') then
-                     Pound_Cmt := Pound_Cmt + 1;
-                  end if;
-               end if;
-               Text_Count := Text_Count + 1;
-               Column := Column + 1;
-            elsif not (Byte in SPACE | TAB) then
-               Bin_Count := Bin_Count + 1;
-               Column := Column + 1;
-            end if;
-         end loop;
-         if Bin_Count = 0 and then Line_Count > 0
-            and then Pound_Cmt > 0 and then Text_Count > 0
-         then
-            return "Shell";
-         end if;
-      end;
-      return "";
-   end Guess_Language;
-
-   --  ------------------------------
-   --  Identify the language used by the given file.
-   --  ------------------------------
-   procedure Find_Language (Manager  : in Language_Manager;
-                            File     : in out SPDX_Tool.Infos.File_Info;
-                            Buffer   : in Buffer_Type;
-                            Analyzer : out Analyzer_Access) is
-      Language : constant String := Manager.Guess_Language (File, Buffer);
-   begin
-      File.Language := To_UString (Language);
-      if Language'Length = 0 then
-         Analyzer := null;
-         Log.Info ("{0}: no language found", File.Path);
-         return;
-      end if;
-      declare
-         Pos : constant Language_Maps.Cursor := Manager.Languages.Find (Language);
-      begin
-         if Language_Maps.Has_Element (Pos) then
-            Analyzer := Language_Maps.Element (Pos).Analyzer;
-            Log.Info ("{0}: language {1} with analyzer", File.Path, Language);
-         elsif Manager.Default /= null then
-            Analyzer := Manager.Default.all'Access;
-            Log.Info ("{0}: language {1} with default analyzer", File.Path, Language);
-         else
-            Analyzer := null;
-            Log.Info ("{0}: language {1} without analyzer", File.Path, Language);
-         end if;
-      end;
-   end Find_Language;
-
    procedure Find_Comments (Analyzer : in Analyzer_Type'Class;
                             Buffer   : in Buffer_Type;
                             Lines    : in out Line_Array;
-                            Count    : out Infos.Line_Count) is
+                            Count    : in Infos.Line_Count) is
       Len      : constant Buffer_Size := Buffer'Length;
       Pos      : Buffer_Index := Buffer'First;
       First    : Buffer_Index;
-      Line_No  : Infos.Line_Count := 0;
       Style    : Comment_Info := (Mode => NO_COMMENT, others => <>);
    begin
-      while Pos <= Len loop
-         First := Pos;
-         Pos := Find_Eol (Buffer (Pos .. Len), Pos);
-         Line_No := Line_No + 1;
-         Lines (Line_No).Line_Start := First;
-         Lines (Line_No).Line_End := Pos - 1;
+      for Line_No in 1 .. Count loop
+         First := Lines (Line_No).Line_Start;
+         Pos := Lines (Line_No).Line_End + 1;
          Analyzer.Find_Comment (Buffer, First, Pos, Style);
          if Style.Text_Last < Style.Text_Start then
             Style.Text_Last := Style.Text_Start - 1;
          end if;
          Style.Length := Printable_Length (Buffer, First, Pos);
-         Lines (Line_No).Style := Style;
+         Lines (Line_No).Style := (Start => Style.Start, Last => Style.Last,
+                                   Head => Style.Head, Text_Start => Style.Text_Start,
+                                   Text_Last => Style.Text_Last, Trailer => Style.Trailer,
+                                   Length => Style.Length, Mode => Style.Mode, Boxed => Style.Boxed);
          if Style.Mode /= NO_COMMENT then
             Lines (Line_No).Comment := Style.Mode;
             Lines (Line_No).Style.Last := Pos - 1;
@@ -308,6 +202,27 @@ package body SPDX_Tool.Languages is
          else
             Lines (Line_No).Comment := NO_COMMENT;
          end if;
+      end loop;
+   end Find_Comments;
+
+   --  ------------------------------
+   --  Find lines in the buffer and setup the line array with indexes giving
+   --  the start and end position of each line.
+   --  ------------------------------
+   procedure Find_Lines (Buffer   : in Buffer_Type;
+                         Lines    : in out Line_Array;
+                         Count    : out Infos.Line_Count) is
+      Len      : constant Buffer_Size := Buffer'Length;
+      Pos      : Buffer_Index := Buffer'First;
+      First    : Buffer_Index;
+      Line_No  : Infos.Line_Count := 0;
+   begin
+      while Pos <= Len loop
+         First := Pos;
+         Pos := Find_Eol (Buffer (Pos .. Len), Pos);
+         Line_No := Line_No + 1;
+         Lines (Line_No).Line_Start := First;
+         Lines (Line_No).Line_End := Pos - 1;
          exit when Line_No = Lines'Last or else Pos > Len;
          if Buffer (Pos) = CR
             and then Pos + 1 <= Len
@@ -319,7 +234,7 @@ package body SPDX_Tool.Languages is
          end if;
       end loop;
       Count := Line_No;
-   end Find_Comments;
+   end Find_Lines;
 
    --  ------------------------------
    --  Compute maximum length of lines between From..To as byte count.
@@ -429,7 +344,7 @@ package body SPDX_Tool.Languages is
    function Is_Presentation_Line (Lines  : in Line_Array;
                                   Buffer : in Buffer_Type;
                                   Line   : in Infos.Line_Number) return Boolean is
-      Info : Comment_Info renames Lines (Line).Style;
+      Info : Files.Comment_Info renames Lines (Line).Style;
    begin
       return (for all I in Info.Text_Start .. Info.Text_Last
                 => Is_Space_Or_Punctuation (Buffer (I)));
@@ -563,196 +478,5 @@ package body SPDX_Tool.Languages is
          return Text;
       end;
    end Extract_License;
-
-   function Create_Analyzer (Manager : in Language_Manager;
-                             Conf    : in Comment_Configuration) return Analyzer_Access is
-   begin
-      if Length (Conf.Alternative) = 0 then
-         if Length (Conf.Block_Start) = 0 then
-            declare
-               Start : constant Buffer_Type := To_Buffer (Conf.Start);
-            begin
-               return new Line_Analyzer_Type '(Len           => Start'Length,
-                                               Comment_Start => Start);
-            end;
-         else
-            declare
-               Block_Start : constant Buffer_Type := To_Buffer (Conf.Block_Start);
-               Block_End   : constant Buffer_Type := To_Buffer (Conf.Block_End);
-            begin
-               return new Block_Analyzer_Type '(Len_Start     => Block_Start'Length,
-                                                Len_End       => Block_End'Length,
-                                                Comment_Start => Block_Start,
-                                                Comment_End   => Block_End);
-            end;
-         end if;
-      end if;
-      return null;
-   end Create_Analyzer;
-
-   function Find_Analyzer (Manager : in Language_Manager;
-                           Name    : in String) return Analyzer_Access is
-      Pos : constant Language_Maps.Cursor := Manager.Languages.Find (Name);
-   begin
-      if Language_Maps.Has_Element (Pos) then
-         return Language_Maps.Element (Pos).Analyzer;
-      else
-         return null;
-      end if;
-   end Find_Analyzer;
-
-   --  ------------------------------
-   --  Initialize the language manager with the given configuration.
-   --  ------------------------------
-   procedure Initialize (Manager : in out Language_Manager;
-                         Config  : in SPDX_Tool.Configs.Config_Type) is
-      procedure Set_Comments (Conf : in Comment_Configuration);
-      procedure Set_Language (Conf : in Language_Configuration);
-      procedure Add_Builtin (Language     : in String;
-                             Start_Cmt    : in String;
-                             End_Cmt      : in String := "";
-                             Alternatives : in String := "");
-      procedure Setup_Language (Name    : in String;
-                                Lang    : in Language_Maps.Reference_Type;
-                                Recurse : in Positive);
-
-      procedure Set_Comments (Conf : in Comment_Configuration) is
-         Lang : constant String := To_String (Conf.Language);
-         Pos  : constant Language_Maps.Cursor := Manager.Languages.Find (Lang);
-      begin
-         if not Language_Maps.Has_Element (Pos) then
-            Manager.Languages.Include (Lang, (null, Conf));
-         end if;
-      end Set_Comments;
-
-      procedure Set_Language (Conf : in Language_Configuration) is
-         Language : constant String := To_String (Conf.Language);
-         Comment  : constant String := To_String (Conf.Comment);
-      begin
-         for Pattern of Conf.Extensions loop
-            Manager.File_Mapper.Insert (Pattern   => Pattern,
-                                        Recursive => True,
-                                        Value     => Language);
-         end loop;
-         if Comment'Length > 0 then
-            Add_Builtin (Language, "", "", Comment);
-         end if;
-      end Set_Language;
-
-      procedure Add_Builtin (Language     : in String;
-                             Start_Cmt    : in String;
-                             End_Cmt      : in String := "";
-                             Alternatives : in String := "") is
-         Conf : Comment_Configuration;
-      begin
-         Conf.Language := To_UString (Language);
-         if End_Cmt'Length = 0 then
-            Conf.Start := To_UString (Start_Cmt);
-         else
-            Conf.Block_Start := To_UString (Start_Cmt);
-            Conf.Block_End := To_UString (End_Cmt);
-         end if;
-         Conf.Alternative := To_UString (Alternatives);
-         Set_Comments (Conf);
-      end Add_Builtin;
-
-      MAX_RECURSE : constant := 10;
-
-      procedure Setup_Language (Name    : in String;
-                                Lang    : in Language_Maps.Reference_Type;
-                                Recurse : in Positive) is
-         Names : constant Util.Strings.Vectors.Vector
-            := Util.Strings.Split (To_String (Lang.Config.Alternative), ",");
-         Result : Combined_Analyzer_Access;
-      begin
-         Result := new Combined_Analyzer_Type '(Count => Positive (Names.Length),
-                                                others => <>);
-         for I in 1 .. Result.Count loop
-            declare
-               Lang : constant String := Names.Element (I);
-               Pos  : constant Language_Maps.Cursor := Manager.Languages.Find (Lang);
-            begin
-               if not Language_Maps.Has_Element (Pos) then
-                  Log.Error ("Language {0}: invalid comment style {1}",
-                             Name, Lang);
-               else
-                  declare
-                     Ref_Lang : constant Language_Maps.Reference_Type
-                        := Manager.Languages.Reference (Pos);
-                  begin
-                     if Ref_Lang.Analyzer = null then
-                        if Recurse > MAX_RECURSE then
-                           Log.Error ("Too many recursive depend {0}", Name);
-                        elsif Length (Ref_Lang.Config.Alternative) = 0 then
-                           Log.Error ("Invalid language {0}", Lang);
-                        else
-                           Setup_Language (Lang, Ref_Lang, Recurse + 1);
-                        end if;
-                     end if;
-                     Result.Analyzers (I) := Ref_Lang.Analyzer;
-                  end;
-               end if;
-            end;
-         end loop;
-         Lang.Analyzer := Result.all'Access;
-      end Setup_Language;
-
-      Basic_Analyzer_Count : Natural := 0;
-   begin
-      Add_Builtin ("Ada", "--");
-      Add_Builtin ("C-line", "//");
-      Add_Builtin ("Shell", "#");
-      Add_Builtin ("Latex", "%");
-      Add_Builtin ("C-block", "/*", "*/");
-      Add_Builtin ("XML", "<!--", "-->");
-      Add_Builtin ("OCaml", "(*", "*)");
-      Add_Builtin ("Erlang", "%%");
-      Add_Builtin ("Lisp", ";;");
-      Add_Builtin ("C-style", "", "", "C-line,C-block");
-      Configs.Configure (Config,
-                         Set_Comments'Access);
-      Configs.Configure (Config,
-                         Set_Language'Access);
-
-      --  Build the basic line or block comment language analyzers.
-      for Iter in Manager.Languages.Iterate loop
-         declare
-            Lang : constant Language_Maps.Reference_Type := Manager.Languages.Reference (Iter);
-         begin
-            if Length (Lang.Config.Alternative) = 0 then
-               Lang.Analyzer := Manager.Create_Analyzer (Lang.Config);
-               Basic_Analyzer_Count := Basic_Analyzer_Count + 1;
-            end if;
-         end;
-      end loop;
-
-      --  Build language analyzer that depend on other analyzers.
-      for Iter in Manager.Languages.Iterate loop
-         declare
-            Lang : constant Language_Maps.Reference_Type := Manager.Languages.Reference (Iter);
-         begin
-            if Length (Lang.Config.Alternative) > 0 then
-               Setup_Language (Language_Maps.Key (Iter), Lang, 1);
-            end if;
-         end;
-      end loop;
-
-      Manager.Default := new Combined_Analyzer_Type '(Count => Basic_Analyzer_Count, others => <>);
-      Basic_Analyzer_Count := 0;
-      for Iter in Manager.Languages.Iterate loop
-         declare
-            Lang : constant Language_Maps.Reference_Type := Manager.Languages.Reference (Iter);
-         begin
-            if Length (Lang.Config.Alternative) = 0
-               and then Lang.Analyzer /= null
-               and then Basic_Analyzer_Count <= Manager.Default.Count
-            then
-               Basic_Analyzer_Count := Basic_Analyzer_Count + 1;
-               Manager.Default.Analyzers (Basic_Analyzer_Count) := Lang.Analyzer;
-            end if;
-         end;
-      end loop;
-
-   end Initialize;
 
 end SPDX_Tool.Languages;

@@ -7,48 +7,50 @@
 with Util.Streams.Files;
 with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Infos;
-with SPDX_Tool.Magic_Manager;
-with SPDX_Tool.Languages;
 package SPDX_Tool.Files is
 
-   use all type Languages.Comment_Mode;
-   subtype Comment_Mode is Languages.Comment_Mode;
-   subtype Line_Array is Languages.Line_Array;
    subtype Line_Number is Infos.Line_Number;
    subtype Line_Count is Infos.Line_Count;
+
+   type Comment_Mode is (NO_COMMENT,
+                         LINE_COMMENT,
+                         LINE_BLOCK_COMMENT,
+                         START_COMMENT,
+                         BLOCK_COMMENT,
+                         END_COMMENT);
+
+   type Comment_Index is new Natural;
+
+   type Comment_Info is record
+      Start      : Buffer_Index := 1;
+      Last       : Buffer_Index := 1;
+      Head       : Buffer_Index := 1;
+      Text_Start : Buffer_Index := 1;
+      Text_Last  : Buffer_Index := 1;
+      Trailer    : Buffer_Size := 0;
+      Length     : Natural := 0;
+      Mode       : Comment_Mode := NO_COMMENT;
+      Boxed      : Boolean := False;
+   end record;
+
+   type Line_Type is record
+      Comment    : Comment_Mode := NO_COMMENT;
+      Style      : Comment_Info;
+      Line_Start : Buffer_Index := 1;
+      Line_End   : Buffer_Size := 0;
+      Tokens     : SPDX_Tool.Buffer_Sets.Set;
+   end record;
+   type Line_Array is array (Infos.Line_Number range <>) of Line_Type;
 
    type File_Type (Max_Lines : Infos.Line_Count) is limited record
       File         : Util.Streams.Files.File_Stream;
       Buffer       : Buffer_Ref;
       Last_Offset  : Buffer_Size;
       Count        : Line_Count := 0;
-      Cmt_Style    : Comment_Mode := Languages.NO_COMMENT;
+      Cmt_Style    : Comment_Mode := NO_COMMENT;
       Lines        : Line_Array (1 .. Max_Lines);
       Boxed        : Boolean;
    end record;
-
-   type File_Manager is tagged limited private;
-   type File_Manager_Access is access all File_Manager;
-
-   --  Initialize the file manager and prepare the libmagic library.
-   procedure Initialize (Manager : in out File_Manager;
-                         Path    : in String);
-
-   --  Open the file and read the first data block (4K) to identify the
-   --  language and comment headers.
-   procedure Open (Manager   : in File_Manager;
-                   Data      : in out File_Type;
-                   File      : in out SPDX_Tool.Infos.File_Info;
-                   Languages : in SPDX_Tool.Languages.Language_Manager);
-
-   --  Save the file to replace the header license template by the corresponding
-   --  SPDX license header.
-   procedure Save (Manager : in File_Manager;
-                   File    : in out File_Type;
-                   Path    : in String;
-                   First   : in Line_Number;
-                   Last    : in Line_Number;
-                   License : in String);
 
    --  Extract from the header the list of tokens used.  Such list
    --  can be used by the license decision tree to find a matching license.
@@ -59,16 +61,5 @@ package SPDX_Tool.Files is
                              First   : in Line_Number;
                              Last    : in Line_Number;
                              Tokens  : in out SPDX_Tool.Buffer_Sets.Set);
-
-private
-
-   type File_Manager is tagged limited record
-      Magic_Manager : SPDX_Tool.Magic_Manager.Magic_Manager;
-   end record;
-
-   --  Identify the file mime type.
-   procedure Find_Mime_Type (Manager : in File_Manager;
-                             File    : in out SPDX_Tool.Infos.File_Info;
-                             Buffer  : in Buffer_Type);
 
 end SPDX_Tool.Files;

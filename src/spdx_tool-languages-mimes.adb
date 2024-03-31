@@ -8,7 +8,7 @@ package body SPDX_Tool.Languages.Mimes is
    overriding
    procedure Detect (Detector : in Mime_Detector_Type;
                      File     : in File_Info;
-                     Buffer   : in Buffer_Type;
+                     Content  : in File_Type;
                      Result   : in out Detector_Result) is
       Mime : constant String := To_String (File.Mime);
    begin
