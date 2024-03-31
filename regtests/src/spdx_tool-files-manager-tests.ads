@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------
 
 with Util.Tests;
-package SPDX_Tool.Files.Tests is
+package SPDX_Tool.Files.Manager.Tests is
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite);
 
@@ -29,4 +29,4 @@ package SPDX_Tool.Files.Tests is
    procedure Test_Save_Java (T : in out Test);
    procedure Test_Save_XHTML (T : in out Test);
 
-end SPDX_Tool.Files.Tests;
+end SPDX_Tool.Files.Manager.Tests;

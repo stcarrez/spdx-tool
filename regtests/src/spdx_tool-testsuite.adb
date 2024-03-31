@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------
 
 with SPDX_Tool.Tests;
-with SPDX_Tool.Files.Tests;
+with SPDX_Tool.Files.Manager.Tests;
 with SPDX_Tool.Licenses.Manager.Tests;
 package body SPDX_Tool.Testsuite is
 
@@ -16,7 +16,7 @@ package body SPDX_Tool.Testsuite is
       --  Executed in reverse order
       SPDX_Tool.Tests.Add_Tests (Tests'Access);
       SPDX_Tool.Licenses.Manager.Tests.Add_Tests (Tests'Access);
-      SPDX_Tool.Files.Tests.Add_Tests (Tests'Access);
+      SPDX_Tool.Files.Manager.Tests.Add_Tests (Tests'Access);
       return Tests'Access;
    end Suite;
 

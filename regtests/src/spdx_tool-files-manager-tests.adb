@@ -8,10 +8,10 @@ with Ada.Directories;
 with Util.Assertions;
 with Util.Test_Caller;
 with SPDX_Tool.Configs;
-with SPDX_Tool.Languages;
-package body SPDX_Tool.Files.Tests is
+with SPDX_Tool.Languages.Manager;
+package body SPDX_Tool.Files.Manager.Tests is
 
-   use SPDX_Tool.Languages;
+   use SPDX_Tool.Languages.Manager;
    subtype File_Info is Infos.File_Info;
 
    --  procedure Assert_Equals is
@@ -512,4 +512,4 @@ package body SPDX_Tool.Files.Tests is
          Message => "Invalid replacement");
    end Test_Save_XHTML;
 
-end SPDX_Tool.Files.Tests;
+end SPDX_Tool.Files.Manager.Tests;
