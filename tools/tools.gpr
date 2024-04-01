@@ -10,7 +10,8 @@ project Tools is
    for Object_Dir use "../obj/" & Spdx_Tool_Config.Build_Profile;
    for Create_Missing_Dirs use "True";
    for Exec_Dir use "../bin";
-   for Main use ("genlangmap.adb", "gendecisiontree.adb", "spdx_tool-gentmpl.adb");
+   for Main use ("gendecisiontree.adb", "spdx_tool-gentmpl.adb",
+                 "spdx_tool-genmap.adb");
 
    package Builder  renames Spdx_Tool.Builder;
    package Compiler renames Spdx_Tool.Compiler;
