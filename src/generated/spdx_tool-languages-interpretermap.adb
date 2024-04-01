@@ -16,22 +16,22 @@ package body SPDX_Tool.Languages.InterpreterMap is
      (212, 169, 30, 210, 102, 40);
 
    G : constant array (0 .. 300) of Unsigned_8 :=
-     (0, 63, 0, 0, 83, 138, 56, 0, 44, 128, 38, 0, 144, 0, 130, 99, 0, 0, 0,
-      0, 0, 46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 4, 0, 0, 123, 10,
-      0, 0, 0, 0, 141, 137, 0, 0, 7, 0, 0, 0, 92, 0, 73, 40, 0, 0, 0, 43,
-      117, 111, 0, 37, 82, 0, 118, 4, 71, 0, 47, 4, 133, 139, 0, 59, 0, 88,
-      0, 0, 36, 139, 24, 0, 141, 129, 49, 0, 78, 0, 46, 8, 0, 31, 0, 0, 0,
-      0, 0, 102, 0, 78, 0, 63, 116, 0, 0, 0, 130, 0, 0, 0, 136, 10, 3, 0, 3,
-      76, 0, 0, 0, 146, 0, 123, 0, 6, 131, 145, 0, 80, 95, 0, 140, 0, 49, 0,
-      148, 0, 0, 0, 121, 0, 0, 91, 44, 51, 0, 0, 0, 0, 102, 16, 106, 0, 0,
-      21, 91, 49, 0, 1, 0, 0, 125, 125, 61, 28, 89, 0, 93, 0, 0, 0, 35, 0,
-      0, 69, 82, 0, 93, 0, 56, 10, 0, 0, 0, 0, 127, 22, 0, 0, 108, 0, 0, 72,
-      0, 0, 0, 0, 55, 0, 3, 137, 0, 12, 0, 70, 0, 69, 0, 0, 34, 0, 58, 84,
-      20, 32, 2, 0, 17, 74, 0, 4, 0, 0, 0, 0, 0, 39, 145, 0, 100, 0, 0, 31,
-      30, 78, 35, 0, 0, 4, 1, 0, 83, 115, 82, 0, 136, 94, 115, 0, 0, 0, 0,
-      0, 34, 42, 9, 6, 75, 139, 0, 35, 97, 19, 0, 97, 56, 0, 0, 91, 13, 0,
-      0, 0, 42, 8, 81, 0, 111, 0, 41, 25, 114, 0, 141, 11, 110, 0, 0, 0, 5,
-      33, 2, 0, 0, 0, 0, 0, 117, 0);
+     (0, 62, 0, 0, 83, 135, 56, 0, 48, 128, 38, 0, 144, 0, 130, 103, 0, 0,
+      0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 4, 0, 0, 123,
+      12, 0, 0, 0, 0, 144, 137, 0, 0, 0, 0, 0, 0, 94, 0, 73, 40, 0, 0, 0,
+      40, 117, 107, 0, 36, 85, 0, 119, 1, 72, 0, 43, 6, 135, 141, 0, 58, 0,
+      88, 0, 0, 37, 138, 22, 0, 143, 129, 49, 0, 78, 0, 46, 8, 0, 31, 0, 0,
+      0, 0, 0, 105, 0, 82, 0, 59, 113, 0, 0, 0, 134, 0, 0, 0, 134, 13, 1, 0,
+      3, 74, 0, 0, 0, 140, 0, 123, 0, 9, 128, 145, 0, 80, 97, 0, 140, 0, 49,
+      0, 148, 0, 0, 0, 121, 0, 0, 91, 44, 53, 0, 0, 0, 0, 102, 16, 106, 0,
+      0, 17, 90, 50, 0, 5, 0, 0, 125, 125, 61, 29, 89, 0, 93, 6, 0, 0, 32,
+      0, 0, 68, 84, 0, 90, 0, 56, 10, 0, 0, 0, 0, 127, 22, 0, 0, 108, 0, 0,
+      73, 0, 0, 0, 0, 55, 0, 3, 134, 0, 12, 0, 69, 0, 70, 0, 0, 32, 0, 59,
+      84, 20, 33, 148, 0, 17, 78, 0, 10, 0, 0, 0, 0, 0, 38, 145, 0, 100, 0,
+      0, 30, 31, 78, 35, 0, 0, 1, 2, 0, 83, 116, 82, 0, 136, 98, 115, 0, 0,
+      0, 0, 0, 35, 43, 9, 4, 78, 138, 0, 35, 96, 19, 0, 97, 55, 0, 0, 90,
+      13, 0, 0, 0, 42, 8, 81, 0, 115, 0, 41, 25, 114, 0, 139, 11, 110, 0, 0,
+      0, 1, 34, 1, 0, 0, 0, 0, 0, 117, 0);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -53,30 +53,30 @@ package body SPDX_Tool.Languages.InterpreterMap is
 
    K_0             : aliased constant String := "pdksh";
    M_0             : aliased constant String := "Shell";
-   K_1             : aliased constant String := "verit";
-   M_1             : aliased constant String := "SMT";
-   K_2             : aliased constant String := "crystal";
-   M_2             : aliased constant String := "Crystal";
+   K_1             : aliased constant String := "crystal";
+   M_1             : aliased constant String := "Crystal";
+   K_2             : aliased constant String := "verit";
+   M_2             : aliased constant String := "SMT";
    K_3             : aliased constant String := "sh";
    M_3             : aliased constant String := "Shell";
-   K_4             : aliased constant String := "regina";
-   M_4             : aliased constant String := "REXX";
+   K_4             : aliased constant String := "newlisp";
+   M_4             : aliased constant String := "NewLisp";
    K_5             : aliased constant String := "picolisp";
    M_5             : aliased constant String := "PicoLisp";
-   K_6             : aliased constant String := "newlisp";
-   M_6             : aliased constant String := "NewLisp";
-   K_7             : aliased constant String := "qjs";
-   M_7             : aliased constant String := "JavaScript";
+   K_6             : aliased constant String := "qjs";
+   M_6             : aliased constant String := "JavaScript";
+   K_7             : aliased constant String := "regina";
+   M_7             : aliased constant String := "REXX";
    K_8             : aliased constant String := "dyalog";
    M_8             : aliased constant String := "APL";
    K_9             : aliased constant String := "pypy";
    M_9             : aliased constant String := "Python";
-   K_10            : aliased constant String := "jq";
-   M_10            : aliased constant String := "jq";
+   K_10            : aliased constant String := "ecl";
+   M_10            : aliased constant String := "Common Lisp";
    K_11            : aliased constant String := "makeinfo";
    M_11            : aliased constant String := "Texinfo";
-   K_12            : aliased constant String := "ecl";
-   M_12            : aliased constant String := "Common Lisp";
+   K_12            : aliased constant String := "jq";
+   M_12            : aliased constant String := "jq";
    K_13            : aliased constant String := "moon";
    M_13            : aliased constant String := "MoonScript";
    K_14            : aliased constant String := "js";
@@ -101,31 +101,31 @@ package body SPDX_Tool.Languages.InterpreterMap is
    M_23            : aliased constant String := "JavaScript";
    K_24            : aliased constant String := "tcsh";
    M_24            : aliased constant String := "Tcsh";
-   K_25            : aliased constant String := "mathsat5";
-   M_25            : aliased constant String := "SMT";
+   K_25            : aliased constant String := "io";
+   M_25            : aliased constant String := "Io";
    K_26            : aliased constant String := "nodejs";
    M_26            : aliased constant String := "JavaScript";
-   K_27            : aliased constant String := "io";
-   M_27            : aliased constant String := "Io";
-   K_28            : aliased constant String := "euiw";
-   M_28            : aliased constant String := "Euphoria";
-   K_29            : aliased constant String := "gosh";
-   M_29            : aliased constant String := "Scheme";
-   K_30            : aliased constant String := "rust-script";
-   M_30            : aliased constant String := "Rust";
-   K_31            : aliased constant String := "groovy";
-   M_31            : aliased constant String := "Groovy";
-   K_32            : aliased constant String := "pwsh";
-   M_32            : aliased constant String := "PowerShell";
-   K_33            : aliased constant String := "rexx";
-   M_33            : aliased constant String := "REXX";
-   K_34            : aliased constant String := "jruby";
-   M_34            : aliased constant String := "Ruby";
+   K_27            : aliased constant String := "mathsat5";
+   M_27            : aliased constant String := "SMT";
+   K_28            : aliased constant String := "gosh";
+   M_28            : aliased constant String := "Scheme";
+   K_29            : aliased constant String := "euiw";
+   M_29            : aliased constant String := "Euphoria";
+   K_30            : aliased constant String := "groovy";
+   M_30            : aliased constant String := "Groovy";
+   K_31            : aliased constant String := "rust-script";
+   M_31            : aliased constant String := "Rust";
+   K_32            : aliased constant String := "jruby";
+   M_32            : aliased constant String := "Ruby";
+   K_33            : aliased constant String := "pwsh";
+   M_33            : aliased constant String := "PowerShell";
+   K_34            : aliased constant String := "rexx";
+   M_34            : aliased constant String := "REXX";
    K_35            : aliased constant String := "ruby";
    M_35            : aliased constant String := "Ruby";
-   K_36            : aliased constant String := "gojq";
+   K_36            : aliased constant String := "jqq";
    M_36            : aliased constant String := "jq";
-   K_37            : aliased constant String := "jqq";
+   K_37            : aliased constant String := "gojq";
    M_37            : aliased constant String := "jq";
    K_38            : aliased constant String := "tclsh";
    M_38            : aliased constant String := "Tcl";
@@ -167,10 +167,10 @@ package body SPDX_Tool.Languages.InterpreterMap is
    M_56            : aliased constant String := "PicoLisp";
    K_57            : aliased constant String := "stp";
    M_57            : aliased constant String := "SMT";
-   K_58            : aliased constant String := "lsl";
-   M_58            : aliased constant String := "LSL";
-   K_59            : aliased constant String := "ash";
-   M_59            : aliased constant String := "Shell";
+   K_58            : aliased constant String := "ash";
+   M_58            : aliased constant String := "Shell";
+   K_59            : aliased constant String := "lsl";
+   M_59            : aliased constant String := "LSL";
    K_60            : aliased constant String := "dart";
    M_60            : aliased constant String := "Dart";
    K_61            : aliased constant String := "ts-node";
@@ -189,24 +189,24 @@ package body SPDX_Tool.Languages.InterpreterMap is
    M_67            : aliased constant String := "JavaScript";
    K_68            : aliased constant String := "aidl";
    M_68            : aliased constant String := "AIDL";
-   K_69            : aliased constant String := "scsynth";
-   M_69            : aliased constant String := "SuperCollider";
-   K_70            : aliased constant String := "pypy3";
-   M_70            : aliased constant String := "Python";
-   K_71            : aliased constant String := "node";
-   M_71            : aliased constant String := "JavaScript";
-   K_72            : aliased constant String := "nextflow";
-   M_72            : aliased constant String := "Nextflow";
+   K_69            : aliased constant String := "pypy3";
+   M_69            : aliased constant String := "Python";
+   K_70            : aliased constant String := "scsynth";
+   M_70            : aliased constant String := "SuperCollider";
+   K_71            : aliased constant String := "nextflow";
+   M_71            : aliased constant String := "Nextflow";
+   K_72            : aliased constant String := "node";
+   M_72            : aliased constant String := "JavaScript";
    K_73            : aliased constant String := "asy";
    M_73            : aliased constant String := "Asymptote";
    K_74            : aliased constant String := "scenic";
    M_74            : aliased constant String := "Scenic";
-   K_75            : aliased constant String := "query-json";
-   M_75            : aliased constant String := "jq";
+   K_75            : aliased constant String := "chakra";
+   M_75            : aliased constant String := "JavaScript";
    K_76            : aliased constant String := "Rscript";
    M_76            : aliased constant String := "R";
-   K_77            : aliased constant String := "chakra";
-   M_77            : aliased constant String := "JavaScript";
+   K_77            : aliased constant String := "query-json";
+   M_77            : aliased constant String := "jq";
    K_78            : aliased constant String := "php";
    M_78            : aliased constant String := "PHP";
    K_79            : aliased constant String := "zsh";
@@ -221,30 +221,30 @@ package body SPDX_Tool.Languages.InterpreterMap is
    M_83            : aliased constant String := "QMake";
    K_84            : aliased constant String := "smtinterpol";
    M_84            : aliased constant String := "SMT";
-   K_85            : aliased constant String := "gsed";
-   M_85            : aliased constant String := "sed";
+   K_85            : aliased constant String := "elvish";
+   M_85            : aliased constant String := "Elvish";
    K_86            : aliased constant String := "jolie";
    M_86            : aliased constant String := "Jolie";
-   K_87            : aliased constant String := "python2";
-   M_87            : aliased constant String := "Python";
-   K_88            : aliased constant String := "elvish";
-   M_88            : aliased constant String := "Elvish";
+   K_87            : aliased constant String := "gsed";
+   M_87            : aliased constant String := "sed";
+   K_88            : aliased constant String := "python2";
+   M_88            : aliased constant String := "Python";
    K_89            : aliased constant String := "python3";
    M_89            : aliased constant String := "Python";
-   K_90            : aliased constant String := "python";
-   M_90            : aliased constant String := "Python";
-   K_91            : aliased constant String := "escript";
-   M_91            : aliased constant String := "Erlang";
-   K_92            : aliased constant String := "mawk";
-   M_92            : aliased constant String := "Awk";
+   K_90            : aliased constant String := "escript";
+   M_90            : aliased constant String := "Erlang";
+   K_91            : aliased constant String := "python";
+   M_91            : aliased constant String := "Python";
+   K_92            : aliased constant String := "janet";
+   M_92            : aliased constant String := "Janet";
    K_93            : aliased constant String := "jconsole";
    M_93            : aliased constant String := "J";
-   K_94            : aliased constant String := "janet";
-   M_94            : aliased constant String := "Janet";
-   K_95            : aliased constant String := "lisp";
-   M_95            : aliased constant String := "Common Lisp";
-   K_96            : aliased constant String := "gawk";
-   M_96            : aliased constant String := "Awk";
+   K_94            : aliased constant String := "mawk";
+   M_94            : aliased constant String := "Awk";
+   K_95            : aliased constant String := "gawk";
+   M_95            : aliased constant String := "Awk";
+   K_96            : aliased constant String := "lisp";
+   M_96            : aliased constant String := "Common Lisp";
    K_97            : aliased constant String := "rake";
    M_97            : aliased constant String := "Ruby";
    K_98            : aliased constant String := "runhugs";
