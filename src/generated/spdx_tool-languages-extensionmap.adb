@@ -191,7 +191,6 @@ package body SPDX_Tool.Languages.ExtensionMap is
       return (Natural (G (F1)) + Natural (G (F2))) mod 1355;
    end Hash;
 
-
    type Name_Array is array (Natural range <>) of Content_Access;
 
    K_0             : aliased constant String := "janet";
@@ -459,7 +458,8 @@ package body SPDX_Tool.Languages.ExtensionMap is
    K_131           : aliased constant String := "topojson";
    M_131           : aliased constant String := "JSON";
    K_132           : aliased constant String := "m";
-   M_132           : aliased constant String := "MATLAB, Mathematica, MUF, Limbo, Mercury, Objective-C, M";
+   M_132           : aliased constant String := "MATLAB, Mathematica, MUF, Limbo, Mercury,"
+       & " Objective-C, M";
    K_133           : aliased constant String := "vba";
    M_133           : aliased constant String := "Vim Script, VBA";
    K_134           : aliased constant String := "gsx";
@@ -491,7 +491,8 @@ package body SPDX_Tool.Languages.ExtensionMap is
    K_147           : aliased constant String := "w";
    M_147           : aliased constant String := "OpenEdge ABL, CWeb";
    K_148           : aliased constant String := "x";
-   M_148           : aliased constant String := "Linker Script, Logos, RPC, DirectX 3D File";
+   M_148           : aliased constant String := "Linker Script, Logos, RPC, DirectX 3D Fil"
+       & "e";
    K_149           : aliased constant String := "rsh";
    M_149           : aliased constant String := "RenderScript";
    K_150           : aliased constant String := "y";
@@ -1559,7 +1560,8 @@ package body SPDX_Tool.Languages.ExtensionMap is
    K_681           : aliased constant String := "vxml";
    M_681           : aliased constant String := "XML";
    K_682           : aliased constant String := "dsc";
-   M_682           : aliased constant String := "Debian Package Control File, DenizenScript";
+   M_682           : aliased constant String := "Debian Package Control File, DenizenScrip"
+       & "t";
    K_683           : aliased constant String := "rnh";
    M_683           : aliased constant String := "RUNOFF";
    K_684           : aliased constant String := "j2";
@@ -2191,7 +2193,8 @@ package body SPDX_Tool.Languages.ExtensionMap is
    K_997           : aliased constant String := "xc";
    M_997           : aliased constant String := "XC";
    K_998           : aliased constant String := "cls";
-   M_998           : aliased constant String := "TeX, Apex, ObjectScript, VBA, Visual Basic 6.0, OpenEdge ABL";
+   M_998           : aliased constant String := "TeX, Apex, ObjectScript, VBA, Visual Basi"
+       & "c 6.0, OpenEdge ABL";
    K_999           : aliased constant String := "gypi";
    M_999           : aliased constant String := "Python";
    K_1000          : aliased constant String := "mxt";
@@ -2497,7 +2500,8 @@ package body SPDX_Tool.Languages.ExtensionMap is
    K_1150          : aliased constant String := "phtml";
    M_1150          : aliased constant String := "HTML+PHP";
    K_1151          : aliased constant String := "inc";
-   M_1151          : aliased constant String := "POV-Ray SDL, Pascal, Pawn, BitBake, SQL, HTML, Assembly, PHP, SourcePawn, NASL, C++, Motorola 68K Assembly";
+   M_1151          : aliased constant String := "POV-Ray SDL, Pascal, Pawn, BitBake, SQL, "
+       & "HTML, Assembly, PHP, SourcePawn, NASL, C++, Motorola 68K Assembly";
    K_1152          : aliased constant String := "rktd";
    M_1152          : aliased constant String := "Racket";
    K_1153          : aliased constant String := "vark";
@@ -2849,7 +2853,8 @@ package body SPDX_Tool.Languages.ExtensionMap is
    K_1326          : aliased constant String := "arpa";
    M_1326          : aliased constant String := "DNS Zone";
    K_1327          : aliased constant String := "gml";
-   M_1327          : aliased constant String := "Game Maker Language, Gerber Image, XML, Graph Modeling Language";
+   M_1327          : aliased constant String := "Game Maker Language, Gerber Image, XML, G"
+       & "raph Modeling Language";
    K_1328          : aliased constant String := "sha256";
    M_1328          : aliased constant String := "Checksums";
    K_1329          : aliased constant String := "lsl";

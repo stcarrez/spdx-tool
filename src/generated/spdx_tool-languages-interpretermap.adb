@@ -48,7 +48,6 @@ package body SPDX_Tool.Languages.InterpreterMap is
       return (Natural (G (F1)) + Natural (G (F2))) mod 150;
    end Hash;
 
-
    type Name_Array is array (Natural range <>) of Content_Access;
 
    K_0             : aliased constant String := "pdksh";
@@ -330,7 +329,8 @@ package body SPDX_Tool.Languages.InterpreterMap is
    K_138           : aliased constant String := "elixir";
    M_138           : aliased constant String := "Elixir";
    K_139           : aliased constant String := "parrot";
-   M_139           : aliased constant String := "Parrot Internal Representation, Parrot Assembly";
+   M_139           : aliased constant String := "Parrot Internal Representation, Parrot As"
+       & "sembly";
    K_140           : aliased constant String := "racket";
    M_140           : aliased constant String := "Racket";
    K_141           : aliased constant String := "sbcl";

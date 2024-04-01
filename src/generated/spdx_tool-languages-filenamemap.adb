@@ -72,7 +72,6 @@ package body SPDX_Tool.Languages.FilenameMap is
       return (Natural (G (F1)) + Natural (G (F2))) mod 361;
    end Hash;
 
-
    type Name_Array is array (Natural range <>) of Content_Access;
 
    K_0             : aliased constant String := ".vimrc";

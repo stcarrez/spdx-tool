@@ -44,7 +44,6 @@ package body SPDX_Tool.Languages.MimeMap is
       return (Natural (G (F1)) + Natural (G (F2))) mod 112;
    end Hash;
 
-
    type Name_Array is array (Natural range <>) of Content_Access;
 
    K_0             : aliased constant String := "text/x-ruby";
@@ -54,7 +53,9 @@ package body SPDX_Tool.Languages.MimeMap is
    K_2             : aliased constant String := "text/x-factor";
    M_2             : aliased constant String := "Factor";
    K_3             : aliased constant String := "text/x-properties";
-   M_3             : aliased constant String := "Windows Registry Entries, INI, ShellCheck Config, Simple File Verification, Java Properties, Win32 Message File, TextMate Properties, EditorConfig, Record Jar, Git Config";
+   M_3             : aliased constant String := "Windows Registry Entries, INI, ShellCheck"
+       & " Config, Simple File Verification, Java Properties, Win32 Message File"
+       & ", TextMate Properties, EditorConfig, Record Jar, Git Config";
    K_4             : aliased constant String := "application/javascript";
    M_4             : aliased constant String := "Jest Snapshot, JavaScript+ERB";
    K_5             : aliased constant String := "text/x-oz";
@@ -90,17 +91,20 @@ package body SPDX_Tool.Languages.MimeMap is
    K_20            : aliased constant String := "text/x-pascal";
    M_20            : aliased constant String := "Pascal, LigoLANG, Component Pascal";
    K_21            : aliased constant String := "text/x-vb";
-   M_21            : aliased constant String := "VBA, FreeBasic, Visual Basic 6.0, Visual Basic .NET";
+   M_21            : aliased constant String := "VBA, FreeBasic, Visual Basic 6.0, Visual "
+       & "Basic .NET";
    K_22            : aliased constant String := "text/x-scheme";
    M_22            : aliased constant String := "Nu, Janet, Scheme";
    K_23            : aliased constant String := "text/apl";
    M_23            : aliased constant String := "APL";
    K_24            : aliased constant String := "text/xml";
-   M_24            : aliased constant String := "XProc, XPages, COLLADA, Eagle, Maven POM, JetBrains MPS, XML, Genshi, LabVIEW, XML Property List, SVG, XSLT";
+   M_24            : aliased constant String := "XProc, XPages, COLLADA, Eagle, Maven POM,"
+       & " JetBrains MPS, XML, Genshi, LabVIEW, XML Property List, SVG, XSLT";
    K_25            : aliased constant String := "text/x-haml";
    M_25            : aliased constant String := "Haml";
    K_26            : aliased constant String := "text/x-c++src";
-   M_26            : aliased constant String := "Game Maker Language, AngelScript, Squirrel, AGS Script, SWIG, C++, Cuda, Edje Data Collection, Metal";
+   M_26            : aliased constant String := "Game Maker Language, AngelScript, Squirre"
+       & "l, AGS Script, SWIG, C++, Cuda, Edje Data Collection, Metal";
    K_27            : aliased constant String := "application/x-aspx";
    M_27            : aliased constant String := "ASP.NET";
    K_28            : aliased constant String := "text/x-puppet";
@@ -132,7 +136,8 @@ package body SPDX_Tool.Languages.MimeMap is
    K_41            : aliased constant String := "text/x-django";
    M_41            : aliased constant String := "Jinja";
    K_42            : aliased constant String := "text/javascript";
-   M_42            : aliased constant String := "PEG.js, Cycript, JSON with Comments, Qt Script, JavaScript";
+   M_42            : aliased constant String := "PEG.js, Cycript, JSON with Comments, Qt S"
+       & "cript, JavaScript";
    K_43            : aliased constant String := "application/pgp";
    M_43            : aliased constant String := "Public Key";
    K_44            : aliased constant String := "text/css";
@@ -160,7 +165,8 @@ package body SPDX_Tool.Languages.MimeMap is
    K_55            : aliased constant String := "text/x-nginx-conf";
    M_55            : aliased constant String := "Nginx";
    K_56            : aliased constant String := "application/json";
-   M_56            : aliased constant String := "Ecere Projects, JSON, Jupyter Notebook, Max, OASv2-json, JSON5, JSONLD, JSONiq, OASv3-json";
+   M_56            : aliased constant String := "Ecere Projects, JSON, Jupyter Notebook, M"
+       & "ax, OASv2-json, JSON5, JSONLD, JSONiq, OASv3-json";
    K_57            : aliased constant String := "text/x-spreadsheet";
    M_57            : aliased constant String := "LTspice Symbol";
    K_58            : aliased constant String := "text/x-rustsrc";
@@ -174,7 +180,9 @@ package body SPDX_Tool.Languages.MimeMap is
    K_62            : aliased constant String := "text/x-sql";
    M_62            : aliased constant String := "SQLPL, PLpgSQL, SQL";
    K_63            : aliased constant String := "text/x-sh";
-   M_63            : aliased constant String := "OpenRC runscript, ShellSession, Ignore List, Nushell, Tcsh, Alpine Abuild, Gentoo Ebuild, Option List, Gentoo Eclass, Shell, Git Attributes";
+   M_63            : aliased constant String := "OpenRC runscript, ShellSession, Ignore Li"
+       & "st, Nushell, Tcsh, Alpine Abuild, Gentoo Ebuild, Option List, Gentoo E"
+       & "class, Shell, Git Attributes";
    K_64            : aliased constant String := "application/x-erb";
    M_64            : aliased constant String := "HTML+ERB";
    K_65            : aliased constant String := "text/x-twig";
@@ -190,7 +198,8 @@ package body SPDX_Tool.Languages.MimeMap is
    K_70            : aliased constant String := "text/x-rst";
    M_70            : aliased constant String := "reStructuredText";
    K_71            : aliased constant String := "text/x-haskell";
-   M_71            : aliased constant String := "Grammatical Framework, PureScript, C2hs Haskell, Bluespec BH, Cabal Config, Dhall, Haskell";
+   M_71            : aliased constant String := "Grammatical Framework, PureScript, C2hs H"
+       & "askell, Bluespec BH, Cabal Config, Dhall, Haskell";
    K_72            : aliased constant String := "text/velocity";
    M_72            : aliased constant String := "Velocity Template Language";
    K_73            : aliased constant String := "text/x-plsql";
@@ -208,7 +217,8 @@ package body SPDX_Tool.Languages.MimeMap is
    K_79            : aliased constant String := "text/x-idl";
    M_79            : aliased constant String := "IDL";
    K_80            : aliased constant String := "text/html";
-   M_80            : aliased constant String := "MTML, HTML+EEX, Bikeshed, HTML, Kit, HTML+Razor, StringTemplate, Svelte, HTML+ECR, Ecmarkup, Marko";
+   M_80            : aliased constant String := "MTML, HTML+EEX, Bikeshed, HTML, Kit, HTML"
+       & "+Razor, StringTemplate, Svelte, HTML+ECR, Ecmarkup, Marko";
    K_81            : aliased constant String := "text/x-java";
    M_81            : aliased constant String := "Apex, UnrealScript, Java, ChucK";
    K_82            : aliased constant String := "text/x-rsrc";
@@ -256,21 +266,27 @@ package body SPDX_Tool.Languages.MimeMap is
    K_103           : aliased constant String := "text/x-ttcn-asn";
    M_103           : aliased constant String := "ASN.1";
    K_104           : aliased constant String := "text/x-common-lisp";
-   M_104           : aliased constant String := "Emacs Lisp, NetLogo, NewLisp, WebAssembly, KiCad Layout, SRecode Template, GCC Machine Description, Common Lisp, LFE";
+   M_104           : aliased constant String := "Emacs Lisp, NetLogo, NewLisp, WebAssembly"
+       & ", KiCad Layout, SRecode Template, GCC Machine Description, Common Lisp"
+       & ", LFE";
    K_105           : aliased constant String := "text/x-elm";
    M_105           : aliased constant String := "Elm";
    K_106           : aliased constant String := "text/x-livescript";
    M_106           : aliased constant String := "LiveScript";
    K_107           : aliased constant String := "text/x-yaml";
-   M_107           : aliased constant String := "RAML, OASv2-yaml, Unity3D Asset, SaltStack, Kaitai Struct, DenizenScript, LookML, OASv3-yaml, Common Workflow Language, MiniYAML, YAML";
+   M_107           : aliased constant String := "RAML, OASv2-yaml, Unity3D Asset, SaltStac"
+       & "k, Kaitai Struct, DenizenScript, LookML, OASv3-yaml, Common Workflow L"
+       & "anguage, MiniYAML, YAML";
    K_108           : aliased constant String := "text/x-csrc";
-   M_108           : aliased constant String := "X BitMap, HolyC, XS, XC, OpenCL, X PixMap, Smithy, NWScript, Monkey C, DTrace, C, GSC, Unified Parallel C";
+   M_108           : aliased constant String := "X BitMap, HolyC, XS, XC, OpenCL, X PixMap"
+       & ", Smithy, NWScript, Monkey C, DTrace, C, GSC, Unified Parallel C";
    K_109           : aliased constant String := "text/x-lua";
    M_109           : aliased constant String := "Terra, Lua";
    K_110           : aliased constant String := "text/x-haxe";
    M_110           : aliased constant String := "Haxe";
    K_111           : aliased constant String := "text/x-python";
-   M_111           : aliased constant String := "NumPy, Starlark, GN, Mojo, Xonsh, Sage, Snakemake, Easybuild, Python";
+   M_111           : aliased constant String := "NumPy, Starlark, GN, Mojo, Xonsh, Sage, S"
+       & "nakemake, Easybuild, Python";
 
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
