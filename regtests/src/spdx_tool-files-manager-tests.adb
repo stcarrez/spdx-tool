@@ -14,6 +14,8 @@ package body SPDX_Tool.Files.Manager.Tests is
    use SPDX_Tool.Languages.Manager;
    subtype File_Info is Infos.File_Info;
 
+   function Get_Path (Name : in String) return File_Info;
+
    --  procedure Assert_Equals is
    --  new Util.Assertions.Assert_Equals_T (Value_Type => Comment_Style);
    procedure Assert_Equals is
@@ -36,7 +38,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Open",
                        Test_Open'Access);
-      Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Open",
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Open (Multiline)",
                        Test_Multiline_Comment'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Save (Ada)",
                        Test_Save_Ada'Access);
@@ -68,6 +70,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager   : File_Manager;
       Languages : Language_Manager;
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       declare
          Data : File_Info := Get_Path ("files/identify/apache-2.0-1.ads");
@@ -135,6 +138,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager   : File_Manager;
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       declare
          Data : File_Info := Get_Path ("files/identify/gpl-3.0.c");
@@ -219,7 +223,7 @@ package body SPDX_Tool.Files.Manager.Tests is
                         "Invalid start at 16");
          Assert_Equals (T, 731, Info.Lines (16).Style.Text_Start,
                         "Invalid start at 16");
-         Assert_Equals (T, 731, Info.Lines (16).Style.Last,
+         Assert_Equals (T, 732, Info.Lines (16).Style.Last,
                         "Invalid last at 16");
       end;
 
@@ -304,7 +308,7 @@ package body SPDX_Tool.Files.Manager.Tests is
                         "Invalid start at 18");
          Assert_Equals (T, 806, Info.Lines (18).Style.Text_Start,
                         "Invalid start at 18");
-         Assert_Equals (T, 806, Info.Lines (18).Style.Last,
+         Assert_Equals (T, 807, Info.Lines (18).Style.Last,
                         "Invalid last at 18");
       end;
    end Test_Multiline_Comment;
@@ -321,6 +325,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 5, 16, "Apache-2.0");
@@ -341,6 +346,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 11, 19, "GPL-3.0");
@@ -361,6 +367,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 5, 15, "Apache-2.0");
@@ -381,6 +388,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 12, 27, "GPL-2.0");
@@ -401,6 +409,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 9, 27, "GPL-3.0");
@@ -421,6 +430,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 3, 22, "MIT");
@@ -441,6 +451,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 11, 13, "LGPL-2.1");
@@ -461,6 +472,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 6, 16, "Apache-2.0");
@@ -481,6 +493,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Info : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 5, 17, "LGPL-2.1");
@@ -501,6 +514,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Data      : File_Info := Get_Path ("files/identify/apache-2.0-5.xhtml");
       Info      : File_Type (100);
    begin
+      SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 5, 15, "Apache-2.0");
