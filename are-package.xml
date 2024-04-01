@@ -39,7 +39,7 @@
     </install>
   </resource>
 
-  <resource name='SPDX_Tool.Extensions'
+  <resource name='SPDX_Tool.Languages.ExtensionMap'
             format='map'
 	    name-access='true'
 	    list-access='true'
@@ -52,8 +52,46 @@
 
     <!-- Copy files with .txt extension from 'help' directory -->
     <install mode='copy' strip-extension='yes'>
-      <fileset dir="tools">
+      <fileset dir="share/spdx-tool">
         <include name="extensions.json"/>
+      </fileset>
+    </install>
+  </resource>
+
+  <resource name='SPDX_Tool.Languages.FilenameMap'
+            format='map'
+	    name-access='true'
+	    list-access='true'
+	    no-type-declaration='true'
+            type='access constant String'>
+    <header>--  SPDX-License-Identifier: Apache-2.0</header>
+    <header>--  Extensions mapping generated from extensions.json</header>
+
+    <mapper type='json'/>
+
+    <!-- Copy files with .txt extension from 'help' directory -->
+    <install mode='copy' strip-extension='yes'>
+      <fileset dir="share/spdx-tool">
+        <include name="filenames.json"/>
+      </fileset>
+    </install>
+  </resource>
+
+  <resource name='SPDX_Tool.Languages.InterpreterMap'
+            format='map'
+	    name-access='true'
+	    list-access='true'
+	    no-type-declaration='true'
+            type='access constant String'>
+    <header>--  SPDX-License-Identifier: Apache-2.0</header>
+    <header>--  Extensions mapping generated from extensions.json</header>
+
+    <mapper type='json'/>
+
+    <!-- Copy files with .txt extension from 'help' directory -->
+    <install mode='copy' strip-extension='yes'>
+      <fileset dir="share/spdx-tool">
+        <include name="interpreters.json"/>
       </fileset>
     </install>
   </resource>
