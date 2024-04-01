@@ -13,6 +13,7 @@ with Util.Streams.Files;
 with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Licenses.Reader;
+with SPDX_Tool.Configs.Default;
 --  with SPDX_Tool.Licenses.Templates;
 package body SPDX_Tool.Licenses.Manager is
 
@@ -32,6 +33,9 @@ package body SPDX_Tool.Licenses.Manager is
                         Config  : in SPDX_Tool.Configs.Config_Type;
                         Job     : in Job_Type) is
       procedure Set_Ignore (Pattern : in String);
+      procedure Load_Ignore_File (Path : in String);
+      procedure Load_Ignore_Content (Label   : in String;
+                                     Content : in String);
 
       procedure Set_Ignore (Pattern : in String) is
       begin
@@ -47,10 +51,54 @@ package body SPDX_Tool.Licenses.Manager is
             end if;
          end if;
       end Set_Ignore;
+
+      procedure Load_Ignore_Content (Label   : in String;
+                                     Content : in String) is
+         procedure String_Reader (Process : not null access procedure (Line : in String));
+
+         procedure String_Reader (Process : not null access procedure (Line : in String)) is
+            Pos   : Natural := Content'First;
+            First : Natural;
+         begin
+            while Pos <= Content'Last loop
+               First := Pos;
+               while Pos <= Content'Last and then not (Content (Pos) in ASCII.CR | ASCII.LF) loop
+                  Pos := Pos + 1;
+               end loop;
+               if Pos < Content'Last then
+                  Process (Content (First .. Pos - 1));
+               elsif not (Content (Content'Last) in ASCII.CR | ASCII.LF) then
+                  Process (Content (First .. Content'Last));
+               end if;
+               Pos := Pos + 1;
+            end loop;
+         end String_Reader;
+      begin
+         Manager.Ignore_Files_Filter.Load_Ignore (Label, String_Reader'Access);
+      end Load_Ignore_Content;
+
+      procedure Load_Ignore_File (Path : in String) is
+      begin
+         if Path = "spdx-tool:ignore.txt" then
+            Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore);
+         elsif Path = "spdx-tool:ignore-docs.txt" then
+            Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore_docs);
+         elsif Util.Strings.Starts_With (Path, "spdx-tool:") then
+            Log.Error ("Invalid builtin ignore file {0}", Path);
+         elsif Ada.Directories.Exists (Path) then
+            Util.Files.Walk.Load_Ignore (Manager.Ignore_Files_Filter, Path);
+         else
+            Log.Error ("Ignore file {} not found", Path);
+         end if;
+      end Load_Ignore_File;
+
    begin
       Configs.Configure (Config,
                          Configs.Names.IGNORE,
                          Set_Ignore'Access);
+      Configs.Configure (Config,
+                         Configs.Names.IGNORE_FILES,
+                         Load_Ignore_File'Access);
       Manager.Languages.Initialize (Config);
       if not Manager.Started then
          if Opt_Mimes then

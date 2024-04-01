@@ -21,6 +21,7 @@ package SPDX_Tool.Configs is
    package Names is
       COLOR               : constant String := "color";
       IGNORE              : constant String := "ignore";
+      IGNORE_FILES        : constant String := "ignore-files";
       NO_BUILTIN_LICENSES : constant String := "no-builtin-licenses";
 
       START               : constant String := "start";
