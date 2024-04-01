@@ -111,9 +111,6 @@ package SPDX_Tool.Languages is
        and then Line.Style.Text_Start >= Buffer'First
        and then Line.Style.Text_Last <= Buffer'Last;
 
-   --  Guess the language based on the file extension.
-   function Get_Language_From_Extension (Path : in String) return String;
-
    procedure Find_Comments (Analyzer : in Analyzer_Type'Class;
                             Buffer   : in Buffer_Type;
                             Lines    : in out Line_Array;

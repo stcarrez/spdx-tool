@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Directories;
-with SPDX_Tool.Extensions;
+with SPDX_Tool.Languages.ExtensionMap;
 with Util.Strings.Tokenizers;
 package body SPDX_Tool.Languages.Extensions is
 
@@ -12,13 +12,13 @@ package body SPDX_Tool.Languages.Extensions is
 
    function Get_Language_From_Extension (Path : in String) return access constant String is
       Ext  : constant String := Ada.Directories.Extension (Path);
-      Kind : access constant String := SPDX_Tool.Extensions.Get_Mapping (Ext);
+      Kind : access constant String := ExtensionMap.Get_Mapping (Ext);
    begin
       if Kind /= null then
          return Kind;
       end if;
       if Kind = null and then Util.Strings.Ends_With (Ext, "~") then
-         Kind := SPDX_Tool.Extensions.Get_Mapping (Ext (Ext'First .. Ext'Last - 1));
+         Kind := ExtensionMap.Get_Mapping (Ext (Ext'First .. Ext'Last - 1));
       end if;
       if Kind /= null then
          return Kind;

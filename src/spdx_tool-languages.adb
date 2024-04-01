@@ -7,7 +7,6 @@ with Ada.Directories;
 
 with Util.Log.Loggers;
 with Util.Files;
-with SPDX_Tool.Extensions;
 
 package body SPDX_Tool.Languages is
 
@@ -157,22 +156,6 @@ package body SPDX_Tool.Languages is
          end loop;
       end if;
    end Find_Comment;
-
-   function Get_Language_From_Extension (Path : in String) return String is
-      Ext  : constant String := Ada.Directories.Extension (Path);
-      Kind : access constant String := SPDX_Tool.Extensions.Get_Mapping (Ext);
-   begin
-      if Kind /= null then
-         return Kind.all;
-      end if;
-      if Kind = null and then Util.Strings.Ends_With (Ext, "~") then
-         Kind := SPDX_Tool.Extensions.Get_Mapping (Ext (Ext'First .. Ext'Last - 1));
-      end if;
-      if Kind /= null then
-         return Kind.all;
-      end if;
-      return "";
-   end Get_Language_From_Extension;
 
    procedure Find_Comments (Analyzer : in Analyzer_Type'Class;
                             Buffer   : in Buffer_Type;
