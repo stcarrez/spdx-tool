@@ -3,14 +3,8 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-with Ada.Streams.Stream_IO;
 
-with Util.Log.Loggers;
-with Util.Files;
 package body SPDX_Tool.Files is
-
-   Log : constant Util.Log.Loggers.Logger :=
-     Util.Log.Loggers.Create ("SPDX_Tool.Files");
 
    --  ------------------------------
    --  Extract from the header the list of tokens used.  Such list

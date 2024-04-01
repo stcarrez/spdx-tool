@@ -154,7 +154,7 @@ private
       Pre => From >= Buffer'First and then From <= Buffer'Last;
 
    --  Guess the printable length of the content assuming UTF-8 sequence.
-  function Printable_Length
+   function Printable_Length
       (Buffer : in Buffer_Type; From : in Buffer_Index; Last : in Buffer_Index)
        return Natural with
       Pre => From >= Buffer'First and then Last <= Buffer'Last;
