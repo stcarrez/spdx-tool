@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
+with Ada.Exceptions;
 with Util.Log.Loggers;
 package body Util.Files.Walk is
 
@@ -130,14 +131,18 @@ package body Util.Files.Walk is
    end Scan_Subdir;
 
    --  ------------------------------
-   --  Load the file that contains a list of files to ignore.  The default
-   --  implementation reads patterns as defined in `.gitignore` files.
+   --  Load a series of lines that contains a list of files to ignore.
+   --  The `Reader` procedure is called with a `Process` procedure that is
+   --  expected to be called for each line which comes from the ignore
+   --  file (such as the .gitignore file).  The `Process` procedure handles
+   --  the interpretation of ignore patterns as defined by `.gitignore`
+   --  and it updates the `Filter` accordingly.
    --  ------------------------------
-   procedure Load_Ignore (Walker : in out Walker_Type;
-                          Path   : String;
-                          Filter : in out Filter_Type'Class) is
-      pragma Unreferenced (Walker);
-
+   procedure Load_Ignore (Filter : in out Filter_Type'Class;
+                          Label  : in String;
+                          Reader : not null access
+                              procedure (Process : not null access
+                                   procedure (Line : in String))) is
       procedure Process (Line : String);
 
       Line_Number : Natural := 0;
@@ -155,18 +160,55 @@ package body Util.Files.Walk is
             end loop;
             if Last >= Line'First then
                Negative := Line (Line'First) = '!';
-               if Negative then
-                  Filter.Include (Line (Line'First + 1 .. Last));
-               else
-                  Filter.Exclude (Line (Line'First .. Last));
-               end if;
+               begin
+                  if Negative then
+                     Filter.Include (Line (Line'First + 1 .. Last));
+                  else
+                     Filter.Exclude (Line (Line'First .. Last));
+                  end if;
+
+               exception
+                  when E: GNAT.Regexp.Error_In_Regexp =>
+                     Log.Error ("{0}:{1}: Invalid regular expression: {2}",
+                                Label,
+                                Util.Strings.Image (Line_Number),
+                                Ada.Exceptions.Exception_Message (E));
+               end;
             end if;
          end if;
       end Process;
    begin
+      Reader (Process'Access);
+   end Load_Ignore;
+
+   --  ------------------------------
+   --  Load the file that contains a list of files to ignore.  The default
+   --  implementation reads patterns as defined in `.gitignore` files.
+   --  ------------------------------
+   procedure Load_Ignore (Filter : in out Filter_Type'Class;
+                          Path   : String) is
+      procedure Reader (Process : not null access procedure (Line : in String));
+
+      procedure Reader (Process : not null access procedure (Line : in String)) is
+      begin
+         Util.Files.Read_File (Path, Process);
+      end Reader;
+   begin
       Log.Debug ("Loading ignore file {0}", Path);
 
-      Util.Files.Read_File (Path, Process'Access);
+      Filter.Load_Ignore (Path, Reader'Access);
+   end Load_Ignore;
+
+   --  ------------------------------
+   --  Load the file that contains a list of files to ignore.  The default
+   --  implementation reads patterns as defined in `.gitignore` files.
+   --  ------------------------------
+   procedure Load_Ignore (Walker : in out Walker_Type;
+                          Path   : String;
+                          Filter : in out Filter_Type'Class) is
+      pragma Unreferenced (Walker);
+   begin
+      Load_Ignore (Filter, Path);
    end Load_Ignore;
 
    function Is_Excluded (Result : Filter_Result) return Boolean
