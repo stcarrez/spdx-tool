@@ -14,4 +14,8 @@ private package SPDX_Tool.Languages.Shell is
                      Content  : in File_Type;
                      Result   : in out Detector_Result);
 
+   procedure Check_Interpreter (Detector    : in Shell_Detector_Type;
+                                Interpreter : in String;
+                                Result      : in out Detector_Result);
+
 end SPDX_Tool.Languages.Shell;

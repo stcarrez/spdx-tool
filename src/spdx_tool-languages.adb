@@ -7,6 +7,7 @@ with Ada.Directories;
 
 with Util.Log.Loggers;
 with Util.Files;
+with Util.Strings.Tokenizers;
 
 package body SPDX_Tool.Languages is
 
@@ -21,6 +22,38 @@ package body SPDX_Tool.Languages is
    begin
       Result.Languages.Append (Language);
    end Set_Language;
+
+   --  ------------------------------
+   --  If the languages string is not null, add every language that is contains
+   --  Languages are separated by ','.
+   --  ------------------------------
+   procedure Set_Languages (Result    : in out Detector_Result;
+                            Languages : access constant String) is
+   begin
+      if Languages /= null then
+         Set_Languages (Result, Languages.all);
+      end if;
+   end Set_Languages;
+
+   procedure Set_Languages (Result    : in out Detector_Result;
+                            Languages : in String) is
+      procedure Collect (Item : in String; Done : out Boolean);
+
+      procedure Collect (Item : in String; Done : out Boolean) is
+      begin
+         if Item'Length > 0 then
+            Set_Language (Result, Item, 0);
+         end if;
+         Done := False;
+      end Collect;
+
+   begin
+      if Util.Strings.Index (Languages, ',') > 0 then
+         Util.Strings.Tokenizers.Iterate_Tokens (Languages, ",", Collect'Access);
+      else
+         Set_Language (Result, Languages);
+      end if;
+   end Set_Languages;
 
    --  Get the language that was resolved.
    function Get_Language (Result : in Detector_Result) return String is
@@ -46,7 +79,7 @@ package body SPDX_Tool.Languages is
          Len : constant Buffer_Size := Analyzer.Len;
          Pos : Buffer_Index := From;
       begin
-         while Pos + Len <= Last loop
+         while Pos + Len - 1 <= Last loop
             if Buffer (Pos .. Pos + Len - 1) = Analyzer.Comment_Start then
                Comment := (Analyzer   => null,
                     Start      => Pos + Len,
@@ -88,8 +121,8 @@ package body SPDX_Tool.Languages is
                --  Empty line
                Comment.Text_Start := Pos;
             end if;
-            Comment.Text_Last := Last - 1;
-            while Pos + Len <= Last loop
+            Comment.Text_Last := Last;
+            while Pos + Len - 1 <= Last loop
                if Buffer (Pos .. Pos + Len - 1) = Analyzer.Comment_End then
                   Comment.Mode := END_COMMENT;
                   Comment.Trailer := Len;
@@ -102,7 +135,7 @@ package body SPDX_Tool.Languages is
             return;
          end;
       end if;
-      while Pos + Len <= Last loop
+      while Pos + Len - 1 <= Last loop
          if Buffer (Pos .. Pos + Len - 1) = Analyzer.Comment_Start then
             declare
                Len_End : constant Buffer_Size := Analyzer.Len_End;
@@ -112,9 +145,13 @@ package body SPDX_Tool.Languages is
                Comment.Text_Start := Pos + Len;
                Comment.Head := Pos;
                Comment.Trailer := 0;
-               Comment.Text_Last := Skip_Backward_Spaces (Buffer, Pos + Len, Last);
                Pos := Pos + Len;
-               while Pos + Len_End <= Last loop
+               if Pos < Last then
+                  Comment.Text_Last := Skip_Backward_Spaces (Buffer, Pos, Last);
+               else
+                  Comment.Text_Last := Pos - 1;
+               end if;
+               while Pos + Len_End - 1 <= Last loop
                   if Buffer (Pos .. Pos + Len_End - 1) = Analyzer.Comment_End then
                      Comment.Mode := LINE_BLOCK_COMMENT;
                      Comment.Trailer := Len_End;
@@ -162,25 +199,29 @@ package body SPDX_Tool.Languages is
                             Lines    : in out Line_Array;
                             Count    : in Infos.Line_Count) is
       Len      : constant Buffer_Size := Buffer'Length;
-      Pos      : Buffer_Index := Buffer'First;
+      Pos      : Buffer_Size := Buffer'First;
       First    : Buffer_Index;
       Style    : Comment_Info := (Mode => NO_COMMENT, others => <>);
    begin
       for Line_No in 1 .. Count loop
          First := Lines (Line_No).Line_Start;
-         Pos := Lines (Line_No).Line_End + 1;
-         Analyzer.Find_Comment (Buffer, First, Pos, Style);
+         Pos := Lines (Line_No).Line_End;
+         if First <= Pos then
+            Analyzer.Find_Comment (Buffer, First, Pos, Style);
+            Style.Length := Printable_Length (Buffer, First, Pos);
+         else
+            Style.Length := 0;
+         end if;
          if Style.Text_Last < Style.Text_Start then
             Style.Text_Last := Style.Text_Start - 1;
          end if;
-         Style.Length := Printable_Length (Buffer, First, Pos);
          Lines (Line_No).Style := (Start => Style.Start, Last => Style.Last,
                                    Head => Style.Head, Text_Start => Style.Text_Start,
                                    Text_Last => Style.Text_Last, Trailer => Style.Trailer,
                                    Length => Style.Length, Mode => Style.Mode, Boxed => Style.Boxed);
          if Style.Mode /= NO_COMMENT then
             Lines (Line_No).Comment := Style.Mode;
-            Lines (Line_No).Style.Last := Pos - 1;
+            Lines (Line_No).Style.Last := Pos;
             Extract_Line_Tokens (Buffer, Lines (Line_No));
          else
             Lines (Line_No).Comment := NO_COMMENT;
@@ -205,6 +246,10 @@ package body SPDX_Tool.Languages is
          Pos := Find_Eol (Buffer (Pos .. Len), Pos);
          Line_No := Line_No + 1;
          Lines (Line_No).Line_Start := First;
+         if Pos = Len then
+            Lines (Line_No).Line_End := Pos;
+            exit;
+         end if;
          Lines (Line_No).Line_End := Pos - 1;
          exit when Line_No = Lines'Last or else Pos > Len;
          if Buffer (Pos) = CR

@@ -3,7 +3,31 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
+with Ada.Strings.Maps;
+with Ada.Strings.Fixed;
+with SPDX_Tool.Languages.InterpreterMap;
 package body SPDX_Tool.Languages.Shell is
+
+   use type Ada.Strings.Maps.Character_Set;
+
+   Spaces : constant Ada.Strings.Maps.Character_Set
+     := Ada.Strings.Maps.To_Set (' ')
+     or Ada.Strings.Maps.To_Set (ASCII.HT);
+
+   Spaces_Or_Path : constant Ada.Strings.Maps.Character_Set
+     := Ada.Strings.Maps.To_Set (' ')
+     or Ada.Strings.Maps.To_Set (ASCII.HT)
+     or Ada.Strings.Maps.To_Set ('/');
+
+   procedure Check_Interpreter (Detector    : in Shell_Detector_Type;
+                                Interpreter : in String;
+                                Result      : in out Detector_Result) is
+      pragma Unreferenced (Detector);
+
+      Language : constant access constant String := InterpreterMap.Get_Mapping (Interpreter);
+   begin
+      Set_Languages (Result, Language);
+   end Check_Interpreter;
 
    overriding
    procedure Detect (Detector : in Shell_Detector_Type;
@@ -11,32 +35,46 @@ package body SPDX_Tool.Languages.Shell is
                      Content  : in File_Type;
                      Result   : in out Detector_Result) is
    begin
-      if Content.Count = 0 then
+      if Content.Last_Offset <= 3 or else Content.Count = 0 then
          return;
       end if;
       declare
          Buf       : constant Buffer_Accessor := Content.Buffer.Value;
-         Last      : constant Buffer_Index := Content.Lines (1).Line_End;
-         Pos       : Buffer_Index := Next_With (Buf.Data, Buf.Data'First, "#!");
-         Next      : Buffer_Index;
-         End_Pos   : Buffer_Index;
-         Start_Pos : Buffer_Index;
+         First     : constant Buffer_Index := Content.Lines (1).Line_Start;
+         Last      : constant Buffer_Size := Content.Lines (1).Line_End;
+         Line      : String (Natural (First) .. Natural (Last));
+         for Line'Address use Buf.Data'Address;
+
+         Pos       : Natural;
+         Next      : Natural;
       begin
-         if Pos >= Last or else Pos = Buf.Data'First then
+         if not Util.Strings.Starts_With (Line, "#!") then
             return;
          end if;
-         Pos := Skip_Spaces (Buf.Data, Pos, Last);
-         if Pos >= Last then
-            return;
+         Pos := Ada.Strings.Fixed.Index (Line (Line'First + 2 .. Line'Last), Spaces);
+         if Pos = 0 then
+            Pos := Line'First + 2;
+         else
+            while Pos < Line'Last and then Line (Pos) in ' ' | ASCII.HT loop
+               Pos := Pos + 1;
+            end loop;
          end if;
-         while Pos < Last loop
-            Next := Next_Space (Buf.Data, Pos, Last);
-            if Next >= Last and then Next_With (Buf.Data, Pos, "/sh") = Next + 1 then
-               Set_Language (Result, "Shell");
+         loop
+            Next := Ada.Strings.Fixed.Index (Line (Pos .. Line'Last), Spaces_Or_Path);
+            if Next = 0 then
+               Next := Line'Last + 1;
+               exit;
+            end if;
+            exit when Line (Next) /= '/';
+            Pos := Next + 1;
+            if Pos >= Line'Last then
                return;
             end if;
-            Pos := Next + 1;
          end loop;
+         if not Util.Strings.Starts_With (Line (Pos .. Next - 1), "env") then
+            Detector.Check_Interpreter (Line (Pos .. Next - 1), Result);
+            return;
+         end if;
       end;
    end Detect;
 

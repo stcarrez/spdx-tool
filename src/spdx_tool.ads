@@ -148,6 +148,13 @@ private
        return Buffer_Index with
       Pre => From >= Buffer'First and then From <= Buffer'Last and then Text'Length > 0;
 
+   --  Find index position of one character in text in the buffer and starting
+   --  at the given position.  Returns 0 if not found.
+   function Index_Any_Of
+      (Buffer : in Buffer_Type; From : in Buffer_Index; Last : in Buffer_Index; Text : in String)
+      return Buffer_Size with
+      Pre => From >= Buffer'First and then From <= Buffer'Last and then Text'Length > 0;
+
    --  Find the end of line.
    function Find_Eol
       (Buffer : in Buffer_Type; From : in Buffer_Index) return Buffer_Index with

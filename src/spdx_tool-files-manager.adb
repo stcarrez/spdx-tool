@@ -68,7 +68,6 @@ package body SPDX_Tool.Files.Manager is
                end if;
             end loop;
          else
-            Data.Count := 0;
             Data.Cmt_Style := NO_COMMENT;
          end if;
          SPDX_Tool.Languages.Boxed_License (Data.Lines (Data.Lines'First .. Data.Count),

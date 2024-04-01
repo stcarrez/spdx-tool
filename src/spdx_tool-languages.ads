@@ -145,6 +145,13 @@ private
                            Language   : in String;
                            Confidence : in Natural := 1);
 
+   --  If the languages string is not null, add every language that is contains
+   --  Languages are separated by ','.
+   procedure Set_Languages (Result    : in out Detector_Result;
+                            Languages : access constant String);
+   procedure Set_Languages (Result    : in out Detector_Result;
+                            Languages : in String);
+
    --  Get the language that was resolved.
    function Get_Language (Result : in Detector_Result) return String;
 

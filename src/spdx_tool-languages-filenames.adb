@@ -4,7 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Directories;
-with Util.Strings.Tokenizers;
 with SPDX_Tool.Languages.FilenameMap;
 package body SPDX_Tool.Languages.Filenames is
 
@@ -14,15 +13,6 @@ package body SPDX_Tool.Languages.Filenames is
                      Content  : in File_Type;
                      Result   : in out Detector_Result) is
       use type Language_Mappers.Match_Result;
-      procedure Collect (Item : in String; Done : out Boolean);
-
-      procedure Collect (Item : in String; Done : out Boolean) is
-      begin
-         if Item'Length > 0 then
-            Set_Language (Result, Item, 0);
-         end if;
-         Done := False;
-      end Collect;
 
       Filename : constant String := Ada.Directories.Simple_Name (File.Path);
       Match    : constant Language_Mappers.Filter_Result := Detector.File_Mapper.Match (File.Path);
@@ -32,16 +22,10 @@ package body SPDX_Tool.Languages.Filenames is
          declare
             Language : constant String := Language_Mappers.Get_Value (Match);
          begin
-            if Util.Strings.Index (Language, ',') > 0 then
-               Util.Strings.Tokenizers.Iterate_Tokens (Language, ",", Collect'Access);
-            else
-               Set_Language (Result, Language);
-            end if;
+            Set_Languages (Result, Language);
          end;
       end if;
-      if Kind /= null then
-         Set_Language (Result, Kind.all);
-      end if;
+      Set_Languages (Result, Kind);
    end Detect;
 
 end SPDX_Tool.Languages.Filenames;

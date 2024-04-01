@@ -5,7 +5,6 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with SPDX_Tool.Languages.ExtensionMap;
-with Util.Strings.Tokenizers;
 package body SPDX_Tool.Languages.Extensions is
 
    function Get_Language_From_Extension (Path : in String) return access constant String;
@@ -31,25 +30,9 @@ package body SPDX_Tool.Languages.Extensions is
                      File     : in File_Info;
                      Content  : in File_Type;
                      Result   : in out Detector_Result) is
-      procedure Collect (Item : in String; Done : out Boolean);
-
-      procedure Collect (Item : in String; Done : out Boolean) is
-      begin
-         if Item'Length > 0 then
-            Set_Language (Result, Item, 0);
-         end if;
-         Done := False;
-      end Collect;
-
       Language : constant access constant String := Get_Language_From_Extension (File.Path);
    begin
-      if Language /= null then
-         if Util.Strings.Index (Language.all, ',') > 0 then
-            Util.Strings.Tokenizers.Iterate_Tokens (Language.all, ",", Collect'Access);
-         else
-            Set_Language (Result, Language.all);
-         end if;
-      end if;
+      Set_Languages (Result, Language);
    end Detect;
 
 end SPDX_Tool.Languages.Extensions;

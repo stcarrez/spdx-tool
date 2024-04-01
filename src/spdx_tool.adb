@@ -220,6 +220,27 @@ package body SPDX_Tool is
       end if;
    end Next_With;
 
+   --  Find index position of one character in text in the buffer and starting
+   --  at the given position.  Returns 0 if not found.
+   function Index_Any_Of (Buffer : in Buffer_Type;
+                          From   : in Buffer_Index;
+                          Last   : in Buffer_Index;
+                          Text   : in String) return Buffer_Size is
+      Pos : Buffer_Index := From;
+   begin
+      while Pos <= Last loop
+         declare
+            C : constant Character := Character'Val (Buffer (Pos));
+         begin
+            if (for some T of Text => C = T) then
+               return Pos;
+            end if;
+            Pos := Pos + 1;
+         end;
+      end loop;
+      return 0;
+   end Index_Any_Of;
+
    --  Find the end of line.
    function Find_Eol (Buffer : in Buffer_Type;
                       From : in Buffer_Index) return Buffer_Index is
