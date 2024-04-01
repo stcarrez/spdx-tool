@@ -11,32 +11,46 @@ procedure SPDX_Tool.Genmap is
    package UBO renames Util.Beans.Objects;
 
    procedure Usage;
-   procedure Register (Name       : in String;
-                       Extensions : in UBO.Object);
+   procedure Register (Name  : in String;
+                       Value : in String);
+   procedure Register (Name  : in String;
+                       Value : in UBO.Object);
    procedure Extract (Label : in String;
                       Root  : in UBO.Object);
    function Get_Label (Option : in String) return String;
 
    Exts : Util.Strings.Maps.Map;
 
-   procedure Register (Name       : in String;
-                       Extensions : in UBO.Object) is
-      Iter : UBO.Iterators.Iterator := UBO.Iterators.First (Extensions);
+   procedure Register (Name : in String;
+                       Value : in String) is
+      Pos : constant Util.Strings.Maps.Cursor := Exts.Find (Value);
    begin
-      while UBO.Iterators.Has_Element (Iter) loop
+      if Util.Strings.Maps.Has_Element (Pos) then
+         Exts.Include (Value, Name & ", " & Util.Strings.Maps.Element (Pos));
+      else
+         Exts.Insert (Value, Name);
+      end if;
+   end Register;
+
+   procedure Register (Name  : in String;
+                       Value : in UBO.Object) is
+   begin
+      if not UBO.Is_Array (Value) then
+         Register (Name, UBO.To_String (Value));
+      else
          declare
-            Item : constant UBO.Object := UBO.Iterators.Element (Iter);
-            Ext  : constant String := UBO.To_String (Item);
-            Pos  : constant Util.Strings.Maps.Cursor := Exts.Find (Ext);
+            Iter : UBO.Iterators.Iterator := UBO.Iterators.First (Value);
          begin
-            if Util.Strings.Maps.Has_Element (Pos) then
-               Exts.Include (Ext, Name & ", " & Util.Strings.Maps.Element (Pos));
-            else
-               Exts.Insert (Ext, Name);
-            end if;
+            while UBO.Iterators.Has_Element (Iter) loop
+               declare
+                  Item : constant UBO.Object := UBO.Iterators.Element (Iter);
+               begin
+                  Register (Name, UBO.To_String (Item));
+               end;
+               UBO.Iterators.Next (Iter);
+            end loop;
          end;
-         UBO.Iterators.Next (Iter);
-      end loop;
+      end if;
    end Register;
 
    procedure Extract (Label : in String;
@@ -58,18 +72,21 @@ procedure SPDX_Tool.Genmap is
 
    procedure Usage is
    begin
-      Ada.Text_IO.Put_Line ("Usage: spdx_tool-genmap {-extensions|-interpreters|-filenames} path");
+      Ada.Text_IO.Put_Line ("Usage: spdx_tool-genmap {--extensions|--interpreters|"
+                            & "--filenames|--mimes} path");
       Ada.Command_Line.Set_Exit_Status (2);
    end Usage;
 
    function Get_Label (Option : in String) return String is
    begin
-      if Option = "-extensions" then
+      if Option = "--extensions" then
          return "extensions";
-      elsif Option = "-interpreters" then
+      elsif Option = "--interpreters" then
          return "interpreters";
-      elsif Option = "-filenames" then
+      elsif Option = "--filenames" then
          return "filenames";
+      elsif Option = "--mimes" then
+         return "codemirror_mime_type";
       else
          return "";
       end if;
