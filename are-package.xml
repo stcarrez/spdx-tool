@@ -11,6 +11,8 @@
     <install mode='copy' strip-extension='yes'>
       <fileset dir="share/spdx-tool">
         <include name="default.toml"/>
+        <include name="ignore.txt"/>
+        <include name="ignore-docs.txt"/>
       </fileset>
     </install>
   </resource>
