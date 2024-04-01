@@ -3,7 +3,9 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
+with Ada.Directories;
 with Util.Strings.Tokenizers;
+with SPDX_Tool.Languages.FilenameMap;
 package body SPDX_Tool.Languages.Filenames is
 
    overriding
@@ -22,7 +24,9 @@ package body SPDX_Tool.Languages.Filenames is
          Done := False;
       end Collect;
 
-      Match : constant Language_Mappers.Filter_Result := Detector.File_Mapper.Match (File.Path);
+      Filename : constant String := Ada.Directories.Simple_Name (File.Path);
+      Match    : constant Language_Mappers.Filter_Result := Detector.File_Mapper.Match (File.Path);
+      Kind     : constant access constant String := FilenameMap.Get_Mapping (Filename);
    begin
       if Match.Match = Language_Mappers.Found then
          declare
@@ -34,6 +38,9 @@ package body SPDX_Tool.Languages.Filenames is
                Set_Language (Result, Language);
             end if;
          end;
+      end if;
+      if Kind /= null then
+         Set_Language (Result, Kind.all);
       end if;
    end Detect;
 
