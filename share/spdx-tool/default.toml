@@ -1,6 +1,10 @@
 # Default configuration
 [default]
 color="yes"
+ignore-files=[
+"spdx-tool:ignore.txt",
+"spdx-tool:ignore-docs.txt"
+]
 ignore=[
 "*.o",
 "*.a",
