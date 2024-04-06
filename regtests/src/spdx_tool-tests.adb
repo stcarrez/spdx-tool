@@ -4,8 +4,15 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
+with GNAT.Source_Info;
 with Util.Test_Caller;
 package body SPDX_Tool.Tests is
+
+   procedure Test_Print_License (T      : in out Test;
+                                 Name   : in String;
+                                 File   : in String;
+                                 Source : in String := GNAT.Source_Info.File;
+                                 Line   : in Natural := GNAT.Source_Info.Line);
 
    package Caller is new Util.Test_Caller (Test, "SPDX_Tool.Tests");
 
@@ -29,6 +36,14 @@ package body SPDX_Tool.Tests is
                        Test_Json_Report'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --output-xml",
                        Test_Xml_Report'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (Apache)",
+                       Test_Print_License_Apache'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (GNAT, boxed)",
+                       Test_Print_License_Gnat'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (BSD, C)",
+                       Test_Print_License_Bsd'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (Ocaml, boxed)",
+                       Test_Print_License_Ocaml'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -46,7 +61,7 @@ package body SPDX_Tool.Tests is
       Result : UString;
    begin
       T.Execute (Tool & " --no-color regtests/src", Result, 0);
-      Util.Tests.Assert_Matches (T, ".*Apache-2.0.*[0-9]+.*90.0.*",
+      Util.Tests.Assert_Matches (T, ".*Apache-2.0.*SPDX.*100.0.*",
                                  Result, "Invalid result");
    end Test_Report_Licenses;
 
@@ -125,5 +140,44 @@ package body SPDX_Tool.Tests is
          Test    => Path,
          Message => "Invalid XML report");
    end Test_Xml_Report;
+
+   procedure Test_Print_License (T      : in out Test;
+                                 Name   : in String;
+                                 File   : in String;
+                                 Source : in String := GNAT.Source_Info.File;
+                                 Line   : in Natural := GNAT.Source_Info.Line) is
+      Path : constant String := Util.Tests.Get_Test_Path (Name);
+      Result : UString;
+   begin
+      T.Execute (Tool & " --no-color -p regtests/files/identify/" & File, "",
+                 Path, Result, 0);
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/" & Name),
+         Test    => Path,
+         Message => "Invalid license extraction",
+         Source  => Source,
+         Line    => Line);
+   end Test_Print_License;
+
+   procedure Test_Print_License_Apache (T : in out Test) is
+   begin
+      Test_Print_License (T, "print-apache.txt", "apache-2.0-1.ads");
+   end Test_Print_License_Apache;
+
+   procedure Test_Print_License_Gnat (T : in out Test) is
+   begin
+      Test_Print_License (T, "print-gnat.txt", "gnat-3.0.ads");
+   end Test_Print_License_Gnat;
+
+   procedure Test_Print_License_Bsd (T : in out Test) is
+   begin
+      Test_Print_License (T, "print-bsd.txt", "bsd-3-clause.c");
+   end Test_Print_License_Bsd;
+
+   procedure Test_Print_License_Ocaml (T : in out Test) is
+   begin
+      Test_Print_License (T, "print-ocaml.txt", "lgpl-2.1.ml");
+   end Test_Print_License_Ocaml;
 
 end SPDX_Tool.Tests;

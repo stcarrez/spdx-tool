@@ -21,5 +21,9 @@ package SPDX_Tool.Tests is
    procedure Test_Identify (T : in out Test);
    procedure Test_Json_Report (T : in out Test);
    procedure Test_Xml_Report (T : in out Test);
+   procedure Test_Print_License_Apache (T : in out Test);
+   procedure Test_Print_License_Gnat (T : in out Test);
+   procedure Test_Print_License_Bsd (T : in out Test);
+   procedure Test_Print_License_Ocaml (T : in out Test);
 
 end SPDX_Tool.Tests;
