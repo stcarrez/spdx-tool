@@ -19,6 +19,8 @@ package SPDX_Tool.Languages is
 
    use type Infos.Line_Count;
    use all type Files.Comment_Mode;
+   subtype Line_Count is Infos.Line_Count;
+   subtype Line_Number is Infos.Line_Number;
    subtype File_Info is Infos.File_Info;
    subtype Line_Array is Files.Line_Array;
    subtype Line_Type is Files.Line_Type;
@@ -38,6 +40,7 @@ package SPDX_Tool.Languages is
       Length     : Natural := 0;
       Mode       : Files.Comment_Mode := NO_COMMENT;
       Boxed      : Boolean := False;
+      Category   : Files.Comment_Category := Files.EMPTY;
    end record;
 
    --  Find and identify the comment from the line represented by Buffer (From .. Last).
@@ -129,6 +132,18 @@ package SPDX_Tool.Languages is
    procedure Find_Lines (Buffer   : in Buffer_Type;
                          Lines    : in out Line_Array;
                          Count    : out Infos.Line_Count);
+
+   --  Find the first and last line header boundaries which could contain
+   --  license information.
+   procedure Find_Headers (Buffer  : in Buffer_Type;
+                           Lines   : in Line_Array;
+                           Count   : in Line_Count;
+                           First   : out Line_Number;
+                           Last    : out Line_Number);
+
+   function Find_Category (Buffer : in Buffer_Type;
+                           From   : in Buffer_Index;
+                           Last   : in Buffer_Index) return Files.Comment_Category;
 
 private
 

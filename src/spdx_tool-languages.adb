@@ -3,8 +3,6 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-with Ada.Directories;
-
 with Util.Log.Loggers;
 with Util.Files;
 with Util.Strings.Tokenizers;
@@ -15,6 +13,7 @@ package body SPDX_Tool.Languages is
      Util.Log.Loggers.Create ("SPDX_Tool.Languages");
 
    use type Infos.License_Kind;
+   use all type Files.Comment_Category;
 
    procedure Set_Language (Result     : in out Detector_Result;
                            Language   : in String;
@@ -90,7 +89,8 @@ package body SPDX_Tool.Languages is
                     Trailer => 0,
                     Length  => 0,
                     Mode    => LINE_COMMENT,
-                    Boxed   => False);
+                    Boxed   => False,
+                    Category  => TEXT);
                return;
             end if;
             Pos := Pos + 1;
@@ -114,9 +114,9 @@ package body SPDX_Tool.Languages is
          begin
             Comment.Start := Pos;
             Comment.Head := Pos;
-            if Pos <= Last - 1 then
+            if Pos <= Last then
                --  Ignore a ' * ' or ' + ' presentation in code blocks.
-               Comment.Text_Start := Skip_Presentation (Buffer, Pos, Last - 1);
+               Comment.Text_Start := Skip_Presentation (Buffer, Pos, Last);
             else
                --  Empty line
                Comment.Text_Start := Pos;
@@ -198,7 +198,6 @@ package body SPDX_Tool.Languages is
                             Buffer   : in Buffer_Type;
                             Lines    : in out Line_Array;
                             Count    : in Infos.Line_Count) is
-      Len      : constant Buffer_Size := Buffer'Length;
       Pos      : Buffer_Size := Buffer'First;
       First    : Buffer_Index;
       Style    : Comment_Info := (Mode => NO_COMMENT, others => <>);
@@ -209,16 +208,25 @@ package body SPDX_Tool.Languages is
          if First <= Pos then
             Analyzer.Find_Comment (Buffer, First, Pos, Style);
             Style.Length := Printable_Length (Buffer, First, Pos);
+            if Style.Text_Last < Style.Text_Start then
+               Style.Text_Last := Style.Text_Start - 1;
+            end if;
+            Style.Category := Find_Category (Buffer, Style.Text_Start, Style.Text_Last);
          else
             Style.Length := 0;
-         end if;
-         if Style.Text_Last < Style.Text_Start then
-            Style.Text_Last := Style.Text_Start - 1;
+            Style.Start := First;
+            Style.Last := Pos;
+            Style.Text_Start := First;
+            Style.Text_Last := Pos;
+            Style.Trailer := 0;
+            Style.Category := EMPTY;
          end if;
          Lines (Line_No).Style := (Start => Style.Start, Last => Style.Last,
                                    Head => Style.Head, Text_Start => Style.Text_Start,
                                    Text_Last => Style.Text_Last, Trailer => Style.Trailer,
-                                   Length => Style.Length, Mode => Style.Mode, Boxed => Style.Boxed);
+                                   Length => Style.Length, Mode => Style.Mode,
+                                   Boxed => Style.Boxed,
+                                   Category => Style.Category);
          if Style.Mode /= NO_COMMENT then
             Lines (Line_No).Comment := Style.Mode;
             Lines (Line_No).Style.Last := Pos;
@@ -228,6 +236,46 @@ package body SPDX_Tool.Languages is
          end if;
       end loop;
    end Find_Comments;
+
+   function Find_Category (Buffer : in Buffer_Type;
+                           From   : in Buffer_Index;
+                           Last   : in Buffer_Index) return Files.Comment_Category is
+   begin
+      if Last < From then
+         return EMPTY;
+      end if;
+      declare
+         Pos : Buffer_Index := From;
+         Space_Count : Natural := 0;
+         Punctuation_Count : Natural := 0;
+         Other_Count : Natural := 0;
+         Len : Buffer_Size;
+      begin
+         while Pos <= Last loop
+            Len := Space_Length (Buffer, Pos, Last);
+            if Len > 0 then
+               Pos := Pos + Len;
+               Space_Count := Space_Count + 1;
+            else
+               Len := Punctuation_Length (Buffer, Pos, Last);
+               if Len > 0 then
+                  Pos := Pos + Len;
+                  Punctuation_Count := Punctuation_Count + 1;
+               else
+                  Other_Count := Other_Count + 1;
+                  Pos := Pos + 1;
+               end if;
+            end if;
+         end loop;
+         if Other_Count > 0 then
+            return TEXT;
+         elsif Punctuation_Count > 0 then
+            return PRESENTATION;
+         else
+            return EMPTY;
+         end if;
+      end;
+   end Find_Category;
 
    --  ------------------------------
    --  Find lines in the buffer and setup the line array with indexes giving
@@ -263,6 +311,37 @@ package body SPDX_Tool.Languages is
       end loop;
       Count := Line_No;
    end Find_Lines;
+
+   --  ------------------------------
+   --  Find the first and last line header boundaries which could contain
+   --  license information.
+   --  ------------------------------
+   procedure Find_Headers (Buffer  : in Buffer_Type;
+                           Lines   : in Line_Array;
+                           Count   : in Line_Count;
+                           First   : out Line_Number;
+                           Last    : out Line_Number) is
+   begin
+      First := Lines'First;
+      while First < Count loop
+         if Lines (First).Style.Mode /= NO_COMMENT
+           and then Lines (First).Style.Category = TEXT
+         then
+            exit;
+         end if;
+         First := First + 1;
+      end loop;
+      Last := First;
+      while Last + 1 <= Count loop
+         if Lines (Last + 1).Style.Mode = NO_COMMENT then
+            exit;
+         end if;
+         Last := Last + 1;
+      end loop;
+      while Last > First and then Lines (Last).Style.Category /= TEXT loop
+         Last := Last - 1;
+      end loop;
+   end Find_Headers;
 
    --  ------------------------------
    --  Compute maximum length of lines between From..To as byte count.
@@ -450,26 +529,7 @@ package body SPDX_Tool.Languages is
          First_Line := License.First_Line;
          Last_Line := License.Last_Line;
       else
-         First_Line := Lines'First;
-         Last_Line := Lines'Last;
-         while First_Line > Last_Line
-           and then Lines (First_Line).Comment = NO_COMMENT
-         loop
-            First_Line := First_Line + 1;
-         end loop;
-         Last_Line := First_Line + 1;
-         while Last_Line <= Lines'Last
-           and then Lines (Last_Line).Comment /= NO_COMMENT
-         loop
-            Last_Line := Last_Line + 1;
-         end loop;
-         Last_Line := Last_Line - 1;
-         if Is_Presentation_Line (Lines, Buffer, First_Line) then
-            First_Line := First_Line + 1;
-         end if;
-         if Is_Presentation_Line (Lines, Buffer, Last_Line) then
-            Last_Line := Last_Line - 1;
-         end if;
+         Find_Headers (Buffer, Lines, Lines'Last, First_Line, Last_Line);
       end if;
       if First_Line > Last_Line then
          return null;

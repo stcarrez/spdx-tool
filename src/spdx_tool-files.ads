@@ -19,6 +19,7 @@ package SPDX_Tool.Files is
                          BLOCK_COMMENT,
                          END_COMMENT);
 
+   type Comment_Category is (EMPTY, PRESENTATION, TEXT);
    type Comment_Index is new Natural;
 
    type Comment_Info is record
@@ -31,6 +32,7 @@ package SPDX_Tool.Files is
       Length     : Natural := 0;
       Mode       : Comment_Mode := NO_COMMENT;
       Boxed      : Boolean := False;
+      Category   : Comment_Category := EMPTY;
    end record;
 
    type Line_Type is record

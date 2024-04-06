@@ -137,15 +137,6 @@ private
       Executor : Executor_Manager (Count);
    end record;
 
-   --  Find the first and last line header boundaries which could contain
-   --  license information.
-   procedure Find_Headers (Manager : in License_Manager;
-                           Buf     : in Buffer_Type;
-                           Lines   : in Line_Array;
-                           Count   : in Line_Count;
-                           First   : out Line_Number;
-                           Last    : out Line_Number);
-
    function Find_License (Manager : in License_Manager;
                           File    : in SPDX_Tool.Files.File_Type)
                           return License_Match;
