@@ -16,18 +16,18 @@ package body SPDX_Tool.Languages.MimeMap is
      (162, 88, 103, 161, 122, 52, 129);
 
    G : constant array (0 .. 224) of Unsigned_8 :=
-     (4, 0, 0, 0, 0, 0, 0, 0, 24, 53, 26, 0, 57, 0, 0, 35, 0, 18, 0, 48, 7,
-      62, 0, 37, 0, 0, 0, 0, 0, 100, 19, 14, 0, 32, 0, 0, 0, 0, 0, 27, 17,
-      0, 0, 0, 2, 37, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0,
-      41, 0, 0, 94, 22, 0, 0, 0, 54, 0, 2, 0, 91, 19, 88, 0, 0, 0, 0, 0, 11,
-      0, 7, 0, 58, 62, 0, 0, 0, 0, 0, 0, 0, 0, 67, 0, 52, 0, 0, 0, 71, 25,
-      32, 38, 16, 29, 92, 0, 0, 106, 0, 42, 103, 0, 0, 53, 72, 0, 7, 9, 57,
-      28, 109, 0, 0, 23, 65, 52, 0, 0, 0, 0, 21, 0, 8, 0, 0, 0, 0, 79, 1,
-      107, 72, 0, 0, 74, 33, 40, 0, 0, 34, 95, 0, 110, 0, 0, 77, 80, 40, 0,
-      33, 6, 27, 0, 85, 0, 70, 26, 0, 0, 71, 108, 14, 37, 82, 12, 76, 10, 0,
-      78, 100, 92, 0, 5, 0, 57, 29, 11, 0, 13, 0, 0, 0, 45, 0, 0, 16, 94,
-      97, 0, 70, 87, 0, 0, 0, 12, 0, 0, 89, 90, 71, 87, 0, 0, 18, 49, 67,
-      61, 14, 99, 0, 69);
+     (52, 0, 0, 0, 0, 0, 0, 0, 21, 50, 40, 0, 41, 0, 0, 0, 109, 10, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 16, 44, 14, 0, 75, 0, 0, 0, 0, 0, 101, 83, 0,
+      0, 0, 0, 78, 3, 0, 0, 0, 0, 36, 0, 0, 0, 32, 0, 0, 82, 0, 0, 84, 0,
+      77, 10, 0, 80, 73, 0, 0, 0, 57, 0, 97, 73, 10, 55, 2, 0, 0, 0, 0, 0,
+      68, 28, 63, 0, 30, 64, 0, 0, 0, 0, 0, 0, 0, 45, 0, 0, 74, 22, 50, 0,
+      111, 0, 15, 26, 28, 66, 51, 0, 0, 44, 0, 45, 65, 0, 0, 1, 20, 0, 63,
+      100, 0, 100, 43, 0, 0, 58, 7, 4, 0, 0, 0, 0, 9, 0, 44, 0, 3, 0, 0, 48,
+      53, 47, 20, 0, 0, 39, 0, 13, 0, 0, 25, 87, 0, 99, 0, 0, 47, 24, 77, 0,
+      33, 19, 7, 0, 11, 44, 0, 51, 0, 0, 64, 66, 34, 4, 44, 104, 21, 90, 0,
+      25, 25, 107, 0, 102, 0, 97, 23, 0, 0, 17, 0, 0, 0, 27, 0, 0, 25, 39,
+      62, 0, 36, 80, 0, 107, 0, 79, 0, 0, 27, 108, 7, 79, 0, 0, 2, 12, 70,
+      111, 77, 46, 0, 8);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -46,247 +46,246 @@ package body SPDX_Tool.Languages.MimeMap is
 
    type Name_Array is array (Natural range <>) of Content_Access;
 
-   K_0             : aliased constant String := "text/x-cobol";
-   M_0             : aliased constant String := "COBOL";
-   K_1             : aliased constant String := "text/x-coffeescript";
-   M_1             : aliased constant String := "CoffeeScript, CSON, EmberScript";
-   K_2             : aliased constant String := "text/apl";
-   M_2             : aliased constant String := "APL";
-   K_3             : aliased constant String := "text/x-c++src";
-   M_3             : aliased constant String := "Game Maker Language, AngelScript, Squirre"
-       & "l, AGS Script, SWIG, C++, Cuda, Edje Data Collection, Metal";
-   K_4             : aliased constant String := "text/x-sas";
-   M_4             : aliased constant String := "SAS";
-   K_5             : aliased constant String := "text/x-ecl";
-   M_5             : aliased constant String := "ECL";
-   K_6             : aliased constant String := "text/x-textile";
-   M_6             : aliased constant String := "Textile";
-   K_7             : aliased constant String := "text/x-pascal";
-   M_7             : aliased constant String := "Pascal, LigoLANG, Component Pascal";
-   K_8             : aliased constant String := "text/x-lua";
-   M_8             : aliased constant String := "Terra, Lua";
-   K_9             : aliased constant String := "text/x-vhdl";
-   M_9             : aliased constant String := "VHDL";
-   K_10            : aliased constant String := "text/x-diff";
-   M_10            : aliased constant String := "Diff";
-   K_11            : aliased constant String := "text/x-tcl";
-   M_11            : aliased constant String := "Glyph, Tcl";
-   K_12            : aliased constant String := "application/json";
-   M_12            : aliased constant String := "Ecere Projects, JSON, Jupyter Notebook, M"
-       & "ax, OASv2-json, JSON5, JSONLD, JSONiq, OASv3-json";
-   K_13            : aliased constant String := "text/x-eiffel";
-   M_13            : aliased constant String := "Eiffel";
-   K_14            : aliased constant String := "application/mbox";
-   M_14            : aliased constant String := "E-mail";
-   K_15            : aliased constant String := "message/http";
-   M_15            : aliased constant String := "HTTP";
-   K_16            : aliased constant String := "text/x-java";
-   M_16            : aliased constant String := "Apex, UnrealScript, Java, ChucK";
-   K_17            : aliased constant String := "text/x-scheme";
-   M_17            : aliased constant String := "Nu, Janet, Scheme";
-   K_18            : aliased constant String := "text/jsx";
-   M_18            : aliased constant String := "Astro, TSX";
-   K_19            : aliased constant String := "application/x-aspx";
-   M_19            : aliased constant String := "ASP.NET";
-   K_20            : aliased constant String := "text/x-sql";
-   M_20            : aliased constant String := "SQLPL, PLpgSQL, SQL";
-   K_21            : aliased constant String := "text/x-dylan";
-   M_21            : aliased constant String := "Dylan";
-   K_22            : aliased constant String := "text/x-systemverilog";
-   M_22            : aliased constant String := "Bluespec, SystemVerilog";
-   K_23            : aliased constant String := "text/x-rsrc";
-   M_23            : aliased constant String := "R";
-   K_24            : aliased constant String := "text/x-perl";
-   M_24            : aliased constant String := "Perl, Raku, Pod";
-   K_25            : aliased constant String := "text/x-octave";
-   M_25            : aliased constant String := "MATLAB";
-   K_26            : aliased constant String := "application/x-erb";
-   M_26            : aliased constant String := "HTML+ERB";
-   K_27            : aliased constant String := "text/x-objectivec";
-   M_27            : aliased constant String := "Objective-C++, Objective-C";
-   K_28            : aliased constant String := "application/dart";
-   M_28            : aliased constant String := "Dart";
-   K_29            : aliased constant String := "text/x-haskell";
-   M_29            : aliased constant String := "Grammatical Framework, PureScript, C2hs H"
-       & "askell, Bluespec BH, Cabal Config, Dhall, Haskell";
-   K_30            : aliased constant String := "text/x-ocaml";
-   M_30            : aliased constant String := "CameLIGO, OCaml, Standard ML";
-   K_31            : aliased constant String := "text/x-scala";
-   M_31            : aliased constant String := "Scala";
-   K_32            : aliased constant String := "text/x-pug";
-   M_32            : aliased constant String := "Pug";
+   K_0             : aliased constant String := "text/x-protobuf";
+   M_0             : aliased constant String := "Protocol Buffer";
+   K_1             : aliased constant String := "text/x-rustsrc";
+   M_1             : aliased constant String := "Sway,Rust,ReasonLIGO,Reason,ReScript";
+   K_2             : aliased constant String := "text/jsx";
+   M_2             : aliased constant String := "TSX,Astro";
+   K_3             : aliased constant String := "text/x-plsql";
+   M_3             : aliased constant String := "PLSQL";
+   K_4             : aliased constant String := "text/x-forth";
+   M_4             : aliased constant String := "MUF,Forth";
+   K_5             : aliased constant String := "text/x-cython";
+   M_5             : aliased constant String := "Cython";
+   K_6             : aliased constant String := "text/x-perl";
+   M_6             : aliased constant String := "Perl,Raku,Pod";
+   K_7             : aliased constant String := "text/x-verilog";
+   M_7             : aliased constant String := "Verilog";
+   K_8             : aliased constant String := "text/x-objectivec";
+   M_8             : aliased constant String := "Objective-C++,Objective-C";
+   K_9             : aliased constant String := "application/xquery";
+   M_9             : aliased constant String := "XQuery";
+   K_10            : aliased constant String := "text/x-webidl";
+   M_10            : aliased constant String := "WebIDL,WebAssembly Interface Type";
+   K_11            : aliased constant String := "text/x-django";
+   M_11            : aliased constant String := "Jinja";
+   K_12            : aliased constant String := "text/x-swift";
+   M_12            : aliased constant String := "Swift";
+   K_13            : aliased constant String := "text/x-idl";
+   M_13            : aliased constant String := "IDL";
+   K_14            : aliased constant String := "text/x-coffeescript";
+   M_14            : aliased constant String := "EmberScript,CoffeeScript,CSON";
+   K_15            : aliased constant String := "text/x-pug";
+   M_15            : aliased constant String := "Pug";
+   K_16            : aliased constant String := "text/velocity";
+   M_16            : aliased constant String := "Velocity Template Language";
+   K_17            : aliased constant String := "text/x-eiffel";
+   M_17            : aliased constant String := "Eiffel";
+   K_18            : aliased constant String := "text/x-toml";
+   M_18            : aliased constant String := "TOML";
+   K_19            : aliased constant String := "text/x-dockerfile";
+   M_19            : aliased constant String := "Dockerfile";
+   K_20            : aliased constant String := "text/x-ocaml";
+   M_20            : aliased constant String := "OCaml,Standard ML,CameLIGO";
+   K_21            : aliased constant String := "text/x-stsrc";
+   M_21            : aliased constant String := "Smalltalk";
+   K_22            : aliased constant String := "application/javascript";
+   M_22            : aliased constant String := "Jest Snapshot,JavaScript+ERB";
+   K_23            : aliased constant String := "text/x-ttcn-asn";
+   M_23            : aliased constant String := "ASN.1";
+   K_24            : aliased constant String := "text/x-kotlin";
+   M_24            : aliased constant String := "Kotlin,Asymptote";
+   K_25            : aliased constant String := "text/x-rsrc";
+   M_25            : aliased constant String := "R";
+   K_26            : aliased constant String := "text/x-smarty";
+   M_26            : aliased constant String := "Smarty,Mustache,Latte";
+   K_27            : aliased constant String := "text/x-cobol";
+   M_27            : aliased constant String := "COBOL";
+   K_28            : aliased constant String := "text/javascript";
+   M_28            : aliased constant String := "Qt Script,PEG.js,JavaScript,JSON with Com"
+       & "ments,Cycript";
+   K_29            : aliased constant String := "text/x-textile";
+   M_29            : aliased constant String := "Textile";
+   K_30            : aliased constant String := "text/x-slim";
+   M_30            : aliased constant String := "Slim";
+   K_31            : aliased constant String := "application/x-jsp";
+   M_31            : aliased constant String := "Java Server Pages,Groovy Server Pages";
+   K_32            : aliased constant String := "text/x-puppet";
+   M_32            : aliased constant String := "Puppet";
    K_33            : aliased constant String := "text/x-brainfuck";
    M_33            : aliased constant String := "Brainfuck";
-   K_34            : aliased constant String := "text/x-csharp";
-   M_34            : aliased constant String := "Uno, Beef, C#, EQ";
-   K_35            : aliased constant String := "text/x-sass";
-   M_35            : aliased constant String := "Sass";
-   K_36            : aliased constant String := "text/x-go";
-   M_36            : aliased constant String := "Go, V";
-   K_37            : aliased constant String := "text/x-properties";
-   M_37            : aliased constant String := "Windows Registry Entries, INI, ShellCheck"
-       & " Config, Simple File Verification, Java Properties, Win32 Message File"
-       & ", TextMate Properties, EditorConfig, Record Jar, Git Config";
-   K_38            : aliased constant String := "text/x-groovy";
-   M_38            : aliased constant String := "Groovy";
-   K_39            : aliased constant String := "application/x-powershell";
-   M_39            : aliased constant String := "PowerShell";
-   K_40            : aliased constant String := "application/pgp";
-   M_40            : aliased constant String := "Public Key";
-   K_41            : aliased constant String := "text/turtle";
-   M_41            : aliased constant String := "Turtle";
-   K_42            : aliased constant String := "application/sieve";
-   M_42            : aliased constant String := "Sieve";
-   K_43            : aliased constant String := "text/x-literate-haskell";
-   M_43            : aliased constant String := "Literate Haskell";
-   K_44            : aliased constant String := "text/x-protobuf";
-   M_44            : aliased constant String := "Protocol Buffer";
-   K_45            : aliased constant String := "text/x-oz";
-   M_45            : aliased constant String := "Oz";
-   K_46            : aliased constant String := "text/x-fortran";
-   M_46            : aliased constant String := "Fortran Free Form, Fortran";
-   K_47            : aliased constant String := "text/x-ebnf";
-   M_47            : aliased constant String := "Lark, EBNF";
-   K_48            : aliased constant String := "text/x-plsql";
-   M_48            : aliased constant String := "PLSQL";
-   K_49            : aliased constant String := "text/x-spreadsheet";
-   M_49            : aliased constant String := "LTspice Symbol";
-   K_50            : aliased constant String := "text/x-twig";
-   M_50            : aliased constant String := "Twig";
-   K_51            : aliased constant String := "text/x-factor";
-   M_51            : aliased constant String := "Factor";
-   K_52            : aliased constant String := "text/x-forth";
-   M_52            : aliased constant String := "MUF, Forth";
-   K_53            : aliased constant String := "text/x-rustsrc";
-   M_53            : aliased constant String := "ReasonLIGO, Rust, Reason, ReScript, Sway";
-   K_54            : aliased constant String := "text/x-mumps";
-   M_54            : aliased constant String := "M";
-   K_55            : aliased constant String := "text/x-rpm-spec";
-   M_55            : aliased constant String := "RPM Spec";
-   K_56            : aliased constant String := "text/x-crystal";
-   M_56            : aliased constant String := "Crystal";
-   K_57            : aliased constant String := "text/css";
-   M_57            : aliased constant String := "Less, CSS, Cloud Firestore Security Rules";
-   K_58            : aliased constant String := "text/velocity";
-   M_58            : aliased constant String := "Velocity Template Language";
-   K_59            : aliased constant String := "text/x-modelica";
-   M_59            : aliased constant String := "Modelica";
-   K_60            : aliased constant String := "text/xml";
-   M_60            : aliased constant String := "XProc, XPages, COLLADA, Eagle, Maven POM,"
-       & " JetBrains MPS, XML, Genshi, LabVIEW, XML Property List, SVG, XSLT";
-   K_61            : aliased constant String := "application/sparql-query";
-   M_61            : aliased constant String := "SPARQL";
-   K_62            : aliased constant String := "text/x-gfm";
-   M_62            : aliased constant String := "RMarkdown, MDX, Markdown";
-   K_63            : aliased constant String := "text/x-smarty";
-   M_63            : aliased constant String := "Mustache, Smarty, Latte";
-   K_64            : aliased constant String := "application/xml";
-   M_64            : aliased constant String := "Ant Build System";
-   K_65            : aliased constant String := "text/mirc";
-   M_65            : aliased constant String := "IRC log";
-   K_66            : aliased constant String := "text/x-toml";
-   M_66            : aliased constant String := "TOML";
-   K_67            : aliased constant String := "text/x-common-lisp";
-   M_67            : aliased constant String := "Emacs Lisp, NetLogo, NewLisp, WebAssembly"
-       & ", KiCad Layout, SRecode Template, GCC Machine Description, Common Lisp"
-       & ", LFE";
-   K_68            : aliased constant String := "text/x-dockerfile";
-   M_68            : aliased constant String := "Dockerfile";
-   K_69            : aliased constant String := "text/vbscript";
-   M_69            : aliased constant String := "VBScript";
-   K_70            : aliased constant String := "text/x-haxe";
-   M_70            : aliased constant String := "Haxe";
-   K_71            : aliased constant String := "text/x-verilog";
-   M_71            : aliased constant String := "Verilog";
-   K_72            : aliased constant String := "text/x-rst";
-   M_72            : aliased constant String := "reStructuredText";
-   K_73            : aliased constant String := "text/x-clojure";
-   M_73            : aliased constant String := "edn, Rouge, Clojure, wisp";
-   K_74            : aliased constant String := "text/x-stex";
-   M_74            : aliased constant String := "TeX, BibTeX";
-   K_75            : aliased constant String := "text/x-fsharp";
-   M_75            : aliased constant String := "F#";
-   K_76            : aliased constant String := "text/x-stsrc";
-   M_76            : aliased constant String := "Smalltalk";
-   K_77            : aliased constant String := "text/x-haml";
-   M_77            : aliased constant String := "Haml";
-   K_78            : aliased constant String := "application/xquery";
-   M_78            : aliased constant String := "XQuery";
-   K_79            : aliased constant String := "text/x-julia";
-   M_79            : aliased constant String := "Julia";
-   K_80            : aliased constant String := "text/x-kotlin";
-   M_80            : aliased constant String := "Kotlin, Asymptote";
-   K_81            : aliased constant String := "text/x-ruby";
-   M_81            : aliased constant String := "RBS, Ruby, HCL, Mirah, Terraform Template";
-   K_82            : aliased constant String := "text/x-cython";
-   M_82            : aliased constant String := "Cython";
-   K_83            : aliased constant String := "text/x-erlang";
-   M_83            : aliased constant String := "Erlang";
-   K_84            : aliased constant String := "text/x-slim";
-   M_84            : aliased constant String := "Slim";
-   K_85            : aliased constant String := "text/x-django";
-   M_85            : aliased constant String := "Jinja";
-   K_86            : aliased constant String := "text/x-elm";
-   M_86            : aliased constant String := "Elm";
-   K_87            : aliased constant String := "text/html";
-   M_87            : aliased constant String := "MTML, HTML+EEX, Bikeshed, HTML, Kit, HTML"
-       & "+Razor, StringTemplate, Svelte, HTML+ECR, Ecmarkup, Marko";
-   K_88            : aliased constant String := "text/x-swift";
-   M_88            : aliased constant String := "Swift";
-   K_89            : aliased constant String := "application/javascript";
-   M_89            : aliased constant String := "Jest Snapshot, JavaScript+ERB";
-   K_90            : aliased constant String := "text/troff";
-   M_90            : aliased constant String := "Roff, Roff Manpage, Pic";
-   K_91            : aliased constant String := "text/x-puppet";
-   M_91            : aliased constant String := "Puppet";
-   K_92            : aliased constant String := "text/x-vb";
-   M_92            : aliased constant String := "VBA, FreeBasic, Visual Basic 6.0, Visual "
-       & "Basic .NET";
-   K_93            : aliased constant String := "text/x-webidl";
-   M_93            : aliased constant String := "WebIDL, WebAssembly Interface Type";
-   K_94            : aliased constant String := "text/x-csrc";
-   M_94            : aliased constant String := "X BitMap, HolyC, XS, XC, OpenCL, X PixMap"
-       & ", Smithy, NWScript, Monkey C, DTrace, C, GSC, Unified Parallel C";
-   K_95            : aliased constant String := "text/x-yaml";
-   M_95            : aliased constant String := "RAML, OASv2-yaml, Unity3D Asset, SaltStac"
-       & "k, Kaitai Struct, DenizenScript, LookML, OASv3-yaml, Common Workflow L"
-       & "anguage, MiniYAML, YAML";
-   K_96            : aliased constant String := "text/x-ttcn-asn";
-   M_96            : aliased constant String := "ASN.1";
-   K_97            : aliased constant String := "text/x-cmake";
-   M_97            : aliased constant String := "CMake, Makefile";
-   K_98            : aliased constant String := "text/x-mathematica";
-   M_98            : aliased constant String := "Mathematica";
-   K_99            : aliased constant String := "text/x-nginx-conf";
-   M_99            : aliased constant String := "Nginx";
-   K_100           : aliased constant String := "text/javascript";
-   M_100           : aliased constant String := "PEG.js, Cycript, JSON with Comments, Qt S"
-       & "cript, JavaScript";
-   K_101           : aliased constant String := "application/x-jsp";
-   M_101           : aliased constant String := "Java Server Pages, Groovy Server Pages";
-   K_102           : aliased constant String := "text/x-idl";
-   M_102           : aliased constant String := "IDL";
-   K_103           : aliased constant String := "text/x-d";
-   M_103           : aliased constant String := "Volt, D";
-   K_104           : aliased constant String := "application/x-httpd-php";
-   M_104           : aliased constant String := "HTML+PHP, Hack, PHP";
-   K_105           : aliased constant String := "text/x-scss";
-   M_105           : aliased constant String := "SCSS";
-   K_106           : aliased constant String := "text/x-sh";
-   M_106           : aliased constant String := "OpenRC runscript, ShellSession, Ignore Li"
-       & "st, Nushell, Tcsh, Alpine Abuild, Gentoo Ebuild, Option List, Gentoo E"
-       & "class, Shell, Git Attributes";
-   K_107           : aliased constant String := "application/typescript";
-   M_107           : aliased constant String := "TypeScript";
-   K_108           : aliased constant String := "text/x-soy";
-   M_108           : aliased constant String := "Closure Templates";
-   K_109           : aliased constant String := "text/x-nsis";
-   M_109           : aliased constant String := "NSIS";
-   K_110           : aliased constant String := "text/x-python";
-   M_110           : aliased constant String := "NumPy, Starlark, GN, Mojo, Xonsh, Sage, S"
-       & "nakemake, Easybuild, Python";
-   K_111           : aliased constant String := "text/x-livescript";
-   M_111           : aliased constant String := "LiveScript";
+   K_34            : aliased constant String := "text/x-dylan";
+   M_34            : aliased constant String := "Dylan";
+   K_35            : aliased constant String := "text/x-fortran";
+   M_35            : aliased constant String := "Fortran Free Form,Fortran";
+   K_36            : aliased constant String := "text/x-haxe";
+   M_36            : aliased constant String := "Haxe";
+   K_37            : aliased constant String := "application/mbox";
+   M_37            : aliased constant String := "E-mail";
+   K_38            : aliased constant String := "text/x-livescript";
+   M_38            : aliased constant String := "LiveScript";
+   K_39            : aliased constant String := "text/x-csrc";
+   M_39            : aliased constant String := "C,XS,XC,X PixMap,X BitMap,Unified Paralle"
+       & "l C,Smithy,OpenCL,NWScript,Monkey C,HolyC,GSC,DTrace";
+   K_40            : aliased constant String := "text/x-modelica";
+   M_40            : aliased constant String := "Modelica";
+   K_41            : aliased constant String := "message/http";
+   M_41            : aliased constant String := "HTTP";
+   K_42            : aliased constant String := "text/x-ruby";
+   M_42            : aliased constant String := "Terraform Template,Ruby,RBS,Mirah,HCL";
+   K_43            : aliased constant String := "text/x-nsis";
+   M_43            : aliased constant String := "NSIS";
+   K_44            : aliased constant String := "application/x-aspx";
+   M_44            : aliased constant String := "ASP.NET";
+   K_45            : aliased constant String := "text/x-sass";
+   M_45            : aliased constant String := "Sass";
+   K_46            : aliased constant String := "application/pgp";
+   M_46            : aliased constant String := "Public Key";
+   K_47            : aliased constant String := "text/x-lua";
+   M_47            : aliased constant String := "Lua,Terra";
+   K_48            : aliased constant String := "text/x-julia";
+   M_48            : aliased constant String := "Julia";
+   K_49            : aliased constant String := "text/x-sas";
+   M_49            : aliased constant String := "SAS";
+   K_50            : aliased constant String := "application/sieve";
+   M_50            : aliased constant String := "Sieve";
+   K_51            : aliased constant String := "text/x-vb";
+   M_51            : aliased constant String := "VBA,Visual Basic 6.0,Visual Basic .NET,Fr"
+       & "eeBasic";
+   K_52            : aliased constant String := "text/x-rst";
+   M_52            : aliased constant String := "reStructuredText";
+   K_53            : aliased constant String := "text/x-csharp";
+   M_53            : aliased constant String := "Uno,EQ,C#,Beef";
+   K_54            : aliased constant String := "text/xml";
+   M_54            : aliased constant String := "XML,XSLT,XProc,XPages,XML Property List,S"
+       & "VG,Maven POM,LabVIEW,JetBrains MPS,Genshi,Eagle,COLLADA";
+   K_55            : aliased constant String := "text/x-elm";
+   M_55            : aliased constant String := "Elm";
+   K_56            : aliased constant String := "text/x-erlang";
+   M_56            : aliased constant String := "Erlang";
+   K_57            : aliased constant String := "text/x-mumps";
+   M_57            : aliased constant String := "M";
+   K_58            : aliased constant String := "text/x-crystal";
+   M_58            : aliased constant String := "Crystal";
+   K_59            : aliased constant String := "text/vbscript";
+   M_59            : aliased constant String := "VBScript";
+   K_60            : aliased constant String := "text/x-mathematica";
+   M_60            : aliased constant String := "Mathematica";
+   K_61            : aliased constant String := "text/x-spreadsheet";
+   M_61            : aliased constant String := "LTspice Symbol";
+   K_62            : aliased constant String := "text/x-twig";
+   M_62            : aliased constant String := "Twig";
+   K_63            : aliased constant String := "text/x-pascal";
+   M_63            : aliased constant String := "Pascal,LigoLANG,Component Pascal";
+   K_64            : aliased constant String := "text/x-nginx-conf";
+   M_64            : aliased constant String := "Nginx";
+   K_65            : aliased constant String := "text/x-d";
+   M_65            : aliased constant String := "D,Volt";
+   K_66            : aliased constant String := "text/x-soy";
+   M_66            : aliased constant String := "Closure Templates";
+   K_67            : aliased constant String := "text/x-haskell";
+   M_67            : aliased constant String := "PureScript,Haskell,Grammatical Framework,"
+       & "Dhall,Cabal Config,C2hs Haskell,Bluespec BH";
+   K_68            : aliased constant String := "text/x-tcl";
+   M_68            : aliased constant String := "Tcl,Glyph";
+   K_69            : aliased constant String := "text/x-sql";
+   M_69            : aliased constant String := "SQLPL,SQL,PLpgSQL";
+   K_70            : aliased constant String := "application/dart";
+   M_70            : aliased constant String := "Dart";
+   K_71            : aliased constant String := "text/x-haml";
+   M_71            : aliased constant String := "Haml";
+   K_72            : aliased constant String := "text/x-clojure";
+   M_72            : aliased constant String := "wisp,edn,Rouge,Clojure";
+   K_73            : aliased constant String := "text/x-octave";
+   M_73            : aliased constant String := "MATLAB";
+   K_74            : aliased constant String := "text/x-diff";
+   M_74            : aliased constant String := "Diff";
+   K_75            : aliased constant String := "text/x-stex";
+   M_75            : aliased constant String := "TeX,BibTeX";
+   K_76            : aliased constant String := "text/x-groovy";
+   M_76            : aliased constant String := "Groovy";
+   K_77            : aliased constant String := "text/turtle";
+   M_77            : aliased constant String := "Turtle";
+   K_78            : aliased constant String := "text/x-scala";
+   M_78            : aliased constant String := "Scala";
+   K_79            : aliased constant String := "text/html";
+   M_79            : aliased constant String := "Svelte,StringTemplate,Marko,MTML,Kit,HTML"
+       & "+Razor,HTML+EEX,HTML+ECR,HTML,Ecmarkup,Bikeshed";
+   K_80            : aliased constant String := "text/x-properties";
+   M_80            : aliased constant String := "INI,Windows Registry Entries,Win32 Messag"
+       & "e File,TextMate Properties,Simple File Verification,ShellCheck Config,"
+       & "Record Jar,Java Properties,Git Config,EditorConfig";
+   K_81            : aliased constant String := "text/x-factor";
+   M_81            : aliased constant String := "Factor";
+   K_82            : aliased constant String := "text/css";
+   M_82            : aliased constant String := "Less,Cloud Firestore Security Rules,CSS";
+   K_83            : aliased constant String := "text/x-scheme";
+   M_83            : aliased constant String := "Scheme,Nu,Janet";
+   K_84            : aliased constant String := "text/x-cmake";
+   M_84            : aliased constant String := "Makefile,CMake";
+   K_85            : aliased constant String := "text/x-scss";
+   M_85            : aliased constant String := "SCSS";
+   K_86            : aliased constant String := "application/x-powershell";
+   M_86            : aliased constant String := "PowerShell";
+   K_87            : aliased constant String := "text/x-yaml";
+   M_87            : aliased constant String := "YAML,Unity3D Asset,SaltStack,RAML,OASv3-y"
+       & "aml,OASv2-yaml,MiniYAML,LookML,Kaitai Struct,DenizenScript,Common Work"
+       & "flow Language";
+   K_88            : aliased constant String := "text/x-systemverilog";
+   M_88            : aliased constant String := "SystemVerilog,Bluespec";
+   K_89            : aliased constant String := "text/x-go";
+   M_89            : aliased constant String := "V,Go";
+   K_90            : aliased constant String := "text/x-literate-haskell";
+   M_90            : aliased constant String := "Literate Haskell";
+   K_91            : aliased constant String := "application/typescript";
+   M_91            : aliased constant String := "TypeScript";
+   K_92            : aliased constant String := "text/x-gfm";
+   M_92            : aliased constant String := "RMarkdown,Markdown,MDX";
+   K_93            : aliased constant String := "text/mirc";
+   M_93            : aliased constant String := "IRC log";
+   K_94            : aliased constant String := "text/x-ebnf";
+   M_94            : aliased constant String := "Lark,EBNF";
+   K_95            : aliased constant String := "application/x-httpd-php";
+   M_95            : aliased constant String := "PHP,Hack,HTML+PHP";
+   K_96            : aliased constant String := "application/x-erb";
+   M_96            : aliased constant String := "HTML+ERB";
+   K_97            : aliased constant String := "text/apl";
+   M_97            : aliased constant String := "APL";
+   K_98            : aliased constant String := "text/x-common-lisp";
+   M_98            : aliased constant String := "WebAssembly,SRecode Template,NewLisp,NetL"
+       & "ogo,LFE,KiCad Layout,GCC Machine Description,Emacs Lisp,Common Lisp";
+   K_99            : aliased constant String := "text/x-python";
+   M_99            : aliased constant String := "Python,Xonsh,Starlark,Snakemake,Sage,NumP"
+       & "y,Mojo,GN,Easybuild";
+   K_100           : aliased constant String := "text/x-vhdl";
+   M_100           : aliased constant String := "VHDL";
+   K_101           : aliased constant String := "application/json";
+   M_101           : aliased constant String := "JSON,OASv3-json,OASv2-json,Max,Jupyter No"
+       & "tebook,JSONiq,JSONLD,JSON5,Ecere Projects";
+   K_102           : aliased constant String := "text/x-ecl";
+   M_102           : aliased constant String := "ECL";
+   K_103           : aliased constant String := "text/x-c++src";
+   M_103           : aliased constant String := "C++,Squirrel,SWIG,Metal,Game Maker Langua"
+       & "ge,Edje Data Collection,Cuda,AngelScript,AGS Script";
+   K_104           : aliased constant String := "text/x-oz";
+   M_104           : aliased constant String := "Oz";
+   K_105           : aliased constant String := "text/x-java";
+   M_105           : aliased constant String := "UnrealScript,Java,ChucK,Apex";
+   K_106           : aliased constant String := "text/x-rpm-spec";
+   M_106           : aliased constant String := "RPM Spec";
+   K_107           : aliased constant String := "text/x-fsharp";
+   M_107           : aliased constant String := "F#";
+   K_108           : aliased constant String := "text/troff";
+   M_108           : aliased constant String := "Roff Manpage,Roff,Pic";
+   K_109           : aliased constant String := "text/x-sh";
+   M_109           : aliased constant String := "Tcsh,ShellSession,Shell,Option List,OpenR"
+       & "C runscript,Nushell,Ignore List,Git Attributes,Gentoo Eclass,Gentoo Eb"
+       & "uild,Alpine Abuild";
+   K_110           : aliased constant String := "application/xml";
+   M_110           : aliased constant String := "Ant Build System";
+   K_111           : aliased constant String := "application/sparql-query";
+   M_111           : aliased constant String := "SPARQL";
 
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
