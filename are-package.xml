@@ -43,7 +43,7 @@
             format='map'
 	    name-access='true'
 	    list-access='true'
-	    no-type-declaration='true'
+	    no-type-declaration='false'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
     <header>--  Extensions mapping generated from extensions.json</header>
@@ -60,8 +60,8 @@
 
   <resource name='SPDX_Tool.Languages.FilenameMap'
             format='map'
-	    name-access='true'
-	    list-access='true'
+	    name-access='false'
+	    list-access='false'
 	    no-type-declaration='true'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
@@ -79,8 +79,8 @@
 
   <resource name='SPDX_Tool.Languages.InterpreterMap'
             format='map'
-	    name-access='true'
-	    list-access='true'
+	    name-access='false'
+	    list-access='false'
 	    no-type-declaration='true'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
@@ -98,8 +98,8 @@
 
   <resource name='SPDX_Tool.Languages.MimeMap'
             format='map'
-	    name-access='true'
-	    list-access='true'
+	    name-access='false'
+	    list-access='false'
 	    no-type-declaration='true'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
@@ -117,8 +117,8 @@
 
   <resource name='SPDX_Tool.Languages.AliasMap'
             format='map'
-	    name-access='true'
-	    list-access='true'
+	    name-access='false'
+	    list-access='false'
 	    no-type-declaration='true'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
@@ -130,6 +130,25 @@
     <install mode='copy' strip-extension='yes'>
       <fileset dir="share/spdx-tool">
         <include name="aliases.json"/>
+      </fileset>
+    </install>
+  </resource>
+
+  <resource name='SPDX_Tool.Languages.CommentsMap'
+            format='map'
+	    name-access='false'
+	    list-access='false'
+	    no-type-declaration='true'
+            type='access constant String'>
+    <header>--  SPDX-License-Identifier: Apache-2.0</header>
+    <header>--  Mapping generated from comments.json</header>
+
+    <mapper type='json'/>
+
+    <!-- Copy files with .txt extension from 'help' directory -->
+    <install mode='copy' strip-extension='yes'>
+      <fileset dir="share/spdx-tool">
+        <include name="comments.json"/>
       </fileset>
     </install>
   </resource>
