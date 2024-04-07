@@ -168,7 +168,7 @@ package body Util.Files.Walk is
                   end if;
 
                exception
-                  when E: GNAT.Regexp.Error_In_Regexp =>
+                  when E : GNAT.Regexp.Error_In_Regexp =>
                      Log.Error ("{0}:{1}: Invalid regular expression: {2}",
                                 Label,
                                 Util.Strings.Image (Line_Number),
