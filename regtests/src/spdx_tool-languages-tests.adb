@@ -8,6 +8,7 @@ with GNAT.Source_Info;
 with Util.Test_Caller;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Languages.Shell;
+with SPDX_Tool.Languages.Modelines;
 package body SPDX_Tool.Languages.Tests is
 
    use SPDX_Tool.Infos;
@@ -25,7 +26,26 @@ package body SPDX_Tool.Languages.Tests is
    begin
       Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Shell",
                        Test_Shell_Detector'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Languages.Modeline",
+                       Test_Modeline_Detector'Access);
    end Add_Tests;
+
+   procedure Check_Modeline (T        : in out Test;
+                             Content  : in String;
+                             Expect   : in String;
+                             Source   : in String := GNAT.Source_Info.File;
+                             Line     : in Natural := GNAT.Source_Info.Line) is
+      File     : File_Info (1);
+      Data     : File_Type (100);
+      Result   : Detector_Result;
+      Modeline : Languages.Modelines.Modeline_Detector_Type;
+   begin
+      Data.Buffer := Create_Buffer (Content);
+      Data.Last_Offset := Content'Length;
+      Find_Lines (Data.Buffer.Value.Data, Data.Lines, Data.Count);
+      Modeline.Detect (File, Data, Result);
+      T.Assert_Equals (Expect, Get_Language (Result), "Invalid detection", Source, Line);
+   end Check_Modeline;
 
    procedure Check_Shell (T        : in out Test;
                           Content  : in String;
@@ -60,5 +80,21 @@ package body SPDX_Tool.Languages.Tests is
       Check_Shell (T, "#! ", "");
       Check_Shell (T, "#! a", "");
    end Test_Shell_Detector;
+
+   --  ------------------------------
+   --  Test the emacs/vim modeline detector on several patterns.
+   --  ------------------------------
+   procedure Test_Modeline_Detector (T : in out Test) is
+   begin
+      Check_Modeline (T, "# -*-lisp-*-", "Common Lisp");
+      Check_Modeline (T, "# -*-C++-*-", "C++");
+      Check_Modeline (T, "# -*-mode:Java-*-", "Java");
+      Check_Modeline (T, "# -*- tabs:8;mode:Perl-*-", "Perl");
+      Check_Modeline (T, "# -*- tabs:8 ; mode: Perl-*-", "Perl");
+      Check_Modeline (T, "# -*- tabs:8 ; mode : Perl-*-", "Perl");
+      Check_Modeline (T, "# -*- tabs:8 ; mode : Perl -*-", "Perl");
+      Check_Modeline (T, "# -*- tabs:4 ; mode : ada ; indend: full-*-", "Ada");
+      Check_Modeline (T, "# -*- Python-*-", "Python");
+   end Test_Modeline_Detector;
 
 end SPDX_Tool.Languages.Tests;

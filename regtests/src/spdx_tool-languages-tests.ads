@@ -14,4 +14,7 @@ package SPDX_Tool.Languages.Tests is
    --  Test shell detector on several patterns.
    procedure Test_Shell_Detector (T : in out Test);
 
+   --  Test the emacs/vim modeline detector on several patterns.
+   procedure Test_Modeline_Detector (T : in out Test);
+
 end SPDX_Tool.Languages.Tests;
