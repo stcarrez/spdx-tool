@@ -65,7 +65,7 @@
 	    no-type-declaration='true'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
-    <header>--  Extensions mapping generated from extensions.json</header>
+    <header>--  Filename mapping generated from filenames.json</header>
 
     <mapper type='json'/>
 
@@ -84,7 +84,7 @@
 	    no-type-declaration='true'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
-    <header>--  Extensions mapping generated from extensions.json</header>
+    <header>--  Interpreter mapping generated from interpreters.json</header>
 
     <mapper type='json'/>
 
@@ -103,7 +103,7 @@
 	    no-type-declaration='true'
             type='access constant String'>
     <header>--  SPDX-License-Identifier: Apache-2.0</header>
-    <header>--  Extensions mapping generated from extensions.json</header>
+    <header>--  Mime mapping generated from mimes.json</header>
 
     <mapper type='json'/>
 
@@ -111,6 +111,25 @@
     <install mode='copy' strip-extension='yes'>
       <fileset dir="share/spdx-tool">
         <include name="mimes.json"/>
+      </fileset>
+    </install>
+  </resource>
+
+  <resource name='SPDX_Tool.Languages.AliasMap'
+            format='map'
+	    name-access='true'
+	    list-access='true'
+	    no-type-declaration='true'
+            type='access constant String'>
+    <header>--  SPDX-License-Identifier: Apache-2.0</header>
+    <header>--  Alias mapping generated from aliases.json</header>
+
+    <mapper type='json'/>
+
+    <!-- Copy files with .txt extension from 'help' directory -->
+    <install mode='copy' strip-extension='yes'>
+      <fileset dir="share/spdx-tool">
+        <include name="aliases.json"/>
       </fileset>
     </install>
   </resource>

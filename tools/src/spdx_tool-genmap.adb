@@ -73,7 +73,7 @@ procedure SPDX_Tool.Genmap is
    procedure Usage is
    begin
       Ada.Text_IO.Put_Line ("Usage: spdx_tool-genmap {--extensions|--interpreters|"
-                            & "--filenames|--mimes} path");
+                            & "--filenames|--mimes|--alias} path");
       Ada.Command_Line.Set_Exit_Status (2);
    end Usage;
 
@@ -87,6 +87,8 @@ procedure SPDX_Tool.Genmap is
          return "filenames";
       elsif Option = "--mimes" then
          return "codemirror_mime_type";
+      elsif Option = "--aliases" then
+         return "aliases";
       else
          return "";
       end if;

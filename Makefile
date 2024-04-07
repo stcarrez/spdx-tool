@@ -25,12 +25,13 @@ generate:
 	bin/spdx_tool-genmap --filenames tools/languages.json | $(JSON_PP) > share/spdx-tool/filenames.json
 	bin/spdx_tool-genmap --interpreters tools/languages.json | $(JSON_PP) > share/spdx-tool/interpreters.json
 	bin/spdx_tool-genmap --mimes tools/languages.json | $(JSON_PP) > share/spdx-tool/mimes.json
+	bin/spdx_tool-genmap --aliases tools/languages.json | $(JSON_PP) > share/spdx-tool/aliases.json
 	are --rule=are-package.xml -o src/generated .
 	cd tools && alr build $(MAKE_ARGS)
 	bin/gendecisiontree > src/generated/spdx_tool-licenses-decisions.ads
 
 test: build-tests
-	bin/spdx_tool-harness
+	bin/spdx_tool-harness -v
 
 clean:
 	alr clean
