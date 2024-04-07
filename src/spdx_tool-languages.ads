@@ -4,10 +4,10 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
+with Ada.Containers.Vectors;
 with Util.Files.Filters;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
-with Util.Strings.Vectors;
 with SPDX_Tool.Files;
 private with Ada.Strings.Hash;
 private with Ada.Containers.Indefinite_Hashed_Maps;
@@ -32,10 +32,10 @@ package SPDX_Tool.Languages is
    type Comment_Info is record
       Analyzer   : Analyzer_Access;
       Start      : Buffer_Index := 1;
-      Last       : Buffer_Index := 1;
+      Last       : Buffer_Size := 0;
       Head       : Buffer_Index := 1;
       Text_Start : Buffer_Index := 1;
-      Text_Last  : Buffer_Index := 1;
+      Text_Last  : Buffer_Size := 0;
       Trailer    : Buffer_Size := 0;
       Length     : Natural := 0;
       Mode       : Files.Comment_Mode := NO_COMMENT;
@@ -143,29 +143,40 @@ package SPDX_Tool.Languages is
 
    function Find_Category (Buffer : in Buffer_Type;
                            From   : in Buffer_Index;
-                           Last   : in Buffer_Index) return Files.Comment_Category;
+                           Last   : in Buffer_Size) return Files.Comment_Category;
 
 private
 
    subtype Comment_Configuration is Configs.Comment_Configuration;
    subtype Language_Configuration is Configs.Language_Configuration;
+   subtype Confidence_Type is Infos.Confidence_Type;
+
+   type Detected_Language is record
+      Language   : UString;
+      Confidence : Confidence_Type;
+   end record;
+
+   package Detected_Language_Vectors is
+      new Ada.Containers.Vectors (Element_Type => Detected_Language, Index_Type => Positive);
 
    type Detector_Result is record
-      Languages : Util.Strings.Vectors.Vector;
+      Languages : Detected_Language_Vectors.Vector;
    end record;
 
    --  Update the language detection result with the language and the given confidence.
    --  Confidence are added
    procedure Set_Language (Result     : in out Detector_Result;
                            Language   : in String;
-                           Confidence : in Natural := 1);
+                           Confidence : in Confidence_Type);
 
    --  If the languages string is not null, add every language that is contains
    --  Languages are separated by ','.
-   procedure Set_Languages (Result    : in out Detector_Result;
-                            Languages : access constant String);
-   procedure Set_Languages (Result    : in out Detector_Result;
-                            Languages : in String);
+   procedure Set_Languages (Result     : in out Detector_Result;
+                            Languages  : access constant String;
+                            Confidence : in Confidence_Type);
+   procedure Set_Languages (Result     : in out Detector_Result;
+                            Languages  : in String;
+                            Confidence : in Confidence_Type);
 
    --  Get the language that was resolved.
    function Get_Language (Result : in Detector_Result) return String;
@@ -179,7 +190,7 @@ private
    --  higher confidence.
    procedure Detect (Detector : in Detector_Type;
                      File     : in File_Info;
-                     Content  : in File_Type;
+                     Content  : in out File_Type;
                      Result   : in out Detector_Result) is abstract;
 
    --  Analyzer for line oriented comments.

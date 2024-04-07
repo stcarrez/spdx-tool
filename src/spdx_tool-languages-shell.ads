@@ -11,7 +11,7 @@ private package SPDX_Tool.Languages.Shell is
    overriding
    procedure Detect (Detector : in Shell_Detector_Type;
                      File     : in File_Info;
-                     Content  : in File_Type;
+                     Content  : in out File_Type;
                      Result   : in out Detector_Result);
 
    procedure Check_Interpreter (Detector    : in Shell_Detector_Type;

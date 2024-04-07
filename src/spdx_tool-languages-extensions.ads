@@ -11,7 +11,7 @@ private package SPDX_Tool.Languages.Extensions is
    overriding
    procedure Detect (Detector : in Extension_Detector_Type;
                      File     : in File_Info;
-                     Content  : in File_Type;
+                     Content  : in out File_Type;
                      Result   : in out Detector_Result);
 
 end SPDX_Tool.Languages.Extensions;

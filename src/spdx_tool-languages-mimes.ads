@@ -6,12 +6,14 @@
 
 private package SPDX_Tool.Languages.Mimes is
 
-   type Mime_Detector_Type is new Detector_Type with null record;
+   type Mime_Detector_Type is new Detector_Type with record
+      Confidence : Confidence_Type := 0.5;
+   end record;
 
    overriding
    procedure Detect (Detector : in Mime_Detector_Type;
                      File     : in File_Info;
-                     Content  : in File_Type;
+                     Content  : in out File_Type;
                      Result   : in out Detector_Result);
 
 end SPDX_Tool.Languages.Mimes;

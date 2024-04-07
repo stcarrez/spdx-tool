@@ -956,6 +956,14 @@ package body SPDX_Tool.Licenses is
       for Node of reverse Nodes loop
          for License of Node.Licenses loop
             if not Map (License) then
+               declare
+                  Token : Token_Access;
+               begin
+                  Token := License_Tree.Get_License (License);
+                  if Token = null then
+                     License_Tree.Load_License (License, Token);
+                  end if;
+               end;
                C := Token_Similarities.Tversky (Decisions.Licenses (License).Tokens,
                                                 Tokens,
                                                 0.75, 0.25);

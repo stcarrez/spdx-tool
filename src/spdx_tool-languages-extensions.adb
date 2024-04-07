@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Util.Strings;
 with SPDX_Tool.Languages.ExtensionMap;
 package body SPDX_Tool.Languages.Extensions is
 
@@ -28,11 +29,11 @@ package body SPDX_Tool.Languages.Extensions is
    overriding
    procedure Detect (Detector : in Extension_Detector_Type;
                      File     : in File_Info;
-                     Content  : in File_Type;
+                     Content  : in out File_Type;
                      Result   : in out Detector_Result) is
       Language : constant access constant String := Get_Language_From_Extension (File.Path);
    begin
-      Set_Languages (Result, Language);
+      Set_Languages (Result, Language, 1.0);
    end Detect;
 
 end SPDX_Tool.Languages.Extensions;

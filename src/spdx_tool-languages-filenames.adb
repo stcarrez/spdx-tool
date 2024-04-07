@@ -10,7 +10,7 @@ package body SPDX_Tool.Languages.Filenames is
    overriding
    procedure Detect (Detector : in Filename_Detector_Type;
                      File     : in File_Info;
-                     Content  : in File_Type;
+                     Content  : in out File_Type;
                      Result   : in out Detector_Result) is
       use type Language_Mappers.Match_Result;
 
@@ -22,10 +22,10 @@ package body SPDX_Tool.Languages.Filenames is
          declare
             Language : constant String := Language_Mappers.Get_Value (Match);
          begin
-            Set_Languages (Result, Language);
+            Set_Languages (Result, Language, 1.0);
          end;
       end if;
-      Set_Languages (Result, Kind);
+      Set_Languages (Result, Kind, 1.0);
    end Detect;
 
 end SPDX_Tool.Languages.Filenames;

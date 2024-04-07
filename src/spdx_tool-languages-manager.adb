@@ -17,7 +17,7 @@ package body SPDX_Tool.Languages.Manager is
    --  ------------------------------
    procedure Find_Language (Manager  : in Language_Manager;
                             File     : in out SPDX_Tool.Infos.File_Info;
-                            Content  : in File_Type;
+                            Content  : in out File_Type;
                             Analyzer : out Analyzer_Access) is
       Result : Detector_Result;
    begin
@@ -25,6 +25,7 @@ package body SPDX_Tool.Languages.Manager is
       Manager.Extension_Detect.Detect (File, Content, Result);
       Manager.Mime_Detect.Detect (File, Content, Result);
       Manager.Shell_Detect.Detect (File, Content, Result);
+      Manager.Modeline_Detect.Detect (File, Content, Result);
       declare
          Language : constant String := Get_Language (Result);
          Pos      : constant Language_Maps.Cursor := Manager.Languages.Find (Language);

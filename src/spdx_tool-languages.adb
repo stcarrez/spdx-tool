@@ -3,9 +3,11 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
+with Ada.Strings.Fixed;
 with Util.Log.Loggers;
 with Util.Files;
-with Util.Strings.Tokenizers;
+with Util.Strings.Vectors;
+with Util.Strings.Split;
 
 package body SPDX_Tool.Languages is
 
@@ -13,44 +15,60 @@ package body SPDX_Tool.Languages is
      Util.Log.Loggers.Create ("SPDX_Tool.Languages");
 
    use type Infos.License_Kind;
+   use type Infos.Confidence_Type;
    use all type Files.Comment_Category;
 
    procedure Set_Language (Result     : in out Detector_Result;
                            Language   : in String;
-                           Confidence : in Natural := 1) is
+                           Confidence : in Confidence_Type) is
    begin
-      Result.Languages.Append (Language);
+      for Iter in Result.Languages.Iterate loop
+         declare
+            Lang : constant Detected_Language_Vectors.Reference_Type
+               := Result.Languages.Reference (Iter);
+         begin
+            if To_String (Lang.Language) = Language then
+               if Float (Lang.Confidence) + Float (Confidence) >= 1.0 then
+                  Lang.Confidence := 1.0;
+               else
+                  Lang.Confidence := Lang.Confidence + Confidence;
+               end if;
+               return;
+            end if;
+         end;
+      end loop;
+      Result.Languages.Append ((To_UString (Language), Confidence));
    end Set_Language;
 
    --  ------------------------------
    --  If the languages string is not null, add every language that is contains
    --  Languages are separated by ','.
    --  ------------------------------
-   procedure Set_Languages (Result    : in out Detector_Result;
-                            Languages : access constant String) is
+   procedure Set_Languages (Result     : in out Detector_Result;
+                            Languages  : access constant String;
+                            Confidence : in Confidence_Type) is
    begin
       if Languages /= null then
-         Set_Languages (Result, Languages.all);
+         Set_Languages (Result, Languages.all, Confidence);
       end if;
    end Set_Languages;
 
-   procedure Set_Languages (Result    : in out Detector_Result;
-                            Languages : in String) is
-      procedure Collect (Item : in String; Done : out Boolean);
-
-      procedure Collect (Item : in String; Done : out Boolean) is
-      begin
-         if Item'Length > 0 then
-            Set_Language (Result, Item, 0);
-         end if;
-         Done := False;
-      end Collect;
-
+   procedure Set_Languages (Result     : in out Detector_Result;
+                            Languages  : in String;
+                            Confidence : in Confidence_Type) is
    begin
       if Util.Strings.Index (Languages, ',') > 0 then
-         Util.Strings.Tokenizers.Iterate_Tokens (Languages, ",", Collect'Access);
+         declare
+            List : constant Util.Strings.Vectors.Vector := Util.Strings.Split (Languages, ",");
+            C : constant Confidence_Type
+               := Confidence_Type (Float (Confidence) / Float (List.Length));
+         begin
+            for Lang of List loop
+               Set_Language (Result, Ada.Strings.Fixed.Trim (Lang, Ada.Strings.Both), C);
+            end loop;
+         end;
       else
-         Set_Language (Result, Languages);
+         Set_Language (Result, Languages, Confidence);
       end if;
    end Set_Languages;
 
@@ -58,7 +76,16 @@ package body SPDX_Tool.Languages is
    function Get_Language (Result : in Detector_Result) return String is
    begin
       if not Result.Languages.Is_Empty then
-         return Result.Languages.First_Element;
+         declare
+            Selected : Detected_Language := (To_UString (""), 0.0);
+         begin
+            for L of Result.Languages loop
+               if L.Confidence > Selected.Confidence then
+                  Selected := L;
+               end if;
+            end loop;
+            return To_String (Selected.Language);
+         end;
       else
          return "";
       end if;
@@ -211,7 +238,11 @@ package body SPDX_Tool.Languages is
             if Style.Text_Last < Style.Text_Start then
                Style.Text_Last := Style.Text_Start - 1;
             end if;
-            Style.Category := Find_Category (Buffer, Style.Text_Start, Style.Text_Last);
+            if Lines (Line_No).Style.Category = UNKNOWN then
+               Style.Category := Find_Category (Buffer, Style.Text_Start, Style.Text_Last);
+            else
+               Style.Category := Lines (Line_No).Style.Category;
+            end if;
          else
             Style.Length := 0;
             Style.Start := First;
@@ -239,7 +270,7 @@ package body SPDX_Tool.Languages is
 
    function Find_Category (Buffer : in Buffer_Type;
                            From   : in Buffer_Index;
-                           Last   : in Buffer_Index) return Files.Comment_Category is
+                           Last   : in Buffer_Size) return Files.Comment_Category is
    begin
       if Last < From then
          return EMPTY;
@@ -321,6 +352,7 @@ package body SPDX_Tool.Languages is
                            Count   : in Line_Count;
                            First   : out Line_Number;
                            Last    : out Line_Number) is
+      pragma Unreferenced (Buffer);
    begin
       First := Lines'First;
       while First < Count loop
@@ -531,6 +563,7 @@ package body SPDX_Tool.Languages is
       else
          Find_Headers (Buffer, Lines, Lines'Last, First_Line, Last_Line);
       end if;
+      Log.Info ("Extract license from lines{0} to{1}", First_Line'Image, Last_Line'Image);
       if First_Line > Last_Line then
          return null;
       end if;

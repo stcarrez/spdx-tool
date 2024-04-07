@@ -286,7 +286,7 @@ package body SPDX_Tool.Licenses.Manager is
                      Map (License) := True;
                   end if;
                end loop;
-               --  exit;
+               exit;
             end loop;
             Match := Guess_License (Nodes, Tokens);
             if Match.Info.Match = Infos.GUESSED_LICENSE then
@@ -513,7 +513,7 @@ package body SPDX_Tool.Licenses.Manager is
                     Ex  : in Ada.Exceptions.Exception_Occurrence) is
    begin
       Log.Error ("Job {0} failed", Job.File.Path);
-      Log.Error ("Exception", Ex);
+      Log.Error ("Exception", Ex, True);
    end Error;
 
    procedure Print_Header (Manager : in out License_Manager) is

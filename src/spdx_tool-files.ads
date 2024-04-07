@@ -19,20 +19,20 @@ package SPDX_Tool.Files is
                          BLOCK_COMMENT,
                          END_COMMENT);
 
-   type Comment_Category is (EMPTY, PRESENTATION, TEXT);
+   type Comment_Category is (UNKNOWN, EMPTY, PRESENTATION, MODELINE, INTERPRETER, TEXT);
    type Comment_Index is new Natural;
 
    type Comment_Info is record
       Start      : Buffer_Index := 1;
-      Last       : Buffer_Index := 1;
+      Last       : Buffer_Size := 0;
       Head       : Buffer_Index := 1;
       Text_Start : Buffer_Index := 1;
-      Text_Last  : Buffer_Index := 1;
+      Text_Last  : Buffer_Size := 0;
       Trailer    : Buffer_Size := 0;
       Length     : Natural := 0;
       Mode       : Comment_Mode := NO_COMMENT;
       Boxed      : Boolean := False;
-      Category   : Comment_Category := EMPTY;
+      Category   : Comment_Category := UNKNOWN;
    end record;
 
    type Line_Type is record

@@ -12,6 +12,7 @@ private with SPDX_Tool.Languages.Extensions;
 private with SPDX_Tool.Languages.Mimes;
 private with SPDX_Tool.Languages.Shell;
 private with SPDX_Tool.Languages.Filenames;
+private with SPDX_Tool.Languages.Modelines;
 package SPDX_Tool.Languages.Manager is
 
    type Language_Manager is tagged limited private;
@@ -25,7 +26,7 @@ package SPDX_Tool.Languages.Manager is
    --  the first 4K block of the file.
    procedure Find_Language (Manager  : in Language_Manager;
                             File     : in out SPDX_Tool.Infos.File_Info;
-                            Content  : in File_Type;
+                            Content  : in out File_Type;
                             Analyzer : out Analyzer_Access);
 
 private
@@ -44,6 +45,7 @@ private
       Extension_Detect : Extensions.Extension_Detector_Type;
       Shell_Detect     : Shell.Shell_Detector_Type;
       Filename_Detect  : Filenames.Filename_Detector_Type;
+      Modeline_Detect  : Modelines.Modeline_Detector_Type;
    end record;
 
    function Create_Analyzer (Manager : in Language_Manager;

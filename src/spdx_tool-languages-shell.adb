@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Maps;
 with Ada.Strings.Fixed;
+with Util.Strings;
 with SPDX_Tool.Languages.InterpreterMap;
 package body SPDX_Tool.Languages.Shell is
 
@@ -26,13 +27,13 @@ package body SPDX_Tool.Languages.Shell is
 
       Language : constant access constant String := InterpreterMap.Get_Mapping (Interpreter);
    begin
-      Set_Languages (Result, Language);
+      Set_Languages (Result, Language, 1.0);
    end Check_Interpreter;
 
    overriding
    procedure Detect (Detector : in Shell_Detector_Type;
                      File     : in File_Info;
-                     Content  : in File_Type;
+                     Content  : in out File_Type;
                      Result   : in out Detector_Result) is
    begin
       if Content.Last_Offset <= 3 or else Content.Count = 0 then
@@ -73,6 +74,7 @@ package body SPDX_Tool.Languages.Shell is
          end loop;
          if not Util.Strings.Starts_With (Line (Pos .. Next - 1), "env") then
             Detector.Check_Interpreter (Line (Pos .. Next - 1), Result);
+            Content.Lines (1).Style.Category := Files.INTERPRETER;
             return;
          end if;
       end;
