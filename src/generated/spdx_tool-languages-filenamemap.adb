@@ -1,6 +1,6 @@
 --  Advanced Resource Embedder 1.5.0
 --  SPDX-License-Identifier: Apache-2.0
---  Extensions mapping generated from extensions.json
+--  Filename mapping generated from filenames.json
 with Interfaces; use Interfaces;
 
 package body SPDX_Tool.Languages.FilenameMap is
@@ -16,46 +16,46 @@ package body SPDX_Tool.Languages.FilenameMap is
      (222, 475, 561, 494, 703, 28, 110, 20, 100, 356, 306);
 
    G : constant array (0 .. 722) of Unsigned_16 :=
-     (0, 0, 160, 77, 121, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 318, 0, 133,
+     (0, 0, 160, 78, 120, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 319, 0, 132,
       0, 0, 0, 0, 0, 0, 0, 0, 109, 105, 165, 0, 0, 0, 0, 0, 0, 0, 0, 196, 0,
-      0, 0, 0, 0, 0, 185, 192, 0, 0, 251, 0, 0, 0, 0, 152, 0, 181, 166, 108,
-      0, 0, 222, 0, 92, 14, 0, 129, 21, 0, 56, 0, 224, 0, 151, 0, 0, 0, 0,
-      186, 0, 0, 213, 270, 0, 0, 0, 0, 0, 56, 0, 233, 241, 79, 0, 175, 0, 0,
-      116, 177, 282, 291, 38, 0, 0, 0, 236, 232, 0, 176, 0, 300, 336, 0,
-      118, 192, 211, 83, 0, 0, 266, 0, 325, 0, 0, 0, 42, 251, 0, 30, 18, 0,
-      345, 0, 0, 0, 0, 14, 77, 0, 80, 230, 343, 0, 0, 0, 0, 0, 356, 0, 156,
-      243, 0, 0, 131, 17, 0, 0, 204, 0, 0, 0, 158, 0, 201, 0, 0, 99, 0, 207,
-      258, 0, 0, 0, 0, 15, 0, 41, 0, 149, 0, 113, 79, 77, 74, 104, 265, 297,
-      0, 0, 0, 0, 0, 126, 0, 0, 0, 0, 115, 356, 0, 0, 0, 0, 260, 17, 78, 71,
-      0, 0, 0, 0, 0, 119, 0, 81, 0, 0, 0, 0, 106, 0, 0, 0, 0, 155, 0, 0,
-      104, 256, 50, 115, 81, 28, 213, 0, 27, 0, 0, 0, 0, 79, 0, 285, 222,
-      80, 0, 251, 333, 0, 0, 0, 0, 0, 0, 0, 163, 332, 0, 0, 0, 298, 0, 201,
-      80, 131, 179, 353, 0, 58, 141, 0, 0, 354, 29, 222, 0, 259, 16, 316,
-      23, 83, 31, 112, 0, 0, 349, 259, 0, 0, 0, 81, 92, 0, 335, 190, 236,
-      206, 0, 144, 0, 178, 0, 99, 0, 0, 0, 0, 285, 171, 199, 0, 197, 332, 0,
-      0, 87, 0, 0, 128, 0, 0, 76, 8, 337, 128, 0, 205, 304, 0, 292, 0, 111,
-      271, 0, 90, 0, 36, 346, 89, 64, 111, 0, 74, 283, 303, 0, 82, 0, 0, 28,
-      2, 0, 0, 0, 0, 0, 0, 0, 66, 0, 102, 200, 0, 0, 0, 0, 62, 247, 0, 0,
-      14, 340, 0, 268, 135, 0, 0, 155, 0, 0, 22, 0, 0, 0, 0, 0, 0, 136, 0,
-      328, 41, 29, 0, 0, 0, 0, 98, 193, 0, 253, 204, 0, 7, 234, 0, 12, 43,
-      288, 0, 0, 0, 63, 12, 0, 235, 0, 0, 304, 3, 74, 0, 70, 0, 295, 197,
-      37, 0, 0, 0, 0, 0, 0, 0, 9, 360, 2, 1, 0, 0, 240, 313, 0, 0, 0, 163,
-      50, 0, 231, 154, 201, 344, 321, 341, 19, 0, 0, 0, 0, 143, 58, 0, 203,
-      317, 352, 0, 0, 6, 183, 174, 178, 336, 0, 0, 0, 0, 192, 0, 193, 0,
-      288, 0, 206, 0, 0, 53, 217, 0, 0, 0, 203, 258, 337, 0, 0, 0, 305, 0,
-      0, 0, 188, 16, 171, 28, 0, 0, 38, 323, 31, 0, 0, 11, 21, 356, 290,
-      302, 120, 0, 106, 326, 0, 0, 0, 170, 277, 0, 0, 193, 0, 0, 0, 0, 0,
-      359, 50, 84, 54, 0, 0, 13, 0, 0, 0, 0, 0, 28, 0, 0, 302, 205, 65, 0,
-      33, 122, 0, 125, 0, 228, 40, 172, 292, 0, 152, 301, 0, 0, 0, 119, 74,
-      113, 215, 280, 0, 0, 103, 0, 0, 46, 5, 130, 277, 0, 284, 68, 260, 0,
-      320, 0, 293, 62, 49, 0, 59, 0, 0, 10, 127, 0, 334, 49, 0, 88, 279,
-      223, 0, 0, 0, 0, 79, 0, 246, 0, 332, 187, 247, 247, 350, 0, 0, 150, 0,
-      4, 0, 0, 136, 123, 43, 0, 33, 102, 85, 44, 202, 0, 51, 265, 274, 235,
-      0, 281, 0, 0, 199, 0, 246, 0, 0, 119, 0, 72, 287, 130, 31, 209, 263,
-      137, 122, 0, 270, 0, 0, 0, 0, 0, 186, 216, 0, 0, 77, 294, 319, 0, 342,
-      0, 0, 167, 0, 0, 0, 40, 66, 125, 0, 0, 61, 0, 0, 20, 278, 0, 28, 0,
-      352, 153, 275, 303, 25, 0, 240, 0, 0, 134, 0, 100, 0, 0, 0, 348, 45,
-      73, 154, 0, 17, 243, 0, 0, 0, 0, 322, 93, 259, 345, 0);
+      0, 0, 0, 0, 0, 183, 192, 0, 0, 251, 0, 0, 0, 0, 152, 0, 181, 166, 108,
+      0, 0, 220, 0, 89, 13, 0, 129, 20, 0, 56, 0, 224, 0, 153, 0, 0, 0, 0,
+      186, 0, 0, 214, 270, 0, 0, 0, 0, 0, 56, 0, 233, 241, 79, 0, 175, 0, 0,
+      116, 176, 281, 291, 38, 0, 0, 0, 236, 232, 0, 176, 0, 301, 337, 0,
+      119, 192, 213, 83, 0, 0, 266, 0, 327, 0, 0, 0, 43, 251, 0, 30, 18, 0,
+      345, 0, 0, 0, 0, 14, 78, 0, 79, 230, 343, 0, 0, 0, 0, 0, 356, 0, 156,
+      243, 0, 0, 131, 17, 0, 0, 204, 0, 0, 0, 160, 0, 201, 0, 0, 100, 0,
+      207, 259, 0, 0, 0, 0, 15, 0, 41, 0, 149, 0, 113, 79, 77, 73, 104, 265,
+      297, 0, 0, 0, 0, 0, 127, 0, 0, 0, 0, 116, 356, 0, 0, 0, 0, 260, 16,
+      78, 72, 0, 0, 0, 0, 0, 119, 0, 80, 0, 0, 0, 0, 106, 0, 0, 0, 0, 155,
+      0, 0, 104, 257, 49, 115, 81, 29, 214, 0, 27, 0, 0, 0, 0, 78, 0, 285,
+      222, 80, 0, 251, 332, 0, 0, 0, 0, 0, 0, 0, 165, 331, 0, 0, 0, 298, 0,
+      200, 81, 131, 178, 353, 0, 59, 141, 0, 0, 354, 29, 222, 0, 259, 16,
+      316, 23, 83, 33, 111, 0, 0, 349, 259, 0, 0, 0, 80, 94, 0, 335, 189,
+      237, 206, 0, 142, 0, 179, 0, 100, 0, 0, 0, 0, 285, 172, 199, 0, 197,
+      332, 0, 0, 86, 0, 0, 127, 0, 0, 76, 7, 338, 128, 0, 205, 305, 0, 290,
+      0, 111, 271, 0, 90, 0, 36, 346, 88, 64, 111, 0, 74, 283, 303, 0, 85,
+      0, 0, 27, 2, 0, 0, 0, 0, 0, 0, 0, 64, 0, 101, 200, 0, 0, 0, 0, 61,
+      247, 0, 0, 14, 341, 0, 268, 135, 0, 0, 154, 0, 0, 22, 0, 0, 0, 0, 0,
+      0, 136, 0, 327, 43, 29, 0, 0, 0, 0, 98, 193, 0, 253, 205, 0, 8, 234,
+      0, 12, 42, 288, 0, 0, 0, 63, 11, 0, 235, 0, 0, 304, 3, 74, 0, 70, 0,
+      294, 196, 37, 0, 0, 0, 0, 0, 0, 0, 10, 360, 2, 1, 0, 0, 240, 310, 0,
+      0, 0, 163, 51, 0, 231, 154, 201, 344, 321, 341, 19, 0, 0, 0, 0, 143,
+      58, 0, 202, 317, 354, 0, 0, 4, 184, 174, 178, 335, 0, 0, 0, 0, 191, 0,
+      193, 0, 287, 0, 206, 0, 0, 54, 217, 0, 0, 0, 202, 258, 336, 0, 0, 0,
+      305, 0, 0, 0, 187, 17, 170, 28, 0, 0, 39, 323, 32, 0, 0, 11, 21, 356,
+      290, 302, 122, 0, 106, 326, 0, 0, 0, 171, 277, 0, 0, 193, 0, 0, 0, 0,
+      0, 359, 47, 84, 53, 0, 0, 13, 0, 0, 0, 0, 0, 28, 0, 0, 302, 205, 65,
+      0, 33, 123, 0, 126, 0, 228, 40, 173, 292, 0, 151, 301, 0, 0, 0, 119,
+      72, 113, 215, 280, 0, 0, 103, 0, 0, 46, 5, 130, 275, 0, 284, 68, 259,
+      0, 320, 0, 293, 62, 48, 0, 59, 0, 0, 9, 126, 0, 334, 48, 0, 88, 279,
+      223, 0, 0, 0, 0, 78, 0, 249, 0, 332, 188, 247, 250, 354, 0, 0, 150, 0,
+      6, 0, 0, 137, 123, 42, 0, 33, 101, 86, 44, 202, 0, 52, 265, 274, 235,
+      0, 282, 0, 0, 199, 0, 246, 0, 0, 119, 0, 72, 287, 130, 31, 210, 263,
+      137, 121, 0, 270, 0, 0, 0, 0, 0, 186, 216, 0, 0, 78, 294, 319, 0, 341,
+      0, 0, 168, 0, 0, 0, 39, 66, 125, 0, 0, 61, 0, 0, 21, 278, 0, 28, 0,
+      352, 152, 275, 303, 25, 0, 240, 0, 0, 133, 0, 100, 0, 0, 0, 348, 45,
+      73, 154, 0, 18, 243, 0, 0, 0, 0, 322, 93, 257, 345, 0);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -82,19 +82,19 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_2             : aliased constant String := "XML";
    K_3             : aliased constant String := "mix.lock";
    M_3             : aliased constant String := "Elixir";
-   K_4             : aliased constant String := ".kshrc";
-   M_4             : aliased constant String := "Shell";
+   K_4             : aliased constant String := ".editorconfig";
+   M_4             : aliased constant String := "EditorConfig";
    K_5             : aliased constant String := "BUILD";
    M_5             : aliased constant String := "Starlark";
-   K_6             : aliased constant String := ".editorconfig";
-   M_6             : aliased constant String := "EditorConfig";
-   K_7             : aliased constant String := ".vscodeignore";
-   M_7             : aliased constant String := "Ignore List";
-   K_8             : aliased constant String := "App.config";
-   M_8             : aliased constant String := "XML";
-   K_9             : aliased constant String := ".bzrignore";
+   K_6             : aliased constant String := ".kshrc";
+   M_6             : aliased constant String := "Shell";
+   K_7             : aliased constant String := "App.config";
+   M_7             : aliased constant String := "XML";
+   K_8             : aliased constant String := ".vscodeignore";
+   M_8             : aliased constant String := "Ignore List";
+   K_9             : aliased constant String := ".gitignore";
    M_9             : aliased constant String := "Ignore List";
-   K_10            : aliased constant String := ".gitignore";
+   K_10            : aliased constant String := ".bzrignore";
    M_10            : aliased constant String := "Ignore List";
    K_11            : aliased constant String := "go.work.sum";
    M_11            : aliased constant String := "Go Checksums";
@@ -106,18 +106,18 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_14            : aliased constant String := "Emacs Lisp";
    K_15            : aliased constant String := "mocha.opts";
    M_15            : aliased constant String := "Option List";
-   K_16            : aliased constant String := "SConscript";
-   M_16            : aliased constant String := "Python";
-   K_17            : aliased constant String := "APKBUILD";
-   M_17            : aliased constant String := "Alpine Abuild";
+   K_16            : aliased constant String := "APKBUILD";
+   M_16            : aliased constant String := "Alpine Abuild";
+   K_17            : aliased constant String := "SConscript";
+   M_17            : aliased constant String := "Python";
    K_18            : aliased constant String := ".npmignore";
    M_18            : aliased constant String := "Ignore List";
    K_19            : aliased constant String := "README.nss";
    M_19            : aliased constant String := "Text";
-   K_20            : aliased constant String := "initial_sids";
-   M_20            : aliased constant String := "SELinux Policy";
-   K_21            : aliased constant String := "_emacs";
-   M_21            : aliased constant String := "Emacs Lisp";
+   K_20            : aliased constant String := "_emacs";
+   M_20            : aliased constant String := "Emacs Lisp";
+   K_21            : aliased constant String := "initial_sids";
+   M_21            : aliased constant String := "SELinux Policy";
    K_22            : aliased constant String := "genfs_contexts";
    M_22            : aliased constant String := "SELinux Policy";
    K_23            : aliased constant String := ".env.staging";
@@ -128,18 +128,18 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_25            : aliased constant String := "Makefile";
    K_26            : aliased constant String := ".coveragerc";
    M_26            : aliased constant String := "INI";
-   K_27            : aliased constant String := "pdm.lock";
-   M_27            : aliased constant String := "TOML";
-   K_28            : aliased constant String := "ant.xml";
-   M_28            : aliased constant String := "Ant Build System";
+   K_27            : aliased constant String := "ant.xml";
+   M_27            : aliased constant String := "Ant Build System";
+   K_28            : aliased constant String := "pdm.lock";
+   M_28            : aliased constant String := "TOML";
    K_29            : aliased constant String := ".curlrc";
    M_29            : aliased constant String := "cURL Config";
    K_30            : aliased constant String := "file_contexts";
    M_30            : aliased constant String := "SELinux Policy";
-   K_31            : aliased constant String := "troffrc-end";
-   M_31            : aliased constant String := "Roff";
-   K_32            : aliased constant String := "tmux.conf";
-   M_32            : aliased constant String := "Shell";
+   K_31            : aliased constant String := "tmux.conf";
+   M_31            : aliased constant String := "Shell";
+   K_32            : aliased constant String := "troffrc-end";
+   M_32            : aliased constant String := "Roff";
    K_33            : aliased constant String := "GNUmakefile";
    M_33            : aliased constant String := "Makefile";
    K_34            : aliased constant String := "build.xml";
@@ -152,16 +152,16 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_37            : aliased constant String := "Text";
    K_38            : aliased constant String := ".all-contributorsrc";
    M_38            : aliased constant String := "JSON";
-   K_39            : aliased constant String := ".env.production";
-   M_39            : aliased constant String := "Dotenv";
-   K_40            : aliased constant String := ".login";
-   M_40            : aliased constant String := "Shell";
+   K_39            : aliased constant String := ".login";
+   M_39            : aliased constant String := "Shell";
+   K_40            : aliased constant String := ".env.production";
+   M_40            : aliased constant String := "Dotenv";
    K_41            : aliased constant String := "Emakefile";
    M_41            : aliased constant String := "Erlang";
-   K_42            : aliased constant String := "security_classes";
-   M_42            : aliased constant String := "SELinux Policy";
-   K_43            : aliased constant String := ".bash_profile";
-   M_43            : aliased constant String := "Shell";
+   K_42            : aliased constant String := ".bash_profile";
+   M_42            : aliased constant String := "Shell";
+   K_43            : aliased constant String := "security_classes";
+   M_43            : aliased constant String := "SELinux Policy";
    K_44            : aliased constant String := ".tmux.conf";
    M_44            : aliased constant String := "Shell";
    K_45            : aliased constant String := "api-extractor.json";
@@ -170,30 +170,30 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_46            : aliased constant String := "Text";
    K_47            : aliased constant String := "Android.bp";
    M_47            : aliased constant String := "Soong";
-   K_48            : aliased constant String := "expr-dist";
-   M_48            : aliased constant String := "R";
-   K_49            : aliased constant String := "click.me";
-   M_49            : aliased constant String := "Text";
-   K_50            : aliased constant String := "Rexfile";
-   M_50            : aliased constant String := "Perl";
-   K_51            : aliased constant String := ".php";
-   M_51            : aliased constant String := "PHP";
+   K_48            : aliased constant String := "click.me";
+   M_48            : aliased constant String := "Text";
+   K_49            : aliased constant String := "expr-dist";
+   M_49            : aliased constant String := "R";
+   K_50            : aliased constant String := ".php";
+   M_50            : aliased constant String := "PHP";
+   K_51            : aliased constant String := "Rexfile";
+   M_51            : aliased constant String := "Perl";
    K_52            : aliased constant String := "go.mod";
    M_52            : aliased constant String := "Go Module";
-   K_53            : aliased constant String := "cpanfile";
-   M_53            : aliased constant String := "Perl";
-   K_54            : aliased constant String := ".env";
-   M_54            : aliased constant String := "Dotenv";
+   K_53            : aliased constant String := ".env";
+   M_53            : aliased constant String := "Dotenv";
+   K_54            : aliased constant String := "cpanfile";
+   M_54            : aliased constant String := "Perl";
    K_55            : aliased constant String := ".env.example";
    M_55            : aliased constant String := "Dotenv";
    K_56            : aliased constant String := "firestore.rules";
    M_56            : aliased constant String := "Cloud Firestore Security Rules";
    K_57            : aliased constant String := ".gvimrc";
    M_57            : aliased constant String := "Vim Script";
-   K_58            : aliased constant String := "Brewfile";
-   M_58            : aliased constant String := "Ruby";
-   K_59            : aliased constant String := ".nanorc";
-   M_59            : aliased constant String := "nanorc";
+   K_58            : aliased constant String := ".nanorc";
+   M_58            : aliased constant String := "nanorc";
+   K_59            : aliased constant String := "Brewfile";
+   M_59            : aliased constant String := "Ruby";
    K_60            : aliased constant String := "Makefile";
    M_60            : aliased constant String := "Makefile";
    K_61            : aliased constant String := "tslint.json";
@@ -236,24 +236,24 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_79            : aliased constant String := "Shell";
    K_80            : aliased constant String := "FONTLOG";
    M_80            : aliased constant String := "Text";
-   K_81            : aliased constant String := "language-subtag-registry.txt";
-   M_81            : aliased constant String := "Record Jar";
-   K_82            : aliased constant String := "installscript.qs";
-   M_82            : aliased constant String := "Qt Script";
+   K_81            : aliased constant String := "installscript.qs";
+   M_81            : aliased constant String := "Qt Script";
+   K_82            : aliased constant String := "language-subtag-registry.txt";
+   M_82            : aliased constant String := "Record Jar";
    K_83            : aliased constant String := ".imgbotconfig";
    M_83            : aliased constant String := "JSON";
    K_84            : aliased constant String := ".htaccess";
    M_84            : aliased constant String := "ApacheConf";
-   K_85            : aliased constant String := ".cvsignore";
-   M_85            : aliased constant String := "Ignore List";
-   K_86            : aliased constant String := ".zlogin";
-   M_86            : aliased constant String := "Shell";
+   K_85            : aliased constant String := ".zlogin";
+   M_85            : aliased constant String := "Shell";
+   K_86            : aliased constant String := ".cvsignore";
+   M_86            : aliased constant String := "Ignore List";
    K_87            : aliased constant String := "SHA1SUMS";
    M_87            : aliased constant String := "Checksums";
-   K_88            : aliased constant String := ".cproject";
-   M_88            : aliased constant String := "XML";
-   K_89            : aliased constant String := ".stylelintignore";
-   M_89            : aliased constant String := "Ignore List";
+   K_88            : aliased constant String := ".stylelintignore";
+   M_88            : aliased constant String := "Ignore List";
+   K_89            : aliased constant String := ".cproject";
+   M_89            : aliased constant String := "XML";
    K_90            : aliased constant String := ".wgetrc";
    M_90            : aliased constant String := "Wget Config";
    K_91            : aliased constant String := "SHA256SUMS";
@@ -266,36 +266,36 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_94            : aliased constant String := "Ignore List";
    K_95            : aliased constant String := "Dockerfile";
    M_95            : aliased constant String := "Dockerfile";
-   K_96            : aliased constant String := "ackrc";
-   M_96            : aliased constant String := "Option List";
-   K_97            : aliased constant String := "Makefile.am";
-   M_97            : aliased constant String := "Makefile";
+   K_96            : aliased constant String := "Makefile.am";
+   M_96            : aliased constant String := "Makefile";
+   K_97            : aliased constant String := "ackrc";
+   M_97            : aliased constant String := "Option List";
    K_98            : aliased constant String := "man";
    M_98            : aliased constant String := "Shell";
    K_99            : aliased constant String := "LICENSE.mysql";
    M_99            : aliased constant String := "Text";
    K_100           : aliased constant String := "abbrev_defs";
    M_100           : aliased constant String := "Emacs Lisp";
-   K_101           : aliased constant String := "nvimrc";
-   M_101           : aliased constant String := "Vim Script";
-   K_102           : aliased constant String := "NEWS";
-   M_102           : aliased constant String := "Text";
+   K_101           : aliased constant String := "NEWS";
+   M_101           : aliased constant String := "Text";
+   K_102           : aliased constant String := "nvimrc";
+   M_102           : aliased constant String := "Vim Script";
    K_103           : aliased constant String := "SConstruct";
    M_103           : aliased constant String := "Python";
    K_104           : aliased constant String := "yarn.lock";
    M_104           : aliased constant String := "YAML";
-   K_105           : aliased constant String := "makefile";
-   M_105           : aliased constant String := "Makefile";
-   K_106           : aliased constant String := "Snakefile";
-   M_106           : aliased constant String := "Snakemake";
+   K_105           : aliased constant String := "Snakefile";
+   M_105           : aliased constant String := "Snakemake";
+   K_106           : aliased constant String := "makefile";
+   M_106           : aliased constant String := "Makefile";
    K_107           : aliased constant String := "Appraisals";
    M_107           : aliased constant String := "Ruby";
    K_108           : aliased constant String := ".watchmanconfig";
    M_108           : aliased constant String := "JSON";
-   K_109           : aliased constant String := "buildfile";
-   M_109           : aliased constant String := "Ruby";
-   K_110           : aliased constant String := "CITATIONS";
-   M_110           : aliased constant String := "Text";
+   K_109           : aliased constant String := "CITATIONS";
+   M_109           : aliased constant String := "Text";
+   K_110           : aliased constant String := "buildfile";
+   M_110           : aliased constant String := "Ruby";
    K_111           : aliased constant String := "haproxy.cfg";
    M_111           : aliased constant String := "HAProxy";
    K_112           : aliased constant String := "nim.cfg";
@@ -304,30 +304,30 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_113           : aliased constant String := "Starlark";
    K_114           : aliased constant String := ".prettierignore";
    M_114           : aliased constant String := "Ignore List";
-   K_115           : aliased constant String := ".dircolors";
-   M_115           : aliased constant String := "dircolors";
-   K_116           : aliased constant String := "Puppetfile";
-   M_116           : aliased constant String := "Ruby";
+   K_115           : aliased constant String := "Puppetfile";
+   M_115           : aliased constant String := "Ruby";
+   K_116           : aliased constant String := ".dircolors";
+   M_116           : aliased constant String := "dircolors";
    K_117           : aliased constant String := ".jslintrc";
    M_117           : aliased constant String := "JSON with Comments";
    K_118           : aliased constant String := "xcompose";
    M_118           : aliased constant String := "XCompose";
    K_119           : aliased constant String := "composer.lock";
    M_119           : aliased constant String := "JSON";
-   K_120           : aliased constant String := ".tm_properties";
-   M_120           : aliased constant String := "TextMate Properties";
-   K_121           : aliased constant String := ".rspec";
-   M_121           : aliased constant String := "Option List";
-   K_122           : aliased constant String := ".atomignore";
-   M_122           : aliased constant String := "Ignore List";
-   K_123           : aliased constant String := "CODEOWNERS";
-   M_123           : aliased constant String := "CODEOWNERS";
+   K_120           : aliased constant String := ".rspec";
+   M_120           : aliased constant String := "Option List";
+   K_121           : aliased constant String := ".tm_properties";
+   M_121           : aliased constant String := "TextMate Properties";
+   K_122           : aliased constant String := "CODEOWNERS";
+   M_122           : aliased constant String := "CODEOWNERS";
+   K_123           : aliased constant String := ".atomignore";
+   M_123           : aliased constant String := "Ignore List";
    K_124           : aliased constant String := ".env.sample";
    M_124           : aliased constant String := "Dotenv";
-   K_125           : aliased constant String := "Makefile.in";
-   M_125           : aliased constant String := "Makefile";
-   K_126           : aliased constant String := ".Rprofile";
-   M_126           : aliased constant String := "R";
+   K_125           : aliased constant String := ".Rprofile";
+   M_125           : aliased constant String := "R";
+   K_126           : aliased constant String := "Makefile.in";
+   M_126           : aliased constant String := "Makefile";
    K_127           : aliased constant String := "bash_logout";
    M_127           : aliased constant String := "Shell";
    K_128           : aliased constant String := "Guardfile";
@@ -338,18 +338,18 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_130           : aliased constant String := "Text";
    K_131           : aliased constant String := ".auto-changelog";
    M_131           : aliased constant String := "JSON";
-   K_132           : aliased constant String := "jsconfig.json";
-   M_132           : aliased constant String := "JSON with Comments";
-   K_133           : aliased constant String := "flake.lock";
-   M_133           : aliased constant String := "JSON";
+   K_132           : aliased constant String := "flake.lock";
+   M_132           : aliased constant String := "JSON";
+   K_133           : aliased constant String := "jsconfig.json";
+   M_133           : aliased constant String := "JSON with Comments";
    K_134           : aliased constant String := ".php_cs";
    M_134           : aliased constant String := "PHP";
    K_135           : aliased constant String := "WORKSPACE.bazel";
    M_135           : aliased constant String := "Starlark";
-   K_136           : aliased constant String := ".simplecov";
-   M_136           : aliased constant String := "Ruby";
-   K_137           : aliased constant String := ".inputrc";
-   M_137           : aliased constant String := "Readline Config";
+   K_136           : aliased constant String := ".inputrc";
+   M_136           : aliased constant String := "Readline Config";
+   K_137           : aliased constant String := ".simplecov";
+   M_137           : aliased constant String := "Ruby";
    K_138           : aliased constant String := "COPYING.regex";
    M_138           : aliased constant String := "Text";
    K_139           : aliased constant String := "zshrc";
@@ -364,10 +364,10 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_143           : aliased constant String := "robots.txt";
    K_144           : aliased constant String := ".project";
    M_144           : aliased constant String := "XML";
-   K_145           : aliased constant String := "Project.ede";
-   M_145           : aliased constant String := "Emacs Lisp";
-   K_146           : aliased constant String := "Fastfile";
-   M_146           : aliased constant String := "Ruby";
+   K_145           : aliased constant String := "Fastfile";
+   M_145           : aliased constant String := "Ruby";
+   K_146           : aliased constant String := "Project.ede";
+   M_146           : aliased constant String := "Emacs Lisp";
    K_147           : aliased constant String := ".htmlhintrc";
    M_147           : aliased constant String := "JSON";
    K_148           : aliased constant String := "zshenv";
@@ -376,12 +376,12 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_149           : aliased constant String := "Quake";
    K_150           : aliased constant String := "ssh_config";
    M_150           : aliased constant String := "SSH Config";
-   K_151           : aliased constant String := "_redirects";
-   M_151           : aliased constant String := "Redirect Rules";
-   K_152           : aliased constant String := ".eslintignore";
-   M_152           : aliased constant String := "Ignore List";
-   K_153           : aliased constant String := "SHA256SUMS.txt";
-   M_153           : aliased constant String := "Checksums";
+   K_151           : aliased constant String := ".eslintignore";
+   M_151           : aliased constant String := "Ignore List";
+   K_152           : aliased constant String := "SHA256SUMS.txt";
+   M_152           : aliased constant String := "Checksums";
+   K_153           : aliased constant String := "_redirects";
+   M_153           : aliased constant String := "Redirect Rules";
    K_154           : aliased constant String := ".coffeelintignore";
    M_154           : aliased constant String := "Ignore List";
    K_155           : aliased constant String := ".XCompose";
@@ -390,38 +390,38 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_156           : aliased constant String := "Puppet";
    K_157           : aliased constant String := ".gnus";
    M_157           : aliased constant String := "Emacs Lisp";
-   K_158           : aliased constant String := "pom.xml";
-   M_158           : aliased constant String := "Maven POM";
-   K_159           : aliased constant String := "vlcrc";
-   M_159           : aliased constant String := "INI";
-   K_160           : aliased constant String := "Singularity";
-   M_160           : aliased constant String := "Singularity";
-   K_161           : aliased constant String := ".ackrc";
-   M_161           : aliased constant String := "Option List";
-   K_162           : aliased constant String := "project.godot";
-   M_162           : aliased constant String := "Godot Resource";
-   K_163           : aliased constant String := "cshrc";
+   K_158           : aliased constant String := ".ackrc";
+   M_158           : aliased constant String := "Option List";
+   K_159           : aliased constant String := "Singularity";
+   M_159           : aliased constant String := "Singularity";
+   K_160           : aliased constant String := "pom.xml";
+   M_160           : aliased constant String := "Maven POM";
+   K_161           : aliased constant String := "project.godot";
+   M_161           : aliased constant String := "Godot Resource";
+   K_162           : aliased constant String := "vlcrc";
+   M_162           : aliased constant String := "INI";
+   K_163           : aliased constant String := ".bash_history";
    M_163           : aliased constant String := "Shell";
-   K_164           : aliased constant String := ".bash_history";
+   K_164           : aliased constant String := "cshrc";
    M_164           : aliased constant String := "Shell";
    K_165           : aliased constant String := ".classpath";
    M_165           : aliased constant String := "XML";
    K_166           : aliased constant String := "latexmkrc";
    M_166           : aliased constant String := "Perl";
-   K_167           : aliased constant String := "Rakefile";
+   K_167           : aliased constant String := "Podfile";
    M_167           : aliased constant String := "Ruby";
-   K_168           : aliased constant String := "Podfile";
+   K_168           : aliased constant String := "Rakefile";
    M_168           : aliased constant String := "Ruby";
    K_169           : aliased constant String := "lexer.x";
    M_169           : aliased constant String := "Lex";
-   K_170           : aliased constant String := "NuGet.config";
-   M_170           : aliased constant String := "XML";
-   K_171           : aliased constant String := "Gopkg.lock";
-   M_171           : aliased constant String := "TOML";
-   K_172           : aliased constant String := "bash_aliases";
-   M_172           : aliased constant String := "Shell";
-   K_173           : aliased constant String := ".jscsrc";
-   M_173           : aliased constant String := "JSON with Comments";
+   K_170           : aliased constant String := "Gopkg.lock";
+   M_170           : aliased constant String := "TOML";
+   K_171           : aliased constant String := "NuGet.config";
+   M_171           : aliased constant String := "XML";
+   K_172           : aliased constant String := ".jscsrc";
+   M_172           : aliased constant String := "JSON with Comments";
+   K_173           : aliased constant String := "bash_aliases";
+   M_173           : aliased constant String := "Shell";
    K_174           : aliased constant String := ".php_cs.dist";
    M_174           : aliased constant String := "PHP";
    K_175           : aliased constant String := "checksums.txt";
@@ -430,10 +430,10 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_176           : aliased constant String := "Perl";
    K_177           : aliased constant String := "MANIFEST.MF";
    M_177           : aliased constant String := "JAR Manifest";
-   K_178           : aliased constant String := "Vagrantfile";
-   M_178           : aliased constant String := "Ruby";
-   K_179           : aliased constant String := "Makefile.boot";
-   M_179           : aliased constant String := "Makefile";
+   K_178           : aliased constant String := "Makefile.boot";
+   M_178           : aliased constant String := "Makefile";
+   K_179           : aliased constant String := "Vagrantfile";
+   M_179           : aliased constant String := "Ruby";
    K_180           : aliased constant String := "_vimrc";
    M_180           : aliased constant String := "Vim Script";
    K_181           : aliased constant String := "Thorfile";
@@ -448,10 +448,10 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_185           : aliased constant String := "Ruby";
    K_186           : aliased constant String := "md5sum.txt";
    M_186           : aliased constant String := "Checksums";
-   K_187           : aliased constant String := "use.stable.mask";
-   M_187           : aliased constant String := "Text";
-   K_188           : aliased constant String := ".emacs";
-   M_188           : aliased constant String := "Emacs Lisp";
+   K_187           : aliased constant String := ".emacs";
+   M_187           : aliased constant String := "Emacs Lisp";
+   K_188           : aliased constant String := "use.stable.mask";
+   M_188           : aliased constant String := "Text";
    K_189           : aliased constant String := "_dir_colors";
    M_189           : aliased constant String := "dircolors";
    K_190           : aliased constant String := "Makefile.wat";
