@@ -1,0 +1,11 @@
+{
+   "Java": {
+      "comment_style": "C++ style",
+   },
+   "Common Lisp": {
+      "comment_style": "semicolon",      
+      "aliases": [
+         "emacs-lisp"
+      ],
+   }
+}
