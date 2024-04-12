@@ -7,6 +7,7 @@
 with Util.Log.Loggers;
 with Util.Strings.Vectors;
 with Util.Strings.Split;
+with SPDX_Tool.Languages.CommentsMap;
 package body SPDX_Tool.Languages.Manager is
 
    Log : constant Util.Log.Loggers.Logger :=
@@ -28,12 +29,18 @@ package body SPDX_Tool.Languages.Manager is
       Manager.Modeline_Detect.Detect (File, Content, Result);
       declare
          Language : constant String := Get_Language (Result);
-         Pos      : constant Language_Maps.Cursor := Manager.Languages.Find (Language);
+         Comment  : constant access constant String := CommentsMap.Get_Mapping (Language);
+         Pos      : Language_Maps.Cursor;
       begin
          if Language'Length = 0 then
             Analyzer := null;
             Log.Info ("{0}: no language found", File.Path);
             return;
+         end if;
+         if Comment /= null then
+            Pos := Manager.Languages.Find (Comment.all);
+         else
+            Pos := Manager.Languages.Find (Language);
          end if;
          File.Language := To_UString (Language);
          if Language_Maps.Has_Element (Pos) then
@@ -188,11 +195,20 @@ package body SPDX_Tool.Languages.Manager is
       Add_Builtin ("C-line", "//");
       Add_Builtin ("Shell", "#");
       Add_Builtin ("Latex", "%");
+      Add_Builtin ("Forth", "\");
       Add_Builtin ("C-block", "/*", "*/");
       Add_Builtin ("XML", "<!--", "-->");
       Add_Builtin ("OCaml", "(*", "*)");
       Add_Builtin ("Erlang", "%%");
-      Add_Builtin ("Lisp", ";;");
+      Add_Builtin ("Lisp", ";");
+      Add_Builtin ("JSP-style", "<%--", "--%>");
+      Add_Builtin ("Smarty-style", "{*", "*}");
+      Add_Builtin ("Haskell-style", "{-", "-}");
+      Add_Builtin ("Smalltalk-style", """", """");
+      Add_Builtin ("PowerShell-block", "<#", "#>");
+      Add_Builtin ("CoffeeScript-block", "###", "###");
+      Add_Builtin ("PowerShell-style", "", "", "PowerShell-block,Shell");
+      Add_Builtin ("CoffeeScript-style", "", "", "Shell,CoffeeScript-block");
       Add_Builtin ("C-style", "", "", "C-line,C-block");
       Configs.Configure (Config,
                          Set_Comments'Access);
