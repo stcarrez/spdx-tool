@@ -1,6 +1,102 @@
 {
+   "Ada": {
+      "comment_style": "dash-style"
+   },
+   "C": {
+      "comment_style": "C-style"
+   },
+   "C#": {
+      "comment_style": "C-style"
+   },
+   "C++": {
+      "comment_style": "C-style"
+   },
+   "CSS": {
+      "comment_style": "C-block"
+   },
+   "Dart": {
+      "comment_style": "C-style"
+   },
+   "Elixir": {
+      "comment_style": "Shell",
+   },
    "Java": {
-      "comment_style": "C++ style",
+      "comment_style": "C-style",
+   },
+   "Go": {
+      "comment_style": "C-style",
+   },
+   "Groovy": {
+      "comment_style": "C-style",
+   },
+   "PHP": {
+      "comment_style": "C-style",
+   },
+   "X10": {
+      "comment_style": "C-style",
+   },
+   "PowerShell": {
+      "comment_style": "PowerShell-style",
+   },
+   "Ruby": {
+      "comment_style": "Shell",
+   },
+   "Rust": {
+      "comment_style": "C-style",
+   },
+   "D": {
+      "comment_style": "C-style",
+   },
+   "CoffeeScript": {
+      "comment_style": "CoffeeScript-style",
+   },
+   "Perl": {
+      "comment_style": "Shell",
+   },
+   "Standard ML": {
+      "comment_style": "OCaml",
+   },
+   "TypeScript": {
+      "comment_style": "C-style",
+   },
+   "JavaScript": {
+      "comment_style": "C-style",
+   },
+   "Smalltalk": {
+      "comment_style": "Smalltalk-style",
+   },
+   "Yacc": {
+      "comment_style": "C-style",
+   },
+   "Lex": {
+      "comment_style": "C-style",
+   },
+   "Swift": {
+      "comment_style": "C-style",
+   },
+   "Objective-C": {
+      "comment_style": "C-style",
+   },
+   "Kotlin": {
+      "comment_style": "C-style",
+   },
+   "Scala": {
+      "comment_style": "C-style",
+   },
+   "Makefile": {
+      "comment_style": "Shell",
+   },
+   "Java Server Pages": {
+      "comment_style": "JSP-style",
+   },
+   "Smarty": {
+      "comment_style": "Smarty-style",
+   },
+   "Haskell": {
+      "comment_style": "Haskell-style",
+   },
+   "Forth": {
+      "comment_style": "Forth-style",
    },
    "Common Lisp": {
       "comment_style": "semicolon",      
