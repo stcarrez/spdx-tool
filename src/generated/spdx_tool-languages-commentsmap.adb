@@ -130,7 +130,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_6             : aliased constant String := "OASv3-json";
    M_6             : aliased constant String := "";
    K_7             : aliased constant String := "JavaScript";
-   M_7             : aliased constant String := "";
+   M_7             : aliased constant String := "C-style";
    K_8             : aliased constant String := "EJS";
    M_8             : aliased constant String := "";
    K_9             : aliased constant String := "Cirru";
@@ -250,9 +250,9 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_66            : aliased constant String := "Shell";
    M_66            : aliased constant String := "";
    K_67            : aliased constant String := "C";
-   M_67            : aliased constant String := "";
+   M_67            : aliased constant String := "C-style";
    K_68            : aliased constant String := "D";
-   M_68            : aliased constant String := "";
+   M_68            : aliased constant String := "C-style";
    K_69            : aliased constant String := "Nim";
    M_69            : aliased constant String := "";
    K_70            : aliased constant String := "E";
@@ -318,7 +318,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_100           : aliased constant String := "Papyrus";
    M_100           : aliased constant String := "";
    K_101           : aliased constant String := "Swift";
-   M_101           : aliased constant String := "";
+   M_101           : aliased constant String := "C-style";
    K_102           : aliased constant String := "Ren'Py";
    M_102           : aliased constant String := "";
    K_103           : aliased constant String := "Option List";
@@ -396,7 +396,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_139           : aliased constant String := "Volt";
    M_139           : aliased constant String := "";
    K_140           : aliased constant String := "C++";
-   M_140           : aliased constant String := "";
+   M_140           : aliased constant String := "C-style";
    K_141           : aliased constant String := "Vue";
    M_141           : aliased constant String := "";
    K_142           : aliased constant String := "DTrace";
@@ -404,7 +404,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_143           : aliased constant String := "Nunjucks";
    M_143           : aliased constant String := "";
    K_144           : aliased constant String := "Java";
-   M_144           : aliased constant String := "C++ style";
+   M_144           : aliased constant String := "C-style";
    K_145           : aliased constant String := "PicoLisp";
    M_145           : aliased constant String := "";
    K_146           : aliased constant String := "TI Program";
@@ -476,7 +476,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_179           : aliased constant String := "Modula-3";
    M_179           : aliased constant String := "";
    K_180           : aliased constant String := "Makefile";
-   M_180           : aliased constant String := "";
+   M_180           : aliased constant String := "Shell";
    K_181           : aliased constant String := "WebAssembly Interface Type";
    M_181           : aliased constant String := "";
    K_182           : aliased constant String := "Isabelle";
@@ -486,7 +486,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_184           : aliased constant String := "Cython";
    M_184           : aliased constant String := "";
    K_185           : aliased constant String := "Ada";
-   M_185           : aliased constant String := "";
+   M_185           : aliased constant String := "dash-style";
    K_186           : aliased constant String := "Clarion";
    M_186           : aliased constant String := "";
    K_187           : aliased constant String := "Common Workflow Language";
@@ -532,7 +532,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_207           : aliased constant String := "Pod";
    M_207           : aliased constant String := "";
    K_208           : aliased constant String := "Forth";
-   M_208           : aliased constant String := "";
+   M_208           : aliased constant String := "Forth-style";
    K_209           : aliased constant String := "Talon";
    M_209           : aliased constant String := "";
    K_210           : aliased constant String := "Genero per";
@@ -574,7 +574,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_228           : aliased constant String := "REALbasic";
    M_228           : aliased constant String := "";
    K_229           : aliased constant String := "Objective-C";
-   M_229           : aliased constant String := "";
+   M_229           : aliased constant String := "C-style";
    K_230           : aliased constant String := "VBScript";
    M_230           : aliased constant String := "";
    K_231           : aliased constant String := "MLIR";
@@ -672,13 +672,13 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_277           : aliased constant String := "Lua";
    M_277           : aliased constant String := "";
    K_278           : aliased constant String := "PHP";
-   M_278           : aliased constant String := "";
+   M_278           : aliased constant String := "C-style";
    K_279           : aliased constant String := "Nushell";
    M_279           : aliased constant String := "";
    K_280           : aliased constant String := "Parrot Assembly";
    M_280           : aliased constant String := "";
    K_281           : aliased constant String := "Haskell";
-   M_281           : aliased constant String := "";
+   M_281           : aliased constant String := "Haskell-style";
    K_282           : aliased constant String := "Brainfuck";
    M_282           : aliased constant String := "";
    K_283           : aliased constant String := "Praat";
@@ -688,7 +688,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_285           : aliased constant String := "Monkey C";
    M_285           : aliased constant String := "";
    K_286           : aliased constant String := "Smalltalk";
-   M_286           : aliased constant String := "";
+   M_286           : aliased constant String := "Smalltalk-style";
    K_287           : aliased constant String := "Alloy";
    M_287           : aliased constant String := "";
    K_288           : aliased constant String := "Opa";
@@ -698,7 +698,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_290           : aliased constant String := "Literate Haskell";
    M_290           : aliased constant String := "";
    K_291           : aliased constant String := "CSS";
-   M_291           : aliased constant String := "";
+   M_291           : aliased constant String := "C-block";
    K_292           : aliased constant String := "Elm";
    M_292           : aliased constant String := "";
    K_293           : aliased constant String := "Markdown";
@@ -756,15 +756,15 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_319           : aliased constant String := "NWScript";
    M_319           : aliased constant String := "";
    K_320           : aliased constant String := "TypeScript";
-   M_320           : aliased constant String := "";
+   M_320           : aliased constant String := "C-style";
    K_321           : aliased constant String := "X Font Directory Index";
    M_321           : aliased constant String := "";
    K_322           : aliased constant String := "Gemini";
    M_322           : aliased constant String := "";
    K_323           : aliased constant String := "Groovy";
-   M_323           : aliased constant String := "";
+   M_323           : aliased constant String := "C-style";
    K_324           : aliased constant String := "C#";
-   M_324           : aliased constant String := "";
+   M_324           : aliased constant String := "C-style";
    K_325           : aliased constant String := "SMT";
    M_325           : aliased constant String := "";
    K_326           : aliased constant String := "Wavefront Object";
@@ -880,7 +880,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_381           : aliased constant String := "sed";
    M_381           : aliased constant String := "";
    K_382           : aliased constant String := "Yacc";
-   M_382           : aliased constant String := "";
+   M_382           : aliased constant String := "C-style";
    K_383           : aliased constant String := "nanorc";
    M_383           : aliased constant String := "";
    K_384           : aliased constant String := "Eiffel";
@@ -914,7 +914,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_398           : aliased constant String := "mupad";
    M_398           : aliased constant String := "";
    K_399           : aliased constant String := "Lex";
-   M_399           : aliased constant String := "";
+   M_399           : aliased constant String := "C-style";
    K_400           : aliased constant String := "Pony";
    M_400           : aliased constant String := "";
    K_401           : aliased constant String := "Scilab";
@@ -1014,7 +1014,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_448           : aliased constant String := "Regular Expression";
    M_448           : aliased constant String := "";
    K_449           : aliased constant String := "Standard ML";
-   M_449           : aliased constant String := "";
+   M_449           : aliased constant String := "OCaml";
    K_450           : aliased constant String := "SugarSS";
    M_450           : aliased constant String := "";
    K_451           : aliased constant String := "Roc";
@@ -1096,7 +1096,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_489           : aliased constant String := "Haml";
    M_489           : aliased constant String := "";
    K_490           : aliased constant String := "Ruby";
-   M_490           : aliased constant String := "";
+   M_490           : aliased constant String := "Shell";
    K_491           : aliased constant String := "Liquid";
    M_491           : aliased constant String := "";
    K_492           : aliased constant String := "Cypher";
@@ -1170,7 +1170,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_526           : aliased constant String := "Batchfile";
    M_526           : aliased constant String := "";
    K_527           : aliased constant String := "Dart";
-   M_527           : aliased constant String := "";
+   M_527           : aliased constant String := "C-style";
    K_528           : aliased constant String := "NumPy";
    M_528           : aliased constant String := "";
    K_529           : aliased constant String := "CoNLL-U";
@@ -1180,7 +1180,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_531           : aliased constant String := "Fortran";
    M_531           : aliased constant String := "";
    K_532           : aliased constant String := "PowerShell";
-   M_532           : aliased constant String := "";
+   M_532           : aliased constant String := "PowerShell-style";
    K_533           : aliased constant String := "Smali";
    M_533           : aliased constant String := "";
    K_534           : aliased constant String := "Chapel";
@@ -1204,13 +1204,13 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_543           : aliased constant String := "Singularity";
    M_543           : aliased constant String := "";
    K_544           : aliased constant String := "Go";
-   M_544           : aliased constant String := "";
+   M_544           : aliased constant String := "C-style";
    K_545           : aliased constant String := "Avro IDL";
    M_545           : aliased constant String := "";
    K_546           : aliased constant String := "OASv2-yaml";
    M_546           : aliased constant String := "";
    K_547           : aliased constant String := "Smarty";
-   M_547           : aliased constant String := "";
+   M_547           : aliased constant String := "Smarty-style";
    K_548           : aliased constant String := "PureBasic";
    M_548           : aliased constant String := "";
    K_549           : aliased constant String := "Clarity";
@@ -1238,7 +1238,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_560           : aliased constant String := "Microsoft Visual Studio Solution";
    M_560           : aliased constant String := "";
    K_561           : aliased constant String := "X10";
-   M_561           : aliased constant String := "";
+   M_561           : aliased constant String := "C-style";
    K_562           : aliased constant String := "JCL";
    M_562           : aliased constant String := "";
    K_563           : aliased constant String := "Erlang";
@@ -1284,7 +1284,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_583           : aliased constant String := "PLpgSQL";
    M_583           : aliased constant String := "";
    K_584           : aliased constant String := "CoffeeScript";
-   M_584           : aliased constant String := "";
+   M_584           : aliased constant String := "CoffeeScript-style";
    K_585           : aliased constant String := "Vim Script";
    M_585           : aliased constant String := "";
    K_586           : aliased constant String := "Dafny";
@@ -1310,7 +1310,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_596           : aliased constant String := "Glyph";
    M_596           : aliased constant String := "";
    K_597           : aliased constant String := "Java Server Pages";
-   M_597           : aliased constant String := "";
+   M_597           : aliased constant String := "JSP-style";
    K_598           : aliased constant String := "HOCON";
    M_598           : aliased constant String := "";
    K_599           : aliased constant String := "RDoc";
@@ -1358,7 +1358,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_620           : aliased constant String := "Astro";
    M_620           : aliased constant String := "";
    K_621           : aliased constant String := "Rust";
-   M_621           : aliased constant String := "";
+   M_621           : aliased constant String := "C-style";
    K_622           : aliased constant String := "OpenAPI Specification v2";
    M_622           : aliased constant String := "";
    K_623           : aliased constant String := "FLUX";
@@ -1476,7 +1476,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_679           : aliased constant String := "Fortran Free Form";
    M_679           : aliased constant String := "";
    K_680           : aliased constant String := "Perl";
-   M_680           : aliased constant String := "";
+   M_680           : aliased constant String := "Shell";
    K_681           : aliased constant String := "Tea";
    M_681           : aliased constant String := "";
    K_682           : aliased constant String := "OpenStep Property List";
@@ -1528,9 +1528,9 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_705           : aliased constant String := "SCSS";
    M_705           : aliased constant String := "";
    K_706           : aliased constant String := "Kotlin";
-   M_706           : aliased constant String := "";
+   M_706           : aliased constant String := "C-style";
    K_707           : aliased constant String := "Scala";
-   M_707           : aliased constant String := "";
+   M_707           : aliased constant String := "C-style";
    K_708           : aliased constant String := "Formatted";
    M_708           : aliased constant String := "";
    K_709           : aliased constant String := "Boogie";
@@ -1542,7 +1542,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_712           : aliased constant String := "Pure Data";
    M_712           : aliased constant String := "";
    K_713           : aliased constant String := "Elixir";
-   M_713           : aliased constant String := "";
+   M_713           : aliased constant String := "Shell";
    K_714           : aliased constant String := "Grammatical Framework";
    M_714           : aliased constant String := "";
    K_715           : aliased constant String := "LSL";
