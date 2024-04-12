@@ -19,6 +19,11 @@ package body SPDX_Tool.Languages.Tests is
                           Expect   : in String;
                           Source   : in String := GNAT.Source_Info.File;
                           Line     : in Natural := GNAT.Source_Info.Line);
+   procedure Check_Modeline (T        : in out Test;
+                             Content  : in String;
+                             Expect   : in String;
+                             Source   : in String := GNAT.Source_Info.File;
+                             Line     : in Natural := GNAT.Source_Info.Line);
 
    package Caller is new Util.Test_Caller (Test, "SPDX_Tool.Languages");
 
@@ -95,6 +100,9 @@ package body SPDX_Tool.Languages.Tests is
       Check_Modeline (T, "# -*- tabs:8 ; mode : Perl -*-", "Perl");
       Check_Modeline (T, "# -*- tabs:4 ; mode : ada ; indend: full-*-", "Ada");
       Check_Modeline (T, "# -*- Python-*-", "Python");
+      Check_Modeline (T, "# -*- tabs:4;mode:Forth;indent:none-*-", "Forth");
+      Check_Modeline (T, "# -*- tabs:4;mode:Forth;indent:none", "");
+      Check_Modeline (T, "# -*- tabs:4;indent:none-*-", "");
    end Test_Modeline_Detector;
 
 end SPDX_Tool.Languages.Tests;
