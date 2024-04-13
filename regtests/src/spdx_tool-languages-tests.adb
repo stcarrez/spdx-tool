@@ -84,6 +84,9 @@ package body SPDX_Tool.Languages.Tests is
       Check_Shell (T, "#!", "");
       Check_Shell (T, "#! ", "");
       Check_Shell (T, "#! a", "");
+      Check_Shell (T, "#!/usr/bin/env -S perl -w -T", "Perl");
+      Check_Shell (T, "#!/usr/bin/env -S PATH=local perl -w -T", "Perl");
+      Check_Shell (T, "#!  /usr/bin/env  -S -j -p PATH=local python3 -w -T", "Python");
    end Test_Shell_Detector;
 
    --  ------------------------------
