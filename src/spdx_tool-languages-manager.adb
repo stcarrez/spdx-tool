@@ -191,7 +191,7 @@ package body SPDX_Tool.Languages.Manager is
 
       Basic_Analyzer_Count : Natural := 0;
    begin
-      Add_Builtin ("Ada", "--");
+      Add_Builtin ("dash-style", "--");
       Add_Builtin ("C-line", "//");
       Add_Builtin ("Shell", "#");
       Add_Builtin ("Latex", "%");

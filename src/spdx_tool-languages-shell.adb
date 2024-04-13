@@ -52,14 +52,10 @@ package body SPDX_Tool.Languages.Shell is
          if not Util.Strings.Starts_With (Line, "#!") then
             return;
          end if;
-         Pos := Ada.Strings.Fixed.Index (Line (Line'First + 2 .. Line'Last), Spaces);
-         if Pos = 0 then
-            Pos := Line'First + 2;
-         else
-            while Pos < Line'Last and then Line (Pos) in ' ' | ASCII.HT loop
-               Pos := Pos + 1;
-            end loop;
-         end if;
+         Pos := Line'First + 2;
+         while Pos < Line'Last and then Line (Pos) in ' ' | ASCII.HT loop
+            Pos := Pos + 1;
+         end loop;
          loop
             Next := Ada.Strings.Fixed.Index (Line (Pos .. Line'Last), Spaces_Or_Path);
             if Next = 0 then
@@ -77,6 +73,26 @@ package body SPDX_Tool.Languages.Shell is
             Content.Lines (1).Style.Category := Files.INTERPRETER;
             return;
          end if;
+         Pos := Next + 1;
+         loop
+            if Pos >= Line'Last then
+               return;
+            end if;
+            Next := Ada.Strings.Fixed.Index (Line (Pos .. Line'Last), Spaces_Or_Path);
+            if Next = 0 then
+               Next := Line'Last + 1;
+               exit;
+            end if;
+            --  Skip /usr/bin/env options as well as env variables NAME=...
+            exit when Line (Pos) /= '-'
+              and then Util.Strings.Index (Line (Pos .. Line'Last), '=') = 0;
+            Pos := Next + 1;
+            if Pos >= Line'Last then
+               return;
+            end if;
+         end loop;
+         Detector.Check_Interpreter (Line (Pos .. Next - 1), Result);
+         Content.Lines (1).Style.Category := Files.INTERPRETER;
       end;
    end Detect;
 
