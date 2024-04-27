@@ -54,10 +54,14 @@
       "comment_style": "Shell",
    },
    "Standard ML": {
-      "comment_style": "OCaml",
+      "comment_style": "OCaml-style",
+   },
+   "OCaml": {
+      "comment_style": "OCaml-style",
    },
    "TypeScript": {
       "comment_style": "C-style",
+      "tokens": "var,const,let,class,document,export,type,interface,private,void,number,string,any,import,from,static,this,null,public,return"
    },
    "JavaScript": {
       "comment_style": "C-style",
@@ -95,11 +99,17 @@
    "Haskell": {
       "comment_style": "Haskell-style",
    },
+   "Erlang": {
+      "comment_style": "Erlang-style",
+   },
+   "Latex": {
+      "comment_style": "Latex-style",
+   },
    "Forth": {
       "comment_style": "Forth-style",
    },
    "Common Lisp": {
-      "comment_style": "semicolon",      
+      "comment_style": "Semicolon",      
       "aliases": [
          "emacs-lisp"
       ],
