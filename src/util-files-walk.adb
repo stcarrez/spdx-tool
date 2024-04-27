@@ -211,8 +211,13 @@ package body Util.Files.Walk is
       Load_Ignore (Filter, Path);
    end Load_Ignore;
 
-   function Is_Excluded (Result : Filter_Result) return Boolean
-     is (Result.Match = Found and then Get_Value (Result) = Excluded);
+   function Is_File_Excluded (Result : Filter_Result) return Boolean
+     is (Result.Match = Found and then Get_Value (Result) = Excluded
+         and then not Is_Only_Directory (Result));
+
+   function Is_Directory_Excluded (Result : Filter_Result) return Boolean
+     is ((Result.Match = Found and then Get_Value (Result) = Excluded)
+          or else (Result.Match /= Not_Found and then Is_Only_Directory (Result)));
 
    --  ------------------------------
    --  Called when a directory is found during a directory tree walk.
@@ -243,29 +248,26 @@ package body Util.Files.Walk is
          begin
             if Name /= "." and then Name /= ".." then
                declare
-                  Result : constant Filter_Result := Match (Filter, Name);
+                  Full_Path : constant String := AD.Full_Name (Ent);
+                  Kind      : constant AD.File_Kind := AD.Kind (Full_Path);
+                  Result    : constant Filter_Result := Match (Filter, Name);
                begin
                   --  Log.Debug ("{0} => {1}",
                   --             AD.Full_Name (Ent), Result.Match'Image);
-                  if Result.Match in Not_Found | No_Value
-                    or else (Result.Match = Found and then Get_Value (Result) = Included)
-                    --  or else Result.Pattern.Dir_Only
-                  then
-                     declare
-                        Full_Path : constant String := AD.Full_Name (Ent);
-                        Kind      : constant AD.File_Kind := AD.Kind (Full_Path);
-                     begin
-                        if Kind /= AD.Directory
-                          and then not Is_Excluded (Result)
-                        then
+                  case Kind is
+                     when AD.Ordinary_File =>
+                        if not Is_File_Excluded (Result) then
                            Walker_Type'Class (Walker).Scan_File (Full_Path);
-                        elsif Kind = AD.Directory
-                          and then not Is_Excluded (Result)
-                        then
+                        end if;
+
+                     when AD.Directory =>
+                        if not Is_Directory_Excluded (Result) then
                            Walker_Type'Class (Walker).Scan_Subdir (Full_Path, Filter, Result);
                         end if;
-                     end;
-                  end if;
+
+                     when others =>
+                        null;
+                  end case;
                end;
             end if;
          end;

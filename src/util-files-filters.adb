@@ -25,6 +25,11 @@ package body Util.Files.Filters is
       return Result.Pattern.Value.all;
    end Get_Value;
 
+   function Is_Only_Directory (Result : in Filter_Result) return Boolean is
+   begin
+      return Result.Pattern.Dir_Only;
+   end Is_Only_Directory;
+
    --  ------------------------------
    --  Add a new pattern and associate it with the given value.
    --  ------------------------------
@@ -119,7 +124,8 @@ package body Util.Files.Filters is
                       others => <>);
                   Node.Dir_Only := True;
                end if;
-               Previous := Node;
+               Set_Value (Node, Value);
+               return;
             elsif Pos < Pattern'Last then
                Node := Find_Child (Previous, Pattern (First .. Pos - 1));
                if Node = null then
