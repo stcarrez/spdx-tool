@@ -493,7 +493,7 @@
    "lark" : "Lark",
    "lasso" : "Lasso",
    "lassoscript" : "Lasso",
-   "latex" : "TeX",
+   "latex" : "TeX,Latex",
    "latte" : "Latte",
    "lean" : "Lean",
    "lean 4" : "Lean 4",
