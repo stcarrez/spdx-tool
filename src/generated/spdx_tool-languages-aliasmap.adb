@@ -2190,7 +2190,7 @@ package body SPDX_Tool.Languages.AliasMap is
    K_1014          : aliased constant String := "openscad";
    M_1014          : aliased constant String := "OpenSCAD";
    K_1015          : aliased constant String := "latex";
-   M_1015          : aliased constant String := "TeX";
+   M_1015          : aliased constant String := "TeX,Latex";
    K_1016          : aliased constant String := "loomscript";
    M_1016          : aliased constant String := "LoomScript";
    K_1017          : aliased constant String := "figfont";
