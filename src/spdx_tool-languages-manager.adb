@@ -194,13 +194,13 @@ package body SPDX_Tool.Languages.Manager is
       Add_Builtin ("dash-style", "--");
       Add_Builtin ("C-line", "//");
       Add_Builtin ("Shell", "#");
-      Add_Builtin ("Latex", "%");
+      Add_Builtin ("Latex-style", "%");
       Add_Builtin ("Forth", "\");
       Add_Builtin ("C-block", "/*", "*/");
       Add_Builtin ("XML", "<!--", "-->");
-      Add_Builtin ("OCaml", "(*", "*)");
-      Add_Builtin ("Erlang", "%%");
-      Add_Builtin ("Lisp", ";");
+      Add_Builtin ("OCaml-style", "(*", "*)");
+      Add_Builtin ("Erlang-style", "%%");
+      Add_Builtin ("Semicolon", ";");
       Add_Builtin ("JSP-style", "<%--", "--%>");
       Add_Builtin ("Smarty-style", "{*", "*}");
       Add_Builtin ("Haskell-style", "{-", "-}");
