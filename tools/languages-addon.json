@@ -1,4 +1,11 @@
 {
+   "GNAT Project": {
+      "type": "programming",
+      "extensions": [
+         ".gpr"
+      ],
+      "comment_style": "dash-style"
+   },
    "Ada": {
       "comment_style": "dash-style"
    },
