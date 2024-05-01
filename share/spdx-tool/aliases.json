@@ -348,6 +348,7 @@
    "glyph" : "Glyph",
    "glyph bitmap distribution format" : "Glyph Bitmap Distribution Format",
    "gn" : "GN",
+   "gnat project" : "GNAT Project",
    "gnu asm" : "Unix Assembly",
    "gnuplot" : "Gnuplot",
    "go" : "Go",
