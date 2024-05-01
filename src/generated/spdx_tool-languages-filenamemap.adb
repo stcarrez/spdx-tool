@@ -10,52 +10,52 @@ package body SPDX_Tool.Languages.FilenameMap is
      (1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 17);
 
    T1 : constant array (0 .. 10) of Unsigned_16 :=
-     (394, 606, 549, 340, 277, 111, 218, 41, 444, 497, 507);
+     (541, 189, 707, 97, 630, 148, 409, 477, 358, 607, 509);
 
    T2 : constant array (0 .. 10) of Unsigned_16 :=
-     (222, 475, 561, 494, 703, 28, 110, 20, 100, 356, 306);
+     (527, 394, 39, 270, 525, 35, 562, 592, 232, 132, 484);
 
-   G : constant array (0 .. 722) of Unsigned_16 :=
-     (0, 0, 288, 277, 34, 0, 0, 0, 154, 0, 0, 0, 0, 0, 0, 215, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 314, 29, 324, 46, 0, 0, 0, 0, 0, 0, 0, 356, 0,
-      0, 173, 0, 0, 0, 227, 239, 0, 0, 0, 0, 0, 0, 0, 31, 0, 33, 171, 156,
-      0, 0, 0, 0, 176, 0, 0, 2, 60, 0, 7, 29, 162, 0, 95, 0, 0, 0, 0, 300,
-      0, 106, 306, 54, 0, 0, 0, 0, 0, 311, 0, 349, 108, 71, 148, 103, 0, 0,
-      0, 23, 281, 357, 223, 0, 0, 315, 312, 355, 0, 350, 0, 79, 27, 0, 117,
-      324, 201, 0, 0, 0, 125, 0, 120, 0, 0, 0, 270, 316, 0, 45, 192, 0, 246,
-      0, 0, 0, 0, 271, 109, 0, 136, 0, 251, 0, 86, 0, 0, 0, 127, 0, 360,
-      172, 0, 0, 0, 111, 0, 0, 78, 0, 0, 0, 101, 0, 293, 0, 325, 102, 0,
-      126, 173, 326, 71, 0, 0, 227, 0, 200, 0, 335, 0, 216, 0, 96, 236, 337,
-      119, 249, 64, 0, 0, 0, 0, 234, 262, 118, 319, 0, 151, 0, 0, 298, 0, 0,
-      350, 32, 47, 277, 348, 0, 0, 0, 0, 289, 0, 342, 0, 0, 0, 0, 123, 0, 0,
-      0, 0, 352, 0, 0, 111, 195, 11, 345, 340, 52, 295, 220, 237, 0, 0, 0,
-      0, 272, 0, 0, 167, 184, 0, 329, 192, 0, 0, 0, 0, 0, 0, 0, 124, 10,
-      339, 0, 298, 0, 0, 249, 194, 179, 174, 176, 0, 33, 333, 0, 0, 214,
-      348, 315, 0, 16, 212, 308, 281, 0, 346, 193, 53, 0, 71, 0, 0, 0, 0,
-      41, 34, 0, 284, 1, 104, 323, 0, 150, 0, 89, 0, 124, 0, 0, 0, 0, 287,
-      43, 213, 209, 37, 37, 0, 0, 0, 0, 0, 310, 0, 0, 257, 127, 132, 6, 0,
-      0, 3, 0, 0, 0, 218, 273, 0, 242, 73, 256, 177, 0, 189, 64, 0, 152,
-      118, 299, 0, 0, 0, 0, 66, 0, 0, 157, 0, 0, 0, 0, 0, 11, 0, 56, 34, 0,
-      0, 0, 0, 72, 146, 0, 0, 23, 97, 0, 231, 322, 0, 0, 310, 0, 0, 87, 0,
-      0, 0, 0, 0, 0, 161, 0, 224, 256, 150, 0, 0, 0, 0, 0, 247, 0, 10, 139,
-      0, 107, 112, 0, 77, 98, 149, 0, 0, 0, 285, 7, 0, 255, 0, 0, 16, 7,
-      132, 0, 158, 0, 62, 246, 120, 0, 0, 0, 0, 0, 0, 0, 360, 170, 75, 174,
-      0, 0, 111, 273, 0, 0, 0, 264, 136, 0, 0, 0, 256, 199, 168, 145, 277,
-      0, 0, 0, 0, 233, 233, 0, 88, 143, 19, 0, 0, 230, 223, 316, 144, 5, 0,
-      0, 0, 0, 174, 0, 74, 0, 344, 0, 250, 0, 0, 304, 342, 0, 0, 0, 108,
-      149, 14, 0, 0, 0, 201, 0, 0, 0, 269, 0, 147, 92, 0, 0, 32, 329, 165,
-      0, 0, 94, 114, 65, 95, 297, 26, 0, 276, 276, 0, 0, 0, 228, 69, 0, 0,
-      78, 0, 0, 0, 0, 0, 329, 109, 69, 99, 0, 0, 51, 0, 0, 0, 0, 0, 355, 0,
-      0, 117, 43, 305, 0, 68, 106, 0, 279, 0, 36, 3, 68, 206, 0, 127, 275,
-      0, 0, 0, 31, 215, 39, 59, 0, 0, 0, 255, 0, 0, 339, 15, 18, 135, 0,
-      213, 153, 211, 0, 109, 0, 288, 0, 170, 0, 224, 0, 0, 214, 0, 4, 178,
-      61, 0, 299, 255, 192, 0, 297, 0, 0, 32, 0, 211, 0, 1, 9, 172, 90, 116,
-      0, 0, 13, 0, 21, 0, 0, 55, 58, 34, 0, 325, 61, 337, 163, 63, 0, 19,
-      228, 340, 114, 0, 106, 0, 0, 203, 0, 2, 0, 0, 217, 0, 116, 309, 113,
-      52, 216, 149, 274, 58, 0, 335, 0, 4, 0, 0, 0, 199, 259, 0, 0, 311, 42,
-      206, 0, 273, 0, 0, 338, 0, 0, 0, 201, 38, 231, 0, 0, 110, 0, 169, 40,
-      81, 0, 221, 0, 251, 25, 240, 204, 219, 0, 184, 0, 0, 16, 0, 20, 0, 0,
-      0, 29, 46, 137, 156, 0, 85, 230, 0, 0, 0, 0, 93, 293, 238, 82, 0);
+   G : constant array (0 .. 725) of Unsigned_16 :=
+     (0, 147, 53, 274, 331, 243, 115, 0, 34, 0, 0, 0, 189, 0, 55, 0, 0, 0,
+      0, 299, 0, 99, 0, 0, 0, 0, 9, 79, 0, 0, 0, 281, 303, 0, 0, 190, 0,
+      145, 0, 0, 0, 358, 0, 0, 55, 42, 0, 0, 185, 0, 0, 0, 265, 0, 0, 0,
+      123, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 109, 0, 0, 139, 95, 55, 0, 0,
+      11, 9, 0, 0, 0, 0, 360, 336, 246, 0, 283, 0, 263, 0, 0, 200, 0, 0,
+      180, 0, 144, 333, 0, 210, 219, 67, 278, 0, 107, 89, 52, 24, 37, 0,
+      116, 0, 0, 257, 136, 220, 357, 19, 0, 0, 277, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 350, 0, 0, 0, 58, 0, 0, 0, 119, 131, 156, 193, 126, 95, 0, 358, 14,
+      34, 338, 328, 297, 0, 0, 212, 73, 157, 0, 0, 0, 0, 161, 0, 0, 190,
+      133, 0, 0, 0, 360, 0, 0, 0, 0, 0, 0, 12, 158, 258, 0, 274, 45, 0, 0,
+      0, 0, 164, 47, 192, 0, 0, 0, 0, 88, 0, 0, 270, 0, 0, 0, 0, 0, 2, 229,
+      0, 33, 39, 198, 0, 320, 123, 190, 86, 0, 0, 172, 0, 326, 0, 27, 191,
+      233, 0, 0, 0, 0, 178, 0, 0, 0, 186, 0, 102, 0, 0, 0, 57, 0, 116, 0, 0,
+      0, 38, 0, 0, 109, 0, 0, 143, 0, 0, 0, 0, 209, 316, 43, 0, 0, 346, 328,
+      295, 0, 0, 112, 0, 73, 0, 0, 0, 0, 0, 91, 226, 0, 0, 0, 0, 40, 0, 293,
+      0, 0, 90, 0, 0, 6, 278, 0, 117, 0, 0, 0, 133, 0, 0, 0, 180, 0, 310, 0,
+      0, 154, 95, 310, 25, 0, 0, 0, 222, 0, 0, 0, 0, 0, 350, 7, 68, 0, 22,
+      0, 299, 55, 0, 0, 142, 350, 224, 0, 276, 104, 0, 269, 0, 0, 95, 0, 0,
+      278, 0, 336, 0, 0, 0, 0, 26, 0, 104, 0, 0, 119, 0, 0, 143, 137, 196,
+      205, 152, 91, 0, 0, 123, 0, 0, 207, 133, 0, 0, 309, 0, 0, 40, 0, 23,
+      302, 0, 0, 95, 31, 0, 0, 360, 69, 348, 21, 158, 6, 0, 0, 337, 48, 72,
+      100, 51, 0, 0, 209, 1, 0, 0, 0, 42, 0, 35, 110, 0, 116, 149, 0, 181,
+      15, 0, 348, 0, 0, 0, 73, 163, 0, 301, 0, 308, 347, 0, 5, 353, 0, 0,
+      97, 279, 106, 0, 0, 83, 0, 12, 44, 0, 47, 0, 0, 0, 274, 0, 0, 0, 300,
+      0, 39, 76, 190, 0, 0, 0, 314, 0, 0, 241, 0, 0, 68, 0, 0, 0, 168, 266,
+      0, 0, 355, 0, 354, 0, 83, 0, 0, 170, 0, 285, 249, 126, 0, 0, 0, 153,
+      0, 0, 37, 159, 0, 145, 1, 282, 0, 0, 278, 16, 231, 0, 179, 0, 0, 290,
+      0, 0, 19, 0, 0, 0, 0, 199, 0, 0, 0, 211, 154, 230, 195, 268, 0, 164,
+      0, 0, 0, 111, 0, 237, 24, 322, 0, 330, 338, 0, 325, 330, 0, 340, 0,
+      241, 0, 282, 281, 190, 0, 143, 136, 356, 0, 0, 163, 264, 67, 0, 270,
+      0, 2, 88, 206, 283, 11, 240, 0, 0, 0, 0, 0, 0, 0, 288, 0, 0, 145, 172,
+      20, 0, 0, 3, 102, 319, 0, 146, 108, 195, 171, 0, 250, 66, 0, 0, 0,
+      128, 44, 0, 330, 0, 251, 0, 189, 0, 200, 34, 0, 287, 134, 77, 221, 41,
+      286, 114, 20, 267, 60, 0, 17, 174, 0, 0, 0, 256, 45, 0, 0, 207, 133,
+      30, 104, 0, 0, 315, 0, 262, 0, 0, 147, 178, 0, 58, 269, 76, 74, 0, 0,
+      127, 197, 0, 228, 133, 103, 143, 0, 126, 0, 9, 360, 342, 15, 56, 0,
+      160, 0, 0, 135, 271, 286, 0, 7, 131, 0, 0, 0, 0, 45, 0, 0, 0, 0, 63,
+      144, 0, 0, 0, 201, 0, 86, 0, 179, 89, 17, 236, 135, 120, 279, 0, 27,
+      0, 0, 25, 140, 18, 0, 351, 0, 56, 268, 303, 0, 13, 0, 75, 14, 0, 244,
+      257, 121, 0, 0, 0, 256, 0, 279, 17, 38, 0, 208, 250, 0, 30, 4, 87);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -66,10 +66,10 @@ package body SPDX_Tool.Languages.FilenameMap is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 723;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 723;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 726;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 726;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 361;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 362;
    end Hash;
 
    type Name_Array is array (Natural range <>) of Content_Access;
@@ -598,204 +598,206 @@ package body SPDX_Tool.Languages.FilenameMap is
    M_260           : aliased constant String := "Nim";
    K_261           : aliased constant String := "ROOT";
    M_261           : aliased constant String := "Isabelle ROOT";
-   K_262           : aliased constant String := ".markdownlintignore";
-   M_262           : aliased constant String := "Ignore List";
-   K_263           : aliased constant String := "profile";
-   M_263           : aliased constant String := "Shell";
-   K_264           : aliased constant String := ".npmignore";
-   M_264           : aliased constant String := "Ignore List";
-   K_265           : aliased constant String := ".env.prod";
-   M_265           : aliased constant String := "Dotenv";
-   K_266           : aliased constant String := "ack";
-   M_266           : aliased constant String := "Perl";
-   K_267           : aliased constant String := "_curlrc";
-   M_267           : aliased constant String := "cURL Config";
-   K_268           : aliased constant String := "lexer.x";
-   M_268           : aliased constant String := "Lex";
-   K_269           : aliased constant String := ".emacs";
-   M_269           : aliased constant String := "Emacs Lisp";
-   K_270           : aliased constant String := "zshrc";
-   M_270           : aliased constant String := "Shell";
-   K_271           : aliased constant String := ".env.sample";
-   M_271           : aliased constant String := "Dotenv";
-   K_272           : aliased constant String := "troffrc";
-   M_272           : aliased constant String := "Roff";
-   K_273           : aliased constant String := ".env.testing";
-   M_273           : aliased constant String := "Dotenv";
-   K_274           : aliased constant String := "DIR_COLORS";
-   M_274           : aliased constant String := "dircolors";
-   K_275           : aliased constant String := "HOSTS";
-   M_275           : aliased constant String := "INI,Hosts File";
-   K_276           : aliased constant String := ".editorconfig";
-   M_276           : aliased constant String := "EditorConfig";
-   K_277           : aliased constant String := ".gemrc";
-   M_277           : aliased constant String := "YAML";
-   K_278           : aliased constant String := ".factor-rc";
-   M_278           : aliased constant String := "Factor";
-   K_279           : aliased constant String := "Makefile.in";
-   M_279           : aliased constant String := "Makefile";
-   K_280           : aliased constant String := "PKGBUILD";
-   M_280           : aliased constant String := "Shell";
-   K_281           : aliased constant String := "meson_options.txt";
-   M_281           : aliased constant String := "Meson";
-   K_282           : aliased constant String := "login";
-   M_282           : aliased constant String := "Shell";
-   K_283           : aliased constant String := "GNUmakefile";
-   M_283           : aliased constant String := "Makefile";
-   K_284           : aliased constant String := "requirements-dev.txt";
-   M_284           : aliased constant String := "Pip Requirements";
-   K_285           : aliased constant String := ".inputrc";
-   M_285           : aliased constant String := "Readline Config";
-   K_286           : aliased constant String := "inputrc";
+   K_262           : aliased constant String := "Kconfig";
+   M_262           : aliased constant String := "Makefile";
+   K_263           : aliased constant String := ".markdownlintignore";
+   M_263           : aliased constant String := "Ignore List";
+   K_264           : aliased constant String := "profile";
+   M_264           : aliased constant String := "Shell";
+   K_265           : aliased constant String := ".npmignore";
+   M_265           : aliased constant String := "Ignore List";
+   K_266           : aliased constant String := ".env.prod";
+   M_266           : aliased constant String := "Dotenv";
+   K_267           : aliased constant String := "ack";
+   M_267           : aliased constant String := "Perl";
+   K_268           : aliased constant String := "_curlrc";
+   M_268           : aliased constant String := "cURL Config";
+   K_269           : aliased constant String := "lexer.x";
+   M_269           : aliased constant String := "Lex";
+   K_270           : aliased constant String := ".emacs";
+   M_270           : aliased constant String := "Emacs Lisp";
+   K_271           : aliased constant String := "zshrc";
+   M_271           : aliased constant String := "Shell";
+   K_272           : aliased constant String := ".env.sample";
+   M_272           : aliased constant String := "Dotenv";
+   K_273           : aliased constant String := "troffrc";
+   M_273           : aliased constant String := "Roff";
+   K_274           : aliased constant String := ".env.testing";
+   M_274           : aliased constant String := "Dotenv";
+   K_275           : aliased constant String := "DIR_COLORS";
+   M_275           : aliased constant String := "dircolors";
+   K_276           : aliased constant String := "HOSTS";
+   M_276           : aliased constant String := "INI,Hosts File";
+   K_277           : aliased constant String := ".editorconfig";
+   M_277           : aliased constant String := "EditorConfig";
+   K_278           : aliased constant String := ".gemrc";
+   M_278           : aliased constant String := "YAML";
+   K_279           : aliased constant String := ".factor-rc";
+   M_279           : aliased constant String := "Factor";
+   K_280           : aliased constant String := "Makefile.in";
+   M_280           : aliased constant String := "Makefile";
+   K_281           : aliased constant String := "PKGBUILD";
+   M_281           : aliased constant String := "Shell";
+   K_282           : aliased constant String := "meson_options.txt";
+   M_282           : aliased constant String := "Meson";
+   K_283           : aliased constant String := "login";
+   M_283           : aliased constant String := "Shell";
+   K_284           : aliased constant String := "GNUmakefile";
+   M_284           : aliased constant String := "Makefile";
+   K_285           : aliased constant String := "requirements-dev.txt";
+   M_285           : aliased constant String := "Pip Requirements";
+   K_286           : aliased constant String := ".inputrc";
    M_286           : aliased constant String := "Readline Config";
-   K_287           : aliased constant String := "Pipfile";
-   M_287           : aliased constant String := "TOML";
-   K_288           : aliased constant String := "gradlew";
-   M_288           : aliased constant String := "Shell";
-   K_289           : aliased constant String := "INSTALL";
-   M_289           : aliased constant String := "Text";
-   K_290           : aliased constant String := ".eleventyignore";
-   M_290           : aliased constant String := "Ignore List";
-   K_291           : aliased constant String := "flake.lock";
-   M_291           : aliased constant String := "JSON";
-   K_292           : aliased constant String := "language-subtag-registry.txt";
-   M_292           : aliased constant String := "Record Jar";
-   K_293           : aliased constant String := "CMakeLists.txt";
-   M_293           : aliased constant String := "CMake";
-   K_294           : aliased constant String := "COPYING.regex";
-   M_294           : aliased constant String := "Text";
-   K_295           : aliased constant String := "buildfile";
-   M_295           : aliased constant String := "Ruby";
-   K_296           : aliased constant String := ".rspec";
-   M_296           : aliased constant String := "Option List";
-   K_297           : aliased constant String := ".irbrc";
-   M_297           : aliased constant String := "Ruby";
-   K_298           : aliased constant String := "Containerfile";
-   M_298           : aliased constant String := "Dockerfile";
-   K_299           : aliased constant String := "nvimrc";
-   M_299           : aliased constant String := "Vim Script";
-   K_300           : aliased constant String := "wscript";
-   M_300           : aliased constant String := "Python";
-   K_301           : aliased constant String := "SConstruct";
+   K_287           : aliased constant String := "inputrc";
+   M_287           : aliased constant String := "Readline Config";
+   K_288           : aliased constant String := "Pipfile";
+   M_288           : aliased constant String := "TOML";
+   K_289           : aliased constant String := "gradlew";
+   M_289           : aliased constant String := "Shell";
+   K_290           : aliased constant String := "INSTALL";
+   M_290           : aliased constant String := "Text";
+   K_291           : aliased constant String := ".eleventyignore";
+   M_291           : aliased constant String := "Ignore List";
+   K_292           : aliased constant String := "flake.lock";
+   M_292           : aliased constant String := "JSON";
+   K_293           : aliased constant String := "language-subtag-registry.txt";
+   M_293           : aliased constant String := "Record Jar";
+   K_294           : aliased constant String := "CMakeLists.txt";
+   M_294           : aliased constant String := "CMake";
+   K_295           : aliased constant String := "COPYING.regex";
+   M_295           : aliased constant String := "Text";
+   K_296           : aliased constant String := "buildfile";
+   M_296           : aliased constant String := "Ruby";
+   K_297           : aliased constant String := ".rspec";
+   M_297           : aliased constant String := "Option List";
+   K_298           : aliased constant String := ".irbrc";
+   M_298           : aliased constant String := "Ruby";
+   K_299           : aliased constant String := "Containerfile";
+   M_299           : aliased constant String := "Dockerfile";
+   K_300           : aliased constant String := "nvimrc";
+   M_300           : aliased constant String := "Vim Script";
+   K_301           : aliased constant String := "wscript";
    M_301           : aliased constant String := "Python";
-   K_302           : aliased constant String := "FONTLOG";
-   M_302           : aliased constant String := "Text";
-   K_303           : aliased constant String := ".c8rc";
-   M_303           : aliased constant String := "JSON";
-   K_304           : aliased constant String := "package.use.stable.mask";
-   M_304           : aliased constant String := "Text";
-   K_305           : aliased constant String := "kakrc";
-   M_305           : aliased constant String := "KakouneScript";
-   K_306           : aliased constant String := "riemann.config";
-   M_306           : aliased constant String := "Clojure";
-   K_307           : aliased constant String := "BUCK";
-   M_307           : aliased constant String := "Starlark";
-   K_308           : aliased constant String := "installscript.qs";
-   M_308           : aliased constant String := "Qt Script";
-   K_309           : aliased constant String := "gvimrc";
-   M_309           : aliased constant String := "Vim Script";
-   K_310           : aliased constant String := "rebar.config";
-   M_310           : aliased constant String := "Erlang";
-   K_311           : aliased constant String := "bash_logout";
-   M_311           : aliased constant String := "Shell";
-   K_312           : aliased constant String := "expr-dist";
-   M_312           : aliased constant String := "R";
-   K_313           : aliased constant String := "mocha.opts";
-   M_313           : aliased constant String := "Option List";
-   K_314           : aliased constant String := "project.godot";
-   M_314           : aliased constant String := "Godot Resource";
-   K_315           : aliased constant String := "zlogout";
-   M_315           : aliased constant String := "Shell";
-   K_316           : aliased constant String := "Makefile";
-   M_316           : aliased constant String := "Makefile";
-   K_317           : aliased constant String := ".env.local";
-   M_317           : aliased constant String := "Dotenv";
-   K_318           : aliased constant String := "latexmkrc";
-   M_318           : aliased constant String := "Perl";
-   K_319           : aliased constant String := "COPYING";
-   M_319           : aliased constant String := "Text";
-   K_320           : aliased constant String := "Makefile.PL";
-   M_320           : aliased constant String := "Perl";
-   K_321           : aliased constant String := "Tiltfile";
-   M_321           : aliased constant String := "Starlark";
-   K_322           : aliased constant String := "WORKSPACE.bazel";
+   K_302           : aliased constant String := "SConstruct";
+   M_302           : aliased constant String := "Python";
+   K_303           : aliased constant String := "FONTLOG";
+   M_303           : aliased constant String := "Text";
+   K_304           : aliased constant String := ".c8rc";
+   M_304           : aliased constant String := "JSON";
+   K_305           : aliased constant String := "package.use.stable.mask";
+   M_305           : aliased constant String := "Text";
+   K_306           : aliased constant String := "kakrc";
+   M_306           : aliased constant String := "KakouneScript";
+   K_307           : aliased constant String := "riemann.config";
+   M_307           : aliased constant String := "Clojure";
+   K_308           : aliased constant String := "BUCK";
+   M_308           : aliased constant String := "Starlark";
+   K_309           : aliased constant String := "installscript.qs";
+   M_309           : aliased constant String := "Qt Script";
+   K_310           : aliased constant String := "gvimrc";
+   M_310           : aliased constant String := "Vim Script";
+   K_311           : aliased constant String := "rebar.config";
+   M_311           : aliased constant String := "Erlang";
+   K_312           : aliased constant String := "bash_logout";
+   M_312           : aliased constant String := "Shell";
+   K_313           : aliased constant String := "expr-dist";
+   M_313           : aliased constant String := "R";
+   K_314           : aliased constant String := "mocha.opts";
+   M_314           : aliased constant String := "Option List";
+   K_315           : aliased constant String := "project.godot";
+   M_315           : aliased constant String := "Godot Resource";
+   K_316           : aliased constant String := "zlogout";
+   M_316           : aliased constant String := "Shell";
+   K_317           : aliased constant String := "Makefile";
+   M_317           : aliased constant String := "Makefile";
+   K_318           : aliased constant String := ".env.local";
+   M_318           : aliased constant String := "Dotenv";
+   K_319           : aliased constant String := "latexmkrc";
+   M_319           : aliased constant String := "Perl";
+   K_320           : aliased constant String := "COPYING";
+   M_320           : aliased constant String := "Text";
+   K_321           : aliased constant String := "Makefile.PL";
+   M_321           : aliased constant String := "Perl";
+   K_322           : aliased constant String := "Tiltfile";
    M_322           : aliased constant String := "Starlark";
-   K_323           : aliased constant String := ".coveragerc";
-   M_323           : aliased constant String := "INI";
-   K_324           : aliased constant String := "Appraisals";
-   M_324           : aliased constant String := "Ruby";
-   K_325           : aliased constant String := "man";
-   M_325           : aliased constant String := "Shell";
-   K_326           : aliased constant String := ".flake8";
-   M_326           : aliased constant String := "INI";
-   K_327           : aliased constant String := ".ackrc";
-   M_327           : aliased constant String := "Option List";
-   K_328           : aliased constant String := "Slakefile";
-   M_328           : aliased constant String := "LiveScript";
-   K_329           : aliased constant String := "Cargo.lock";
-   M_329           : aliased constant String := "TOML";
-   K_330           : aliased constant String := ".gclient";
-   M_330           : aliased constant String := "Python";
-   K_331           : aliased constant String := ".bash_logout";
-   M_331           : aliased constant String := "Shell";
-   K_332           : aliased constant String := "sshd_config";
-   M_332           : aliased constant String := "SSH Config";
-   K_333           : aliased constant String := "Jakefile";
-   M_333           : aliased constant String := "JavaScript";
-   K_334           : aliased constant String := "dir_colors";
-   M_334           : aliased constant String := "dircolors";
-   K_335           : aliased constant String := ".gitconfig";
-   M_335           : aliased constant String := "Git Config";
-   K_336           : aliased constant String := "configure.ac";
-   M_336           : aliased constant String := "M4Sugar";
-   K_337           : aliased constant String := ".cvsignore";
-   M_337           : aliased constant String := "Ignore List";
-   K_338           : aliased constant String := "Rakefile";
-   M_338           : aliased constant String := "Ruby";
-   K_339           : aliased constant String := ".stylelintignore";
-   M_339           : aliased constant String := "Ignore List";
-   K_340           : aliased constant String := "9fs";
-   M_340           : aliased constant String := "Shell";
-   K_341           : aliased constant String := "makefile";
-   M_341           : aliased constant String := "Makefile";
-   K_342           : aliased constant String := "Steepfile";
-   M_342           : aliased constant String := "Ruby";
-   K_343           : aliased constant String := "gitignore-global";
-   M_343           : aliased constant String := "Ignore List";
-   K_344           : aliased constant String := "ssh-config";
-   M_344           : aliased constant String := "SSH Config";
-   K_345           : aliased constant String := ".zprofile";
-   M_345           : aliased constant String := "Shell";
-   K_346           : aliased constant String := "glide.lock";
-   M_346           : aliased constant String := "YAML";
-   K_347           : aliased constant String := ".bzrignore";
-   M_347           : aliased constant String := "Ignore List";
-   K_348           : aliased constant String := "tsconfig.json";
-   M_348           : aliased constant String := "JSON with Comments";
-   K_349           : aliased constant String := "encodings.dir";
-   M_349           : aliased constant String := "X Font Directory Index";
-   K_350           : aliased constant String := "hosts";
-   M_350           : aliased constant String := "INI,Hosts File";
-   K_351           : aliased constant String := "LICENSE.mysql";
-   M_351           : aliased constant String := "Text";
-   K_352           : aliased constant String := ".XCompose";
-   M_352           : aliased constant String := "XCompose";
-   K_353           : aliased constant String := "Lexer.x";
-   M_353           : aliased constant String := "Lex";
-   K_354           : aliased constant String := "Project.ede";
-   M_354           : aliased constant String := "Emacs Lisp";
-   K_355           : aliased constant String := "mkfile";
-   M_355           : aliased constant String := "Makefile";
-   K_356           : aliased constant String := "Pipfile.lock";
-   M_356           : aliased constant String := "JSON";
-   K_357           : aliased constant String := ".zshenv";
-   M_357           : aliased constant String := "Shell";
-   K_358           : aliased constant String := "APKBUILD";
-   M_358           : aliased constant String := "Alpine Abuild";
-   K_359           : aliased constant String := "fp-lib-table";
-   M_359           : aliased constant String := "KiCad Layout";
-   K_360           : aliased constant String := ".cshrc";
-   M_360           : aliased constant String := "Shell";
+   K_323           : aliased constant String := "WORKSPACE.bazel";
+   M_323           : aliased constant String := "Starlark";
+   K_324           : aliased constant String := ".coveragerc";
+   M_324           : aliased constant String := "INI";
+   K_325           : aliased constant String := "Appraisals";
+   M_325           : aliased constant String := "Ruby";
+   K_326           : aliased constant String := "man";
+   M_326           : aliased constant String := "Shell";
+   K_327           : aliased constant String := ".flake8";
+   M_327           : aliased constant String := "INI";
+   K_328           : aliased constant String := ".ackrc";
+   M_328           : aliased constant String := "Option List";
+   K_329           : aliased constant String := "Slakefile";
+   M_329           : aliased constant String := "LiveScript";
+   K_330           : aliased constant String := "Cargo.lock";
+   M_330           : aliased constant String := "TOML";
+   K_331           : aliased constant String := ".gclient";
+   M_331           : aliased constant String := "Python";
+   K_332           : aliased constant String := ".bash_logout";
+   M_332           : aliased constant String := "Shell";
+   K_333           : aliased constant String := "sshd_config";
+   M_333           : aliased constant String := "SSH Config";
+   K_334           : aliased constant String := "Jakefile";
+   M_334           : aliased constant String := "JavaScript";
+   K_335           : aliased constant String := "dir_colors";
+   M_335           : aliased constant String := "dircolors";
+   K_336           : aliased constant String := ".gitconfig";
+   M_336           : aliased constant String := "Git Config";
+   K_337           : aliased constant String := "configure.ac";
+   M_337           : aliased constant String := "M4Sugar";
+   K_338           : aliased constant String := ".cvsignore";
+   M_338           : aliased constant String := "Ignore List";
+   K_339           : aliased constant String := "Rakefile";
+   M_339           : aliased constant String := "Ruby";
+   K_340           : aliased constant String := ".stylelintignore";
+   M_340           : aliased constant String := "Ignore List";
+   K_341           : aliased constant String := "9fs";
+   M_341           : aliased constant String := "Shell";
+   K_342           : aliased constant String := "makefile";
+   M_342           : aliased constant String := "Makefile";
+   K_343           : aliased constant String := "Steepfile";
+   M_343           : aliased constant String := "Ruby";
+   K_344           : aliased constant String := "gitignore-global";
+   M_344           : aliased constant String := "Ignore List";
+   K_345           : aliased constant String := "ssh-config";
+   M_345           : aliased constant String := "SSH Config";
+   K_346           : aliased constant String := ".zprofile";
+   M_346           : aliased constant String := "Shell";
+   K_347           : aliased constant String := "glide.lock";
+   M_347           : aliased constant String := "YAML";
+   K_348           : aliased constant String := ".bzrignore";
+   M_348           : aliased constant String := "Ignore List";
+   K_349           : aliased constant String := "tsconfig.json";
+   M_349           : aliased constant String := "JSON with Comments";
+   K_350           : aliased constant String := "encodings.dir";
+   M_350           : aliased constant String := "X Font Directory Index";
+   K_351           : aliased constant String := "hosts";
+   M_351           : aliased constant String := "INI,Hosts File";
+   K_352           : aliased constant String := "LICENSE.mysql";
+   M_352           : aliased constant String := "Text";
+   K_353           : aliased constant String := ".XCompose";
+   M_353           : aliased constant String := "XCompose";
+   K_354           : aliased constant String := "Lexer.x";
+   M_354           : aliased constant String := "Lex";
+   K_355           : aliased constant String := "Project.ede";
+   M_355           : aliased constant String := "Emacs Lisp";
+   K_356           : aliased constant String := "mkfile";
+   M_356           : aliased constant String := "Makefile";
+   K_357           : aliased constant String := "Pipfile.lock";
+   M_357           : aliased constant String := "JSON";
+   K_358           : aliased constant String := ".zshenv";
+   M_358           : aliased constant String := "Shell";
+   K_359           : aliased constant String := "APKBUILD";
+   M_359           : aliased constant String := "Alpine Abuild";
+   K_360           : aliased constant String := "fp-lib-table";
+   M_360           : aliased constant String := "KiCad Layout";
+   K_361           : aliased constant String := ".cshrc";
+   M_361           : aliased constant String := "Shell";
 
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
@@ -888,7 +890,7 @@ package body SPDX_Tool.Languages.FilenameMap is
       K_348'Access, K_349'Access, K_350'Access, K_351'Access,
       K_352'Access, K_353'Access, K_354'Access, K_355'Access,
       K_356'Access, K_357'Access, K_358'Access, K_359'Access,
-      K_360'Access);
+      K_360'Access, K_361'Access);
 
    Contents : constant Name_Array := (
       M_0'Access, M_1'Access, M_2'Access, M_3'Access,
@@ -981,7 +983,7 @@ package body SPDX_Tool.Languages.FilenameMap is
       M_348'Access, M_349'Access, M_350'Access, M_351'Access,
       M_352'Access, M_353'Access, M_354'Access, M_355'Access,
       M_356'Access, M_357'Access, M_358'Access, M_359'Access,
-      M_360'Access);
+      M_360'Access, M_361'Access);
 
    function Get_Mapping (Name : String) return access constant String is
       H : constant Natural := Hash (Name);
