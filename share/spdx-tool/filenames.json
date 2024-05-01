@@ -165,6 +165,7 @@
    "Jenkinsfile" : "Groovy",
    "Justfile" : "Just",
    "Kbuild" : "Makefile",
+   "Kconfig" : "Makefile",
    "LICENSE" : "Text",
    "LICENSE.mysql" : "Text",
    "Lexer.x" : "Lex",
