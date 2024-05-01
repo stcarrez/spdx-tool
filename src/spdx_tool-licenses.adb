@@ -814,7 +814,8 @@ package body SPDX_Tool.Licenses is
                end if;
                if Next_Token = null then
                   if Current /= null then
-                     Log.Debug ("Missmatch found");
+                     Log.Info ("License template missmatch found at line{0} after {1} lines",
+                               Pos.Line'Image, Util.Strings.Image (Natural (Pos.Line - From)));
                   end if;
                   Result.Last := Current;
                   return Result;
@@ -909,6 +910,7 @@ package body SPDX_Tool.Licenses is
       Token : Token_Access;
       Stamp : Util.Measures.Stamp;
    begin
+      Log.Info ("Checking with license template '{0}'", Licenses.Files.Names (License).all);
       Token := License_Tree.Get_License (License);
       if Token = null then
          License_Tree.Load_License (License, Token);
@@ -946,7 +948,7 @@ package body SPDX_Tool.Licenses is
 
    function Guess_License (Nodes   : in Decision_Array_Access;
                            Tokens  : in SPDX_Tool.Buffer_Sets.Set) return License_Match is
-      Map   : License_Index_Map (0 .. Licenses.Files.Names_Count) := (others => False);
+      Map   : License_Index_Map := EMPTY_MAP;
       Guess : License_Index := 0;
       Confidence : Confidence_Type := 0.0;
       C : Confidence_Type;
@@ -955,7 +957,7 @@ package body SPDX_Tool.Licenses is
    begin
       for Node of reverse Nodes loop
          for License of Node.Licenses loop
-            if not Map (License) then
+            if not Is_Set (Map, License) then
                declare
                   Token : Token_Access;
                begin
@@ -978,7 +980,7 @@ package body SPDX_Tool.Licenses is
                             SPDX_Tool.Licenses.Files.Names (License).all,
                             C'Image);
                end if;
-               Map (License) := True;
+               Set_License (Map, License);
             end if;
          end loop;
       end loop;

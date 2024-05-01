@@ -10,11 +10,11 @@ with Util.Strings.Tokenizers;
 with Util.Log.Loggers;
 with Util.Streams.Files;
 
-with SPDX_Tool.Licenses.Files;
+--  with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Licenses.Reader;
 with SPDX_Tool.Configs.Default;
---  with SPDX_Tool.Licenses.Templates;
+with SPDX_Tool.Licenses.Templates;
 package body SPDX_Tool.Licenses.Manager is
 
    use all type SPDX_Tool.Files.Comment_Mode;
@@ -100,6 +100,21 @@ package body SPDX_Tool.Licenses.Manager is
                          Configs.Names.IGNORE_FILES,
                          Load_Ignore_File'Access);
       Manager.Languages.Initialize (Config);
+
+      --  Setup the list of license tokens
+      if not Opt_No_Builtin then
+         declare
+            First : Buffer_Index := 1;
+            Last  : Buffer_Index;
+         begin
+            for I in Licenses.Templates.Token_Pos'Range loop
+               Last := First + Buffer_Size (Licenses.Templates.Token_Pos (I) - 1);
+               Manager.Tokens.Insert (Licenses.Templates.Tokens (First .. Last),
+                                      SPDX_Tool.Token_Index (I));
+               First := Last + 1;
+            end loop;
+         end;
+      end if;
       if not Manager.Started then
          if Opt_Mimes then
             for I in Manager.File_Mgr'Range loop
@@ -249,8 +264,83 @@ package body SPDX_Tool.Licenses.Manager is
       Manager.Executor.Wait;
    end Wait;
 
+   package License_Algorithms is
+      new Util.Algorithms.Arrays (Element_Type => License_Index,
+                                  Index_Type => Positive,
+                                  Array_Type => License_Index_Array,
+                                  Middle => Middle);
+
+   function Find_License_Templates (Manager : in License_Manager;
+                                    Line    : in SPDX_Tool.Languages.Line_Type) return License_Index_Map is
+      Result : License_Index_Map := SPDX_Tool.EMPTY_MAP;
+      First  : Boolean := True;
+   begin
+      for Token of Line.Tokens loop
+         declare
+            Pos  : constant Token_Counters.Token_Maps.Cursor := Manager.Tokens.Find (Token);
+            Item : Index_Type;
+            R    : Algorithms.Result_Type;
+         begin
+            if Token_Counters.Token_Maps.Has_Element (Pos) then
+               Item.Token := Token_Counters.Token_Maps.Element (Pos);
+               R := Algorithms.Find (Licenses.Templates.Index, Item);
+               if R.Found then
+                  declare
+                     List : License_Index_Array_Access := Templates.Index (R.Position).List;
+                  begin
+                     Log.Debug ("Token {0}[{1}] has {2} licenses list",
+                                To_String (To_UString (Token)),
+                                Util.Strings.Image (Natural (Item.Token)),
+                                Util.Strings.Image (Natural (List'Length)));
+                     if First then
+                        Set_Licenses (Result, List.all);
+                        First := False;
+                     else
+                        And_Licenses (Result, List.all);
+                     end if;
+                  end;
+               else
+                  Log.Debug ("Token {0} not found in index",
+                             Util.Strings.Image (Natural (Item.Token)));
+               end if;
+            end if;
+         end;
+      end loop;
+      return Result;
+   end Find_License_Templates;
+
+   procedure Find_License_Templates (Manager : in License_Manager;
+                                     Lines   : in out SPDX_Tool.Languages.Line_Array;
+                                     From    : in Line_Number;
+                                     To      : in Line_Number) is
+   begin
+      for Line in From .. To loop
+         Lines (Line).Licenses := Manager.Find_License_Templates (Lines (Line));
+      end loop;
+   end Find_License_Templates;
+
+   function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
+                                    From    : in Line_Number;
+                                    To      : in Line_Number) return License_Index_Array is
+      First    : Boolean := True;
+      Licenses : License_Index_Map := EMPTY_MAP;
+   begin
+      for Line in From .. To loop
+         if Get_Count (Lines (Line).Licenses) > 0 then
+            if First then
+               Licenses := Lines (Line).Licenses;
+               First := False;
+            else
+               And_Licenses (Licenses, Lines (Line).Licenses);
+            end if;
+            exit when Get_Count (Licenses) < 10;
+         end if;
+      end loop;
+      return To_License_Index_Array (Licenses);
+   end Find_License_Templates;
+
    function Find_License (Manager : in License_Manager;
-                          File    : in SPDX_Tool.Files.File_Type)
+                          File    : in out SPDX_Tool.Files.File_Type)
                           return License_Match is
       Buf     : constant Buffer_Accessor := File.Buffer.Value;
       Result  : License_Match := (Last => null, Depth => 0, others => <>);
@@ -271,23 +361,38 @@ package body SPDX_Tool.Licenses.Manager is
       end if;
       SPDX_Tool.Files.Extract_Tokens (File, First_Line, Last_Line, Tokens);
       if not Opt_No_Builtin then
-         declare
-            Map   : License_Index_Map (0 .. Licenses.Files.Names_Count) := (others => False);
-            Nodes : constant Decision_Array_Access := Find_Builtin_License (Tokens);
-         begin
-            for Node of reverse Nodes loop
-               for License of Node.Licenses loop
-                  if not Map (License) then
-                     Match := Find_License (License, File, First_Line, Last_Line);
-                     if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-                        SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
-                        return Match;
-                     end if;
-                     Map (License) := True;
+         Manager.Find_License_Templates (File.Lines, First_Line, Last_Line);
+         for Line in First_Line .. Last_Line loop
+            declare
+               List  : constant License_Index_Array
+                     := Find_License_Templates (File.Lines, Line, Last_Line);
+            begin
+               for License of List loop
+                  Match := Find_License (License, File, First_Line, Last_Line);
+                  if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                     SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
+                     return Match;
                   end if;
                end loop;
-               exit;
-            end loop;
+            end;
+         end loop;
+         declare
+            Nodes : constant Decision_Array_Access := Find_Builtin_License (Tokens);
+         begin
+            Log.Info ("No license found by Find_Builtin_License");
+            --  for Node of reverse Nodes loop
+            --   for License of Node.Licenses loop
+            --      if not Map (License) then
+            --         Match := Find_License (License, File, First_Line, Last_Line);
+            --         if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+            --            SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
+            --            return Match;
+            --         end if;
+            --         Map (License) := True;
+            --      end if;
+            --   end loop;
+            --   exit;
+            --  end loop;
             Match := Guess_License (Nodes, Tokens);
             if Match.Info.Match = Infos.GUESSED_LICENSE then
                Match.Info.First_Line := First_Line;

@@ -11,6 +11,7 @@ with Util.Strings.Sets;
 with SPDX_Tool.Files.Manager;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
+private with SPDX_Tool.Token_Counters;
 private with SPDX_Tool.Languages.Manager;
 private with Util.Executors;
 private with Util.Concurrent.Counters;
@@ -130,6 +131,9 @@ private
       Exclude_Languages    : Util.Strings.Sets.Set;
       Licenses             : License_Template;
 
+      --  A map of tokens used in license templates.
+      Tokens               : SPDX_Tool.Token_Counters.Token_Maps.Map;
+
       Files    : SPDX_Tool.Infos.File_Map;
 
       Mgr_Idx  : Util.Concurrent.Counters.Counter;
@@ -137,8 +141,17 @@ private
       Executor : Executor_Manager (Count);
    end record;
 
+   procedure Find_License_Templates (Manager : in License_Manager;
+                                     Lines   : in out SPDX_Tool.Languages.Line_Array;
+                                     From    : in Line_Number;
+                                     To      : in Line_Number);
+
+   function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
+                                    From    : in Line_Number;
+                                    To      : in Line_Number) return License_Index_Array;
+
    function Find_License (Manager : in License_Manager;
-                          File    : in SPDX_Tool.Files.File_Type)
+                          File    : in out SPDX_Tool.Files.File_Type)
                           return License_Match;
 
    overriding

@@ -10,6 +10,8 @@ with Ada.Containers.Vectors;
 with GNAT.Strings;
 with GNAT.Regpat;
 
+with Util.Algorithms.Arrays;
+
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Buffer_Sets;
@@ -68,6 +70,27 @@ package SPDX_Tool.Licenses is
    type Position is new Natural range 0 .. 255;
    for Position'Size use 8;
    type Position_Array is array (Token_Index range <>) of Position;
+   type License_Array is array (License_Index range <>) of Token_Array_Access;
+
+   type Index_Type is record
+      Token : Token_Index;
+      List  : License_Index_Array_Access;
+   end record;
+   type Token_Index_Array is array (Positive range <>) of Index_Type;
+
+   function "<" (Left, Right : Index_Type) return Boolean
+      is (Left.Token < Right.Token);
+   overriding
+   function "=" (Left, Right : Index_Type) return Boolean
+      is (Left.Token = Right.Token);
+   function Middle (Low, High : Positive) return Positive
+      is ((High + Low) / 2);
+
+   package Algorithms is
+      new Util.Algorithms.Arrays (Element_Type => Index_Type,
+                                  Index_Type => Positive,
+                                  Array_Type => Token_Index_Array,
+                                  Middle => Middle);
 
    function Is_Loaded (License : in License_Template)
                        return Boolean is (License.Root /= null);
@@ -266,9 +289,6 @@ private
    overriding
    function Kind (Token : in Final_Token_Type)
                   return Token_Kind is (TOK_LICENSE);
-
-   type License_Index_Array is array (Positive range <>) of License_Index;
-   type License_Index_Map is array (License_Index range <>) of Boolean;
 
    type Decision_Node;
    type Decision_Node_Access is access constant Decision_Node;
