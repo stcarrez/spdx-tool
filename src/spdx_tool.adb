@@ -165,21 +165,25 @@ package body SPDX_Tool is
          when SPACE | TAB | LF | CR =>
             return 1;
 
-            --  2 byte sequence: 0xA0
+            --  2 byte sequence: 0xA0 (assume space if we reached end of buffer).
          when 16#C2# =>
-            return (if First + 1 <= Last
-                    and then Buffer (First + 1) = 16#A0# then 2 else 0);
+            return (if First = Last then 1
+                    else (if Buffer (First + 1) = 16#A0# then 2 else 0));
 
-            --  3 byte sequenes: 0x2000..0x200A
+            --  3 byte sequenes: 0x2000..0x200A (assume space if we reached end of buffer).
          when 16#E2# =>
-            return (if First + 2 <= Last and then Buffer (First + 1) = 16#80#
-                    and then Buffer (First + 2) >= 16#82#
-                    and then Buffer (First + 2) <= 16#8A# then 3 else 0);
+            return (if First = Last then 1
+                    else (if Buffer (First + 1) /= 16#80# then 0
+                          else (if First + 1 = Last then 2
+                                else (if Buffer (First + 2) >= 16#82#
+                                      and then Buffer (First + 2) <= 16#8A# then 3 else 0))));
 
-            --  3 byte sequences: 0x3000
+            --  3 byte sequences: 0x3000 (assume space if we reached end of buffer).
          when 16#E3# =>
-            return (if First + 2 <= Last and then Buffer (First + 1) = 16#80#
-                    and then Buffer (First + 2) = 16#80# then 3 else 0);
+            return (if First = Last then 1
+                    else (if Buffer (First + 1) /= 16#80# then 0
+                          else (if First + 1 = Last then 2
+                                else (if Buffer (First + 2) = 16#80# then 3 else 0))));
 
          when others =>
             return 0;
@@ -209,22 +213,22 @@ package body SPDX_Tool is
             | Character'Pos ('@') | Character'Pos ('/') | Character'Pos ('\') =>
             return 1;
 
-            --  2 byte sequence: 0xA0
+            --  2 byte sequence: 0xA0 (assume punctuation if we reach end of buffer)
          when 16#C2# =>
-            return (if First + 1 <= Last
-                    and then Buffer (First + 1) = 16#A0# then 2 else 0);
+            return (if First = Last then 1
+                    else (if Buffer (First + 1) = 16#A0# then 2 else 0));
 
             --  3 byte sequenes: 0x2000..0x206F
          when 16#E2# =>
-            return 3;
+            return (if First + 2 <= Last then 3 else Last - First + 1);
 
             --  3 byte sequences: 0x3000..0x303F
          when 16#E3# =>
-            return 3;
+            return (if First + 2 <= Last then 3 else Last - First + 1);
 
             --  3 byte sequences: 0xFF00..0xFFEF
          when 16#EF# =>
-            return 3;
+            return (if First + 2 <= Last then 3 else Last - First + 1);
 
          when others =>
             return 0;
