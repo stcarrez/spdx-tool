@@ -31,6 +31,8 @@ package body SPDX_Tool.Languages.Extensions is
                      File     : in File_Info;
                      Content  : in out File_Type;
                      Result   : in out Detector_Result) is
+      pragma Unreferenced (Content);
+
       Language : constant access constant String := Get_Language_From_Extension (File.Path);
    begin
       Set_Languages (Result, Language, 1.0);

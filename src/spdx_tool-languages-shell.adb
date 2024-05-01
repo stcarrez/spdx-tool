@@ -11,10 +11,6 @@ package body SPDX_Tool.Languages.Shell is
 
    use type Ada.Strings.Maps.Character_Set;
 
-   Spaces : constant Ada.Strings.Maps.Character_Set
-     := Ada.Strings.Maps.To_Set (' ')
-     or Ada.Strings.Maps.To_Set (ASCII.HT);
-
    Spaces_Or_Path : constant Ada.Strings.Maps.Character_Set
      := Ada.Strings.Maps.To_Set (' ')
      or Ada.Strings.Maps.To_Set (ASCII.HT)

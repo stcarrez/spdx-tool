@@ -11,6 +11,7 @@ package body SPDX_Tool.Languages.Mimes is
                      File     : in File_Info;
                      Content  : in out File_Type;
                      Result   : in out Detector_Result) is
+      pragma Unreferenced (Content);
       Mime : constant String := To_String (File.Mime);
    begin
       if Util.Strings.Starts_With (Mime, "text/") then

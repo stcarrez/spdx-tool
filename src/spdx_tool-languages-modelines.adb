@@ -7,7 +7,6 @@ with Ada.Strings.Maps;
 with Ada.Strings.Fixed;
 with Util.Strings.Transforms;
 with SPDX_Tool.Languages.AliasMap;
-with SPDX_Tool.Languages.CommentsMap;
 package body SPDX_Tool.Languages.Modelines is
 
    use type Ada.Strings.Maps.Character_Set;

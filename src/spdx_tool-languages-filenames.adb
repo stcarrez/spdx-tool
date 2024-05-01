@@ -12,6 +12,7 @@ package body SPDX_Tool.Languages.Filenames is
                      File     : in File_Info;
                      Content  : in out File_Type;
                      Result   : in out Detector_Result) is
+      pragma Unreferenced (Content);
       use type Language_Mappers.Match_Result;
 
       Filename : constant String := Ada.Directories.Simple_Name (File.Path);
