@@ -14,7 +14,6 @@ PREFIX=/usr/local
 
 build:
 	alr build $(MAKE_ARGS)
-	cd tools && alr build $(MAKE_ARGS)
 
 build-tests:
 	cd regtests && alr build $(MAKE_ARGS)
@@ -29,9 +28,14 @@ generate:
 	bin/spdx_tool-genmap --mimes $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/mimes.json
 	bin/spdx_tool-genmap --aliases $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/aliases.json
 	bin/spdx_tool-genmap --comments $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/comments.json
+	bin/spdx_tool-gentmpl src/generated/spdx_tool-licenses-templates.ads
 	are --rule=are-package.xml -o src/generated .
 	cd tools && alr build $(MAKE_ARGS)
 	bin/gendecisiontree > src/generated/spdx_tool-licenses-decisions.ads
+
+import-licenses:
+	cd tools && alr build $(MAKE_ARGS)
+	bin/spdx_tool-genlicenses jsonld licenses/standard
 
 test: build-tests
 	bin/spdx_tool-harness -v
