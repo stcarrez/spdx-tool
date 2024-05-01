@@ -8,6 +8,108 @@ with Util.Log.Loggers;
 with Util.Properties;
 package body SPDX_Tool is
 
+   use Interfaces;
+
+   procedure Set_License (Into    : in out License_Index_Map;
+                          License : in License_Index) is
+      Pos : constant License_Bitmap_Index := License_Bitmap_Index (License / 32);
+      Bit : constant Natural := Natural (License mod 32);
+   begin
+      Into (Pos) := Into (Pos) or License_Bitmap (Shift_Left (Unsigned_32 (1), Bit));
+   end Set_License;
+
+   procedure Set_Licenses (Into : in out License_Index_Map;
+                           List : in License_Index_Array) is
+   begin
+      for License of List loop
+         Set_License (Into, License);
+      end loop;
+   end Set_Licenses;
+
+   procedure And_Licenses (Into : in out License_Index_Map;
+                           List : in License_Index_Array) is
+      New_List : License_Index_Map := EMPTY_MAP;
+   begin
+      Set_Licenses (New_List, List);
+      for I in Into'Range loop
+         Into (I) := Into (I) and New_List (I);
+      end loop;
+   end And_Licenses;
+
+   procedure And_Licenses (Into : in out License_Index_Map;
+                           Map  : in License_Index_Map) is
+   begin
+      for I in Into'Range loop
+         Into (I) := Into (I) and Map (I);
+      end loop;
+   end And_Licenses;
+
+   function Get_Count (V : in Interfaces.Unsigned_8) return Natural is
+      Count : Natural := 0;
+      Mask  : Unsigned_8 := 1;
+      Val   : Unsigned_8 := V;
+   begin
+      while Val /= 0 loop
+         if (Val and Mask) /= 0 then
+            Count := Count + 1;
+            Val := Val xor Mask;
+         end if;
+         Mask := Shift_Left (Mask, 1);
+      end loop;
+      return Count;
+   end Get_Count;
+
+   function Is_Set (From    : in License_Index_Map;
+                    License : in License_Index) return Boolean is
+      Pos : constant License_Bitmap_Index := License_Bitmap_Index (License / 32);
+      Bit : constant Natural := Natural (License mod 32);
+   begin
+      return (From (Pos) and License_Bitmap (Shift_Left (Unsigned_32 (1), Bit))) /= 0;
+   end Is_Set;
+
+   function Get_Count (Map : in License_Index_Map) return Natural is
+      Result : Natural := 0;
+   begin
+      for V of Map loop
+         if V /= 0 then
+            Result := Result + Get_Count (Unsigned_8 (V and 16#ff#));
+            Result := Result + Get_Count (Unsigned_8 (Shift_Right (V, 8) and 16#ff#));
+            Result := Result + Get_Count (Unsigned_8 (Shift_Right (V, 16) and 16#ff#));
+            Result := Result + Get_Count (Unsigned_8 (Shift_Right (V, 24) and 16#ff#));
+         end if;
+      end loop;
+      return Result;
+   end Get_Count;
+
+   function To_License_Index_Array (Map : in License_Index_Map) return License_Index_Array is
+      Count  : constant Natural := Get_Count (Map);
+      Result : License_Index_Array (1 .. Count);
+      Pos    : Positive := 1;
+      V      : License_Bitmap;
+   begin
+      for I in Map'Range loop
+         V := Map (I);
+         if V /= 0 then
+            declare
+               Bit_Pos : Natural := 0;
+               Mask    : License_Bitmap := 1;
+            begin
+               loop
+                  if (V and Mask) /= 0 then
+                     Result (Pos) := License_Index (Natural (I) * 32 + Bit_Pos);
+                     Pos := Pos + 1;
+                     V := V xor Mask;
+                     exit when V = 0;
+                  end if;
+                  Mask := License_Bitmap (Shift_Left (Unsigned_32 (Mask), 1));
+                  Bit_Pos := Bit_Pos + 1;
+               end loop;
+            end;
+         end if;
+      end loop;
+      return Result;
+   end To_License_Index_Array;
+
    procedure Configure_Logs (Debug : Boolean; Verbose : Boolean) is
       Log_Config  : Util.Properties.Manager;
    begin

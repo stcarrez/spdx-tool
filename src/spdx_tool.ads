@@ -8,6 +8,7 @@ with Ada.Streams;
 with Ada.Strings.Unbounded;
 with Util.Blobs;
 with Intl;
+with Interfaces;
 package SPDX_Tool is
 
    use Ada.Streams;
@@ -44,10 +45,37 @@ package SPDX_Tool is
 
    type Name_Access is access constant String;
 
-   type License_Index is new Natural;
+   MAX_LICENSE_COUNT : constant := 768;
+
+   type License_Index is new Natural range 0 .. MAX_LICENSE_COUNT - 1;
    type Count_Type is new Natural range 0 .. 65_535;
    for Count_Type'Size use 16;
-   type Token_Index is new Positive;
+   type Token_Index is new Positive range 1 .. 65_535;
+   for Token_Index'Size use 16;
+
+   type License_Index_Array is array (Positive range <>) of License_Index;
+   type License_Index_Array_Access is access constant License_Index_Array;
+
+   type License_Bitmap is new Interfaces.Unsigned_32;
+   type License_Bitmap_Index is new Natural range 0 .. MAX_LICENSE_COUNT / 32;
+   type License_Index_Map is array (License_Bitmap_Index) of License_Bitmap;
+
+   EMPTY_MAP : constant License_Index_Map := (others => 0);
+
+   procedure Set_License (Into    : in out License_Index_Map;
+                          License : in License_Index);
+   procedure Set_Licenses (Into : in out License_Index_Map;
+                           List : in License_Index_Array);
+   procedure And_Licenses (Into : in out License_Index_Map;
+                           List : in License_Index_Array);
+   procedure And_Licenses (Into : in out License_Index_Map;
+                           Map  : in License_Index_Map);
+   function Is_Set (From    : in License_Index_Map;
+                    License : in License_Index) return Boolean;
+   function Is_Empty (Map : in License_Index_Map) return Boolean
+      is (for some V of Map => V /= 0);
+   function Get_Count (Map : in License_Index_Map) return Natural;
+   function To_License_Index_Array (Map : in License_Index_Map) return License_Index_Array;
 
 private
 
