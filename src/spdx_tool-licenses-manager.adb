@@ -264,14 +264,9 @@ package body SPDX_Tool.Licenses.Manager is
       Manager.Executor.Wait;
    end Wait;
 
-   package License_Algorithms is
-      new Util.Algorithms.Arrays (Element_Type => License_Index,
-                                  Index_Type => Positive,
-                                  Array_Type => License_Index_Array,
-                                  Middle => Middle);
-
    function Find_License_Templates (Manager : in License_Manager;
-                                    Line    : in SPDX_Tool.Languages.Line_Type) return License_Index_Map is
+                                    Line    : in SPDX_Tool.Languages.Line_Type)
+                                     return License_Index_Map is
       Result : License_Index_Map := SPDX_Tool.EMPTY_MAP;
       First  : Boolean := True;
    begin
@@ -286,7 +281,7 @@ package body SPDX_Tool.Licenses.Manager is
                R := Algorithms.Find (Licenses.Templates.Index, Item);
                if R.Found then
                   declare
-                     List : License_Index_Array_Access := Templates.Index (R.Position).List;
+                     List : constant License_Index_Array_Access := Templates.Index (R.Position).List;
                   begin
                      Log.Debug ("Token {0}[{1}] has {2} licenses list",
                                 To_String (To_UString (Token)),
