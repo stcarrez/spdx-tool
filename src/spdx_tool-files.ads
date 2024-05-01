@@ -41,6 +41,7 @@ package SPDX_Tool.Files is
       Line_Start : Buffer_Index := 1;
       Line_End   : Buffer_Size := 0;
       Tokens     : SPDX_Tool.Buffer_Sets.Set;
+      Licenses   : License_Index_Map := SPDX_Tool.EMPTY_MAP;
    end record;
    type Line_Array is array (Infos.Line_Number range <>) of Line_Type;
 
