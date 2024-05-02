@@ -42,4 +42,4 @@ windows = { USE_MAGICADA = "no" }
 # [[pins]]
 # printer_toolkitada = { url="git@gitlab.com:stcarrez/printer-toolkit.git" }
 [[pins]]
-sciada = { url="git@gitlab.com:stcarrez/ada-sci.git" }
+sciada = { url="https://gitlab.com/stcarrez/ada-sci.git" }
