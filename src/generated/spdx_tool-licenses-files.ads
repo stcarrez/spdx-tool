@@ -3,7 +3,7 @@
 --  License templates extracted from https://github.com/spdx/license-list-data.git
 package SPDX_Tool.Licenses.Files is
 
-   Names_Count : constant := 653;
+   Names_Count : constant := 652;
    Names : constant Name_Array;
 
    --  Returns the data stream with the given name or null.
@@ -655,17 +655,16 @@ private
    K_639           : aliased constant String := "standard/softSurfer";
    K_640           : aliased constant String := "standard/ssh-keyscan";
    K_641           : aliased constant String := "standard/swrule";
-   K_642           : aliased constant String := "standard/template";
-   K_643           : aliased constant String := "standard/threeparttable";
-   K_644           : aliased constant String := "standard/ulem";
-   K_645           : aliased constant String := "standard/w3m";
-   K_646           : aliased constant String := "standard/wxWindows";
-   K_647           : aliased constant String := "standard/xinetd";
-   K_648           : aliased constant String := "standard/xkeyboard-config-Zinoviev";
-   K_649           : aliased constant String := "standard/xlock";
-   K_650           : aliased constant String := "standard/xpp";
-   K_651           : aliased constant String := "standard/xzoom";
-   K_652           : aliased constant String := "standard/zlib-acknowledgement";
+   K_642           : aliased constant String := "standard/threeparttable";
+   K_643           : aliased constant String := "standard/ulem";
+   K_644           : aliased constant String := "standard/w3m";
+   K_645           : aliased constant String := "standard/wxWindows";
+   K_646           : aliased constant String := "standard/xinetd";
+   K_647           : aliased constant String := "standard/xkeyboard-config-Zinoviev";
+   K_648           : aliased constant String := "standard/xlock";
+   K_649           : aliased constant String := "standard/xpp";
+   K_650           : aliased constant String := "standard/xzoom";
+   K_651           : aliased constant String := "standard/zlib-acknowledgement";
 
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
@@ -830,6 +829,5 @@ private
       K_636'Access, K_637'Access, K_638'Access, K_639'Access,
       K_640'Access, K_641'Access, K_642'Access, K_643'Access,
       K_644'Access, K_645'Access, K_646'Access, K_647'Access,
-      K_648'Access, K_649'Access, K_650'Access, K_651'Access,
-      K_652'Access);
+      K_648'Access, K_649'Access, K_650'Access, K_651'Access);
 end SPDX_Tool.Licenses.Files;
