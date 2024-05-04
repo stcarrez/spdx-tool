@@ -295,6 +295,7 @@
    "dsp" : "Microsoft Developer Studio Project,Faust",
    "dts" : "Device Tree Source",
    "dtsi" : "Device Tree Source",
+   "dtso" : "Device Tree Source",
    "dtx" : "TeX",
    "duby" : "Mirah",
    "dwl" : "DataWeave",
