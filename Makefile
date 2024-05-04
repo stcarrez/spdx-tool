@@ -30,8 +30,8 @@ generate:
 	bin/spdx_tool-genmap --comments $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/comments.json
 	bin/spdx_tool-gentmpl src/generated/spdx_tool-licenses-templates.ads
 	are --rule=are-package.xml -o src/generated .
-	cd tools && alr build $(MAKE_ARGS)
-	bin/gendecisiontree > src/generated/spdx_tool-licenses-decisions.ads
+	# cd tools && alr build $(MAKE_ARGS)
+	# bin/gendecisiontree > src/generated/spdx_tool-licenses-decisions.ads
 
 import-licenses:
 	cd tools && alr build $(MAKE_ARGS)
