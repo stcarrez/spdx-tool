@@ -50,6 +50,9 @@ package SPDX_Tool is
    type License_Index is new Natural range 0 .. MAX_LICENSE_COUNT - 1;
    type Count_Type is new Natural range 0 .. 65_535;
    for Count_Type'Size use 16;
+
+   function Increment (Value : in Count_Type) return Count_Type is (Value + 1);
+
    type Token_Index is new Positive range 1 .. 65_535;
    for Token_Index'Size use 16;
 
