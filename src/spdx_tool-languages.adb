@@ -9,6 +9,7 @@ with Util.Files;
 with Util.Strings.Vectors;
 with Util.Strings.Split;
 
+with SPDX_Tool.Counter_Arrays;
 package body SPDX_Tool.Languages is
 
    Log : constant Util.Log.Loggers.Logger :=
@@ -222,6 +223,7 @@ package body SPDX_Tool.Languages is
    end Find_Comment;
 
    procedure Find_Comments (Analyzer : in Analyzer_Type'Class;
+                            Tokens   : in Token_Map;
                             Buffer   : in Buffer_Type;
                             Lines    : in out Line_Array;
                             Count    : in Infos.Line_Count) is
@@ -261,7 +263,7 @@ package body SPDX_Tool.Languages is
          if Style.Mode /= NO_COMMENT then
             Lines (Line_No).Comment := Style.Mode;
             Lines (Line_No).Style.Last := Pos;
-            Extract_Line_Tokens (Buffer, Lines (Line_No));
+            Extract_Line_Tokens (Tokens, Buffer, Lines (Line_No));
          else
             Lines (Line_No).Comment := NO_COMMENT;
          end if;
@@ -527,7 +529,8 @@ package body SPDX_Tool.Languages is
    --  Extract from the given line in the comment the list of tokens used.
    --  Such list can be used by the license decision tree to find a matching license.
    --  ------------------------------
-   procedure Extract_Line_Tokens (Buffer : in Buffer_Type;
+   procedure Extract_Line_Tokens (Tokens : in Token_Map;
+                                  Buffer : in Buffer_Type;
                                   Line   : in out Line_Type) is
       Last  : constant Buffer_Index := Line.Style.Text_Last;
       Pos   : Buffer_Index := Line.Style.Text_Start;
@@ -538,7 +541,14 @@ package body SPDX_Tool.Languages is
          exit when First > Last;
          Pos := Next_Space (Buffer, First, Last);
          if First <= Pos then
-            Line.Tokens.Include (Buffer (First .. Pos));
+            declare
+               use SPDX_Tool.Token_Counters.Token_Maps;
+               Token_Pos : constant Token_Cursor := Tokens.Find (Buffer (First .. Pos));
+            begin
+               if SPDX_Tool.Token_Counters.Token_Maps.Has_Element (Token_Pos) then
+                  Counter_Arrays.Update (Line.Tokens, 1, Element (Token_Pos), Increment'Access);
+               end if;
+            end;
          end if;
          Pos := Pos + 1;
       end loop;

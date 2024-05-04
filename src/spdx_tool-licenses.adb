@@ -8,39 +8,20 @@ with Ada.Text_IO;
 with Util.Strings;
 with Util.Log.Loggers;
 
-with SCI.Numbers;
-with SCI.Similarities.Indefinite_Ordered_Sets;
-
 with SPDX_Tool.Licenses.Files;
-with SPDX_Tool.Licenses.Decisions;
+--  with SPDX_Tool.Licenses.Decisions;
 package body SPDX_Tool.Licenses is
 
    use all type SPDX_Tool.Files.Comment_Mode;
    use type SPDX_Tool.Infos.License_Kind;
-   subtype Confidence_Type is SPDX_Tool.Infos.Confidence_Type;
-   use type SPDX_Tool.Infos.Confidence_Type;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
-
-   --  ??? Mul and Div seem necessary as "*" and "/" fail to instantiate
-   function Mul (Left, Right : Confidence_Type) return Confidence_Type is (Left * Right);
-   function Div (Left, Right : Confidence_Type) return Confidence_Type is (Left / Right);
-   function From_Float (Value : Float) return Confidence_Type is (Confidence_Type (Value));
-   function From_Integer (Value : Integer) return Confidence_Type is (Confidence_Type (Value));
-
-   package Confidence_Number is
-     new SCI.Numbers.Number (Confidence_Type, "*" => Mul, "/" => Div);
-   package Confidence_Conversion is
-     new SCI.Numbers.Conversion (Confidence_Number);
-   package Token_Similarities is
-      new SCI.Similarities.Indefinite_Ordered_Sets (SPDX_Tool.Buffer_Sets, Confidence_Conversion);
 
    function Extract_SPDX (Lines   : in SPDX_Tool.Languages.Line_Array;
                           Content : in Buffer_Type;
                           Line    : in Infos.Line_Number;
                           From    : in Buffer_Index) return Infos.License_Info;
-   function Get_License_Name (License : in License_Index) return String;
 
    function Get_License_Name (License : in License_Index) return String is
       Name    : constant Name_Access := Files.Names (License);
@@ -59,24 +40,29 @@ package body SPDX_Tool.Licenses is
 
       procedure Load_License (License : in License_Index;
                               Token   : out Token_Access);
+
+   private
+      Licenses : License_Template_Array (0 .. SPDX_Tool.Licenses.Files.Names_Count - 1);
    end License_Tree;
 
    protected body License_Tree is
       function Get_License (License : in License_Index) return Token_Access is
       begin
-         return Decisions.Licenses (License).Root;
+         return Licenses (License).Root;
       end Get_License;
 
       procedure Load_License (License : in License_Index;
                               Token    : out Token_Access) is
          Stamp : Util.Measures.Stamp;
       begin
-         Token := Decisions.Licenses (License).Root;
+         Token := Licenses (License).Root;
          if Token = null then
-            Load_License (License, Decisions.Licenses (License), Token);
+            Load_License (License, Licenses (License), Token);
             if Token /= null then
-               Collect_License_Tokens (Token, Decisions.Licenses (License).Tokens);
-               Decisions.Licenses (License).Root := Token;
+               --  Collect_License_Tokens (Token, Decisions.Licenses (License).Tokens);
+               Licenses (License).Root := Token;
+            else
+               Log.Debug ("No license loaded for {0}", SPDX_Tool.Licenses.Files.Names (License).all);
             end if;
          end if;
          Report (Stamp, "Load template license");
@@ -817,6 +803,7 @@ package body SPDX_Tool.Licenses is
                      Log.Info ("License template missmatch found at line{0} after {1} lines",
                                Pos.Line'Image, Util.Strings.Image (Natural (Pos.Line - From)));
                   end if;
+                  Result.Info.Last_Line := Pos.Line;
                   Result.Last := Current;
                   return Result;
                end if;
@@ -880,28 +867,6 @@ package body SPDX_Tool.Licenses is
       return Result;
    end Find_SPDX_License;
 
-   --  ------------------------------
-   --  Find a license from the license decision tree.
-   --  ------------------------------
-   function Find_Builtin_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
-                          return Decision_Array_Access is
-      Node   : Decision_Node_Access := SPDX_Tool.Licenses.Decisions.Root;
-      Result : Decision_Array_Access (1 .. 20);
-      Depth  : Natural := 0;
-   begin
-      while Node /= null loop
-         Depth := Depth + 1;
-         Result (Depth) := Node;
-         exit when Node.Length = 0;
-         if Tokens.Contains (Node.Token) then
-            Node := Node.Left;
-         else
-            Node := Node.Right;
-         end if;
-      end loop;
-      return Result (1 .. Depth);
-   end Find_Builtin_License;
-
    function Find_License (License : in License_Index;
                           File    : in SPDX_Tool.Files.File_Type;
                           From    : in Line_Number;
@@ -943,55 +908,6 @@ package body SPDX_Tool.Licenses is
          return Result;
       end;
    end Find_License;
-
-   MIN_CONFIDENCE : constant := 700 * Confidence_Type'Small;
-
-   function Guess_License (Nodes   : in Decision_Array_Access;
-                           Tokens  : in SPDX_Tool.Buffer_Sets.Set) return License_Match is
-      Map   : License_Index_Map := EMPTY_MAP;
-      Guess : License_Index := 0;
-      Confidence : Confidence_Type := 0.0;
-      C : Confidence_Type;
-      Result  : License_Match := (Last => null, Depth => 0, others => <>);
-      Stamp   : Util.Measures.Stamp;
-   begin
-      for Node of reverse Nodes loop
-         for License of Node.Licenses loop
-            if not Is_Set (Map, License) then
-               declare
-                  Token : Token_Access;
-               begin
-                  Token := License_Tree.Get_License (License);
-                  if Token = null then
-                     License_Tree.Load_License (License, Token);
-                  end if;
-               end;
-               C := Token_Similarities.Tversky (Decisions.Licenses (License).Tokens,
-                                                Tokens,
-                                                0.75, 0.25);
-               if C >= Confidence then
-                  Log.Debug ("Confidence with {0}: {1} *",
-                         SPDX_Tool.Licenses.Files.Names (License).all,
-                         C'Image);
-                  Guess := License;
-                  Confidence := C;
-               else
-                  Log.Debug ("Confidence with {0}: {1}",
-                            SPDX_Tool.Licenses.Files.Names (License).all,
-                            C'Image);
-               end if;
-               Set_License (Map, License);
-            end if;
-         end loop;
-      end loop;
-      if Confidence >= MIN_CONFIDENCE then
-         Result.Info.Match := Infos.GUESSED_LICENSE;
-         Result.Info.Confidence := Confidence;
-         Result.Info.Name := To_UString (Get_License_Name (Guess));
-         SPDX_Tool.Licenses.Report (Stamp, "Guess license");
-      end if;
-      return Result;
-   end Guess_License;
 
    protected body  License_Stats is
 

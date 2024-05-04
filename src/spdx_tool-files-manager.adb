@@ -12,8 +12,6 @@ package body SPDX_Tool.Files.Manager is
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Files");
 
-   use type SPDX_Tool.Languages.Analyzer_Access;
-
    --  ------------------------------
    --  Identify the language used by the given file.
    --  ------------------------------
@@ -59,17 +57,6 @@ package body SPDX_Tool.Files.Manager is
          SPDX_Tool.Languages.Find_Lines (Buf.Data (Buf.Data'First .. Len), Data.Lines, Data.Count);
          Manager.Find_Mime_Type (File, Buf.Data (Buf.Data'First .. Len));
          Languages.Find_Language (File, Data, Analyzer);
-         if Analyzer /= null then
-            Analyzer.all.Find_Comments (Buf.Data (Buf.Data'First .. Len), Data.Lines, Data.Count);
-            for Line of Data.Lines (1 .. Data.Count) loop
-               if Line.Style.Mode /= NO_COMMENT then
-                  Data.Cmt_Style := Line.Style.Mode;
-                  exit;
-               end if;
-            end loop;
-         else
-            Data.Cmt_Style := NO_COMMENT;
-         end if;
          SPDX_Tool.Languages.Boxed_License (Data.Lines (Data.Lines'First .. Data.Count),
                                             Buf.Data, Data.Boxed);
       end;

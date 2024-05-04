@@ -8,6 +8,7 @@ with Util.Log.Loggers;
 with Util.Strings.Vectors;
 with Util.Strings.Split;
 with SPDX_Tool.Languages.CommentsMap;
+with SPDX_Tool.Licenses.Templates;
 package body SPDX_Tool.Languages.Manager is
 
    Log : constant Util.Log.Loggers.Logger :=
@@ -20,6 +21,8 @@ package body SPDX_Tool.Languages.Manager is
                             File     : in out SPDX_Tool.Infos.File_Info;
                             Content  : in out File_Type;
                             Analyzer : out Analyzer_Access) is
+      Buf    : constant Buffer_Accessor := Content.Buffer.Value;
+      Len    : constant Buffer_Size := Content.Last_Offset;
       Result : Detector_Result;
    begin
       Manager.Filename_Detect.Detect (File, Content, Result);
@@ -52,6 +55,18 @@ package body SPDX_Tool.Languages.Manager is
          else
             Analyzer := null;
             Log.Info ("{0}: language {1} without analyzer", File.Path, Language);
+         end if;
+         if Analyzer /= null then
+            Analyzer.all.Find_Comments (Manager.Tokens, Buf.Data (Buf.Data'First .. Len),
+                                        Content.Lines, Content.Count);
+            for Line of Content.Lines (1 .. Content.Count) loop
+               if Line.Style.Mode /= NO_COMMENT then
+                  Content.Cmt_Style := Line.Style.Mode;
+                  exit;
+               end if;
+            end loop;
+         else
+            Content.Cmt_Style := NO_COMMENT;
          end if;
       end;
    end Find_Language;
@@ -189,8 +204,22 @@ package body SPDX_Tool.Languages.Manager is
          Lang.Analyzer := Result.all'Access;
       end Setup_Language;
 
+      procedure Initialize_Tokens is
+         use type Licenses.Position;
+         First : Buffer_Index := 1;
+         Last  : Buffer_Index;
+      begin
+         for I in Licenses.Templates.Token_Pos'Range loop
+            Last := First + Buffer_Size (Licenses.Templates.Token_Pos (I) - 1);
+            Manager.Tokens.Insert (Licenses.Templates.Tokens (First .. Last),
+                                   SPDX_Tool.Token_Index (I));
+            First := Last + 1;
+         end loop;
+      end Initialize_Tokens;
+
       Basic_Analyzer_Count : Natural := 0;
    begin
+      Initialize_Tokens;
       Add_Builtin ("dash-style", "--");
       Add_Builtin ("C-line", "//");
       Add_Builtin ("Shell", "#");

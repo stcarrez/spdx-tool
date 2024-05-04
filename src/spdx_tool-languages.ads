@@ -9,6 +9,7 @@ with Util.Files.Filters;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
 with SPDX_Tool.Files;
+with SPDX_Tool.Token_Counters;
 private with Ada.Strings.Hash;
 private with Ada.Containers.Indefinite_Hashed_Maps;
 package SPDX_Tool.Languages is
@@ -25,6 +26,8 @@ package SPDX_Tool.Languages is
    subtype Line_Array is Files.Line_Array;
    subtype Line_Type is Files.Line_Type;
    subtype File_Type is Files.File_Type;
+   subtype Token_Map is SPDX_Tool.Token_Counters.Token_Maps.Map;
+   subtype Token_Cursor is SPDX_Tool.Token_Counters.Token_Maps.Cursor;
 
    type Analyzer_Type is limited interface;
    type Analyzer_Access is access all Analyzer_Type'Class;
@@ -108,13 +111,15 @@ package SPDX_Tool.Languages is
 
    --  Extract from the given line in the comment the list of tokens used.
    --  Such list can be used by the license decision tree to find a matching license.
-   procedure Extract_Line_Tokens (Buffer : in Buffer_Type;
+   procedure Extract_Line_Tokens (Tokens : in Token_Map;
+                                  Buffer : in Buffer_Type;
                                   Line   : in out Line_Type)
      with Pre => Line.Comment /= Files.NO_COMMENT
        and then Line.Style.Text_Start >= Buffer'First
        and then Line.Style.Text_Last <= Buffer'Last;
 
    procedure Find_Comments (Analyzer : in Analyzer_Type'Class;
+                            Tokens   : in Token_Map;
                             Buffer   : in Buffer_Type;
                             Lines    : in out Line_Array;
                             Count    : in Infos.Line_Count);

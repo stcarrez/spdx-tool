@@ -16,6 +16,7 @@ with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Languages;
+with SPDX_Tool.Counter_Arrays;
 private with Util.Measures;
 package SPDX_Tool.Licenses is
 
@@ -56,16 +57,13 @@ package SPDX_Tool.Licenses is
    type License_Template is record
       Root   : Token_Access;
       Name   : UString;
-      Tokens : SPDX_Tool.Buffer_Sets.Set;
+      --  Tokens : SPDX_Tool.Buffer_Sets.Set;
    end record;
 
    type Name_Array is array (License_Index range <>) of Name_Access;
 
-   type Token_Count_Type is record
-      Index : Token_Index;
-      Count : Count_Type;
-   end record;
-   type Token_Array is array (Positive range <>) of Token_Count_Type;
+   subtype Token_Count_Type is SPDX_Tool.Counter_Arrays.Cell_Type;
+   subtype Token_Array is SPDX_Tool.Counter_Arrays.Cell_Array_Type;
    type Token_Array_Access is access constant Token_Array;
    type Position is new Natural range 0 .. 255;
    for Position'Size use 8;
@@ -120,6 +118,8 @@ package SPDX_Tool.Licenses is
    procedure Performance_Report;
 
 private
+
+   function Get_License_Name (License : in License_Index) return String;
 
    procedure Load_License (Name    : in String;
                            Content : in Buffer_Type;
@@ -300,10 +300,6 @@ private
    end record;
    type Decision_Array_Access is array (Positive range <>) of Decision_Node_Access;
 
-   --  Find a license from the license decision tree.
-   function Find_Builtin_License (Tokens : in SPDX_Tool.Buffer_Sets.Set)
-                          return Decision_Array_Access;
-
    --  Find in the header comment an SPDX license tag.
    function Find_SPDX_License (Content : in Buffer_Type;
                                Lines   : in SPDX_Tool.Languages.Line_Array;
@@ -324,9 +320,6 @@ private
                           From    : in Line_Number;
                           To      : in Line_Number)
                           return License_Match;
-
-   function Guess_License (Nodes   : in Decision_Array_Access;
-                           Tokens  : in SPDX_Tool.Buffer_Sets.Set) return License_Match;
 
    procedure Report (Stamp : in out Util.Measures.Stamp;
                      Title : in String;

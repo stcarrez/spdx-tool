@@ -8,6 +8,7 @@ with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
 private with Ada.Strings.Hash;
 private with Ada.Containers.Indefinite_Hashed_Maps;
+private with SPDX_Tool.Token_Counters;
 private with SPDX_Tool.Languages.Extensions;
 private with SPDX_Tool.Languages.Mimes;
 private with SPDX_Tool.Languages.Shell;
@@ -40,6 +41,7 @@ private
 
    type Language_Manager is tagged limited record
       Languages        : Language_Maps.Map;
+      Tokens           : SPDX_Tool.Token_Counters.Token_Maps.Map;
       Default          : Combined_Analyzer_Access;
       Mime_Detect      : Mimes.Mime_Detector_Type;
       Extension_Detect : Extensions.Extension_Detector_Type;
