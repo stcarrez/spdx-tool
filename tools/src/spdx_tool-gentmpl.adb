@@ -82,6 +82,9 @@ procedure SPDX_Tool.Gentmpl is
       if Word in "2008" | "2009" | "2011" then
          return True;
       end if;
+      if Word in "beginOptional" then
+         return True;
+      end if;
       return False;
    end Is_Ignored;
 
@@ -371,7 +374,7 @@ begin
    Writer.Write ("--  Inverted index is sorted on the indexed token" & ASCII.LF);
    Writer.Write ("--  Tokens in the buffer are sorted" & ASCII.LF);
    Writer.Write ("--  All this content is stored in .rodata section" & ASCII.LF);
-   Writer.Write ("private package SPDX_Tool.Licenses.Templates is" & ASCII.LF);
+   Writer.Write ("package SPDX_Tool.Licenses.Templates is" & ASCII.LF);
    Writer.Write ("   List      : constant License_Array;" & ASCII.LF);
    Writer.Write ("   Index     : constant Token_Index_Array;" & ASCII.LF);
    Writer.Write ("   Tokens    : constant Buffer_Type;" & ASCII.LF);
