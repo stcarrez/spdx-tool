@@ -816,10 +816,6 @@ package body SPDX_Tool.Licenses is
                          (To, Pos.Pos), Pos, Next_Token);
                end if;
                if Next_Token = null then
-                  if Current /= null then
-                     Log.Info ("License template missmatch found at line{0} after {1} lines",
-                               Pos.Line'Image, Util.Strings.Image (Natural (Pos.Line - From)));
-                  end if;
                   Result.Info.Last_Line := Pos.Line;
                   Result.Last := Current;
                   return Result;
@@ -892,7 +888,7 @@ package body SPDX_Tool.Licenses is
       Token : Token_Access;
       Stamp : Util.Measures.Stamp;
    begin
-      Log.Info ("Checking with license template '{0}'", Licenses.Files.Names (License).all);
+      Log.Debug ("Checking with license template '{0}'", Licenses.Files.Names (License).all);
       Token := License_Tree.Get_License (License);
       if Token = null then
          License_Tree.Load_License (License, Token);
@@ -910,6 +906,13 @@ package body SPDX_Tool.Licenses is
                if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                   return Match;
                end if;
+               if Match.Last /= null and then Match.Info.First_Line + 1 < Match.Info.Last_Line then
+                  Log.Info ("License '{0}' missmatch at line{1} after {2} lines",
+                            Licenses.Files.Names (License).all,
+                            Match.Info.Last_Line'Image,
+                            Util.Strings.Image (Natural (Match.Info.Last_Line - Match.Info.First_Line)));
+               end if;
+               exit when Match.Info.First_Line + 1 < Match.Info.Last_Line;
                if Match.Last /= null then
                   Match.Depth := Match.Last.Depth;
                   if Result.Last = null or else Match.Depth > Result.Depth then

@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------
 with SCI.Sparse.COO_Arrays;
 package SPDX_Tool.Counter_Arrays is
-  new SCI.Sparse.COO_Arrays (Row_Type    => License_Index,
-                             Column_Type => Token_Index,
-                             Value_Type  => Count_Type);
+  new SCI.Sparse.COO_Arrays (Row_Type      => License_Index,
+                             Column_Type   => Token_Index,
+                             Value_Type    => Count_Type,
+                             Default_Value => 0);
