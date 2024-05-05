@@ -9,6 +9,7 @@ with Util.Properties;
 package body SPDX_Tool is
 
    use Interfaces;
+   function Get_Count (V : in Interfaces.Unsigned_8) return Natural;
 
    procedure Set_License (Into    : in out License_Index_Map;
                           License : in License_Index) is
@@ -347,7 +348,9 @@ package body SPDX_Tool is
       return 0;
    end Index_Any_Of;
 
+   --  ------------------------------
    --  Find the end of line.
+   --  ------------------------------
    function Find_Eol (Buffer : in Buffer_Type;
                       From : in Buffer_Index) return Buffer_Index is
       Pos : Buffer_Index := From;
@@ -357,6 +360,20 @@ package body SPDX_Tool is
       end loop;
       return Pos;
    end Find_Eol;
+
+   --  ------------------------------
+   --  Find the next '"' after the `From` position.
+   --  ------------------------------
+   function Find_String_End (Content : in Buffer_Type;
+                             From    : in Buffer_Index;
+                             Last    : in Buffer_Index) return Buffer_Index is
+      Pos : Buffer_Index := From;
+   begin
+      while Pos < Last and then Content (Pos) /= Character'Pos ('"') loop
+         Pos := Pos + 1;
+      end loop;
+      return Pos;
+   end Find_String_End;
 
    --  ------------------------------
    --  Guess the printable length of the content assuming UTF-8 sequence.

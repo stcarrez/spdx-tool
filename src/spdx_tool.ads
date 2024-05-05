@@ -191,6 +191,12 @@ private
       (Buffer : in Buffer_Type; From : in Buffer_Index) return Buffer_Index with
       Pre => From >= Buffer'First and then From <= Buffer'Last;
 
+   --  Find the next '"' after the `From` position.
+   function Find_String_End (Content : in Buffer_Type;
+                             From    : in Buffer_Index;
+                             Last    : in Buffer_Index) return Buffer_Index with
+      Pre => From >= Content'First and then From <= Content'Last;
+
    --  Guess the printable length of the content assuming UTF-8 sequence.
    function Printable_Length
       (Buffer : in Buffer_Type; From : in Buffer_Index; Last : in Buffer_Index)
