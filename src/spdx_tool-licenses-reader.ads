@@ -23,4 +23,26 @@ package SPDX_Tool.Licenses.Reader is
    function Get_Name (License : License_Type) return String;
    function Get_Template (License : License_Type) return String;
 
+   type Parser_Type is abstract tagged limited record
+      Current_Pos : Buffer_Index;
+      Token_Pos   : Buffer_Index;
+      Name_Pos    : Buffer_Index;
+      Name_End    : Buffer_Index;
+      Orig_Pos    : Buffer_Index;
+      Orig_End    : Buffer_Index;
+      Match_Pos   : Buffer_Index;
+      Match_End   : Buffer_Index;
+   end record;
+
+   --  Parse the license text template that was extracted from the JSONLD file.
+   --  The Parser instance is updated to indicate position of tokens found
+   --  and the `Token` method is called for each token found as parsing progresses.
+   procedure Parse (Parser  : in out Parser_Type'Class;
+                    Content : in Buffer_Type);
+
+   --  Called by `Parse` when a token is found.
+   procedure Token (Parser  : in out Parser_Type;
+                    Content : in Buffer_Type;
+                    Token   : in Token_Kind) is abstract;
+
 end SPDX_Tool.Licenses.Reader;

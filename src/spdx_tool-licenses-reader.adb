@@ -102,4 +102,134 @@ package body SPDX_Tool.Licenses.Reader is
       Util.Files.Write_File (Path, Content);
    end Save_License;
 
+   --  ------------------------------
+   --  Parse the license text template that was extracted from the JSONLD file.
+   --  The Parser instance is updated to indicate position of tokens found
+   --  and the `Token` method is called for each token found as parsing progresses.
+   --  ------------------------------
+   procedure Parse (Parser  : in out Parser_Type'Class;
+                    Content : in Buffer_Type) is
+      procedure Parse_Var;
+
+      TAG_BEGIN_OPTIONAL : constant String := "<<beginOptional>>";
+      TAG_END_OPTIONAL   : constant String := "<<endOptional>>";
+      TAG_VAR            : constant String := "<<var";
+
+      Last     : constant Buffer_Index := Content'Last;
+      Pos      : Buffer_Index := Content'First;
+
+      --  ------------------------------
+      --  Parse and extract information from <<var tags>>.
+      --  We only keep the regular expression defined by the match="" attribute.
+      --  ------------------------------
+      procedure Parse_Var is
+         Match : Buffer_Index;
+      begin
+         Match := Next_With (Content, Pos, ";name=""");
+         if Match > Pos then
+            Parser.Name_Pos := Match;
+            Parser.Name_End := Find_String_End (Content, Match, Last);
+            Pos := Parser.Name_End + 1;
+            if Pos > Last then
+               return;
+            end if;
+         end if;
+         Match := Next_With (Content, Pos, ";original=""");
+         if Match > Pos then
+            Parser.Orig_Pos := Match;
+            Parser.Orig_End := Find_String_End (Content, Match, Last);
+            Pos := Parser.Orig_End + 1;
+            if Pos > Last then
+               return;
+            end if;
+         end if;
+         Match := Next_With (Content, Pos, ";match=""");
+         if Match > Pos then
+            Parser.Match_Pos := Match;
+            Parser.Match_End := Find_String_End (Content, Match, Last);
+            Pos := Parser.Match_End + 1;
+            if Pos > Last then
+               return;
+            end if;
+         end if;
+         while Pos < Last loop
+            Match := Next_With (Content, Pos, ">>");
+            if Match > Pos then
+               Pos := Match;
+               return;
+            end if;
+            Pos := Pos + 1;
+         end loop;
+      end Parse_Var;
+
+      First    : Buffer_Index;
+      Match    : Buffer_Index;
+      Token    : Token_Kind;
+      Len      : Buffer_Size;
+   begin
+      --  <<beginOptional>>
+      --  <<endOptional>>
+      --  <<var;name="...";original="...";match=".+">>
+      while Pos <= Last loop
+         --  Ignore white spaces between tokens.
+         loop
+            Len := Space_Length (Content, Pos, Last);
+            exit when Len = 0;
+            Pos := Pos + Len;
+            if Pos > Last then
+               Parser.Token (Content, TOK_END);
+               return;
+            end if;
+         end loop;
+
+         Token := TOK_WORD;
+         Parser.Token_Pos := Pos;
+         First := Pos;
+         while Pos <= Last loop
+            if Content (Pos) = Character'Pos ('<') then
+               Match := Next_With (Content, Pos, TAG_BEGIN_OPTIONAL);
+               if Match > Pos then
+                  exit when Pos /= First;
+                  Pos := Match;
+                  Token := TOK_OPTIONAL;
+                  exit;
+               end if;
+               Match := Next_With (Content, Pos, TAG_END_OPTIONAL);
+               if Match > Pos then
+                  exit when Pos /= First;
+                  Pos := Match;
+                  Token := TOK_END_OPTIONAL;
+                  exit;
+               end if;
+               Match := Next_With (Content, Pos, TAG_VAR);
+               if Match > Pos then
+                  exit when Pos /= First;
+                  Pos := Match;
+                  Token := TOK_VAR;
+                  Parse_Var;
+                  exit;
+               end if;
+            elsif Pos = First then
+               exit when Space_Length (Content, Pos, Last) /= 0;
+               Len := Punctuation_Length (Content, Pos, Last);
+               if Len > 0 then
+                  Pos := Pos + Len;
+                  exit;
+               end if;
+            else
+               exit when Punctuation_Length (Content, Pos, Last) /= 0;
+               exit when Space_Length (Content, Pos, Last) /= 0;
+            end if;
+            Pos := Pos + 1;
+         end loop;
+         if Pos > Last then
+            Parser.Current_Pos := Last;
+         else
+            Parser.Current_Pos := Pos;
+         end if;
+         Parser.Token (Content, Token);
+      end loop;
+      Parser.Token (Content, TOK_END);
+   end Parse;
+
 end SPDX_Tool.Licenses.Reader;
