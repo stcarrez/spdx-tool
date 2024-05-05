@@ -125,6 +125,9 @@ package SPDX_Tool.Licenses is
                        TOK_END_OPTIONAL,
                        TOK_END);
 
+   --  Get a printable representation of a list of licenses.
+   function To_String (List : in License_Index_Array) return String;
+
 private
 
    function Get_License_Name (License : in License_Index) return String;

@@ -33,6 +33,24 @@ package body SPDX_Tool.Licenses is
       end if;
    end Get_License_Name;
 
+   --  ------------------------------
+   --  Get a printable representation of a list of licenses.
+   --  ------------------------------
+   function To_String (List : in License_Index_Array) return String is
+      Result : UString;
+      Empty  : Boolean := True;
+   begin
+      for License of List loop
+         if not Empty then
+            Ada.Strings.Unbounded.Append (Result, ", ");
+         else
+            Empty := False;
+         end if;
+         Ada.Strings.Unbounded.Append (Result, Get_License_Name (License));
+      end loop;
+      return To_String (Result);
+   end To_String;
+
    --  Protect concurrent loading of license templates.
    protected License_Tree is
       function Get_License (License : in License_Index) return Token_Access;

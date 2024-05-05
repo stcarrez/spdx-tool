@@ -290,7 +290,7 @@ package body SPDX_Tool.Licenses.Manager is
                declare
                   List : constant License_Index_Array_Access := Templates.Index (R.Position).List;
                begin
-                  Log.Debug ("Token [{1}] has {2} licenses list",
+                  Log.Debug ("Token {0} used by {1} licenses list",
                              Util.Strings.Image (Natural (Item.Token)),
                              Util.Strings.Image (Natural (List'Length)));
                   if First then
@@ -317,6 +317,12 @@ package body SPDX_Tool.Licenses.Manager is
       for Line in From .. To loop
          Lines (Line).Licenses := Manager.Find_License_Templates (Lines (Line));
       end loop;
+      if Util.Log.Loggers.Get_Level (Log) >= Util.Log.DEBUG_LEVEL then
+         for Line in From .. To loop
+            Log.Debug ("Line {0}: {1}", Util.Strings.Image (Natural (Line)),
+                       To_String (To_License_Index_Array (Lines (Line).Licenses)));
+         end loop;
+      end if;
    end Find_License_Templates;
 
    function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
