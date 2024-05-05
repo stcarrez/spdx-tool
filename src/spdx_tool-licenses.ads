@@ -117,6 +117,14 @@ package SPDX_Tool.Licenses is
 
    procedure Performance_Report;
 
+   type Token_Kind is (TOK_WORD,
+                       TOK_COPYRIGHT,
+                       TOK_OPTIONAL,
+                       TOK_VAR,
+                       TOK_LICENSE,
+                       TOK_END_OPTIONAL,
+                       TOK_END);
+
 private
 
    function Get_License_Name (License : in License_Index) return String;
@@ -191,12 +199,6 @@ private
    --  - spaces are ignored,
    --  - punctuation must match,
    --  - Copyright, (c) and "©" are considered identical,
-
-   type Token_Kind is (TOK_WORD,
-                       TOK_COPYRIGHT,
-                       TOK_OPTIONAL,
-                       TOK_VAR,
-                       TOK_LICENSE);
 
    type Token_Type (Len : Buffer_Size) is tagged limited record
       Next      : Token_Access;

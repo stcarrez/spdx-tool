@@ -423,7 +423,7 @@ package body SPDX_Tool.Licenses is
             when TOK_COPYRIGHT =>
                Parse_Copyright;
 
-            when TOK_LICENSE =>
+            when TOK_LICENSE | TOK_END_OPTIONAL | TOK_END =>
                exit;
 
          end case;
