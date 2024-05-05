@@ -14,10 +14,12 @@ with SPDX_Tool.Counter_Arrays;
 with SPDX_Tool.Licenses;
 with SPDX_Tool.Token_Counters;
 with SPDX_Tool.Licenses.Files;
+with SPDX_Tool.Licenses.Reader;
 procedure SPDX_Tool.Gentmpl is
 
    use Ada.Streams;
    use type Ada.Containers.Count_Type;
+   use all type SPDX_Tool.Licenses.Token_Kind;
 
    procedure Print_Token_Data;
    procedure Print_Token_Array (I : in License_Index);
@@ -52,6 +54,13 @@ procedure SPDX_Tool.Gentmpl is
    Output   : aliased Util.Streams.Files.File_Stream;
    Writer   : aliased Util.Streams.Texts.Print_Stream;
 
+   type Parser_Type is new SPDX_Tool.Licenses.Reader.Parser_Type with null record;
+
+   overriding
+   procedure Token (Parser  : in out Parser_Type;
+                    Content : in Buffer_Type;
+                    Token   : in SPDX_Tool.Licenses.Token_Kind);
+
    function Increment (Value : in Count_Type) return Count_Type is
    begin
       return Value + 1;
@@ -82,9 +91,6 @@ procedure SPDX_Tool.Gentmpl is
       if Word in "2008" | "2009" | "2011" then
          return True;
       end if;
-      if Word in "beginOptional" then
-         return True;
-      end if;
       return False;
    end Is_Ignored;
 
@@ -93,48 +99,58 @@ procedure SPDX_Tool.Gentmpl is
                         Buf  : in Buffer_Type;
                         From : in Buffer_Index;
                         To   : in Buffer_Index) is
-      First : Buffer_Index := From;
-      Last  : Buffer_Index := To;
+      Len   : constant Buffer_Size := Punctuation_Length (Buf, From, To);
+      First : constant Buffer_Index := (if Len > 0 then From + Len else From);
    begin
-      while First <= Last and then Is_Punctuation (Buf (First)) loop
-         First := First + 1;
-      end loop;
-      while First <= Last and then Is_Punctuation (Buf (Last)) loop
-         Last := Last - 1;
-      end loop;
-      if First <= Last and then not Is_Ignored (Buf (First .. Last)) then
+      if First <= To and then not Is_Ignored (Buf (First .. To)) then
          SPDX_Tool.Token_Counters.Add_Token (Into, Idx,
-                                             Buf (First .. Last),
+                                             Buf (First .. To),
                                              Increment'Access);
       end if;
    end Add_Token;
 
-   procedure Load_License (Name : in String) is
-      Buf   : constant access constant Buffer_Type := Licenses.Files.Get_Content (Name);
-      Last  : constant Buffer_Index := Buf'Last;
-      Pos   : Buffer_Index := 1;
-      First : Buffer_Index;
-      Len   : Buffer_Size;
+   overriding
+   procedure Token (Parser  : in out Parser_Type;
+                    Content : in Buffer_Type;
+                    Token   : in SPDX_Tool.Licenses.Token_Kind) is
    begin
-      loop
-         loop
-            if Pos > Last then
-               return;
-            end if;
-            Len := SPDX_Tool.Punctuation_Length (Buf.all, Pos, Last);
-            if Len = 0 then
-               Len := Space_Length (Buf.all, Pos, Last);
-               exit when Len = 0;
-            end if;
-            Pos := Pos + Len;
-         end loop;
-         First := Pos;
-         Pos := SPDX_Tool.Next_Space (Buf.all, First, Last);
-         if First <= Pos then
-            Add_Token (Info, Idx, Buf.all, First, Pos);
-         end if;
-         Pos := Pos + 1;
-      end loop;
+      if Token = TOK_VAR then
+         declare
+            Last  : constant Buffer_Index := Parser.Orig_End;
+            Pos   : Buffer_Index := Parser.Orig_Pos;
+            Len   : Buffer_Size;
+            First : Buffer_Index;
+         begin
+            while Pos < Last loop
+               loop
+                  if Pos > Last then
+                     return;
+                  end if;
+                  Len := SPDX_Tool.Punctuation_Length (Content, Pos, Last);
+                  if Len = 0 then
+                     Len := Space_Length (Content, Pos, Last);
+                     exit when Len = 0;
+                  end if;
+                  Pos := Pos + Len;
+               end loop;
+               First := Pos;
+               Pos := SPDX_Tool.Next_Space (Content, First, Last);
+               if First <= Pos then
+                  Add_Token (Info, Idx, Content, First, Pos);
+               end if;
+               Pos := Pos + 1;
+            end loop;
+         end;
+      elsif Token = TOK_WORD and then Parser.Token_Pos < Parser.Current_Pos - 1 then
+         Add_Token (Info, Idx, Content, Parser.Token_Pos, Parser.Current_Pos - 1);
+      end if;
+   end Token;
+
+   procedure Load_License (Name : in String) is
+      Buf    : constant access constant Buffer_Type := Licenses.Files.Get_Content (Name);
+      Parser : Parser_Type;
+   begin
+      Parser.Parse (Buf.all);
    end Load_License;
 
    procedure Build_Index_For_License (I : in License_Index) is
