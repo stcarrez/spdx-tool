@@ -12,7 +12,6 @@ with Util.Streams.Files;
 
 with SCI.Similarities.COO_Arrays;
 with SPDX_Tool.Licenses.Files;
-with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Licenses.Reader;
 with SPDX_Tool.Configs.Default;
 with SPDX_Tool.Licenses.Templates;
@@ -275,6 +274,8 @@ package body SPDX_Tool.Licenses.Manager is
    function Find_License_Templates (Manager : in License_Manager;
                                     Line    : in SPDX_Tool.Languages.Line_Type)
                                      return License_Index_Map is
+      pragma Unreferenced (Manager);
+
       Result : License_Index_Map := SPDX_Tool.EMPTY_MAP;
       First  : Boolean := True;
    begin
@@ -383,7 +384,12 @@ package body SPDX_Tool.Licenses.Manager is
    begin
       if not Freqs.Cells.Is_Empty then
          for License in SPDX_Tool.Licenses.Files.Names'Range loop
-            C := Cosine (Freqs, 1, Manager.Token_Frequency, License);
+            declare
+               Cosine_Stamp   : Util.Measures.Stamp;
+            begin
+               C := Cosine (Freqs, 1, Manager.Token_Frequency, License);
+               SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
+            end;
             Log.Debug ("Confidence with {0} -> {1}",
                        Get_License_Name (License), C'Image);
             if Confidence < C then
@@ -417,7 +423,6 @@ package body SPDX_Tool.Licenses.Manager is
       Buf     : constant Buffer_Accessor := File.Buffer.Value;
       Result  : License_Match := (Last => null, Depth => 0, others => <>);
       Match   : License_Match;
-      Tokens  : SPDX_Tool.Buffer_Sets.Set;
       Stamp   : Util.Measures.Stamp;
       First_Line : Line_Number;
       Last_Line  : Line_Number;
@@ -431,7 +436,6 @@ package body SPDX_Tool.Licenses.Manager is
       if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          return Match;
       end if;
-      SPDX_Tool.Files.Extract_Tokens (File, First_Line, Last_Line, Tokens);
       if not Opt_No_Builtin then
          Manager.Find_License_Templates (File.Lines, First_Line, Last_Line);
          for Line in First_Line .. Last_Line loop

@@ -9,7 +9,6 @@ with Util.Strings;
 with Util.Log.Loggers;
 
 with SPDX_Tool.Licenses.Files;
---  with SPDX_Tool.Licenses.Decisions;
 package body SPDX_Tool.Licenses is
 
    use all type SPDX_Tool.Files.Comment_Mode;
@@ -59,10 +58,10 @@ package body SPDX_Tool.Licenses is
          if Token = null then
             Load_License (License, Licenses (License), Token);
             if Token /= null then
-               --  Collect_License_Tokens (Token, Decisions.Licenses (License).Tokens);
                Licenses (License).Root := Token;
             else
-               Log.Debug ("No license loaded for {0}", SPDX_Tool.Licenses.Files.Names (License).all);
+               Log.Debug ("No license loaded for {0}",
+                          SPDX_Tool.Licenses.Files.Names (License).all);
             end if;
          end if;
          Report (Stamp, "Load template license");

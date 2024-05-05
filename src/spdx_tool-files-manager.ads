@@ -33,16 +33,6 @@ package SPDX_Tool.Files.Manager is
                    Last    : in Line_Number;
                    License : in String);
 
-   --  Extract from the header the list of tokens used.  Such list
-   --  can be used by the license decision tree to find a matching license.
-   --  We could extract more tokens such as tokens which are not really part
-   --  of the license header but this is not important as the decision tree
-   --  tries to find a best match.
-   procedure Extract_Tokens (File    : in File_Type;
-                             First   : in Line_Number;
-                             Last    : in Line_Number;
-                             Tokens  : in out SPDX_Tool.Buffer_Sets.Set);
-
 private
 
    type File_Manager is tagged limited record

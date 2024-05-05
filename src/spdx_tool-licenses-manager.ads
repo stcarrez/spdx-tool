@@ -164,6 +164,10 @@ private
       Executor : Executor_Manager (Count);
    end record;
 
+   function Find_License_Templates (Manager : in License_Manager;
+                                    Line    : in SPDX_Tool.Languages.Line_Type)
+                                     return License_Index_Map;
+
    procedure Find_License_Templates (Manager : in License_Manager;
                                      Lines   : in out SPDX_Tool.Languages.Line_Array;
                                      From    : in Line_Number;
