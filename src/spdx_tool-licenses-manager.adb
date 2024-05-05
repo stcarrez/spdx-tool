@@ -383,20 +383,25 @@ package body SPDX_Tool.Licenses.Manager is
       Freqs   : Frequency_Arrays.Array_Type := Manager.Compute_Frequency (Lines, From, To);
    begin
       if not Freqs.Cells.Is_Empty then
-         for License in SPDX_Tool.Licenses.Files.Names'Range loop
-            declare
-               Cosine_Stamp   : Util.Measures.Stamp;
-            begin
-               C := Cosine (Freqs, 1, Manager.Token_Frequency, License);
-               SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
-            end;
-            Log.Debug ("Confidence with {0} -> {1}",
-                       Get_License_Name (License), C'Image);
-            if Confidence < C then
-               Confidence := C;
-               Guess := License;
-            end if;
-         end loop;
+         declare
+            Licenses : constant License_Index_Array
+               := Find_License_Templates (Lines, From, To);
+         begin
+            for License of Licenses loop
+               declare
+                  Cosine_Stamp   : Util.Measures.Stamp;
+               begin
+                  C := Cosine (Freqs, 1, Manager.Token_Frequency, License);
+                  SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
+               end;
+               Log.Debug ("Confidence with {0} -> {1}",
+                          Get_License_Name (License), C'Image);
+               if Confidence < C then
+                  Confidence := C;
+                  Guess := License;
+               end if;
+            end loop;
+         end;
       end if;
       if Confidence >= MIN_CONFIDENCE then
          Result.Info.First_Line := From;
