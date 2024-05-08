@@ -676,6 +676,7 @@ package body SPDX_Tool.Licenses.Manager is
    begin
       Log.Info ("License manager stopping, max fill {0}",
                 Util.Strings.Image (Manager.Max_Fill));
+      Free (Manager.Executor);
    end Finalize;
 
    function Get_File_Manager (Manager : in out License_Manager)
