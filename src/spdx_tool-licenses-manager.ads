@@ -161,7 +161,7 @@ private
 
       Mgr_Idx  : Util.Concurrent.Counters.Counter;
       File_Mgr : File_Manager_Array (1 .. Count);
-      Executor : Executor_Manager (Count);
+      Executor : Executor_Manager_Access;
    end record;
 
    function Find_License_Templates (Manager : in License_Manager;
@@ -180,6 +180,9 @@ private
    function Find_License (Manager : in License_Manager;
                           File    : in out SPDX_Tool.Files.File_Type)
                           return License_Match;
+
+   overriding
+   procedure Initialize (Manager : in out License_Manager);
 
    overriding
    procedure Finalize (Manager : in out License_Manager);

@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Streams.Stream_IO;
+with Ada.Unchecked_Deallocation;
 
 with Util.Strings;
 with Util.Strings.Tokenizers;
@@ -662,7 +663,16 @@ package body SPDX_Tool.Licenses.Manager is
    end Report;
 
    overriding
+   procedure Initialize (Manager : in out License_Manager) is
+   begin
+      Manager.Executor := new Executor_Manager (Manager.Count);
+   end Initialize;
+
+   overriding
    procedure Finalize (Manager : in out License_Manager) is
+      procedure Free is
+         new Ada.Unchecked_Deallocation (Object => Executor_Manager'Class,
+                                         Name   => Executor_Manager_Access);
    begin
       Log.Info ("License manager stopping, max fill {0}",
                 Util.Strings.Image (Manager.Max_Fill));
