@@ -45,6 +45,9 @@ package SPDX_Tool.Infos is
       Confidence : Confidence_Type := 1.0;
    end record;
 
+   function Lines_Image (Info : in License_Info) return String
+      is (Image (Info.First_Line) & ".." & Image (Info.Last_Line));
+
    --  Holds the license text found in the header of the file
    type License_Text (Len : Buffer_Size) is record
       Content : Buffer_Type (1 .. Len);

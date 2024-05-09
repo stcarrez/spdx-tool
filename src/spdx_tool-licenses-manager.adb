@@ -25,6 +25,8 @@ package body SPDX_Tool.Licenses.Manager is
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
 
+   function Is_Info_Log return Boolean is (Util.Log.Loggers.Get_Level (Log) <= Util.Log.INFO_LEVEL);
+
    File_Mgr : SPDX_Tool.Files.Manager.File_Manager_Access := null with Thread_Local_Storage;
 
    --  ------------------------------
@@ -438,6 +440,7 @@ package body SPDX_Tool.Licenses.Manager is
       Stamp   : Util.Measures.Stamp;
       First_Line : Line_Number;
       Last_Line  : Line_Number;
+      Checked    : License_Index_Map := EMPTY_MAP;
    begin
       if File.Cmt_Style = NO_COMMENT or else File.Count = 0 then
          Result.Info.Match := Infos.NONE;
@@ -456,10 +459,13 @@ package body SPDX_Tool.Licenses.Manager is
                      := Find_License_Templates (File.Lines, Line, Last_Line);
             begin
                for License of List loop
-                  Match := Find_License (License, File, First_Line, Last_Line);
-                  if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-                     SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
-                     return Match;
+                  if not Is_Set (Checked, License) then
+                     Match := Find_License (License, File, First_Line, Last_Line);
+                     if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                        SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
+                        return Match;
+                     end if;
+                     Set_License (Checked, License);
                   end if;
                end loop;
             end;
@@ -571,25 +577,30 @@ package body SPDX_Tool.Licenses.Manager is
       end if;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE | Infos.GUESSED_LICENSE
       then
-         declare
-            Name : constant String := To_String (File.License.Name);
-         begin
-            File.Filtered := Manager.Is_Filtered (File);
-            if File.Filtered then
-               Log.Info ("{0}: {1} (ignored)", File.Path, Name);
-            else
-               Log.Info ("{0}: {1}", File.Path, Name);
-               Manager.Stats.Increment (Name);
-               if Manager.Job = UPDATE_LICENSES then
-                  File_Mgr.Save
-                    (File    => Data,
-                     Path    => File.Path,
-                     First   => File.License.First_Line,
-                     Last    => File.License.Last_Line,
-                     License => Name);
+         File.Filtered := Manager.Is_Filtered (File);
+         if Is_Info_Log then
+            declare
+               Name : constant String := To_String (File.License.Name);
+               Pos  : constant String := Infos.Lines_Image (File.License);
+            begin
+               if File.Filtered then
+                  Log.Info ("{0}: {1} (ignored at lines {2})", File.Path, Name, Pos);
+               else
+                  Log.Info ("{0}: {1} at lines {2}", File.Path, Name, Pos);
                end if;
+            end;
+         end if;
+         if not File.Filtered then
+            --  Manager.Stats.Increment (Name);
+            if Manager.Job = UPDATE_LICENSES then
+               File_Mgr.Save
+                  (File    => Data,
+                   Path    => File.Path,
+                   First   => File.License.First_Line,
+                   Last    => File.License.Last_Line,
+                   License => To_String (File.License.Name));
             end if;
-         end;
+         end if;
       elsif Data.Last_Offset = 0 then
          File.License.Name := To_UString (Empty_File);
          File.Filtered := Manager.Is_Filtered (File);
