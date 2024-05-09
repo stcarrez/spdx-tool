@@ -113,6 +113,7 @@ package body SPDX_Tool.Languages.Manager is
    --  ------------------------------
    procedure Initialize (Manager : in out Language_Manager;
                          Config  : in SPDX_Tool.Configs.Config_Type) is
+      procedure Initialize_Tokens;
       procedure Set_Comments (Conf : in Comment_Configuration);
       procedure Set_Language (Conf : in Language_Configuration);
       procedure Add_Builtin (Language     : in String;

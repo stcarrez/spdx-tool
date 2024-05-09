@@ -4,7 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
-with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Magic_Manager;
 with SPDX_Tool.Languages.Manager;
