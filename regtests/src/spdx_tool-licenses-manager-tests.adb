@@ -8,9 +8,7 @@ with GNAT.Source_Info;
 with Util.Test_Caller;
 with SPDX_Tool.Files;
 with SPDX_Tool.Token_Counters;
-with SPDX_Tool.Licenses.Manager;
 with SPDX_Tool.Licenses.Templates;
-with SPDX_Tool.Languages;
 with SPDX_Tool.Infos;
 package body SPDX_Tool.Licenses.Manager.Tests is
 
