@@ -910,7 +910,7 @@ package body SPDX_Tool.Licenses is
                   Log.Info ("License '{0}' missmatch at line{1} after {2} lines",
                             Licenses.Files.Names (License).all,
                             Match.Info.Last_Line'Image,
-                            Util.Strings.Image (Natural (Match.Info.Last_Line - Match.Info.First_Line)));
+                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));
                end if;
                exit when Match.Info.First_Line + 1 < Match.Info.Last_Line;
                if Match.Last /= null then
@@ -928,103 +928,6 @@ package body SPDX_Tool.Licenses is
          return Result;
       end;
    end Find_License;
-
-   protected body  License_Stats is
-
-      procedure Increment (Name : in String) is
-         Pos : constant Count_Maps.Cursor := Map.Find (Name);
-      begin
-         if Count_Maps.Has_Element (Pos) then
-            declare
-               Count : constant Positive := Count_Maps.Element (Pos) + 1;
-            begin
-               Map.Replace_Element (Position => Pos, New_Item => Count);
-            end;
-         else
-            Map.Insert (Name, 1);
-         end if;
-      end Increment;
-
-      procedure Add_Line (Line : in Buffer_Type; Line_Number : Infos.Line_Number) is
-         procedure Process (Item : in out Line_Maps.Map);
-
-         procedure Process (Item : in out Line_Maps.Map) is
-            Pos  : constant Line_Maps.Cursor := Item.Find (Line);
-         begin
-            if Line_Maps.Has_Element (Pos) then
-               Item.Replace_Element (Pos, Line_Maps.Element (Pos) + 1);
-            else
-               Item.Insert (Line, 1);
-            end if;
-         end Process;
-
-         S : Line_Maps.Map;
-      begin
-         while Infos.Line_Count (Lines.Length) < Line_Number loop
-            Lines.Append (S);
-         end loop;
-         Lines.Update_Element (Line_Number, Process'Access);
-      end Add_Line;
-
-      procedure Add_Header (File : in SPDX_Tool.Files.File_Type) is
-         Buf     : constant Buffer_Accessor := File.Buffer.Value;
-         Start, Last : Buffer_Index;
-      begin
-         for Line in 1 .. File.Count loop
-            if File.Lines (Line).Comment /= NO_COMMENT then
-               Start := File.Lines (Line).Style.Text_Start;
-               Last  := File.Lines (Line).Style.Text_Last;
-               Add_Line (Buf.Data (Start .. Last), Line);
-               if Max_Line < Line then
-                  Max_Line := Line;
-               end if;
-            end if;
-         end loop;
-         Unknown_Count := Unknown_Count + 1;
-      end Add_Header;
-
-      function Get_Stats return Count_Maps.Map is
-      begin
-         return Map;
-      end Get_Stats;
-
-      procedure Print_Header is
-         type Line_Array is array (1 .. Max_Line) of Line_Sets.Set;
-
-         L : Line_Array := (others => <>);
-      begin
-         for I in L'Range loop
-            declare
-               Stat : Line_Sets.Set;
-            begin
-               for Iter in Lines.Element (I).Iterate loop
-                  declare
-                     Content : constant Buffer_Type := Line_Maps.Key (Iter);
-                     Count   : constant Positive := Line_Maps.Element (Iter);
-                  begin
-                     Stat.Include ((Len => Content'Length,
-                                    Count => Count,
-                                    Content => Content));
-                  end;
-               end loop;
-               L (I) := Stat;
-            end;
-         end loop;
-         for I in L'Range loop
-            if not L (I).Is_Empty then
-               declare
-                  First : constant Line_Stat := L (I).First_Element;
-                  Last  : constant Line_Stat := L (I).Last_Element;
-                  S     : String (1 .. Natural (First.Len));
-                  for S'Address use First.Content'Address;
-               begin
-                  Log.Info ("{0}|{1}|{2}", First.Count'Image, Last.Count'Image, S);
-               end;
-            end if;
-         end loop;
-      end Print_Header;
-
-   end License_Stats;
 
    Perf : Util.Measures.Measure_Set;
 

@@ -47,11 +47,7 @@ package SPDX_Tool.Licenses.Manager is
                         Path    : String) with
      Pre'Class => Path'Length > 0 and then Ada.Directories.Exists (Path);
 
-   function Get_Stats (Manager : in License_Manager) return Count_Maps.Map;
-
    procedure Wait (Manager : in out License_Manager);
-
-   procedure Print_Header (Manager : in out License_Manager);
 
    --  Load the license template from the given path.
    procedure Load_License (Manager : in out License_Manager;
@@ -135,7 +131,6 @@ private
       Max_Fill  : Natural := 0;
       Started   : Boolean := False;
       Job       : Job_Type := READ_LICENSES;
-      Stats     : License_Stats;
 
       --  Filters to identify license files (ex: COPYING, LICENSE.txt, ...)
       --  Filters to ignore files when looking at file headers.  The two filters
@@ -163,6 +158,11 @@ private
       File_Mgr : File_Manager_Array (1 .. Count);
       Executor : Executor_Manager_Access;
    end record;
+
+   function Compute_Frequency (Manager : in License_Manager;
+                               Lines   : in SPDX_Tool.Languages.Line_Array;
+                               From    : in Line_Number;
+                               To      : in Line_Number) return Frequency_Arrays.Array_Type;
 
    function Find_License_Templates (Manager : in License_Manager;
                                     Line    : in SPDX_Tool.Languages.Line_Type)

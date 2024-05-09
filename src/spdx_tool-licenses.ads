@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Containers.Indefinite_Ordered_Sets;
-with Ada.Containers.Vectors;
 
 with GNAT.Strings;
 with GNAT.Regpat;
@@ -141,43 +139,6 @@ private
                             Root    : in out Token_Access;
                             Current : in Token_Access;
                             License : in UString);
-
-   type Line_Stat (Len : Buffer_Size) is record
-      Count    : Positive := 1;
-      Content  : Buffer_Type (1 .. Len);
-   end record;
-
-   function "<" (Left, Right : Line_Stat) return Boolean
-      is (Left.Count > Right.Count
-          or else (Left.Count = Right.Count and then Left.Len < Right.Len)
-          or else (Left.Count = Right.Count and then Left.Len = Right.Len
-            and then Left.Content < Right.Content));
-
-   package Line_Maps is new Ada.Containers.Indefinite_Ordered_Maps
-    (Key_Type => Buffer_Type, Element_Type => Positive, "<" => "<", "=" => "=");
-
-   package Line_Sets is new Ada.Containers.Indefinite_Ordered_Sets
-    (Element_Type    => Line_Stat, "<" => "<", "=" => "=");
-
-   package Line_Vectors is new Ada.Containers.Vectors
-    (Index_Type => Line_Number, Element_Type => Line_Maps.Map, "=" => Line_Maps."=");
-
-   protected type License_Stats is
-
-      procedure Increment (Name : in String);
-
-      procedure Add_Header (File : in Files.File_Type);
-
-      function Get_Stats return Count_Maps.Map;
-
-      procedure Print_Header;
-
-   private
-      Map   : Count_Maps.Map;
-      Lines : Line_Vectors.Vector;
-      Unknown_Count : Natural := 0;
-      Max_Line : Line_Count := 0;
-   end License_Stats;
 
    function Skip_Spaces (Content : in Buffer_Type;
                          Lines   : in Line_Array;

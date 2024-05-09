@@ -12,7 +12,6 @@ with Util.Log.Loggers;
 with Util.Streams.Files;
 
 with SCI.Similarities.COO_Arrays;
-with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Licenses.Reader;
 with SPDX_Tool.Configs.Default;
 with SPDX_Tool.Licenses.Templates;
@@ -25,7 +24,8 @@ package body SPDX_Tool.Licenses.Manager is
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
 
-   function Is_Info_Log return Boolean is (Util.Log.Loggers.Get_Level (Log) <= Util.Log.INFO_LEVEL);
+   function Is_Info_Log return Boolean
+      is (Util.Log.Loggers.Get_Level (Log) <= Util.Log.INFO_LEVEL);
 
    File_Mgr : SPDX_Tool.Files.Manager.File_Manager_Access := null with Thread_Local_Storage;
 
@@ -263,11 +263,6 @@ package body SPDX_Tool.Licenses.Manager is
       end case;
    end Scan_File;
 
-   function Get_Stats (Manager : in License_Manager) return Count_Maps.Map is
-   begin
-      return Manager.Stats.Get_Stats;
-   end Get_Stats;
-
    procedure Wait (Manager : in out License_Manager) is
    begin
       Manager.Executor.Stop;
@@ -380,7 +375,7 @@ package body SPDX_Tool.Licenses.Manager is
       package Similarities is
          new SCI.Similarities.COO_Arrays (Arrays => Freq_Transformers.Frequency_Arrays,
                                           Conversions => Confidence_Conversions);
-      function To_Float (Value : Float) return Float is (Float (Value));
+      function To_Float (Value : Float) return Float is (Value);
       function Cosine is
          new Similarities.Cosine (To_Float => To_Float);
 
@@ -610,27 +605,6 @@ package body SPDX_Tool.Licenses.Manager is
             Log.Info ("{0}: {1}", File.Path, Empty_File);
          end if;
       else
-         if Result.Last /= null then
-            declare
-               procedure Print_License (License : in Token_Access);
-               procedure Print_License (License : in Token_Access) is
-                  Token : Token_Access := License;
-               begin
-                  while Token /= null loop
-                     if Token.Alternate /= null then
-                        Print_License (Token.Alternate);
-                     end if;
-                     if Token.Kind = TOK_LICENSE then
-                        Log.Error ("Possible license: {0}",
-                                   To_String (Final_Token_Type (Token.all).License));
-                     end if;
-                     Token := Token.Next;
-                  end loop;
-               end Print_License;
-            begin
-               Print_License (Result.Last);
-            end;
-         end if;
          declare
             Cmt_Count : Natural := 0;
          begin
@@ -648,7 +622,6 @@ package body SPDX_Tool.Licenses.Manager is
                   Log.Info ("{0} is {1}: {2} lines no comment", File.Path,
                             To_String (File.Language),
                             Image (Data.Count));
-                  Manager.Stats.Increment (To_String (File.Mime));
                end if;
             else
                File.License.Name := To_UString (Unknown_License);
@@ -660,8 +633,6 @@ package body SPDX_Tool.Licenses.Manager is
                             To_String (File.Language),
                             Image (Data.Count),
                             Util.Strings.Image (Cmt_Count));
-                  Manager.Stats.Increment ("unknown " & To_String (File.Mime));
-                  Manager.Stats.Add_Header (Data);
                end if;
             end if;
          end;
@@ -717,10 +688,5 @@ package body SPDX_Tool.Licenses.Manager is
       Log.Error ("Job {0} failed", Job.File.Path);
       Log.Error ("Exception", Ex, True);
    end Error;
-
-   procedure Print_Header (Manager : in out License_Manager) is
-   begin
-      Manager.Stats.Print_Header;
-   end Print_Header;
 
 end SPDX_Tool.Licenses.Manager;

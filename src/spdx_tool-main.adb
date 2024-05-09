@@ -356,9 +356,6 @@ begin
       else
          Report_Summary (Manager);
       end if;
-      begin
-         Manager.Print_Header;
-      end;
    end;
    if SPDX_Tool.Licenses.Opt_Perf_Report then
       SPDX_Tool.Licenses.Performance_Report;
