@@ -66,15 +66,6 @@ procedure SPDX_Tool.Gentmpl is
       return Value + 1;
    end Increment;
 
-   function Is_Punctuation (C : in Byte) return Boolean
-   is (Is_Space_Or_Punctuation (C) or else C = Character'Pos ('_')
-       or else C = Character'Pos ('=') or else C = Character'Pos ('*')
-       or else C = Character'Pos ('+') or else C = Character'Pos ('?')
-       or else C = Character'Pos ('>') or else C = Character'Pos (']')
-       or else C = Character'Pos ('[') or else C = Character'Pos ('/')
-       or else C = Character'Pos ('#') or else C = Character'Pos ('$')
-       or else C = Character'Pos ('`'));
-
    function Is_Ignored (Token : in Buffer_Type) return Boolean is
       Word : String (Natural (Token'First) .. Natural (Token'Last));
       for Word'Address use Token'Address;
