@@ -6,22 +6,28 @@
 
 with GNAT.Source_Info;
 with Util.Test_Caller;
+with Util.Assertions;
+with SPDX_Tool.Configs;
 with SPDX_Tool.Files;
 with SPDX_Tool.Token_Counters;
-with SPDX_Tool.Licenses.Templates;
 with SPDX_Tool.Infos;
 package body SPDX_Tool.Licenses.Manager.Tests is
 
    use SPDX_Tool.Infos;
-   use SPDX_Tool.Languages;
    subtype File_Info is Infos.File_Info;
+
+   procedure Assert_Equals is
+     new Util.Assertions.Assert_Equals_T (Value_Type => License_Kind);
 
    procedure Check_License (T        : in out Test;
                             Filename : in String;
                             License  : in String;
                             Expect   : in String;
+                            Start    : in Positive;
+                            Finish   : in Positive;
                             Source   : in String := GNAT.Source_Info.File;
                             Line     : in Natural := GNAT.Source_Info.Line);
+   function Get_Path (Name : in String) return File_Info;
 
    function Get_Path (Name : in String) return File_Info is
       Path : constant String
@@ -46,19 +52,29 @@ package body SPDX_Tool.Licenses.Manager.Tests is
                             Filename : in String;
                             License  : in String;
                             Expect   : in String;
+                            Start    : in Positive;
+                            Finish   : in Positive;
                             Source   : in String := GNAT.Source_Info.File;
                             Line     : in Natural := GNAT.Source_Info.Line) is
+      Config  : SPDX_Tool.Configs.Config_Type;
       Data    : File_Info := Get_Path ("files/identify/" & Filename);
       Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
       File    : SPDX_Tool.Files.File_Type (100);
       Result  : License_Match;
    begin
+      Manager.Languages.Initialize (Config);
+
       --  Load only one license to simplify the debugging in case of problem.
-      --  Manager.Load_License ("licenses/" & License);
+      Manager.Load_License ("licenses/" & License);
       Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-      --Result := Manager.Find_License (File);
-      --Util.Tests.Assert_Equals (T, Expect, Result.Info.Name,
-      --                          "Invalid license found", Source, Line);
+      Result := Manager.Find_License (File);
+      Util.Tests.Assert_Equals (T, Expect, Result.Info.Name,
+                                "Invalid license found", Source, Line);
+      Assert_Equals (T, TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
+      Util.Tests.Assert_Equals (T, Start, Natural (Result.Info.First_Line), "Invalid first line");
+      Util.Tests.Assert_Equals (T, Finish, Natural (Result.Info.Last_Line), "Invalid last line");
+      T.Assert (Result.Info.Confidence = 1.0,
+                "Invalid confidence:" & Result.Info.Confidence'Image);
    end Check_License;
 
    --  ------------------------------
@@ -66,37 +82,27 @@ package body SPDX_Tool.Licenses.Manager.Tests is
    --  ------------------------------
    procedure Test_Find_License_Fixed (T : in out Test) is
    begin
-      Check_License (T, "apache-2.0-1.ads", "Apache-2.0-alt.txt", "Apache-2.0");
+      Check_License (T, "apache-2.0-1.ads", "standard/Apache-2.0.txt",
+                     "Apache-2.0", 3, 16);
    end Test_Find_License_Fixed;
 
    procedure Test_Find_License_Var (T : in out Test) is
    begin
       --  License contains variable part.
-      --  Check_License (T, "apache-2.0-2.ads", "standard/Apache-2.0.txt", "Apache-2.0");
-      Check_License (T, "lgpl-2.1.c", "standard/LGPL-2.1+.txt", "LGPL-2.1+");
-      Check_License (T, "bsd-3-clause.c", "standard/BSD-3-Clause.txt", "BSD-3-Clause");
+      Check_License (T, "lgpl-2.1.c", "standard/LGPL-2.1+.txt",
+                     "LGPL-2.1+", 2, 16);
+      Check_License (T, "bsd-3-clause.c", "standard/BSD-3-Clause.txt",
+                     "BSD-3-Clause", 1, 14);
    end Test_Find_License_Var;
 
    procedure Test_Find_License_SPDX (T : in out Test) is
    begin
-      Check_License (T, "gpl-2.0-only-1.sh", "standard/LGPL-2.1+.txt", "GPL-2.0-only");
-      Check_License (T, "mit-2.c", "standard/LGPL-2.1+.txt", "MIT");
-      Check_License (T, "gpl-2.0-or-bsd.c", "standard/LGPL-2.1+.txt", "GPL-2.0+ OR BSD-3-Clause");
-
-      declare
-         Start : Util.Measures.Stamp;
-         T : SPDX_Tool.Token_Counters.Token_Maps.Map;
-         First : Buffer_Index := 1;
-         Last  : Buffer_Index;
-      begin
-         for I in SPDX_Tool.Licenses.Templates.Token_Pos'Range loop
-            Last := First + Buffer_Size (SPDX_Tool.Licenses.Templates.Token_Pos (I) - 1);
-            T.Insert (SPDX_Tool.Licenses.Templates.Tokens (First .. Last),
-                      SPDX_Tool.Token_Index (I));
-            First := Last + 1;
-         end loop;
-         Util.Measures.Report (Start, "Fill map with tokens");
-      end;
+      Check_License (T, "gpl-2.0-only-1.sh", "standard/LGPL-2.1+.txt",
+                     "GPL-2.0-only", 1, 1);
+      Check_License (T, "mit-2.c", "standard/LGPL-2.1+.txt",
+                     "MIT", 1, 1);
+      Check_License (T, "gpl-2.0-or-bsd.c", "standard/LGPL-2.1+.txt",
+                     "GPL-2.0+ OR BSD-3-Clause", 1, 1);
    end Test_Find_License_SPDX;
 
 end SPDX_Tool.Licenses.Manager.Tests;
