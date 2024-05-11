@@ -29,6 +29,8 @@ procedure SPDX_Tool.Genmap is
                       Root  : in UBO.Object);
    function Get_Label (Option : in String) return String;
    function To_String (List : in Vector) return String;
+   function Get_Priority (Name : in String) return Natural;
+   function Compare (Left, Right : in String) return Boolean;
 
    Exts : Maps.Map;
    Use_Lowercase : Boolean := False;
