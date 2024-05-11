@@ -220,7 +220,9 @@ package body SPDX_Tool.Languages.Manager is
 
       Basic_Analyzer_Count : Natural := 0;
    begin
-      Initialize_Tokens;
+      if Manager.Tokens.Is_Empty then
+         Initialize_Tokens;
+      end if;
       Add_Builtin ("dash-style", "--");
       Add_Builtin ("C-line", "//");
       Add_Builtin ("Shell", "#");
