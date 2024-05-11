@@ -182,7 +182,7 @@ package body SPDX_Tool.Licenses is
             exit when First.Pos > End_Line;
             Len := Punctuation_Length (Content, First.Pos, End_Line);
             if Len > 0 then
-               Pos.Pos := Pos.Pos + Len - 1;
+               Pos.Pos := First.Pos + Len - 1;
             else
                Pos.Pos := Next_Space (Content, First.Pos, End_Line);
             end if;
@@ -245,7 +245,7 @@ package body SPDX_Tool.Licenses is
             exit when First.Pos > End_Line;
             Len := Punctuation_Length (Content, First.Pos, End_Line);
             if Len > 0 then
-               Pos.Pos := Pos.Pos + Len - 1;
+               Pos.Pos := First.Pos + Len - 1;
             else
                Pos.Pos := Next_Space (Content, First.Pos, End_Line);
             end if;
