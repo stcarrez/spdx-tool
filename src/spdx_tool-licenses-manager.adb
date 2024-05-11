@@ -747,6 +747,7 @@ package body SPDX_Tool.Licenses.Manager is
         := Files.Get_Content (Name.all);
       Parser : Parser_Type;
    begin
+      Log.Debug ("Loading license template {0}", Name.all);
       Into.Name := To_UString (Get_License_Name (License));
       Tokens := null;
       Parser.Root := null;
@@ -759,10 +760,17 @@ package body SPDX_Tool.Licenses.Manager is
                            Token  : in Token_Access) is
    begin
       Parser.Token_Count := Parser.Token_Count + 1;
-      if Parser.Optional > 0 and then Parser.Optionals (Parser.Optional).Optional = null then
+      if Token.all in Optional_Token_Type'Class then
+         Parser.Optional := Parser.Optional + 1;
+         Parser.Optionals (Parser.Optional) := Optional_Token_Type (Token.all)'Access;
+
+      elsif Parser.Optional > 0 and then Parser.Optionals (Parser.Optional).Optional = null then
          Parser.Optionals (Parser.Optional).Optional := Token;
-         Parser.Previous := Token;
-         return;
+         Token.Previous := Parser.Previous;
+         if Parser.Optional /= 1 then
+            Parser.Previous := Token;
+            return;
+         end if;
       end if;
       Token.Previous := Parser.Previous;
       if Parser.Previous = null then
@@ -877,14 +885,13 @@ package body SPDX_Tool.Licenses.Manager is
                Log.Error ("too many nested <<beginOptional>>");
                return;
             end if;
-            Parser.Optional := Parser.Optional + 1;
-            Parser.Optionals (Parser.Optional)
-               := new Optional_Token_Type '(Len => 0,
+            T := new Optional_Token_Type '(Len => 0,
                                             Previous => null,
                                             Next => null,
                                             Alternate => null,
                                             others => <>);
-            Parser.Append_Token (Parser.Optionals (Parser.Optional).all'Access);
+            Parser.Append_Token (T);
+            Parser.Previous := T;
 
          when TOK_END_OPTIONAL =>
             if Parser.Optional = 0 then
