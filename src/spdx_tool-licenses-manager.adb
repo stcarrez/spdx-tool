@@ -12,7 +12,6 @@ with Util.Log.Loggers;
 with Util.Streams.Files;
 
 with SCI.Similarities.COO_Arrays;
-with SPDX_Tool.Licenses.Reader;
 with SPDX_Tool.Configs.Default;
 with SPDX_Tool.Licenses.Templates;
 with SPDX_Tool.Licenses.Files;
@@ -695,7 +694,6 @@ package body SPDX_Tool.Licenses.Manager is
       Log.Error ("Exception", Ex, True);
    end Error;
 
-
    function Find_Token (Parser : in Parser_Type;
                         Word   : in Buffer_Type) return Token_Access is
       Item : Token_Access;
@@ -860,7 +858,8 @@ package body SPDX_Tool.Licenses.Manager is
                                      Previous => null,
                                      Next => null,
                                      Alternate => null,
-                                     Content => Content (Parser.Token_Pos .. Parser.Current_Pos - 1));
+                                     Content => Content (Parser.Token_Pos
+                                        .. Parser.Current_Pos - 1));
                Parser.Append_Token (T);
             end if;
             Parser.Previous := T;

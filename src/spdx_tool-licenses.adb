@@ -444,7 +444,7 @@ package body SPDX_Tool.Licenses is
                end if;
                if Next_Token = null then
                   if Current /= null then
-                     Log.Error ("Current : {0}", To_String (To_UString (Content (Pos.Pos .. Pos.Pos + 20))));
+                     Log.Error ("Current : {0}", To_String (Content (Pos.Pos .. Pos.Pos + 20)));
                   end if;
                   Result.Info.Last_Line := Pos.Line;
                   Result.Last := Current;

@@ -11,6 +11,7 @@ package body Util.Algorithms.Arrays is
 
    --  Left := (1, 3, 5, 7)
    --  Right := (1, 2, 3, 8) => (1, 3)
+   overriding
    function "&" (Left, Right : Array_Type) return Array_Type is
       M : Array_Type (Left'First .. Max (Left'Last, Right'Last));
       Target : Index_Type := M'First;
@@ -19,11 +20,11 @@ package body Util.Algorithms.Arrays is
       for Val of Left loop
          if Right (Pos) = Val then
             M (Target) := Val;
-                Pos := Index_Type'Succ (Pos);
-                Target := Index_Type'Succ (Target);
+            Pos := Index_Type'Succ (Pos);
+            Target := Index_Type'Succ (Target);
          else
             while Pos <= Right'Last and then Right (Pos) < Val loop
-                   Pos := Index_Type'Succ (Pos);
+               Pos := Index_Type'Succ (Pos);
             end loop;
          end if;
       end loop;
@@ -48,14 +49,14 @@ package body Util.Algorithms.Arrays is
             if Pos > Into'Last then
                return;
             end if;
-             end loop;
-             if Into (Pos) = Val then
-                Pos := Index_Type'Succ (Pos);
-                Into (Target) := Val;
-                Target := Index_Type'Succ (Target);
+         end loop;
+         if Into (Pos) = Val then
+            Pos := Index_Type'Succ (Pos);
+            Into (Target) := Val;
+            Target := Index_Type'Succ (Target);
             Count := Count + 1;
             exit when Target > Into'Last or else Pos > Into'Last;
-             end if;
+         end if;
       end loop;
    end Intersect;
 
@@ -65,17 +66,17 @@ package body Util.Algorithms.Arrays is
       Pos  : Index_Type := Low;
    begin
       while Low <= High loop
-         Pos := Middle (low, High);
-             if From (Pos) = Item then
-                return (True, Pos);
-             end if;
-             if From (Pos) < Item then
-                Low := Index_Type'Succ (Pos);
-             else
-                High := Index_Type'Pred (Pos);
-             end if;
+         Pos := Middle (Low, High);
+         if From (Pos) = Item then
+            return (True, Pos);
+         end if;
+         if From (Pos) < Item then
+            Low := Index_Type'Succ (Pos);
+         else
+            High := Index_Type'Pred (Pos);
+         end if;
       end loop;
       return (False, Pos);
-  end Find;
+   end Find;
 
 end Util.Algorithms.Arrays;

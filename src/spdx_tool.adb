@@ -402,6 +402,13 @@ package body SPDX_Tool is
       return Count;
    end Printable_Length;
 
+   function To_String (Buffer : in Buffer_Type) return String is
+      Content : String (1 .. Buffer'Length);
+      for Content'Address use Buffer'Address;
+   begin
+      return Content;
+   end To_String;
+
    function To_UString (Buffer : in Buffer_Type) return UString is
       Content : String (1 .. Buffer'Length);
       for Content'Address use Buffer'Address;

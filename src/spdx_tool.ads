@@ -204,6 +204,7 @@ private
        return Natural with
       Pre => From >= Buffer'First and then Last <= Buffer'Last;
 
+   function To_String (Buffer : in Buffer_Type) return String;
    function To_UString (Buffer : in Buffer_Type) return UString;
 
 end SPDX_Tool;
