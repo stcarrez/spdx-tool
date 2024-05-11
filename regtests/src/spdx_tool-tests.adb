@@ -83,7 +83,7 @@ package body SPDX_Tool.Tests is
       T.Execute (Tool & " --no-color --only-licenses None -f regtests", Result, 0);
       Util.Tests.Assert_Matches (T, ".*None.*",
                                  Result, "wrong license");
-      Util.Tests.Assert_Matches (T, ".*regtests/alire.toml.*",
+      Util.Tests.Assert_Matches (T, ".*regtests/files/templates/text.ads.*",
                                  Result, "missing file");
       Util.Tests.Assert_Matches (T, ".*regtests/spdx_tool_tests.gpr.*",
                                  Result, "missing file");
