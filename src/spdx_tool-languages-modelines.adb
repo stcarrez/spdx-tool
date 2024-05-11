@@ -10,6 +10,7 @@ with SPDX_Tool.Languages.AliasMap;
 package body SPDX_Tool.Languages.Modelines is
 
    use type Ada.Strings.Maps.Character_Set;
+   use type Confidence_Type;
    package ASF renames Ada.Strings.Fixed;
 
    Separator : constant Ada.Strings.Maps.Character_Set
@@ -25,7 +26,7 @@ package body SPDX_Tool.Languages.Modelines is
       if Lang /= null then
          Set_Language (Result, Lang.all, 1.0);
       else
-         Set_Language (Result, Alias, 0.9);
+         Set_Language (Result, Alias, 900 * Confidence_Type'Small);
       end if;
    end Set_Language;
 

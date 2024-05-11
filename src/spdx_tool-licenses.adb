@@ -426,7 +426,6 @@ package body SPDX_Tool.Licenses is
                   Pos.Pos := Pos.Pos + Len;
                   exit when Pos.Pos > Last.Pos;
                end loop;
-               --  Pos.Pos := Skip_Spaces (Content, Pos.Pos, Last.Pos);
                exit when Pos.Pos > Last.Pos;
                First.Pos := Pos.Pos;
                Len := Punctuation_Length (Content, Pos.Pos, Last.Pos);
@@ -443,9 +442,6 @@ package body SPDX_Tool.Licenses is
                          (To, Pos.Pos), Pos, Next_Token);
                end if;
                if Next_Token = null then
-                  if Current /= null then
-                     Log.Debug ("Current : {0}", To_String (Content (Pos.Pos .. Pos.Pos + 20)));
-                  end if;
                   Result.Info.Last_Line := Pos.Line;
                   Result.Last := Current;
                   return Result;
@@ -461,7 +457,6 @@ package body SPDX_Tool.Licenses is
                   Result.Last := Current;
                   return Result;
                end if;
-               --  Pos.Pos := Pos.Pos + 1;
             end loop;
          end if;
          if First.Line = Pos.Line then
