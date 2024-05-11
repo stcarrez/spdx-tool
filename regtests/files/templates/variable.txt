@@ -1,0 +1,1 @@
+<<var;name="bullet";original="1.";match=".{0,20}">> Redistributions of <<var;name="code";original="source code";match="source code|works">>

@@ -1,0 +1,1 @@
+THIS <<var;name="software2";original="SOFTWARE";match="(SOFTWARE)|(THEME)">> IS PROVIDED <<var;name="copyrightHolderAsIs";original="BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS";match=".*">> "AS IS" AND ANY
