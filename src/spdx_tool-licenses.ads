@@ -253,25 +253,25 @@ private
    type Decision_Array_Access is array (Positive range <>) of Decision_Node_Access;
 
    --  Find in the header comment an SPDX license tag.
-   function Find_SPDX_License (Content : in Buffer_Type;
-                               Lines   : in SPDX_Tool.Languages.Line_Array;
-                               From    : in Line_Number;
-                               To      : in Line_Number)
+   function Look_SPDX_License (Content : in Buffer_Type;
+                                Lines   : in SPDX_Tool.Languages.Line_Array;
+                                From    : in Line_Number;
+                                To      : in Line_Number)
                                return License_Match
       with Pre => From <= To;
 
-   function Find_License (License : in License_Index;
+   function Look_License (License : in License_Index;
                           File    : in SPDX_Tool.Files.File_Type;
                           From    : in Line_Number;
                           To      : in Line_Number)
                           return License_Match;
 
-   function Find_License (Root    : in Token_Access;
-                          Content : in Buffer_Type;
-                          Lines   : in SPDX_Tool.Languages.Line_Array;
-                          From    : in Line_Number;
-                          To      : in Line_Number)
-                          return License_Match;
+   function Look_License_Tree (Root    : in Token_Access;
+                               Content : in Buffer_Type;
+                               Lines   : in SPDX_Tool.Languages.Line_Array;
+                               From    : in Line_Number;
+                               To      : in Line_Number)
+                           return License_Match;
 
    procedure Report (Stamp : in out Util.Measures.Stamp;
                      Title : in String;

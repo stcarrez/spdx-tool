@@ -395,11 +395,11 @@ package body SPDX_Tool.Licenses is
       Result := From;
    end Match;
 
-   function Find_License (Root    : in Token_Access;
-                          Content : in Buffer_Type;
-                          Lines   : in Line_Array;
-                          From    : in Line_Number;
-                          To      : in Line_Number)
+   function Look_License_Tree (Root    : in Token_Access;
+                               Content : in Buffer_Type;
+                               Lines   : in Line_Array;
+                               From    : in Line_Number;
+                               To      : in Line_Number)
                           return License_Match is
       Current : Token_Access := null;
       Result  : License_Match;
@@ -468,12 +468,12 @@ package body SPDX_Tool.Licenses is
       Result.Info.Match := Infos.UNKNOWN_LICENSE;
       Result.Last := null;
       return Result;
-   end Find_License;
+   end Look_License_Tree;
 
    --  ------------------------------
    --  Find in the header comment an SPDX license tag.
    --  ------------------------------
-   function Find_SPDX_License (Content : in Buffer_Type;
+   function Look_SPDX_License (Content : in Buffer_Type;
                                Lines   : in Line_Array;
                                From    : in Line_Number;
                                To      : in Line_Number)
@@ -503,9 +503,9 @@ package body SPDX_Tool.Licenses is
       Result.Info.Match := Infos.UNKNOWN_LICENSE;
       Result.Last := null;
       return Result;
-   end Find_SPDX_License;
+   end Look_SPDX_License;
 
-   function Find_License (License : in License_Index;
+   function Look_License (License : in License_Index;
                           File    : in SPDX_Tool.Files.File_Type;
                           From    : in Line_Number;
                           To      : in Line_Number)
@@ -526,8 +526,8 @@ package body SPDX_Tool.Licenses is
       begin
          while Line <= To loop
             if File.Lines (Line).Comment /= NO_COMMENT then
-               Match := Find_License (Token, Buf.Data,
-                                      File.Lines, Line, To);
+               Match := Look_License_Tree (Token, Buf.Data,
+                                           File.Lines, Line, To);
                if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                   return Match;
                end if;
@@ -552,7 +552,7 @@ package body SPDX_Tool.Licenses is
          Report (Stamp, "Find license (no match)");
          return Result;
       end;
-   end Find_License;
+   end Look_License;
 
    Perf : Util.Measures.Measure_Set;
 

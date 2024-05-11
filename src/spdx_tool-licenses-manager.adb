@@ -427,6 +427,38 @@ package body SPDX_Tool.Licenses.Manager is
    end Guess_License;
 
    function Find_License (Manager : in License_Manager;
+                          Content : in Buffer_Type;
+                          Lines   : in SPDX_Tool.Languages.Line_Array;
+                          From    : in Line_Number;
+                          To      : in Line_Number) return License_Match is
+      Result  : License_Match := (Last => null, Depth => 0, others => <>);
+      Match   : License_Match;
+   begin
+      for Line in From .. To loop
+         if Lines (Line).Comment /= NO_COMMENT then
+            Match := Look_License_Tree (Manager.Licenses.Root, Content,
+                                        Lines, Line, To);
+            if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+               return Match;
+            end if;
+            if Match.Last /= null then
+               if Match.Info.First_Line + 1 < Match.Info.Last_Line then
+                  Log.Info ("License missmatch at line{0} after {1} lines",
+                            Match.Info.Last_Line'Image,
+                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));
+               end if;
+               Match.Depth := Match.Last.Depth;
+               if Result.Last = null or else Match.Depth > Result.Depth then
+                  Result.Last := Match.Last;
+                  Result.Depth := Match.Depth;
+               end if;
+            end if;
+         end if;
+      end loop;
+      return Result;
+   end Find_License;
+
+   function Find_License (Manager : in License_Manager;
                           File    : in out SPDX_Tool.Files.File_Type)
                           return License_Match is
       Buf     : constant Buffer_Accessor := File.Buffer.Value;
@@ -442,7 +474,7 @@ package body SPDX_Tool.Licenses.Manager is
          return Result;
       end if;
       Languages.Find_Headers (Buf.Data, File.Lines, File.Count, First_Line, Last_Line);
-      Match := Find_SPDX_License (Buf.Data, File.Lines, First_Line, Last_Line);
+      Match := Look_SPDX_License (Buf.Data, File.Lines, First_Line, Last_Line);
       if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          return Match;
       end if;
@@ -455,7 +487,7 @@ package body SPDX_Tool.Licenses.Manager is
             begin
                for License of List loop
                   if not Is_Set (Checked, License) then
-                     Match := Find_License (License, File, First_Line, Last_Line);
+                     Match := Look_License (License, File, First_Line, Last_Line);
                      if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                         SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
                         return Match;
@@ -477,8 +509,8 @@ package body SPDX_Tool.Licenses.Manager is
       end if;
       for Line in First_Line .. Last_Line loop
          if File.Lines (Line).Comment /= NO_COMMENT then
-            Match := Find_License (Manager.Licenses.Root, Buf.Data,
-                                   File.Lines, Line, Last_Line);
+            Match := Look_License_Tree (Manager.Licenses.Root, Buf.Data,
+                                        File.Lines, Line, Last_Line);
             if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                return Match;
             end if;
@@ -766,11 +798,9 @@ package body SPDX_Tool.Licenses.Manager is
 
       elsif Parser.Optional > 0 and then Parser.Optionals (Parser.Optional).Optional = null then
          Parser.Optionals (Parser.Optional).Optional := Token;
-         Token.Previous := Parser.Previous;
-         if Parser.Optional /= 1 then
-            Parser.Previous := Token;
-            return;
-         end if;
+         Token.Previous := Parser.Optionals (Parser.Optional).all'Access;
+         Parser.Previous := Token;
+         return;
       end if;
       Token.Previous := Parser.Previous;
       if Parser.Previous = null then
