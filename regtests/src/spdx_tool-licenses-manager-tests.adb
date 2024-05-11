@@ -141,7 +141,11 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Manager.Languages.Initialize (Config);
       Manager.Load_License ("regtests/files/templates/text.txt");
       Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-      Result := Manager.Find_License (File);
+      declare
+         Buf : constant Buffer_Accessor := File.Buffer.Value;
+      begin
+         Result := Manager.Find_License (Buf.Data, File.Lines, 1, 2);
+      end;
       Util.Tests.Assert_Equals (T, "text", Result.Info.Name,
                                 "Invalid license found");
    end Test_Template_Fixed;
@@ -159,7 +163,11 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Manager.Languages.Initialize (Config);
       Manager.Load_License ("regtests/files/templates/variable.txt");
       Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-      Result := Manager.Find_License (File);
+      declare
+         Buf : constant Buffer_Accessor := File.Buffer.Value;
+      begin
+         Result := Manager.Find_License (Buf.Data, File.Lines, 1, 2);
+      end;
       Util.Tests.Assert_Equals (T, "variable", Result.Info.Name,
                                 "Invalid license found");
    end Test_Template_Var;
@@ -174,7 +182,11 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Manager.Languages.Initialize (Config);
       Manager.Load_License ("regtests/files/templates/variable-2.txt");
       Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-      Result := Manager.Find_License (File);
+      declare
+         Buf : constant Buffer_Accessor := File.Buffer.Value;
+      begin
+         Result := Manager.Find_License (Buf.Data, File.Lines, 1, 2);
+      end;
       Util.Tests.Assert_Equals (T, "variable-2", Result.Info.Name,
                                 "Invalid license found");
    end Test_Template_Var2;
