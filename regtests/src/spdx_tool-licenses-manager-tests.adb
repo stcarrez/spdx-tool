@@ -53,6 +53,8 @@ package body SPDX_Tool.Licenses.Manager.Tests is
                        Test_Find_License_Fixed'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (variable)",
                        Test_Find_License_Var'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (optional)",
+                       Test_Find_License_Optional'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (SPDX)",
                        Test_Find_License_SPDX'Access);
    end Add_Tests;
@@ -190,10 +192,18 @@ package body SPDX_Tool.Licenses.Manager.Tests is
    begin
       --  License contains variable part.
       Check_License (T, "lgpl-2.1.c", "standard/LGPL-2.1+.txt",
-                     "LGPL-2.1+", TEMPLATE_LICENSE, 2, 16);
+                     "LGPL-2.1+", TEMPLATE_LICENSE, 1, 16);
       Check_License (T, "bsd-3-clause.c", "standard/BSD-3-Clause.txt",
-                     "BSD-3-Clause", TEMPLATE_LICENSE, 1, 14);
+                     "BSD-3-Clause", TEMPLATE_LICENSE, 1, 24);
    end Test_Find_License_Var;
+
+   procedure Test_Find_License_Optional (T : in out Test) is
+   begin
+      Check_License (T, "antlr-pd-1.c", "standard/ANTLR-PD.txt",
+                     "ANTLR-PD", TEMPLATE_LICENSE, 1, 16);
+      Check_License (T, "antlr-pd-2.c", "standard/ANTLR-PD.txt",
+                     "ANTLR-PD", TEMPLATE_LICENSE, 3, 16);
+   end Test_Find_License_Optional;
 
    procedure Test_Find_License_SPDX (T : in out Test) is
    begin
