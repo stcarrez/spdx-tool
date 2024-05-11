@@ -4,12 +4,12 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
+with Ada.Tags;
 with GNAT.Source_Info;
 with Util.Test_Caller;
 with Util.Assertions;
 with SPDX_Tool.Configs;
 with SPDX_Tool.Files;
-with SPDX_Tool.Token_Counters;
 with SPDX_Tool.Infos;
 package body SPDX_Tool.Licenses.Manager.Tests is
 
@@ -41,6 +41,8 @@ package body SPDX_Tool.Licenses.Manager.Tests is
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite) is
    begin
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (token)",
+                       Test_Load_Template'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (fixed)",
                        Test_Template_Fixed'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (variable)",
@@ -86,9 +88,48 @@ package body SPDX_Tool.Licenses.Manager.Tests is
    end Check_License;
 
    --  ------------------------------
+   --  Test reading and loading a license template.
+   --  ------------------------------
+   procedure Test_Load_Template (T : in out Test) is
+      procedure Test_Load (Content : in String; Count : in Natural);
+
+      procedure Test_Load (Content : in String; Count : in Natural) is
+         Result  : License_Template;
+      begin
+         Manager.Load_License ("token", To_Buffer (Content), Result);
+         T.Assert (Result.Root /= null, "Template not loaded");
+
+         declare
+            Node : Token_Access := Result.Root;
+         begin
+            for I in 1 .. Count loop
+               T.Assert (Node /= null, "Template not loaded");
+               Util.Tests.Assert_Equals (T, "SPDX_TOOL.LICENSES.TOKEN_TYPE",
+                                         Ada.Tags.Expanded_Name (Node'Tag),
+                                         "Invalid token at " & I'Image);
+               Node := Node.Next;
+            end loop;
+            T.Assert (Node /= null, "Template not loaded");
+            Util.Tests.Assert_Equals (T, "SPDX_TOOL.LICENSES.FINAL_TOKEN_TYPE",
+                                      Ada.Tags.Expanded_Name (Node'Tag),
+                                      "Invalid final token");
+         end;
+      end Test_Load;
+   begin
+      Test_Load ("token", 1);
+      Test_Load ("  token   ", 1);
+      Test_Load (" token1  token2", 2);
+      Test_Load (" token1 token2 token3", 3);
+      Test_Load ("(token)", 3);
+      Test_Load ("( token )", 3);
+      Test_Load ("{(.)}", 5);
+      Test_Load ("token1.", 2);
+   end Test_Load_Template;
+
+   --  ------------------------------
    --  Test reading a template and matching fix content.
    --  ------------------------------
-   procedure Test_Template_Fixed (T : in out TesT) is
+   procedure Test_Template_Fixed (T : in out Test) is
       Data    : File_Info := Get_Path ("files/templates/text.ads");
       Config  : SPDX_Tool.Configs.Config_Type;
       Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
@@ -106,7 +147,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
    --  ------------------------------
    --  Test reading a template and matching fix content.
    --  ------------------------------
-   procedure Test_Template_Var (T : in out TesT) is
+   procedure Test_Template_Var (T : in out Test) is
       Data    : File_Info := Get_Path ("files/templates/variable.ads");
       Config  : SPDX_Tool.Configs.Config_Type;
       Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
@@ -121,7 +162,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
                                 "Invalid license found");
    end Test_Template_Var;
 
-   procedure Test_Template_Var2 (T : in out TesT) is
+   procedure Test_Template_Var2 (T : in out Test) is
       Data    : File_Info := Get_Path ("files/templates/variable-2.ads");
       Config  : SPDX_Tool.Configs.Config_Type;
       Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
