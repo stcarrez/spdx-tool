@@ -14,7 +14,6 @@ executables = ["genlangmap"]
 
 [[depends-on]]
 spdx_tool = "*"
-utilada = "^2.6.0"
 
 [configuration]
 disabled = true
