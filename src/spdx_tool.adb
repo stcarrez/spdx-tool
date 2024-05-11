@@ -143,6 +143,13 @@ package body SPDX_Tool is
       Util.Log.Loggers.Initialize (Log_Config);
    end Configure_Logs;
 
+   function To_Buffer (S : String) return Buffer_Type is
+      Data   : Buffer_Type (Buffer_Index (S'First) .. Buffer_Index (S'Last));
+      for Data'Address use S'Address;
+   begin
+      return Data;
+   end To_Buffer;
+
    function To_Buffer (S : UString) return Buffer_Type is
       Result : String := To_String (S);
       Data   : Buffer_Type (Buffer_Index (Result'First) .. Buffer_Index (Result'Last));

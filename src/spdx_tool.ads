@@ -37,6 +37,7 @@ package SPDX_Tool is
    function Length (S : UString) return Natural
       renames Ada.Strings.Unbounded.Length;
 
+   function To_Buffer (S : String) return Buffer_Type;
    function To_Buffer (S : UString) return Buffer_Type;
 
    function "-" (M : in String) return String renames Intl."-";
