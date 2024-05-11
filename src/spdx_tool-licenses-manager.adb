@@ -15,6 +15,7 @@ with SCI.Similarities.COO_Arrays;
 with SPDX_Tool.Licenses.Reader;
 with SPDX_Tool.Configs.Default;
 with SPDX_Tool.Licenses.Templates;
+with SPDX_Tool.Licenses.Files;
 package body SPDX_Tool.Licenses.Manager is
 
    use all type SPDX_Tool.Files.Comment_Mode;
@@ -359,7 +360,7 @@ package body SPDX_Tool.Licenses.Manager is
       for Line in From .. To loop
          SPDX_Tool.Counter_Arrays.Merge (Counters, Lines (Line).Tokens, Update'Access);
       end loop;
-      if not Counters.Cells.Is_Empty then
+      if not Counters.Cells.Is_Empty and then Manager.License_Frequency /= null then
          Freq_Transformers.TIDF (From     => Counters,
                                  Doc_Freq => Manager.License_Frequency.all,
                                  Into => Freqs);
@@ -483,6 +484,11 @@ package body SPDX_Tool.Licenses.Manager is
                return Match;
             end if;
             if Match.Last /= null then
+               if Match.Info.First_Line + 1 < Match.Info.Last_Line then
+                  Log.Info ("License missmatch at line{0} after {1} lines",
+                            Match.Info.Last_Line'Image,
+                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));
+               end if;
                Match.Depth := Match.Last.Depth;
                if Result.Last = null or else Match.Depth > Result.Depth then
                   Result.Last := Match.Last;
@@ -688,5 +694,215 @@ package body SPDX_Tool.Licenses.Manager is
       Log.Error ("Job {0} failed", Job.File.Path);
       Log.Error ("Exception", Ex, True);
    end Error;
+
+
+   function Find_Token (Parser : in Parser_Type;
+                        Word   : in Buffer_Type) return Token_Access is
+      Item : Token_Access;
+   begin
+      if Parser.Previous = null then
+         Item := Parser.Root;
+      else
+         Item := Parser.Previous.Next;
+      end if;
+      while Item /= null loop
+         if Item.Content = Word then
+            return Item;
+         end if;
+         Item := Item.Alternate;
+      end loop;
+      return null;
+   end Find_Token;
+
+   procedure Load_License (Name    : in String;
+                           Content : in Buffer_Type;
+                           License : in out License_Template) is
+      Pos   : Buffer_Index := Content'First;
+      Match : Buffer_Index;
+      Parser : Parser_Type;
+   begin
+      Match := Next_With (Content, Pos, SPDX_License_Tag);
+      if Match > Pos then
+         Match := Skip_Spaces (Content, Match, Content'Last);
+         Pos := Find_Eol (Content, Match);
+         License.Name := To_UString (Content (Match .. Pos - 1));
+      else
+         License.Name := To_UString (Name);
+      end if;
+      Parser.Root := License.Root;
+      Parser.License := License.Name;
+      Parser.Parse (Content);
+      License.Root := Parser.Root;
+      Log.Debug ("License {0} => {1} tokens", To_String (License.Name),
+                Natural'Image (Parser.Token_Count));
+
+   exception
+      when E : others =>
+         Log.Error ("Exception ", E);
+   end Load_License;
+
+   procedure Load_License (License : in License_Index;
+                           Into    : in out License_Template;
+                           Tokens  : out Token_Access) is
+      Name    : constant Name_Access := Files.Names (License);
+      Content : constant access constant Buffer_Type
+        := Files.Get_Content (Name.all);
+      Parser : Parser_Type;
+   begin
+      Into.Name := To_UString (Get_License_Name (License));
+      Tokens := null;
+      Parser.Root := null;
+      Parser.License := Into.Name;
+      Parser.Parse (Content.all);
+      Tokens := Parser.Root;
+   end Load_License;
+
+   procedure Append_Token (Parser : in out Parser_Type;
+                           Token  : in Token_Access) is
+   begin
+      Parser.Token_Count := Parser.Token_Count + 1;
+      if Parser.Optional > 0 and then Parser.Optionals (Parser.Optional).Optional = null then
+         Parser.Optionals (Parser.Optional).Optional := Token;
+         Parser.Previous := Token;
+         return;
+      end if;
+      Token.Previous := Parser.Previous;
+      if Parser.Previous = null then
+         if Parser.Root = null then
+            Parser.Root := Token;
+         else
+            Token.Alternate := Parser.Root.Alternate;
+            Parser.Root.Alternate := Token;
+         end if;
+      elsif Parser.Previous.Next = null then
+            Parser.Previous.Next := Token;
+      else
+         declare
+            Prev : Token_Access := Parser.Previous.Next;
+         begin
+            --  Insert the new token at end of the Alternate list if this
+            --  is a variable token (otherwise, we insert to head of list).
+            if Token.Kind in TOK_VAR | TOK_OPTIONAL then
+               while Prev.Alternate /= null loop
+                  Prev := Prev.Alternate;
+               end loop;
+            end if;
+            Token.Alternate := Prev.Alternate;
+            Prev.Alternate := Token;
+         end;
+      end if;
+   end Append_Token;
+
+   overriding
+   procedure Token (Parser  : in out Parser_Type;
+                    Content : in Buffer_Type;
+                    Token   : in SPDX_Tool.Licenses.Token_Kind) is
+      function Create_Regpat (Content : in Buffer_Type) return Token_Access;
+
+      function Create_Regpat (Content : in Buffer_Type) return Token_Access is
+         Regpat : String (1 .. Content'Length);
+         for Regpat'Address use Content'Address;
+      begin
+         if Regpat = ".+" then
+            return new Any_Token_Type '(Len => Content'Length,
+                                        Previous => null,
+                                        Next => null,
+                                        Alternate => null,
+                                        Content => Content,
+                                        Max_Length => 1000);
+         end if;
+         if Regpat = ".*" or else Regpat = ".{0,5000}" then
+            return new Any_Token_Type '(Len => Content'Length,
+                                        Previous => null,
+                                        Next => null,
+                                        Alternate => null,
+                                        Content => Content,
+                                        Max_Length => 1000);
+         end if;
+         if Regpat = ".{0,20}" then
+            return new Any_Token_Type '(Len => Content'Length,
+                                        Previous => null,
+                                        Next => null,
+                                        Alternate => null,
+                                        Content => Content,
+                                        Max_Length => 20);
+         end if;
+         Log.Debug ("Pattern: '{0}'", Regpat);
+         declare
+            Pat : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
+         begin
+            return new Regpat_Token_Type '(Len => Content'Length,
+                                           Plen => Pat.Size,
+                                           Previous => null,
+                                           Next => null,
+                                           Alternate => null,
+                                           Content => Content,
+                                           Pattern => Pat);
+         end;
+
+      exception
+         when others =>
+            Log.Error ("Cannot compile regex: '{0}'", Regpat);
+            return new Token_Type '(Len => Content'Length,
+                                    Previous => null,
+                                    Next => null,
+                                    Alternate => null,
+                                    Content => Content);
+      end Create_Regpat;
+
+      T : Token_Access;
+   begin
+      case Token is
+         when TOK_WORD =>
+            T := Parser.Find_Token (Content (Parser.Token_Pos .. Parser.Current_Pos - 1));
+            if T = null then
+               T := new Token_Type '(Len => Parser.Current_Pos - Parser.Token_Pos,
+                                     Previous => null,
+                                     Next => null,
+                                     Alternate => null,
+                                     Content => Content (Parser.Token_Pos .. Parser.Current_Pos - 1));
+               Parser.Append_Token (T);
+            end if;
+            Parser.Previous := T;
+
+         when TOK_VAR =>
+            T := Parser.Find_Token (Content (Parser.Match_Pos .. Parser.Match_End));
+            if T = null then
+               T := Create_Regpat (Content => Content (Parser.Match_Pos .. Parser.Match_End));
+               Parser.Append_Token (T);
+            end if;
+            Parser.Previous := T;
+
+         when TOK_OPTIONAL =>
+            if Parser.Optional = MAX_NESTED_OPTIONAL then
+               Log.Error ("too many nested <<beginOptional>>");
+               return;
+            end if;
+            Parser.Optional := Parser.Optional + 1;
+            Parser.Optionals (Parser.Optional)
+               := new Optional_Token_Type '(Len => 0,
+                                            Previous => null,
+                                            Next => null,
+                                            Alternate => null,
+                                            others => <>);
+            Parser.Append_Token (Parser.Optionals (Parser.Optional).all'Access);
+
+         when TOK_END_OPTIONAL =>
+            if Parser.Optional = 0 then
+               Log.Error ("not with a <<beginOptional>> element");
+               return;
+            end if;
+            T := Parser.Optionals (Parser.Optional).all'Access;
+            Parser.Previous := T;
+            Parser.Optional := Parser.Optional - 1;
+
+         when TOK_LICENSE | TOK_END | TOK_COPYRIGHT =>
+            T := new Final_Token_Type '(Len => 0,
+                                        License => Parser.License,
+                                        others => <>);
+            Parser.Append_Token (T);
+
+      end case;
+   end Token;
 
 end SPDX_Tool.Licenses.Manager;

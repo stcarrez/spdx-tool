@@ -109,10 +109,6 @@ package SPDX_Tool.Licenses is
       Name       : UString;
    end record;
 
-   procedure Load_License (License : in License_Index;
-                           Into    : in out License_Template;
-                           Tokens  : out Token_Access);
-
    procedure Performance_Report;
 
    type Token_Kind is (TOK_WORD,
@@ -129,16 +125,6 @@ package SPDX_Tool.Licenses is
 private
 
    function Get_License_Name (License : in License_Index) return String;
-
-   procedure Load_License (Name    : in String;
-                           Content : in Buffer_Type;
-                           License : in out License_Template);
-
-   procedure Parse_License (Content : in Buffer_Type;
-                            From    : in Buffer_Index;
-                            Root    : in out Token_Access;
-                            Current : in Token_Access;
-                            License : in UString);
 
    function Skip_Spaces (Content : in Buffer_Type;
                          Lines   : in Line_Array;

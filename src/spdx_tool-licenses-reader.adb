@@ -146,8 +146,13 @@ package body SPDX_Tool.Licenses.Reader is
          Match := Next_With (Content, Pos, ";match=""");
          if Match > Pos then
             Parser.Match_Pos := Match;
-            Parser.Match_End := Find_String_End (Content, Match, Last);
-            Pos := Parser.Match_End + 1;
+            Pos := Find_String_End (Content, Match, Last);
+            if Content (Pos) = Character'Pos ('"') then
+               Parser.Match_End := Pos - 1;
+               Pos := Pos + 1;
+            else
+               Parser.Match_End := Pos;
+            end if;
             if Pos > Last then
                return;
             end if;

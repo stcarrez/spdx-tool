@@ -9,6 +9,7 @@ with Util.Strings;
 with Util.Log.Loggers;
 
 with SPDX_Tool.Licenses.Files;
+with SPDX_Tool.Licenses.Manager;
 package body SPDX_Tool.Licenses is
 
    use all type SPDX_Tool.Files.Comment_Mode;
@@ -74,7 +75,7 @@ package body SPDX_Tool.Licenses is
       begin
          Token := Licenses (License).Root;
          if Token = null then
-            Load_License (License, Licenses (License), Token);
+            Manager.Load_License (License, Licenses (License), Token);
             if Token /= null then
                Licenses (License).Root := Token;
             else
@@ -461,42 +462,6 @@ package body SPDX_Tool.Licenses is
       end loop;
    end Collect_License_Tokens;
 
-   procedure Load_License (Name    : in String;
-                           Content : in Buffer_Type;
-                           License : in out License_Template) is
-      Pos   : Buffer_Index := Content'First;
-      Match : Buffer_Index;
-      Count : constant Natural := Token_Count;
-   begin
-      Match := Next_With (Content, Pos, SPDX_License_Tag);
-      if Match > Pos then
-         Match := Skip_Spaces (Content, Match, Content'Last);
-         Pos := Find_Eol (Content, Match);
-         License.Name := To_UString (Content (Match .. Pos - 1));
-      else
-         License.Name := To_UString (Name);
-      end if;
-      Parse_License (Content, Pos, License.Root, null, License.Name);
-      Log.Debug ("License {0} => {1} tokens", To_String (License.Name),
-                Natural'Image (Token_Count - Count));
-
-   exception
-      when E : others =>
-         Log.Error ("Exception ", E);
-   end Load_License;
-
-   procedure Load_License (License : in License_Index;
-                           Into    : in out License_Template;
-                           Tokens  : out Token_Access) is
-      Name    : constant Name_Access := Files.Names (License);
-      Content : constant access constant Buffer_Type
-        := Files.Get_Content (Name.all);
-   begin
-      Into.Name := To_UString (Get_License_Name (License));
-      Tokens := null;
-      Parse_License (Content.all, Content'First, Tokens, null, Into.Name);
-   end Load_License;
-
    function Depth (Token : in Token_Type'Class) return Natural is
       Result : Natural := 0;
       Parent : Token_Access := Token.Previous;
@@ -570,13 +535,19 @@ package body SPDX_Tool.Licenses is
             First   : constant Line_Pos
               := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos + 1), To);
             End_Line : Buffer_Index;
+            Len      : Buffer_Size;
          begin
             exit when First.Line > Lines'Last;
             exit when End_Pos.Pos - From.Pos > Token.Max_Length;
             exit when Lines (First.Line).Comment = NO_COMMENT;
             End_Line := Lines (First.Line).Style.Text_Last;
             exit when First.Pos > End_Line;
-            Pos.Pos := Next_Space (Content, First.Pos, End_Line);
+            Len := Punctuation_Length (Content, First.Pos, End_Line);
+            if Len > 0 then
+               Pos.Pos := Pos.Pos + Len - 1;
+            else
+               Pos.Pos := Next_Space (Content, First.Pos, End_Line);
+            end if;
             Match (Check, Content, Lines, First, (To.Line, Pos.Pos), Result, Next);
             if Next /= null and then Result /= First then
                return;
@@ -628,12 +599,18 @@ package body SPDX_Tool.Licenses is
             First   : constant Line_Pos
               := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos + 1), To);
             End_Line : Buffer_Index;
+            Len      : Buffer_Size;
          begin
             exit when First.Line > Lines'Last;
             exit when Lines (First.Line).Comment = NO_COMMENT;
             End_Line := Lines (First.Line).Style.Text_Last;
             exit when First.Pos > End_Line;
-            Pos.Pos := Next_Space (Content, First.Pos, End_Line);
+            Len := Punctuation_Length (Content, First.Pos, End_Line);
+            if Len > 0 then
+               Pos.Pos := Pos.Pos + Len - 1;
+            else
+               Pos.Pos := Next_Space (Content, First.Pos, End_Line);
+            end if;
             Match (Check, Content, Lines, First, (To.Line, Pos.Pos), Result, Next);
             if Next /= null and then Result /= First then
                return;
@@ -791,6 +768,7 @@ package body SPDX_Tool.Licenses is
       Pos, First : Line_Pos;
       Next_Token : Token_Access;
       Last : Line_Pos;
+      Len        : Buffer_Size;
    begin
       Result.Info.First_Line := From;
       Pos.Line := From;
@@ -804,10 +782,21 @@ package body SPDX_Tool.Licenses is
             end if;
             Last.Pos := Lines (Pos.Line).Style.Text_Last;
             while Pos.Pos <= Last.Pos and then First.Line = Pos.Line loop
-               Pos.Pos := Skip_Spaces (Content, Pos.Pos, Last.Pos);
+               loop
+                  Len := Space_Length (Content, Pos.Pos, Last.Pos);
+                  exit when Len = 0;
+                  Pos.Pos := Pos.Pos + Len;
+                  exit when Pos.Pos > Last.Pos;
+               end loop;
+               --  Pos.Pos := Skip_Spaces (Content, Pos.Pos, Last.Pos);
                exit when Pos.Pos > Last.Pos;
                First.Pos := Pos.Pos;
-               Pos.Pos := Next_Space (Content, Pos.Pos, Last.Pos);
+               Len := Punctuation_Length (Content, Pos.Pos, Last.Pos);
+               if Len > 0 then
+                  Pos.Pos := Pos.Pos + Len - 1;
+               else
+                  Pos.Pos := Next_Space (Content, Pos.Pos, Last.Pos);
+               end if;
                if Current = null then
                   Match (Root, Content, Lines, First,
                          (To, Pos.Pos), Pos, Next_Token);
@@ -816,6 +805,9 @@ package body SPDX_Tool.Licenses is
                          (To, Pos.Pos), Pos, Next_Token);
                end if;
                if Next_Token = null then
+                  if Current /= null then
+                     Log.Error ("Current : {0}", To_String (To_UString (Content (Pos.Pos .. Pos.Pos + 20))));
+                  end if;
                   Result.Info.Last_Line := Pos.Line;
                   Result.Last := Current;
                   return Result;
