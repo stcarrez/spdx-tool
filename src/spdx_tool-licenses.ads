@@ -242,16 +242,6 @@ private
    function Kind (Token : in Final_Token_Type)
                   return Token_Kind is (TOK_LICENSE);
 
-   type Decision_Node;
-   type Decision_Node_Access is access constant Decision_Node;
-   type Decision_Node (Length : Buffer_Size; Size : Natural) is record
-      Left     : Decision_Node_Access;
-      Right    : Decision_Node_Access;
-      Token    : Buffer_Type (1 .. Length);
-      Licenses : License_Index_Array (1 .. Size);
-   end record;
-   type Decision_Array_Access is array (Positive range <>) of Decision_Node_Access;
-
    --  Find in the header comment an SPDX license tag.
    function Look_SPDX_License (Content : in Buffer_Type;
                                 Lines   : in SPDX_Tool.Languages.Line_Array;
