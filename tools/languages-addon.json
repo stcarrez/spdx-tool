@@ -142,6 +142,13 @@
    "Forth": {
       "comment_style": "Forth-style",
    },
+   "Snowball": {
+      "type": "programming",
+      "extensions": [
+         ".sbl"
+      ],
+      "comment_style": "C-style"
+   },
    "Common Lisp": {
       "comment_style": "Semicolon",      
       "aliases": [
