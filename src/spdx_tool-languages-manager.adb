@@ -3,7 +3,7 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-
+with Ada.Unchecked_Deallocation;
 with Util.Log.Loggers;
 with Util.Strings.Vectors;
 with Util.Strings.Split;
@@ -287,5 +287,20 @@ package body SPDX_Tool.Languages.Manager is
       end loop;
 
    end Initialize;
+
+   overriding
+   procedure Finalize (Manager : in out Language_Manager) is
+      procedure Free is
+         new Ada.Unchecked_Deallocation (Object => Analyzer_Type'Class,
+                                         Name   => Analyzer_Access);
+      procedure Free is
+         new Ada.Unchecked_Deallocation (Object => Combined_Analyzer_Type,
+                                         Name   => Combined_Analyzer_Access);
+   begin
+      for I in Manager.Default.Analyzers'Range loop
+         Free (Manager.Default.Analyzers (I));
+      end loop;
+      Free (Manager.Default);
+   end Finalize;
 
 end SPDX_Tool.Languages.Manager;

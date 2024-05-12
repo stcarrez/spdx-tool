@@ -10,8 +10,6 @@ with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
 with SPDX_Tool.Files;
 with SPDX_Tool.Token_Counters;
-private with Ada.Strings.Hash;
-private with Ada.Containers.Indefinite_Hashed_Maps;
 package SPDX_Tool.Languages is
 
    --  Mapper to guess language from path extension (result is the language name).
@@ -241,12 +239,5 @@ private
       Analyzer : Analyzer_Access;
       Config   : Comment_Configuration;
    end record;
-
-   --  Map which gives the analyzer to use for a given language.
-   package Language_Maps is
-      new Ada.Containers.Indefinite_Hashed_Maps (Key_Type     => String,
-                                                 Element_Type => Language_Descriptor,
-                                                 Hash         => Ada.Strings.Hash,
-                                                 Equivalent_Keys => "=");
 
 end SPDX_Tool.Languages;

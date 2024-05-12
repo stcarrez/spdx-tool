@@ -6,6 +6,7 @@
 
 with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
+private with Ada.Finalization;
 private with Ada.Strings.Hash;
 private with Ada.Containers.Indefinite_Hashed_Maps;
 private with SPDX_Tool.Token_Counters;
@@ -39,7 +40,7 @@ private
                                                  Hash         => Ada.Strings.Hash,
                                                  Equivalent_Keys => "=");
 
-   type Language_Manager is tagged limited record
+   type Language_Manager is limited new Ada.Finalization.Limited_Controlled with record
       Languages        : Language_Maps.Map;
       Tokens           : SPDX_Tool.Token_Counters.Token_Maps.Map;
       Default          : Combined_Analyzer_Access;
@@ -55,5 +56,8 @@ private
 
    function Find_Analyzer (Manager : in Language_Manager;
                            Name    : in String) return Analyzer_Access;
+
+   overriding
+   procedure Finalize (Manager : in out Language_Manager);
 
 end SPDX_Tool.Languages.Manager;
