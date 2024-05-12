@@ -49,6 +49,8 @@ package body SPDX_Tool.Licenses.Manager.Tests is
                        Test_Template_Var'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (variable2)",
                        Test_Template_Var2'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (optional)",
+                       Test_Template_Optional'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (fixed)",
                        Test_Find_License_Fixed'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (variable)",
@@ -170,6 +172,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       end;
       Util.Tests.Assert_Equals (T, "variable", Result.Info.Name,
                                 "Invalid license found");
+      Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
    end Test_Template_Var;
 
    procedure Test_Template_Var2 (T : in out Test) is
@@ -189,7 +192,46 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       end;
       Util.Tests.Assert_Equals (T, "variable-2", Result.Info.Name,
                                 "Invalid license found");
+      Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
    end Test_Template_Var2;
+
+   procedure Test_Template_Optional (T : in out Test) is
+      Config  : SPDX_Tool.Configs.Config_Type;
+      Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
+   begin
+      Manager.Languages.Initialize (Config);
+      Manager.Load_License ("regtests/files/templates/optional-1.txt");
+      declare
+         Data    : File_Info := Get_Path ("files/templates/optional-1.ads");
+         File    : SPDX_Tool.Files.File_Type (100);
+         Result  : License_Match;
+      begin
+         Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
+         declare
+            Buf : constant Buffer_Accessor := File.Buffer.Value;
+         begin
+            Result := Manager.Find_License (Buf.Data, File.Lines, 1, 2);
+         end;
+         Util.Tests.Assert_Equals (T, "optional-1", Result.Info.Name,
+                                   "Invalid license found");
+         Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
+      end;
+      declare
+         Data    : File_Info := Get_Path ("files/templates/optional-1.java");
+         File    : SPDX_Tool.Files.File_Type (100);
+         Result  : License_Match;
+      begin
+         Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
+         declare
+            Buf : constant Buffer_Accessor := File.Buffer.Value;
+         begin
+            Result := Manager.Find_License (Buf.Data, File.Lines, 1, 4);
+         end;
+         Util.Tests.Assert_Equals (T, "optional-1", Result.Info.Name,
+                                   "Invalid license found");
+         Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
+      end;
+   end Test_Template_Optional;
 
    --  ------------------------------
    --  Test Find_License with simple license files
