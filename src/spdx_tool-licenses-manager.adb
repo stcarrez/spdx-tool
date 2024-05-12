@@ -790,19 +790,26 @@ package body SPDX_Tool.Licenses.Manager is
 
    procedure Append_Token (Parser : in out Parser_Type;
                            Token  : in Token_Access) is
+      Is_Optional : constant Boolean := Token.all in Optional_Token_Type'Class;
+      Is_Linked   : Boolean := False;
    begin
       Parser.Token_Count := Parser.Token_Count + 1;
-      if Token.all in Optional_Token_Type'Class then
-         Parser.Optional := Parser.Optional + 1;
-         Parser.Optionals (Parser.Optional) := Optional_Token_Type (Token.all)'Access;
-
-      elsif Parser.Optional > 0 and then Parser.Optionals (Parser.Optional).Optional = null then
+      if Parser.Optional > 0 and then Parser.Optionals (Parser.Optional).Optional = null then
          Parser.Optionals (Parser.Optional).Optional := Token;
          Token.Previous := Parser.Optionals (Parser.Optional).all'Access;
          Parser.Previous := Token;
+         Is_Linked := True;
+      end if;
+      if Is_Optional then
+         Parser.Optional := Parser.Optional + 1;
+         Parser.Optionals (Parser.Optional) := Optional_Token_Type (Token.all)'Access;
+      end if;
+      if Parser.Optional > 1 then
          return;
       end if;
-      Token.Previous := Parser.Previous;
+      if Token.Previous = null then
+         Token.Previous := Parser.Previous;
+      end if;
       if Parser.Previous = null then
          if Parser.Root = null then
             Parser.Root := Token;
@@ -810,9 +817,7 @@ package body SPDX_Tool.Licenses.Manager is
             Token.Alternate := Parser.Root.Alternate;
             Parser.Root.Alternate := Token;
          end if;
-      elsif Parser.Previous.Next = null then
-            Parser.Previous.Next := Token;
-      else
+      elsif Parser.Previous.Next /= null then
          declare
             Prev : Token_Access := Parser.Previous.Next;
          begin
@@ -826,6 +831,8 @@ package body SPDX_Tool.Licenses.Manager is
             Token.Alternate := Prev.Alternate;
             Prev.Alternate := Token;
          end;
+      elsif not Is_Linked then
+         Parser.Previous.Next := Token;
       end if;
    end Append_Token;
 

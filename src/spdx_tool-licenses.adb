@@ -300,7 +300,7 @@ package body SPDX_Tool.Licenses is
          return;
       end if;
       Token.Optional.Matches (Content, Lines, From, To, Result, Next);
-      if Next = null then
+      if Next = null and then (Result = From or else Token.Optional.Next /= null) then
          Token.Next.Matches (Content, Lines, From, To, Result, Next);
          return;
       end if;
@@ -313,6 +313,9 @@ package body SPDX_Tool.Licenses is
          Check : Token_Access := Token.Optional.Next;
          End_Line : Buffer_Index;
       begin
+         if Check /= null and then Next = Check.Next then
+            Check := Check.Next;
+         end if;
          while Check /= null loop
             if Pos.Pos + 1 > Last
               or else Lines (Pos.Line).Comment = NO_COMMENT
@@ -451,6 +454,8 @@ package body SPDX_Tool.Licenses is
                  and then Current.Next.Kind = TOK_LICENSE
                then
                   Current := Current.Next;
+               end if;
+               if Current.Kind = TOK_LICENSE then
                   Result.Info.Name := Final_Token_Type (Current.all).License;
                   Result.Info.Last_Line := Pos.Line;
                   Result.Info.Match := Infos.TEMPLATE_LICENSE;
