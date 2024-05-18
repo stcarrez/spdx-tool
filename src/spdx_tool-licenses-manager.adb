@@ -135,7 +135,8 @@ package body SPDX_Tool.Licenses.Manager is
 
             --  Pre-compute for each license, the Sqrt of sum of square of token frequencies.
             for I in Manager.License_Squares'Range loop
-               Manager.License_Squares (I) := Similarities.Sqrt_Square (Manager.Token_Frequency, I);
+               Manager.License_Squares (I)
+                  := Similarities.Sqrt_Square (Manager.Token_Frequency, I);
             end loop;
          end;
       end if;

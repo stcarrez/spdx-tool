@@ -53,7 +53,7 @@ package body SPDX_Tool.Files.Manager is
 
       Fd         : Util.Systems.Types.File_Type := Util.Systems.Os.NO_FILE;
       P          : Interfaces.C.Strings.chars_ptr;
-      Flags      : Interfaces.C.int := O_CLOEXEC + O_RDONLY;
+      Flags      : constant Interfaces.C.int := O_CLOEXEC + O_RDONLY;
    begin
       Log.Debug ("Open file {0}", File.Path);
 
