@@ -11,6 +11,7 @@ with Util.Assertions;
 with SPDX_Tool.Configs;
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
+with SPDX_Tool.Licenses.Reader;
 package body SPDX_Tool.Licenses.Manager.Tests is
 
    use SPDX_Tool.Infos;
@@ -77,6 +78,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Result  : License_Match;
    begin
       Manager.Languages.Initialize (Config);
+      Manager.File_Mgr (1).Initialize ("");
 
       --  Load only one license to simplify the debugging in case of problem.
       Manager.Load_License ("licenses/" & License);
@@ -100,7 +102,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       procedure Test_Load (Content : in String; Count : in Natural) is
          Result  : License_Template;
       begin
-         Manager.Load_License ("token", To_Buffer (Content), Result);
+         Reader.Load_License ("token", To_Buffer (Content), Result);
          T.Assert (Result.Root /= null, "Template not loaded");
 
          declare
@@ -141,6 +143,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Result  : License_Match;
    begin
       Manager.Languages.Initialize (Config);
+      Manager.File_Mgr (1).Initialize ("");
       Manager.Load_License ("regtests/files/templates/text.txt");
       Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
       declare
@@ -163,6 +166,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Result  : License_Match;
    begin
       Manager.Languages.Initialize (Config);
+      Manager.File_Mgr (1).Initialize ("");
       Manager.Load_License ("regtests/files/templates/variable.txt");
       Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
       declare
@@ -183,6 +187,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Result  : License_Match;
    begin
       Manager.Languages.Initialize (Config);
+      Manager.File_Mgr (1).Initialize ("");
       Manager.Load_License ("regtests/files/templates/variable-2.txt");
       Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
       declare
@@ -200,6 +205,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
    begin
       Manager.Languages.Initialize (Config);
+      Manager.File_Mgr (1).Initialize ("");
       Manager.Load_License ("regtests/files/templates/optional-1.txt");
       declare
          Data    : File_Info := Get_Path ("files/templates/optional-1.ads");

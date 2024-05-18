@@ -72,6 +72,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       declare
          Data : File_Info := Get_Path ("files/identify/apache-2.0-1.ads");
          Info : File_Type (100);
@@ -140,6 +141,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       declare
          Data : File_Info := Get_Path ("files/identify/gpl-3.0.c");
          Info : File_Type (100);
@@ -327,6 +329,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 5, 16, "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -348,6 +351,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 11, 19, "GPL-3.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -369,6 +373,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 5, 15, "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -390,6 +395,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 12, 27, "GPL-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -411,6 +417,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 9, 27, "GPL-3.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -432,6 +439,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 3, 22, "MIT");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -453,6 +461,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 11, 13, "LGPL-2.1");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -474,6 +483,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 6, 16, "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -495,6 +505,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 5, 17, "LGPL-2.1");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
@@ -516,6 +527,7 @@ package body SPDX_Tool.Files.Manager.Tests is
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
+      Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
       Manager.Save (Info, Result, 5, 15, "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
