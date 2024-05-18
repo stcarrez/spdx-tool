@@ -4,9 +4,9 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
-with Util.Streams.Files;
 with SPDX_Tool.Counter_Arrays;
 with SPDX_Tool.Infos;
+with Util.Streams.Raw;
 package SPDX_Tool.Files is
 
    subtype Line_Number is Infos.Line_Number;
@@ -46,7 +46,7 @@ package SPDX_Tool.Files is
    type Line_Array is array (Infos.Line_Number range <>) of Line_Type;
 
    type File_Type (Max_Lines : Infos.Line_Count) is limited record
-      File         : Util.Streams.Files.File_Stream;
+      File         : Util.Streams.Raw.Raw_Stream;
       Buffer       : Buffer_Ref;
       Last_Offset  : Buffer_Size;
       Count        : Line_Count := 0;

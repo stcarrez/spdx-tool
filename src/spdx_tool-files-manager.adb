@@ -4,9 +4,15 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Streams.Stream_IO;
+with Ada.IO_Exceptions;
+with Interfaces.C.Strings;
 
 with Util.Log.Loggers;
 with Util.Files;
+with Util.Streams.Files;
+with Util.Systems.Types;
+with Util.Systems.Os;
+with Util.Systems.Constants;
 package body SPDX_Tool.Files.Manager is
 
    Log : constant Util.Log.Loggers.Logger :=
@@ -41,11 +47,24 @@ package body SPDX_Tool.Files.Manager is
                    Data      : in out File_Type;
                    File      : in out SPDX_Tool.Infos.File_Info;
                    Languages : in SPDX_Tool.Languages.Manager.Language_Manager) is
+      use Util.Systems.Constants;
+      use type Util.Systems.Types.File_Type;
+      use type Interfaces.C.int;
+
+      Fd         : Util.Systems.Types.File_Type := Util.Systems.Os.NO_FILE;
+      P          : Interfaces.C.Strings.chars_ptr;
+      Flags      : Interfaces.C.int := O_CLOEXEC + O_RDONLY;
    begin
       Log.Debug ("Open file {0}", File.Path);
 
-      Data.File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => File.Path);
-      Data.Buffer := Create_Buffer (4096);
+      P := Interfaces.C.Strings.New_String (File.Path);
+      Fd := Util.Systems.Os.Sys_Open (P, Flags, 0);
+      Interfaces.C.Strings.Free (P);
+      if Fd = Util.Systems.Os.NO_FILE then
+         raise Ada.IO_Exceptions.Name_Error with File.Path;
+      end if;
+      Data.File.Initialize (File => Fd);
+      Data.Buffer := Manager.Buffer;
       Data.Count := 0;
       declare
          Buf      : constant Buffer_Accessor := Data.Buffer.Value;
@@ -147,7 +166,10 @@ package body SPDX_Tool.Files.Manager is
    procedure Initialize (Manager : in out File_Manager;
                          Path    : in String) is
    begin
-      Magic_Manager.Initialize (Manager.Magic_Manager, Path);
+      if Path'Length > 0 then
+         Magic_Manager.Initialize (Manager.Magic_Manager, Path);
+      end if;
+      Manager.Buffer := Create_Buffer (8192);
    end Initialize;
 
 end SPDX_Tool.Files.Manager;

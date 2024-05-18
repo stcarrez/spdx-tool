@@ -72,19 +72,19 @@ package SPDX_Tool.Licenses is
       Token : Token_Index;
       List  : License_Index_Array_Access;
    end record;
-   type Token_Index_Array is array (Positive range <>) of Index_Type;
+   type Token_Index_Array is array (Token_Index range <>) of Index_Type;
 
    function "<" (Left, Right : Index_Type) return Boolean
       is (Left.Token < Right.Token);
    overriding
    function "=" (Left, Right : Index_Type) return Boolean
       is (Left.Token = Right.Token);
-   function Middle (Low, High : Positive) return Positive
+   function Middle (Low, High : Token_Index) return Token_Index
       is ((High + Low) / 2);
 
    package Algorithms is
       new Util.Algorithms.Arrays (Element_Type => Index_Type,
-                                  Index_Type => Positive,
+                                  Index_Type => Token_Index,
                                   Array_Type => Token_Index_Array,
                                   Middle => Middle);
 
@@ -262,6 +262,8 @@ private
                                From    : in Line_Number;
                                To      : in Line_Number)
                            return License_Match;
+
+   Perf : aliased Util.Measures.Measure_Set;
 
    procedure Report (Stamp : in out Util.Measures.Stamp;
                      Title : in String;

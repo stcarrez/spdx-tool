@@ -559,8 +559,6 @@ package body SPDX_Tool.Licenses is
       end;
    end Look_License;
 
-   Perf : Util.Measures.Measure_Set;
-
    procedure Performance_Report is
    begin
       Util.Measures.Write (Perf, "spdx-tool", Ada.Text_IO.Standard_Output);

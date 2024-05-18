@@ -111,6 +111,9 @@ private
 
    type Frequency_Array_Access is access all Freq_Transformers.Frequency_Array;
 
+   type Float_Array is array (License_Index range <>) of Float;
+   type Float_Array_Access is access all Float_Array;
+
    type License_Manager_Access is access all License_Manager;
 
    type License_Job_Type is record
@@ -159,6 +162,7 @@ private
       --  A map of tokens used in license templates.
       Token_Counters       : SPDX_Tool.Counter_Arrays.Array_Type;
       Token_Frequency      : Frequency_Arrays.Array_Type;
+      License_Squares      : Float_Array_Access;
       License_Frequency    : Frequency_Array_Access;
 
       Files    : SPDX_Tool.Infos.File_Map;

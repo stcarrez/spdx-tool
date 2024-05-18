@@ -36,6 +36,7 @@ private
 
    type File_Manager is tagged limited record
       Magic_Manager : SPDX_Tool.Magic_Manager.Magic_Manager;
+      Buffer        : Buffer_Ref;
    end record;
 
    --  Identify the file mime type.

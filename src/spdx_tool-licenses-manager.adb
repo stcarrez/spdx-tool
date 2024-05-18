@@ -27,6 +27,13 @@ package body SPDX_Tool.Licenses.Manager is
    function Is_Info_Log return Boolean
       is (Util.Log.Loggers.Get_Level (Log) <= Util.Log.INFO_LEVEL);
 
+   function To_Float (Value : Float) return Float is (Value);
+
+   package Similarities is
+      new SCI.Similarities.COO_Arrays (Arrays      => Freq_Transformers.Frequency_Arrays,
+                                       Conversions => Confidence_Conversions,
+                                       To_Float    => To_Float);
+
    File_Mgr : SPDX_Tool.Files.Manager.File_Manager_Access := null with Thread_Local_Storage;
 
    --  ------------------------------
@@ -95,6 +102,7 @@ package body SPDX_Tool.Licenses.Manager is
          end if;
       end Load_Ignore_File;
 
+      Stamp   : Util.Measures.Stamp;
    begin
       Configs.Configure (Config,
                          Configs.Names.IGNORE,
@@ -123,19 +131,29 @@ package body SPDX_Tool.Licenses.Manager is
                                     Doc_Freq => F,
                                     Into     => Manager.Token_Frequency);
             Manager.License_Frequency := new Freq_Transformers.Frequency_Array '(F);
+            Manager.License_Squares := new Float_Array (Licenses.Templates.List'Range);
+
+            --  Pre-compute for each license, the Sqrt of sum of square of token frequencies.
+            for I in Manager.License_Squares'Range loop
+               Manager.License_Squares (I) := Similarities.Sqrt_Square (Manager.Token_Frequency, I);
+            end loop;
          end;
       end if;
       if not Manager.Started then
-         if Opt_Mimes then
+         declare
+            Path : constant String := (if Opt_Mimes then "/usr/share/misc/magic" else "");
+         begin
             for I in Manager.File_Mgr'Range loop
-               Manager.File_Mgr (I).Initialize ("/usr/share/misc/magic");
+               Manager.File_Mgr (I).Initialize (Path);
             end loop;
-         end if;
+         end;
          Manager.Manager := Manager'Unchecked_Access;
          Manager.Executor.Start;
          Manager.Started := True;
       end if;
       Manager.Job := Job;
+      Util.Measures.Set_Current (Perf'Access);
+      SPDX_Tool.Licenses.Report (Stamp, "configure license manager");
    end Configure;
 
    --  ------------------------------
@@ -372,12 +390,6 @@ package body SPDX_Tool.Licenses.Manager is
                            Lines   : in SPDX_Tool.Languages.Line_Array;
                            From    : in Line_Number;
                            To      : in Line_Number) return License_Match is
-      package Similarities is
-         new SCI.Similarities.COO_Arrays (Arrays => Freq_Transformers.Frequency_Arrays,
-                                          Conversions => Confidence_Conversions);
-      function To_Float (Value : Float) return Float is (Value);
-      function Cosine is
-         new Similarities.Cosine (To_Float => To_Float);
 
       Guess : License_Index := 0;
       Confidence : Confidence_Type := 0.0;
@@ -395,7 +407,8 @@ package body SPDX_Tool.Licenses.Manager is
                declare
                   Cosine_Stamp   : Util.Measures.Stamp;
                begin
-                  C := Cosine (Freqs, 1, Manager.Token_Frequency, License);
+                  C := Similarities.Cosine (Freqs, 1, Manager.Token_Frequency, License,
+                                            Manager.License_Squares (License));
                   SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
                end;
                Log.Debug ("Confidence with {0} -> {1}",
@@ -413,7 +426,8 @@ package body SPDX_Tool.Licenses.Manager is
          for Line in From + 1 .. To - 1 loop
             Freqs := Manager.Compute_Frequency (Lines, Line, To);
             exit when Freqs.Cells.Is_Empty;
-            C := Cosine (Freqs, 1, Manager.Token_Frequency, Guess);
+            C := Similarities.Cosine (Freqs, 1, Manager.Token_Frequency, Guess,
+                                      Manager.License_Squares (Guess));
             exit when Confidence > C;
             Result.Info.First_Line := Line;
             Confidence := C;
