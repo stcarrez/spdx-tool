@@ -54,7 +54,7 @@ procedure SPDX_Tool.Gentmpl is
    Output   : aliased Util.Streams.Files.File_Stream;
    Writer   : aliased Util.Streams.Texts.Print_Stream;
 
-   type Parser_Type is new SPDX_Tool.Licenses.Reader.Parser_Type with null record;
+   type Parser_Type is new SPDX_Tool.Licenses.Reader.Abstract_Parser_Type with null record;
 
    overriding
    procedure Token (Parser  : in out Parser_Type;

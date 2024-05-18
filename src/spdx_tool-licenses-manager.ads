@@ -16,7 +16,6 @@ with SCI.Numbers;
 private with SPDX_Tool.Languages.Manager;
 private with Util.Executors;
 private with Util.Concurrent.Counters;
-private with SPDX_Tool.Licenses.Reader;
 package SPDX_Tool.Licenses.Manager is
 
    package UFW renames Util.Files.Walk;
@@ -80,14 +79,6 @@ package SPDX_Tool.Licenses.Manager is
    generic
       with procedure Process (Map : in SPDX_Tool.Infos.File_Map);
    procedure Report (Manager : in out License_Manager);
-
-   procedure Load_License (Name    : in String;
-                           Content : in Buffer_Type;
-                           License : in out License_Template);
-
-   procedure Load_License (License : in License_Index;
-                           Into    : in out License_Template;
-                           Tokens  : out Token_Access);
 
 private
 
@@ -213,33 +204,5 @@ private
                            Lines   : in SPDX_Tool.Languages.Line_Array;
                            From    : in Line_Number;
                            To      : in Line_Number) return License_Match;
-
-   MAX_NESTED_OPTIONAL : constant := 10;
-
-   type Optional_Index is new Natural range 0 .. MAX_NESTED_OPTIONAL;
-   type Optional_Token_Array_Access is
-      array (Optional_Index range 1 .. MAX_NESTED_OPTIONAL) of Optional_Token_Access;
-
-   type Parser_Type is new SPDX_Tool.Licenses.Reader.Parser_Type with record
-      Root        : Token_Access;
-      Token       : Token_Access;
-      Previous    : Token_Access;
-      Optionals   : Optional_Token_Array_Access;
-      Optional    : Optional_Index := 0;
-      Saved       : Token_Access;
-      Token_Count : Natural := 0;
-      License     : UString;
-   end record;
-
-   overriding
-   procedure Token (Parser  : in out Parser_Type;
-                    Content : in Buffer_Type;
-                    Token   : in SPDX_Tool.Licenses.Token_Kind);
-
-   function Find_Token (Parser : in Parser_Type;
-                        Word   : in Buffer_Type) return Token_Access;
-
-   procedure Append_Token (Parser : in out Parser_Type;
-                           Token  : in Token_Access);
 
 end SPDX_Tool.Licenses.Manager;

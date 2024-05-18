@@ -9,7 +9,7 @@ with Util.Strings;
 with Util.Log.Loggers;
 
 with SPDX_Tool.Licenses.Files;
-with SPDX_Tool.Licenses.Manager;
+with SPDX_Tool.Licenses.Reader;
 package body SPDX_Tool.Licenses is
 
    use all type SPDX_Tool.Files.Comment_Mode;
@@ -75,7 +75,7 @@ package body SPDX_Tool.Licenses is
       begin
          Token := Licenses (License).Root;
          if Token = null then
-            Manager.Load_License (License, Licenses (License), Token);
+            Reader.Load_License (License, Licenses (License), Token);
             if Token /= null then
                Licenses (License).Root := Token;
             else
