@@ -7,6 +7,7 @@
 with System.Multiprocessors;
 with Ada.Command_Line;
 with Ada.Directories;
+with Ada.Exceptions;
 with GNAT.Command_Line;
 with GNAT.Strings;
 
@@ -97,11 +98,6 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--mimes",
                         Help   => -("Identify mime types of files"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Update'Access,
-                        Switch => "-u",
-                        Long_Switch => "--update",
-                        Help   => -("Update the license to use a SPDX-License tag"));
-      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Files'Access,
                         Switch => "-f",
                         Long_Switch => "--files",
@@ -165,6 +161,11 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--output-xml=",
                         Argument => "PATH",
                         Help   => -("Generic a XML report with licenses and files"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Update_Pattern'Access,
+                        Long_Switch => "--update=",
+                        Argument => "PATTERN",
+                        Help   => -("Update the license to use a SPDX-License tag"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.Opt_Perf_Report'Access,
                         Long_Switch => "--print-perf-report",
@@ -327,8 +328,11 @@ begin
       then
          Read_Licenses (Manager, Licenses.License_Dir.all);
       end if;
-      if Opt_Update then
+      if SPDX_Tool.Licenses.Update_Pattern /= null
+        and then SPDX_Tool.Licenses.Update_Pattern.all /= ""
+      then
          Manager.Configure (Tool_Config, Licenses.Manager.UPDATE_LICENSES);
+         Manager.Set_Update_Pattern (SPDX_Tool.Licenses.Update_Pattern.all);
       else
          Manager.Configure (Tool_Config, Licenses.Manager.READ_LICENSES);
       end if;
@@ -362,6 +366,10 @@ begin
    end if;
 
 exception
+   when E : SPDX_Tool.Licenses.Manager.Invalid_Pattern =>
+      Log.Error (-("invalid option --update: {}"), Ada.Exceptions.Exception_Message (E));
+      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+
    when SPDX_Tool.Configs.Error |
         GNAT.Command_Line.Exit_From_Command_Line |
         GNAT.Command_Line.Invalid_Switch =>

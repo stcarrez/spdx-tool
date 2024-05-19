@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Ada.Streams.Stream_IO;
+with Ada.Strings.Fixed;
 with Ada.Unchecked_Deallocation;
 
 with Util.Strings;
@@ -29,12 +30,71 @@ package body SPDX_Tool.Licenses.Manager is
 
    function To_Float (Value : Float) return Float is (Value);
 
+   function Get_Range (Pattern : in String) return SPDX_Tool.Infos.Line_Range_Type;
+
    package Similarities is
       new SCI.Similarities.COO_Arrays (Arrays      => Freq_Transformers.Frequency_Arrays,
                                        Conversions => Confidence_Conversions,
                                        To_Float    => To_Float);
 
    File_Mgr : SPDX_Tool.Files.Manager.File_Manager_Access := null with Thread_Local_Storage;
+
+   function Get_Range (Pattern : in String) return SPDX_Tool.Infos.Line_Range_Type is
+      Pos    : constant Natural := Ada.Strings.Fixed.Index (Pattern, "..");
+      Result : SPDX_Tool.Infos.Line_Range_Type;
+   begin
+      if Pos > Pattern'First then
+         Result.First_Line := Line_Count'Value (Pattern (Pattern'First .. Pos - 1));
+         Result.Last_Line := Line_Count'Value (Pattern (Pos + 2 .. Pattern'Last));
+      elsif Pos = Pattern'First then
+         Result.Last_Line := Line_Count'Value (Pattern (Pos + 2 .. Pattern'Last));
+      else
+         Result.First_Line := Line_Count'Value (Pattern);
+         Result.Last_Line := Result.First_Line;
+      end if;
+      return Result;
+
+   exception
+      when Constraint_Error =>
+         raise Invalid_Pattern with -("Invalid range of line");
+   end Get_Range;
+
+   --  ------------------------------
+   --  Setup the update pattern when the tool must replace the existing license
+   --  with an SPDX-License tag.  The pattern allows to define a set of lines to
+   --  keep before and after the SPDX-License tag.  The pattern format is:
+   --     {[line|line-range].}spdx{.[line|line-range]}
+   --  Example:
+   --     spdx
+   --     1..3.spdx
+   --     1.spdx.2
+   --  ------------------------------
+   procedure Set_Update_Pattern (Manager : in out License_Manager;
+                                 Pattern : in String) is
+      Pos : constant Natural := Ada.Strings.Fixed.Index (Pattern, "spdx");
+   begin
+      if Pos = 0 then
+         raise Invalid_Pattern with -("missing 'spdx' tag in the pattern");
+      end if;
+
+      if Pos = Pattern'First then
+         Manager.Before.First_Line := 0;
+         Manager.Before.Last_Line := 0;
+      elsif Pattern (Pos - 1) /= '.' or else Pos - 1 = Pattern'First then
+         raise Invalid_Pattern with -("invalid update pattern");
+      else
+         Manager.Before := Get_Range (Pattern (Pattern'First .. Pos - 2));
+      end if;
+
+      if Pos + 3 = Pattern'Last then
+         Manager.After.First_Line := 0;
+         Manager.After.Last_Line := 0;
+      elsif Pattern (Pos + 4) /= '.' or else Pos + 4 = Pattern'Last then
+         raise Invalid_Pattern with -("invalid update pattern");
+      else
+         Manager.After := Get_Range (Pattern (Pos + 5 .. Pattern'Last));
+      end if;
+   end Set_Update_Pattern;
 
    --  ------------------------------
    --  Configure the license manager.
@@ -148,7 +208,6 @@ package body SPDX_Tool.Licenses.Manager is
                Manager.File_Mgr (I).Initialize (Path);
             end loop;
          end;
-         Manager.Manager := Manager'Unchecked_Access;
          Manager.Executor.Start;
          Manager.Started := True;
       end if;
@@ -645,6 +704,8 @@ package body SPDX_Tool.Licenses.Manager is
                    Path    => File.Path,
                    First   => File.License.First_Line,
                    Last    => File.License.Last_Line,
+                   Before  => Manager.Before,
+                   After   => Manager.After,
                    License => To_String (File.License.Name));
             end if;
          end if;
@@ -699,6 +760,7 @@ package body SPDX_Tool.Licenses.Manager is
    overriding
    procedure Initialize (Manager : in out License_Manager) is
    begin
+      Manager.Manager := Manager'Unchecked_Access;
       Manager.Executor := new Executor_Manager (Manager.Count);
    end Initialize;
 
@@ -715,6 +777,10 @@ package body SPDX_Tool.Licenses.Manager is
                 Util.Strings.Image (Manager.Max_Fill));
       Free (Manager.Executor);
       Free (Manager.License_Frequency);
+
+   exception
+      when E : others =>
+         Log.Error ("Exception:", E);
    end Finalize;
 
    function Get_File_Manager (Manager : in out License_Manager)

@@ -29,6 +29,7 @@ package SPDX_Tool.Licenses is
    Only_Licenses    : aliased GNAT.Strings.String_Access;
    Ignore_Languages : aliased GNAT.Strings.String_Access;
    Only_Languages   : aliased GNAT.Strings.String_Access;
+   Update_Pattern   : aliased GNAT.Strings.String_Access;
    Opt_No_Builtin   : aliased Boolean := False;
    Opt_Perf_Report  : aliased Boolean := False;
 

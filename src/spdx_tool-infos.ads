@@ -13,6 +13,11 @@ package SPDX_Tool.Infos is
 
    type Line_Count is new Natural range 0 .. MAX_LINES;
 
+   type Line_Range_Type is record
+      First_Line : Line_Count := 0;
+      Last_Line  : Line_Count := 0;
+   end record;
+
    subtype Line_Number is Line_Count range 1 .. Line_Count'Last;
 
    function Image (Line : in Line_Count)

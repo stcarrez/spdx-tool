@@ -30,6 +30,8 @@ package SPDX_Tool.Files.Manager is
                    Path    : in String;
                    First   : in Line_Number;
                    Last    : in Line_Number;
+                   Before  : in Line_Range_Type;
+                   After   : in Line_Range_Type;
                    License : in String);
 
 private

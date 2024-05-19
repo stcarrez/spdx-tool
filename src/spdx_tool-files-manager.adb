@@ -15,8 +15,9 @@ with Util.Systems.Os;
 with Util.Systems.Constants;
 package body SPDX_Tool.Files.Manager is
 
-   Log : constant Util.Log.Loggers.Logger :=
-     Util.Log.Loggers.Create ("SPDX_Tool.Files");
+   use type SPDX_Tool.Infos.Line_Count;
+
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("SPDX_Tool.Files");
 
    --  ------------------------------
    --  Identify the language used by the given file.
@@ -90,24 +91,59 @@ package body SPDX_Tool.Files.Manager is
                    Path    : in String;
                    First   : in Infos.Line_Number;
                    Last    : in Infos.Line_Number;
+                   Before  : in Line_Range_Type;
+                   After   : in Line_Range_Type;
                    License : in String) is
       Buf       : constant Buffer_Accessor := File.Buffer.Value;
       Tmp_Path  : constant String := Path & ".tmp";
       Pos       : constant Buffer_Index := Buf.Data'First;
       Output    : Util.Streams.Files.File_Stream;
-      First_Pos : Buffer_Index;
+      First_Pos : Buffer_Size;
       Next_Pos  : Buffer_Index;
       Spaces    : Buffer_Size;
       Length    : Buffer_Size;
+      Line      : Line_Count := First;
    begin
       Log.Info ("Writing license {0} in {1}", License, Path);
 
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
 
       if File.Lines (First).Comment = LINE_COMMENT then
-         First_Pos := File.Lines (First).Style.Text_Start;
+         Line := First;
+
+         --  Keep some license lines before the inserted SPDX license tag.
+         if Before.First_Line = 1 then
+            Line := Line + Before.Last_Line;
+            if Line > File.Lines'Last then
+               Line := File.Lines'Last;
+            end if;
+         end if;
+         if Before.First_Line <= 1 then
+            First_Pos := File.Lines (Line).Style.Text_Start;
+         else
+            First_Pos := File.Lines (Line).Line_Start;
+            First_Pos := First_Pos - 1;
+         end if;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
+         end if;
+
+         --  Some license lines are dropped but we must keep some others
+         --  before the SPDX license tag.
+         if Before.First_Line > 1 then
+            Line := First + Before.First_Line - 1;
+            if Line < File.Lines'Last then
+               First_Pos := File.Lines (Line - 1).Line_End + 1;
+               Line := First + Before.Last_Line;
+               if Line > File.Lines'Last then
+                  Line := File.Lines'Last;
+               end if;
+               Next_Pos := File.Lines (Line).Style.Text_Start;
+               if Next_Pos > First_Pos then
+                  Output.Write (Buf.Data (First_Pos .. Next_Pos - 1));
+               end if;
+               First_Pos := Next_Pos;
+            end if;
          end if;
          if File.Lines (First).Style.Boxed then
             Next_Pos := File.Lines (Last).Style.Text_Last;

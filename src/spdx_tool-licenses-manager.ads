@@ -20,10 +20,23 @@ package SPDX_Tool.Licenses.Manager is
 
    package UFW renames Util.Files.Walk;
 
+   Invalid_Pattern : exception;
+
    type Job_Type is (READ_LICENSES, UPDATE_LICENSES, LOAD_LICENSES);
 
    type License_Manager (Count : Task_Count) is
    limited new UFW.Walker_Type with private;
+
+   --  Setup the update pattern when the tool must replace the existing license
+   --  with an SPDX-License tag.  The pattern allows to define a set of lines to
+   --  keep before and after the SPDX-License tag.  The pattern format is:
+   --     {[line|line-range].}spdx{.[line|line-range]}
+   --  Example:
+   --     spdx
+   --     1..3.spdx
+   --     1.spdx.2
+   procedure Set_Update_Pattern (Manager : in out License_Manager;
+                                 Pattern : in String);
 
    --  Configure the license manager.
    procedure Configure (Manager : in out License_Manager;
@@ -155,6 +168,10 @@ private
       Token_Frequency      : Frequency_Arrays.Array_Type;
       License_Squares      : Float_Array_Access;
       License_Frequency    : Frequency_Array_Access;
+
+      --  Replacement information
+      Before   : SPDX_Tool.Infos.Line_Range_Type;
+      After    : SPDX_Tool.Infos.Line_Range_Type;
 
       Files    : SPDX_Tool.Infos.File_Map;
 

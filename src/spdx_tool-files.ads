@@ -11,6 +11,7 @@ package SPDX_Tool.Files is
 
    subtype Line_Number is Infos.Line_Number;
    subtype Line_Count is Infos.Line_Count;
+   subtype Line_Range_Type is Infos.Line_Range_Type;
 
    type Comment_Mode is (NO_COMMENT,
                          LINE_COMMENT,
