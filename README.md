@@ -32,9 +32,25 @@ NTP                                      1
 ## Replace the license header by the `SPDX-License-Identifier` header
 
 ```
-spdx-tool --only-licenses=Apache-2.0 --update src
+spdx-tool --only-licenses=Apache-2.0 --update=spdx src
 ```
 
+Likewise but keep the first line two lines of the existing license header:
+
+```
+spdx-tool --only-licenses=Apache-2.0 --update=1..2.spdx src
+```
+
+## Build an XML or JSON report of files with their licenses
+
+```
+spdx-tool --output-xml=report.xml .
+spdx-tool --output-json=report.json .
+```
+
+## Version 0.2.0  - May 2024
+  - License identification improvement
+  - Update replacement of `SPDX-License-Identifier` and allow keeping some lines from original license header
 
 ## Version 0.1.0  - Jan 2024
   - First version to identify licenses and change to use the `SPDX-License-Identifier` header.
@@ -74,4 +90,5 @@ in the project.  For each file, the spdx-tool tries to:
 * https://github.com/spdx/license-list-data
 * https://spdx.org
 * https://spdx.dev/learn/handling-license-info/
+* https://github.com/github-linguist/linguist.git
 
