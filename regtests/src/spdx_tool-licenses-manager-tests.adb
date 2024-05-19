@@ -16,9 +16,12 @@ package body SPDX_Tool.Licenses.Manager.Tests is
 
    use SPDX_Tool.Infos;
    subtype File_Info is Infos.File_Info;
+   subtype Line_Range_Type is SPDX_Tool.Infos.Line_Range_Type;
 
    procedure Assert_Equals is
      new Util.Assertions.Assert_Equals_T (Value_Type => License_Kind);
+   procedure Assert_Equals is
+     new Util.Assertions.Assert_Equals_T (Value_Type => Line_Count);
 
    procedure Check_License (T        : in out Test;
                             Filename : in String;
@@ -42,6 +45,8 @@ package body SPDX_Tool.Licenses.Manager.Tests is
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite) is
    begin
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Set_Pattern",
+                       Test_Set_Update_Pattern'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (token)",
                        Test_Load_Template'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (fixed)",
@@ -61,6 +66,41 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (SPDX)",
                        Test_Find_License_SPDX'Access);
    end Add_Tests;
+
+   --  Test parsing various update patterns.
+   procedure Test_Set_Update_Pattern (T : in out Test) is
+      procedure Check (Pattern : in String;
+                       Before  : in Line_Range_Type;
+                       After   : in Line_Range_Type);
+
+      Config  : SPDX_Tool.Configs.Config_Type;
+      Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
+
+      procedure Check (Pattern : in String;
+                       Before  : in Line_Range_Type;
+                       After   : in Line_Range_Type) is
+      begin
+         Manager.Set_Update_Pattern (Pattern);
+         Assert_Equals (T, Before.First_Line, Manager.Before.First_Line,
+                        "Invalid Before.first_line for: " & Pattern);
+         Assert_Equals (T, Before.Last_Line, Manager.Before.Last_Line,
+                        "Invalid Before.last_line for: " & Pattern);
+         Assert_Equals (T, After.First_Line, Manager.After.First_Line,
+                        "Invalid After.first_line for: " & Pattern);
+         Assert_Equals (T, After.Last_Line, Manager.After.Last_Line,
+                        "Invalid After.last_line for: " & Pattern);
+      end Check;
+   begin
+      Manager.Languages.Initialize (Config);
+      Check ("spdx", (0, 0), (0, 0));
+      Check ("1.spdx", (1, 1), (0, 0));
+      Check ("spdx.1", (0, 0), (1, 1));
+      Check ("1..2.spdx", (1, 2), (0, 0));
+      Check ("spdx.1..2", (0, 0), (1, 2));
+      Check ("1..2.spdx.3..4", (1, 2), (3, 4));
+      --  Manager.Set_Update_Pattern ("1...spdx");
+      --  Manager.Set_Update_Pattern ("spdx.1..");
+   end Test_Set_Update_Pattern;
 
    procedure Check_License (T        : in out Test;
                             Filename : in String;

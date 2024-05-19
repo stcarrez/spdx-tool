@@ -11,6 +11,9 @@ package SPDX_Tool.Licenses.Manager.Tests is
 
    type Test is new Util.Tests.Test with null record;
 
+   --  Test parsing various update patterns.
+   procedure Test_Set_Update_Pattern (T : in out Test);
+
    --  Test reading and loading a license template.
    procedure Test_Load_Template (T : in out Test);
 

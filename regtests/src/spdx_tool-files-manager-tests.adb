@@ -331,7 +331,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 5, 16, "Apache-2.0");
+      Manager.Save (Info, Result, 5, 16, (0, 0), (0, 0), "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -353,7 +353,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 11, 19, "GPL-3.0");
+      Manager.Save (Info, Result, 11, 19, (0, 0), (0, 0), "GPL-3.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -375,7 +375,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 5, 15, "Apache-2.0");
+      Manager.Save (Info, Result, 5, 15, (0, 0), (0, 0), "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -397,7 +397,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 12, 27, "GPL-2.0");
+      Manager.Save (Info, Result, 12, 27, (0, 0), (0, 0), "GPL-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -419,7 +419,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 9, 27, "GPL-3.0");
+      Manager.Save (Info, Result, 9, 27, (0, 0), (0, 0), "GPL-3.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -441,7 +441,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 3, 22, "MIT");
+      Manager.Save (Info, Result, 3, 22, (0, 0), (0, 0), "MIT");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -463,7 +463,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 11, 13, "LGPL-2.1");
+      Manager.Save (Info, Result, 11, 13, (0, 0), (0, 0), "LGPL-2.1");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -485,7 +485,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 6, 16, "Apache-2.0");
+      Manager.Save (Info, Result, 6, 16, (0, 0), (0, 0), "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -507,7 +507,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 5, 17, "LGPL-2.1");
+      Manager.Save (Info, Result, 5, 17, (0, 0), (0, 0), "LGPL-2.1");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
@@ -529,7 +529,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 5, 15, "Apache-2.0");
+      Manager.Save (Info, Result, 5, 15, (0, 0), (0, 0), "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
         (T       => T,
