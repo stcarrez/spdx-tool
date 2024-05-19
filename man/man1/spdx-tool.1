@@ -1,15 +1,16 @@
 .\"
-.TH SPDX-TOOL 1 "Jan 6, 2024" "SPDX License Tool"
+.TH SPDX-TOOL 1 "May 19, 2024" "SPDX License Tool"
 .SH NAME
 spdx-tool - SPDX license management tool
 .SH SYNOPSIS
 .B spdx-tool
-[ -v ] [-vv] [-vv] [-V]
+[ -v ] [-vv] [-vvv] [-V]
 [-t
 .I count
 ] [--no-color]
- [-c | --check] [-u | --update] [-i | --identify] [-f | --files]
- [-m | --mimes] [-p | --print-license]
+ [-c | --check] [-i | --identify] [-f | --files]
+ [-m | --mimes] [-p | --print-license] [--languages]
+ [--no-builtin-licenses]
  [--ignore-licenses
 .I spdx-name1,spdx-name2,...
 ]
@@ -27,7 +28,9 @@ spdx-tool - SPDX license management tool
 ] [--output-xml
 .I file
 ]
- [--license
+ [--update
+.I pattern
+] [--license
 .I file
 ]
 .I files|directories
@@ -45,14 +48,14 @@ produce a JSON/XML report for the licenses found with the list of files,
 .IP \(bu 4
 replace a license header by the SPDX license tag header.
 .\"
-.PP
+.P
 The tool uses the license templates to identify
 the license used in source files.  The builtin repository contains arround 600 license templates
 and it can be completed by your own templates as long as you use the SPDX license description
 format described in
 \fIThe Software Package Data Exchange® (SPDX®) Specification Version 2.3\fP.
 .\"
-.PP
+.P
 The spdx-tool scans the directory or files passed as parameter.  Directories are scanned recursively
 and the
 .I .gitignore
@@ -68,26 +71,27 @@ extract the license header text at beginning of the source file,
 .\"
 .IP \(bu 4
 identify the license by using the following algorithms:
+.RS 4
 .\"
-.IP \(bu 6
+.IP \(bu 3
 look for a
 .I SPDX-License-Identifier
 tag, when it was found, the match report indicates
-. IR SPDX ,
+.IR SPDX ,
 .\"
-.IP \(bu 6
+.IP \(bu 3
 look for a template match from the license templates
 builtin repository or the templates configured for the tool.  When this succeeds, the match
 report indicates
 .IR TMPL ,
 .\"
-.IP \(bu 6
-guess the best matching license by computing the
-.I Tversky
-index (0..1) and reporting the repository license having the highest Tversky index.  The report will
-indicate the highest Tversky index found.
+.IP \(bu 3
+guess the best matching license by using an inverted index of license tokens.
+The tool then uses a classical \fIterm frequency inverse document frequency\fP
+algorithm to find the best matching license.  The report will indicate the
+highest \fICosine\fP similarity found.
 .\"
-.PP
+.P
 .SH OPTIONS
 The following options are recognized by \fIspdx-tool\fR:
 .TP 5
@@ -102,8 +106,7 @@ Enable the verbose mode.
 -vv
 Enable debugging output.
 .TP 5
--t
-.I count
+-t \fIcount\fP
 Defines the number of threads for the encryption and decryption process.
 By default, it uses the number of system CPU cores.
 .TP 5
@@ -125,6 +128,27 @@ and understand why some files have no license header.
 --mimes
 Produce a report with the list of files grouped by the mime type that is identified.  This option is
 useful to understand why some files have no license header.
+.TP 5
+--print-license
+Print the license which was identified from the source file after the analysis.
+.TP 5
+--update \fIpattern\fP
+Update the license header found by the equivalent SPDX license with the
+.I SPDX-License-Identifier
+tag.  The
+.I pattern
+string allows to control the replacement to allow keeping some lines from the existing license header.
+It indicates which lines must be kept before and after the SPDX tag.
+The pattern has the following format:
+.\"
+.RS 8
+[\fInumber\fP[..\fInumber\fP].]spdx[.\fInumber\fP[..number]]
+.\"
+.RE
+Line numbers are relative to the first line representing the license header.
+Use the
+.I --print-license
+option to see how the tool identifies the license and decide which lines must be kept.
 
 .SH SEE ALSO
 .IR file (1)
