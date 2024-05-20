@@ -94,15 +94,25 @@ package body SPDX_Tool.Files.Manager is
                    Before  : in Line_Range_Type;
                    After   : in Line_Range_Type;
                    License : in String) is
+      procedure Copy_Line (Line : in Line_Count);
+
       Buf       : constant Buffer_Accessor := File.Buffer.Value;
       Tmp_Path  : constant String := Path & ".tmp";
       Pos       : constant Buffer_Index := Buf.Data'First;
       Output    : Util.Streams.Files.File_Stream;
       First_Pos : Buffer_Size;
       Next_Pos  : Buffer_Index;
+      Last_Pos  : Buffer_Index;
       Spaces    : Buffer_Size;
       Length    : Buffer_Size;
       Line      : Line_Count := First;
+
+      procedure Copy_Line (Line : in Line_Count) is
+         Start_Pos : Buffer_Index := File.Lines (Line).Line_Start;
+         Last_Pos  : Buffer_Index := File.Lines (Line + 1).Line_Start - 1;
+      begin
+         Output.Write (Buf.Data (Start_Pos .. Last_Pos));
+      end Copy_Line;
    begin
       Log.Info ("Writing license {0} in {1}", License, Path);
 
@@ -146,14 +156,16 @@ package body SPDX_Tool.Files.Manager is
             end if;
          end if;
          if File.Lines (First).Style.Boxed then
-            Next_Pos := File.Lines (Last).Style.Text_Last;
+            Next_Pos := File.Lines (Line).Style.Text_Last;
+            Last_Pos := File.Lines (Last).Style.Text_Last;
             while Next_Pos > First_Pos
               and then not Is_Space (Buf.Data (Next_Pos - 1))
             loop
                Next_Pos := Next_Pos - 1;
             end loop;
          else
-            Next_Pos := File.Lines (Last).Style.Last + 1;
+            Next_Pos := File.Lines (Line).Style.Last + 1;
+            Last_Pos := File.Lines (Last).Style.Last + 1;
          end if;
 
       elsif File.Lines (First).Comment = LINE_BLOCK_COMMENT then
@@ -162,12 +174,14 @@ package body SPDX_Tool.Files.Manager is
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
          Next_Pos := File.Lines (Last).Style.Text_Last - 1;
+         Last_Pos := Next_Pos;
       else
          First_Pos := File.Lines (First).Style.Text_Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
          Next_Pos := File.Lines (Last).Style.Text_Last + 1;
+         Last_Pos := Next_Pos;
       end if;
 
       Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
@@ -179,15 +193,31 @@ package body SPDX_Tool.Files.Manager is
          Length := Languages.Max_Length (File.Lines, First, Last);
          Spaces := Length - License'Length - String '("SPDX-License-Identifier: ")'Length - Spaces;
          Spaces := Spaces - (File.Lines (First).Style.Text_Start - File.Lines (First).Line_Start);
-         Spaces := Spaces - (File.Lines (Last).Line_End - Next_Pos + 1);
+         Spaces := Spaces - (File.Lines (Last).Line_End - Last_Pos + 1);
          while Spaces > 0 loop
             Output.Write (" ");
             Spaces := Spaces - 1;
          end loop;
       end if;
 
-      if Next_Pos < File.Last_Offset then
-         Output.Write (Buf.Data (Next_Pos .. File.Last_Offset));
+      if After.First_Line > 0 and then Line + 1 <= File.Lines'Last then
+         declare
+            Keep_Pos : Buffer_Index := File.Lines (Line + 1).Line_Start - 1;
+         begin
+            if Next_Pos <= Keep_Pos then
+               Output.Write (Buf.Data (Next_Pos .. Keep_Pos));
+            end if;
+         end;
+         Line := First + After.First_Line - 1;
+         while Line <= File.Lines'Last loop
+            Copy_Line (Line);
+            Line := Line + 1;
+            exit when Line >= First + After.Last_Line;
+         end loop;
+         Last_Pos := Last_Pos + 1;
+      end if;
+      if Last_Pos < File.Last_Offset then
+         Output.Write (Buf.Data (Last_Pos .. File.Last_Offset));
       end if;
 
       --  Copy the rest of the file unmodified.
