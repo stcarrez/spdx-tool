@@ -108,6 +108,10 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--print-license",
                         Help   => -("Print license found in header files"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Print_Lineno'Access,
+                        Long_Switch => "--print-lineno",
+                        Help   => -("Add line number when printing license text"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Identify'Access,
                         Switch => "-i",
                         Long_Switch => "--identify",
@@ -222,7 +226,7 @@ procedure SPDX_Tool.Main is
          if Opt_Check or else Opt_Files or else Opt_Mimes then
             Writer.New_Line;
          end if;
-         SPDX_Tool.Reports.Print_Texts (Driver, Styles, Files);
+         SPDX_Tool.Reports.Print_Texts (Driver, Styles, Files, Opt_Print_Lineno);
       end if;
    end Print_Report;
 

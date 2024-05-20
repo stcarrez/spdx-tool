@@ -304,18 +304,22 @@ package body SPDX_Tool.Reports is
       end loop;
    end Print_Identify;
 
-   procedure Print_License_Text (Printer : in out PT.Printer_Type'Class;
-                                 Styles  : in Style_Configuration;
-                                 Text    : in Infos.License_Text) is
-      pragma Unreferenced (Styles);
+   procedure Print_License_Text (Printer   : in out PT.Printer_Type'Class;
+                                 Styles    : in Style_Configuration;
+                                 Text      : in Infos.License_Text;
+                                 Show_Line : in Boolean) is
       Last    : constant Natural := Natural (Text.Len);
       Content : String (1 .. Last);
       for Content'Address use Text.Content'Address;
 
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Printer);
+      Field  : PT.Texts.Field_Type;
       Pos    : Natural := 1;
       First  : Natural;
+      Line   : Positive := 1;
    begin
+      Writer.Create_Field (Field, Styles.Default, 0.0);
+      Writer.Will_Put (Field, "999");
       loop
          First := Pos;
          while Pos <= Content'Last
@@ -323,24 +327,29 @@ package body SPDX_Tool.Reports is
          loop
             Pos := Pos + 1;
          end loop;
+         if Show_Line then
+            Writer.Put_Int (Field, Line);
+         end if;
          Writer.Put_UTF8 (Content (First .. Pos - 1));
          Writer.New_Line;
          Pos := Pos + 1;
          exit when Pos > Content'Last;
+         Line := Line + 1;
       end loop;
    end Print_License_Text;
 
    --  ------------------------------
    --  Print the license texts content found in header files.
    --  ------------------------------
-   procedure Print_Texts (Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration;
-                          Files   : in SPDX_Tool.Infos.File_Map) is
+   procedure Print_Texts (Printer   : in out PT.Printer_Type'Class;
+                          Styles    : in Style_Configuration;
+                          Files     : in SPDX_Tool.Infos.File_Map;
+                          Show_Line : in Boolean) is
       use type Infos.License_Text_Access;
    begin
       for File of Files loop
          if not File.Filtered and then File.Text /= null then
-            Print_License_Text (Printer, Styles, File.Text.all);
+            Print_License_Text (Printer, Styles, File.Text.all, Show_Line);
          end if;
       end loop;
    end Print_Texts;

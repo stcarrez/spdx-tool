@@ -46,13 +46,15 @@ package SPDX_Tool.Reports is
                              Files   : in SPDX_Tool.Infos.File_Map);
 
    --  Print the license texts content found in header files.
-   procedure Print_Texts (Printer : in out PT.Printer_Type'Class;
-                          Styles  : in Style_Configuration;
-                          Files   : in SPDX_Tool.Infos.File_Map);
+   procedure Print_Texts (Printer   : in out PT.Printer_Type'Class;
+                          Styles    : in Style_Configuration;
+                          Files     : in SPDX_Tool.Infos.File_Map;
+                          Show_Line : in Boolean);
 
-   procedure Print_License_Text (Printer : in out PT.Printer_Type'Class;
-                                 Styles  : in Style_Configuration;
-                                 Text    : in Infos.License_Text);
+   procedure Print_License_Text (Printer   : in out PT.Printer_Type'Class;
+                                 Styles    : in Style_Configuration;
+                                 Text      : in Infos.License_Text;
+                                 Show_Line : in Boolean);
 
    --  Write a JSON report with the license and files that were identified.
    procedure Write_Json (Path  : in String;
