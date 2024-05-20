@@ -125,7 +125,7 @@ package body SPDX_Tool.Reports is
          Writer.Create_Field (Fields (4), Styles.Title, 10.0);
          Writer.Create_Field (Fields (5), Styles.Title, 20.0);
          Writer.Set_Bottom_Right_Padding (Fields (4), (W => 2, H => 0));
-         Writer.Set_Max_Dimension (Fields (1), (W => Max, H => 0));
+         Writer.Set_Max_Dimension (Fields (1), (W => Max, H => 1));
          Writer.Set_Justify (Fields (1), PT.J_LEFT);
          Writer.Set_Justify (Fields (2), PT.J_RIGHT);
          Writer.Set_Justify (Fields (3), PT.J_RIGHT);
@@ -209,14 +209,14 @@ package body SPDX_Tool.Reports is
          Writer.Create_Field (License_Fields (1), Styles.Title, 0.0);
          Writer.Create_Field (License_Fields (2), Styles.Title, 20.0);
          Writer.Create_Field (License_Fields (3), Styles.Title, 20.0);
-         Writer.Set_Max_Dimension (License_Fields (1), (W => Max, H => 0));
+         Writer.Set_Max_Dimension (License_Fields (1), (W => Max, H => 1));
          Writer.Set_Justify (License_Fields (1), PT.J_LEFT);
          Writer.Set_Justify (License_Fields (2), PT.J_RIGHT);
 
          Writer.Layout_Fields (License_Fields);
          Writer.Create_Field (File_Fields (1), Styles.Default, 0.0);
          Writer.Create_Field (File_Fields (2), Styles.Default, 0.0);
-         Writer.Set_Max_Dimension (File_Fields (1), (W => 3, H => 0));
+         Writer.Set_Max_Dimension (File_Fields (1), (W => 3, H => 1));
          Writer.Layout_Fields (File_Fields);
 
          for Item of List loop
@@ -346,9 +346,24 @@ package body SPDX_Tool.Reports is
                           Files     : in SPDX_Tool.Infos.File_Map;
                           Show_Line : in Boolean) is
       use type Infos.License_Text_Access;
+      Visible_Files : Natural := 0;
    begin
+      --  See if we have several files to print.
       for File of Files loop
          if not File.Filtered and then File.Text /= null then
+            Visible_Files := Visible_Files + 1;
+            exit when Visible_Files >= 2;
+         end if;
+      end loop;
+
+      --  Print the license texts of files.
+      for File of Files loop
+         if not File.Filtered and then File.Text /= null then
+            if Visible_Files >= 2 then
+               Printer.New_Line;
+               Printer.Put (File.Path);
+               Printer.New_Line;
+            end if;
             Print_License_Text (Printer, Styles, File.Text.all, Show_Line);
          end if;
       end loop;
