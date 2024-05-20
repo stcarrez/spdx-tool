@@ -502,8 +502,6 @@ package body SPDX_Tool.Files.Manager.Tests is
    procedure Test_Save_Erlang (T : in out Test) is
       Config : SPDX_Tool.Configs.Config_Type;
       Data   : File_Info := Get_Path ("files/identify/apache-2.0-4.erl");
-      Result : constant String
-        := Util.Tests.Get_Test_Path ("replace-apache-2.0-4.erl");
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
@@ -512,13 +510,31 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages.Initialize (Config);
       Manager.Initialize ("");
       Manager.Open (Info, Data, Languages);
-      Manager.Save (Info, Result, 6, 16, (0, 0), (0, 0), "Apache-2.0");
-      T.Assert (Ada.Directories.Exists (Result), "File not created");
-      Util.Tests.Assert_Equal_Files
-        (T       => T,
-         Expect  => Util.Tests.Get_Path ("regtests/expect/replace-apache-2.0-4.erl"),
-         Test    => Result,
-         Message => "Invalid replacement");
+      declare
+         Result : constant String
+            := Util.Tests.Get_Test_Path ("replace-apache-2.0-4.erl");
+      begin
+         Manager.Save (Info, Result, 4, 16, (0, 0), (0, 0), "Apache-2.0");
+         T.Assert (Ada.Directories.Exists (Result), "File not created");
+         Util.Tests.Assert_Equal_Files
+            (T       => T,
+             Expect  => Util.Tests.Get_Path ("regtests/expect/replace-apache-2.0-4.erl"),
+             Test    => Result,
+             Message => "Invalid replacement");
+      end;
+      declare
+         Result : constant String
+            := Util.Tests.Get_Test_Path ("replace-apache-2.0-4-1.erl");
+      begin
+         Manager.Save (Info, Result, 4, 16, (1, 1), (0, 0), "Apache-2.0");
+         T.Assert (Ada.Directories.Exists (Result), "File not created");
+         Util.Tests.Assert_Equal_Files
+            (T       => T,
+             Expect  => Util.Tests.Get_Path ("regtests/expect/replace-apache-2.0-4-1.erl"),
+             Test    => Result,
+             Message => "Invalid replacement");
+      end;
+
    end Test_Save_Erlang;
 
    procedure Test_Save_Java (T : in out Test) is
