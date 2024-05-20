@@ -1,0 +1,5 @@
+-----------------------------------------------------------------------
+--  keystore -- Ada keystore
+--  SPDX-License-Identifier: Apache-2.0
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+-----------------------------------------------------------------------

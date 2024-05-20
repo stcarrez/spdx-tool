@@ -1,0 +1,6 @@
+-----------------------------------------------------------------------
+--  keystore -- Ada keystore
+--  SPDX-License-Identifier: Apache-2.0
+--  Copyright (C) 2019, 2020, 2022 Stephane Carrez
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+-----------------------------------------------------------------------

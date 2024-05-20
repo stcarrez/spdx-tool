@@ -365,6 +365,42 @@ package body SPDX_Tool.Files.Manager.Tests is
              Test    => Result,
              Message => "Invalid replacement");
       end;
+      declare
+         Result : constant String
+            := Util.Tests.Get_Test_Path ("replace-apache-2.0.1-3.ads");
+      begin
+         Manager.Save (Info, Result, 3, 16, (0, 0), (1, 2), "Apache-2.0");
+         T.Assert (Ada.Directories.Exists (Result), "File not created");
+         Util.Tests.Assert_Equal_Files
+            (T       => T,
+             Expect  => Util.Tests.Get_Path ("regtests/expect/replace-apache-2.0.1-3.ads"),
+             Test    => Result,
+             Message => "Invalid replacement");
+      end;
+      declare
+         Result : constant String
+            := Util.Tests.Get_Test_Path ("replace-apache-2.0.1-4.ads");
+      begin
+         Manager.Save (Info, Result, 3, 16, (0, 0), (2, 2), "Apache-2.0");
+         T.Assert (Ada.Directories.Exists (Result), "File not created");
+         Util.Tests.Assert_Equal_Files
+            (T       => T,
+             Expect  => Util.Tests.Get_Path ("regtests/expect/replace-apache-2.0.1-4.ads"),
+             Test    => Result,
+             Message => "Invalid replacement");
+      end;
+      declare
+         Result : constant String
+            := Util.Tests.Get_Test_Path ("replace-apache-2.0.1-5.ads");
+      begin
+         Manager.Save (Info, Result, 3, 16, (1, 1), (2, 2), "Apache-2.0");
+         T.Assert (Ada.Directories.Exists (Result), "File not created");
+         Util.Tests.Assert_Equal_Files
+            (T       => T,
+             Expect  => Util.Tests.Get_Path ("regtests/expect/replace-apache-2.0.1-5.ads"),
+             Test    => Result,
+             Message => "Invalid replacement");
+      end;
    end Test_Save_Ada;
 
    procedure Test_Save_Ada_Boxed (T : in out Test) is
