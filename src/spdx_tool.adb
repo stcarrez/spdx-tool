@@ -4,12 +4,67 @@
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 
+with Ada.Finalization;
 with Util.Log.Loggers;
+with Util.Log.Formatters.Factories;
 with Util.Properties;
+with Util.Strings.Builders;
 package body SPDX_Tool is
 
    use Interfaces;
+   use Util.Log.Formatters;
    function Get_Count (V : in Interfaces.Unsigned_8) return Natural;
+
+   type NLS_Formatter (Length : Positive) is
+      new Util.Log.Formatters.Formatter (Length) with null record;
+
+   --  Format the message with the list of arguments.
+   overriding
+   procedure Format (Format    : in NLS_Formatter;
+                     Into      : in out Util.Strings.Builders.Builder;
+                     Level     : in Util.Log.Level_Type;
+                     Logger    : in String;
+                     Message   : in String;
+                     Arguments : in String_Array_Access);
+
+   function Create_Formatter (Name    : in String;
+                              Config  : in Util.Properties.Manager) return Formatter_Access;
+
+   --  Format the message with the list of arguments.
+   overriding
+   procedure Format (Format    : in NLS_Formatter;
+                     Into      : in out Util.Strings.Builders.Builder;
+                     Level     : in Util.Log.Level_Type;
+                     Logger    : in String;
+                     Message   : in String;
+                     Arguments : in String_Array_Access) is
+   begin
+      if Level >= Util.Log.INFO_LEVEL then
+         Formatter (Format).Format (Into, Level, Logger, -(Message), Arguments);
+      else
+         Formatter (Format).Format (Into, Level, Logger, Message, Arguments);
+      end if;
+   end Format;
+
+   --  ------------------------------
+   --  Create a formatter instance with a factory with the given name.
+   --  ------------------------------
+   function Create_Formatter (Name    : in String;
+                              Config  : in Util.Properties.Manager) return Formatter_Access is
+      pragma Unreferenced (Config);
+
+      Result : constant Formatter_Access
+        := new NLS_Formatter '(Ada.Finalization.Limited_Controlled with Length => Name'Length,
+                               Name => Name,
+                               others => <>);
+   begin
+      return Result.all'Access;
+   end Create_Formatter;
+
+   package Formatter_Factory is
+      new Util.Log.Formatters.Factories (Name   => "NLS",
+                                         Create => Create_Formatter'Access)
+                                          with Unreferenced;
 
    procedure Set_License (Into    : in out License_Index_Map;
                           License : in License_Index) is
@@ -114,33 +169,32 @@ package body SPDX_Tool is
    procedure Configure_Logs (Debug : Boolean; Verbose : Boolean) is
       Log_Config  : Util.Properties.Manager;
    begin
-      Log_Config.Set ("log4j.rootCategory", "DEBUG,errorConsole");
-      Log_Config.Set ("log4j.appender.errorConsole", "Console");
-      Log_Config.Set ("log4j.appender.errorConsole.level", "ERROR");
-      Log_Config.Set ("log4j.appender.errorConsole.layout", "message");
-      Log_Config.Set ("log4j.appender.errorConsole.stderr", "true");
-      Log_Config.Set ("log4j.appender.errorConsole.prefix", "spdx-tool: ");
-      Log_Config.Set ("log4j.logger.Util", "DEBUG");
-      Log_Config.Set ("log4j.logger.Util.Events", "ERROR");
-      Log_Config.Set ("log4j.logger.SPDX_Tool", "INFO");
+      Log_Config.Set ("spdx_tool.rootCategory", "DEBUG,errorConsole");
+      Log_Config.Set ("spdx_tool.appender.errorConsole", "Console");
+      Log_Config.Set ("spdx_tool.appender.errorConsole.level", "ERROR");
+      Log_Config.Set ("spdx_tool.appender.errorConsole.layout", "message");
+      Log_Config.Set ("spdx_tool.appender.errorConsole.stderr", "true");
+      Log_Config.Set ("spdx_tool.appender.errorConsole.prefix", "spdx-tool: ");
+      Log_Config.Set ("spdx_tool.logger.Util", "DEBUG");
+      Log_Config.Set ("spdx_tool.logger.Util.Events", "ERROR");
+      Log_Config.Set ("spdx_tool.logger.SPDX_Tool", "INFO:NLS");
       if Verbose or Debug then
-         Log_Config.Set ("log4j.logger.Util", "DEBUG");
-         Log_Config.Set ("log4j.logger.Are", "INFO");
-         Log_Config.Set ("log4j.rootCategory", "INFO,errorConsole,verbose");
-         Log_Config.Set ("log4j.appender.verbose", "Console");
-         Log_Config.Set ("log4j.appender.verbose.level", "INFO");
-         Log_Config.Set ("log4j.appender.verbose.layout", "level-message");
+         Log_Config.Set ("spdx_tool.logger.Util", "DEBUG");
+         Log_Config.Set ("spdx_tool.rootCategory", "INFO,errorConsole,verbose");
+         Log_Config.Set ("spdx_tool.appender.verbose", "Console");
+         Log_Config.Set ("spdx_tool.appender.verbose.level", "INFO");
+         Log_Config.Set ("spdx_tool.appender.verbose.layout", "level-message");
       end if;
       if Debug then
-         Log_Config.Set ("log4j.logger.Util.Processes", "INFO");
-         Log_Config.Set ("log4j.logger.SPDX_Tool", "DEBUG");
-         Log_Config.Set ("log4j.rootCategory", "DEBUG,errorConsole,debug");
-         Log_Config.Set ("log4j.appender.debug", "Console");
-         Log_Config.Set ("log4j.appender.debug.level", "DEBUG");
-         Log_Config.Set ("log4j.appender.debug.layout", "full");
+         Log_Config.Set ("spdx_tool.logger.Util.Processes", "INFO");
+         Log_Config.Set ("spdx_tool.logger.SPDX_Tool", "DEBUG");
+         Log_Config.Set ("spdx_tool.rootCategory", "DEBUG,errorConsole,debug");
+         Log_Config.Set ("spdx_tool.appender.debug", "Console");
+         Log_Config.Set ("spdx_tool.appender.debug.level", "DEBUG");
+         Log_Config.Set ("spdx_tool.appender.debug.layout", "full");
       end if;
 
-      Util.Log.Loggers.Initialize (Log_Config);
+      Util.Log.Loggers.Initialize (Log_Config, "spdx_tool.");
    end Configure_Logs;
 
    function To_Buffer (S : String) return Buffer_Type is
