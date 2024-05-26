@@ -63,7 +63,7 @@ package body SPDX_Tool.Configs is
 
       Result := TOML_Parse_String (S);
       if not Result.Success then
-         Log.Error ("Invalid default configuration file");
+         Log.Error ("invalid default configuration file");
          Log.Error ("{0}: {1}", To_String (Result.Location),
                     To_String (Result.Message));
       else
@@ -85,7 +85,7 @@ package body SPDX_Tool.Configs is
          Result : constant TOML.Read_Result := TOML.File_IO.Load_File (Path);
       begin
          if not Result.Success then
-            Log.Error (-("Invalid configuration file:"), Path);
+            Log.Error ("invalid configuration file:", Path);
             Log.Error ("{0}:{1}: {2}",
                        Path,
                        To_String (Result.Location),
@@ -146,7 +146,7 @@ package body SPDX_Tool.Configs is
          begin
             for Comment of Comments loop
                if Comment.Value.Kind /= TOML.TOML_Table then
-                  Log.Error ("Invalid configuration {0}", To_String (Comment.Key));
+                  Log.Error ("invalid configuration {0}", To_String (Comment.Key));
                else
                   declare
                      Conf  : Comment_Configuration;

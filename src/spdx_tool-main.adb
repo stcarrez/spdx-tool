@@ -254,7 +254,7 @@ procedure SPDX_Tool.Main is
       Filter.Include ("*.txt");
       Filter.Exclude ("*");
       if not AD.Exists (Path) then
-         Log.Error (-("path '{0}' does not exist"), Path);
+         Log.Error ("path '{0}' does not exist", Path);
          Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       elsif AD.Kind (Path) = AD.Directory then
          Manager.Scan (Path, Filter);
@@ -267,7 +267,7 @@ procedure SPDX_Tool.Main is
    begin
       if Configs.Config_Path.all /= "" then
          if not Ada.Directories.Exists (Configs.Config_Path.all) then
-            Log.Error (-("Configuration file '{0}' does not exist."),
+            Log.Error ("Configuration file '{0}' does not exist.",
                        Configs.Config_Path.all);
             Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
             raise GNAT.Command_Line.Exit_From_Command_Line;
@@ -288,7 +288,7 @@ begin
       Configure_Logs (Opt_Debug, Opt_Verbose);
    end if;
    if not (Opt_Tasks in Task_Count'Range) then
-      Log.Error (-("Invalid number of tasks: {0}"),
+      Log.Error ("Invalid number of tasks: {0}",
                  Util.Strings.Image (Opt_Tasks));
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       return;
@@ -347,7 +347,7 @@ begin
          begin
             exit when Arg'Length = 0;
             if not AD.Exists (Arg) then
-               Log.Error (-("path '{0}' does not exist"), Arg);
+               Log.Error ("path '{0}' does not exist", Arg);
                Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
             elsif AD.Kind (Arg) = AD.Directory then
                Manager.Scan (Arg, Filter);
@@ -371,7 +371,7 @@ begin
 
 exception
    when E : SPDX_Tool.Licenses.Manager.Invalid_Pattern =>
-      Log.Error (-("invalid option --update: {}"), Ada.Exceptions.Exception_Message (E));
+      Log.Error ("invalid option --update: {}", Ada.Exceptions.Exception_Message (E));
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
    when SPDX_Tool.Configs.Error |
@@ -380,7 +380,7 @@ exception
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
    when E : others =>
-      Log.Error (-("some internal error occurred"), E);
+      Log.Error ("some internal error occurred", E);
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
 end SPDX_Tool.Main;

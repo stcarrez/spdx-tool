@@ -37,7 +37,7 @@ package body SPDX_Tool.Files.Manager is
 
    exception
       when others =>
-         Log.Error (-("cannot identify mime type for '{0}'"), File.Path);
+         Log.Error ("cannot identify mime type for '{0}'", File.Path);
    end Find_Mime_Type;
 
    --  ------------------------------
@@ -106,10 +106,11 @@ package body SPDX_Tool.Files.Manager is
       Spaces    : Buffer_Size;
       Length    : Buffer_Size;
       Line      : Line_Count := First;
+      Spaces_After : Buffer_Size := 0;
 
       procedure Copy_Line (Line : in Line_Count) is
-         Start_Pos : Buffer_Index := File.Lines (Line).Line_Start;
-         Last_Pos  : Buffer_Index := File.Lines (Line + 1).Line_Start - 1;
+         Start_Pos : constant Buffer_Index := File.Lines (Line).Line_Start;
+         Last_Pos  : constant Buffer_Index := File.Lines (Line + 1).Line_Start - 1;
       begin
          Output.Write (Buf.Data (Start_Pos .. Last_Pos));
       end Copy_Line;
@@ -182,6 +183,7 @@ package body SPDX_Tool.Files.Manager is
          end if;
          Next_Pos := File.Lines (Last).Style.Text_Last + 1;
          Last_Pos := Next_Pos;
+         Spaces_After := 1;
       end if;
 
       Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
@@ -198,11 +200,13 @@ package body SPDX_Tool.Files.Manager is
             Output.Write (" ");
             Spaces := Spaces - 1;
          end loop;
+      elsif Spaces_After > 0 then
+         Output.Write (" ");
       end if;
 
       if After.First_Line > 0 and then Line + 1 <= File.Lines'Last then
          declare
-            Keep_Pos : Buffer_Index := File.Lines (Line + 1).Line_Start - 1;
+            Keep_Pos : constant Buffer_Index := File.Lines (Line + 1).Line_Start - 1;
          begin
             if Next_Pos <= Keep_Pos then
                Output.Write (Buf.Data (Next_Pos .. Keep_Pos));
