@@ -1,0 +1,362 @@
+# Translation file for the spdx-tool
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: spdx-tool 0.1.0\n"
+"Report-Msgid-Bugs-To: Stephane.Carrez@gmail.com\n"
+"POT-Creation-Date: 2024-06-01\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Scarrez\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: spdx_tool-languages-manager.adb
+msgid ", "
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Add line number when printing license text"
+msgstr ""
+
+#: spdx_tool-licenses-reader.adb
+msgid "cannot compile regex: '{0}'"
+msgstr "impossible de compiler l'expression régulière: '{0}'"
+
+#: spdx_tool-files-manager.adb
+msgid "cannot identify mime type for '{0}'"
+msgstr "impossible d'identifier le type mime de '{0}'"
+
+#: spdx_tool-magic_manager.adb
+msgid "cannot load magic file {0}: {1}"
+msgstr "impossible de lire le fichier magic {0}: {1}"
+
+#: spdx_tool-main.adb
+msgid "Check and gather licenses used in source files"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "configuration file '{0}' does not exist."
+msgstr "le fichier de configuration '{0}' n'existe pas"
+
+#: spdx_tool-reports.adb
+msgid "Count"
+msgstr "Nombre"
+
+#: spdx_tool.adb
+msgid "debug"
+msgstr "debug"
+
+#: spdx_tool-main.adb
+msgid "Disable colors in output"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Disable internal builtin license repository"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Enable debug execution"
+msgstr ""
+
+#: spdx_tool.adb
+msgid "error"
+msgstr "erreur"
+
+#: spdx_tool-licenses-reader.adb spdx_tool-magic_manager.adb
+#: spdx_tool-files-manager.adb spdx_tool-languages-manager.adb
+#: spdx_tool-main.adb spdx_tool-licenses-manager.adb spdx_tool-configs.adb
+msgid "Error"
+msgstr "erreur"
+
+#: spdx_tool-licenses-reader.adb spdx_tool-licenses-manager.adb
+msgid "exception"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "excluded file {0}"
+msgstr "fichier exclu {0}"
+
+#: spdx_tool-main.adb
+msgid "Export the licenses in the directory"
+msgstr ""
+
+#: spdx_tool-languages.adb
+msgid "extract license from lines{0} to{1}"
+msgstr ""
+
+#: spdx_tool.adb
+msgid "fatal"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Generic a JSON report with licenses and files"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Generic a XML report with licenses and files"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Identify languages used in files"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Identify mime types of files"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Identify the license and only print the SPDX license"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "ignore file {} not found"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Ignore the files with languages in the given list"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Ignore the files with licenses in the given list"
+msgstr ""
+
+#: spdx_tool.adb
+msgid "info"
+msgstr ""
+
+#: spdx_tool-configs.adb spdx_tool-licenses-manager.adb spdx_tool-licenses.adb
+#: spdx_tool-languages.adb spdx_tool-languages-manager.adb
+#: spdx_tool-files-manager.adb
+msgid "Info"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "invalid builtin ignore file {0}"
+msgstr ""
+
+#: spdx_tool-configs.adb
+msgid "invalid configuration file:"
+msgstr ""
+
+#: spdx_tool-configs.adb
+msgid "invalid configuration {0}"
+msgstr ""
+
+#: spdx_tool-configs.adb
+msgid "invalid default configuration file"
+msgstr ""
+
+#: spdx_tool-languages-manager.adb
+msgid "invalid language {0}"
+msgstr "langage invalide {0}"
+
+#: spdx_tool-main.adb
+msgid "invalid number of tasks: {0}"
+msgstr "nombre de taches incorrect: {0}"
+
+#: spdx_tool-main.adb
+msgid "invalid option --update: {}"
+msgstr "option --update invalide: {}"
+
+#: spdx_tool-licenses-manager.adb
+msgid "Invalid range of line"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "invalid update pattern"
+msgstr "pattern de mise à jour incorrect"
+
+#: spdx_tool-licenses-manager.adb
+msgid "job {0} failed"
+msgstr ""
+
+#: spdx_tool-reports.adb
+msgid "Language"
+msgstr ""
+
+#: spdx_tool-languages-manager.adb
+msgid "language {0}: invalid comment style {1}"
+msgstr "language {0}: style de commentaire invalid {1}"
+
+#: spdx_tool-reports.adb
+msgid "License"
+msgstr ""
+
+#: spdx_tool-licenses.adb
+msgid "license '{0}' missmatch at line{1} after {2} lines"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "license missmatch at line{0} after {1} lines"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "List files grouped by license name"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "load license template {0}"
+msgstr ""
+
+#: spdx_tool-configs.adb
+msgid "loading default configuration"
+msgstr "chargement de la configuration par défaut"
+
+#: spdx_tool-licenses-manager.adb
+msgid "loading licenses from {0}"
+msgstr "chargement des licenses depuis {0}"
+
+#: spdx_tool-reports.adb
+msgid "Match"
+msgstr ""
+
+#: spdx_tool-reports.adb
+msgid "Mime type"
+msgstr "Type mime"
+
+#: spdx_tool-licenses-manager.adb
+msgid "missing 'spdx' tag in the pattern"
+msgstr "manque le tag 'spdx' dans le pattern"
+
+#: spdx_tool-reports.adb
+msgid "None"
+msgstr "Aucun"
+
+#: spdx_tool-licenses-reader.adb
+msgid "not with a <<beginOptional>> element"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Number of threads to process the files"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Only consider files with languages in the given list"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Only consider files with licenses in the given list"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "path '{0}' does not exist"
+msgstr "le chemin '{0}' n'existe pas"
+
+#: spdx_tool-main.adb
+msgid "Path of a license file or a directory with licenses"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Path of the spdx-tool configuration file"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Print license found in header files"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Print performance report (debugging"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Print the version"
+msgstr ""
+
+#: spdx_tool-reports.adb
+msgid "Ratio"
+msgstr ""
+
+#: spdx_tool-configs.adb
+msgid "reading configuration file '{0}'"
+msgstr "lecture du fichier de configuration '{0}"
+
+#: spdx_tool-licenses-manager.adb
+msgid "scan file {0}"
+msgstr "scan du fichier {0}"
+
+#: spdx_tool-main.adb
+msgid "some internal error occurred"
+msgstr "erreur interne"
+
+#: spdx_tool-main.adb
+msgid "spdx-tool - SPDX license management tool"
+msgstr "spdx-tool - Outil de gestion de license SPDX"
+
+#: spdx_tool-licenses-reader.adb
+msgid "too many nested <<beginOptional>>"
+msgstr "trop de <<beginOptional>>"
+
+#: spdx_tool-languages-manager.adb
+msgid "too many recursive depend {0}"
+msgstr "trop de dépendances récursives {0}"
+
+#: spdx_tool-reports.adb
+msgid "Unknown"
+msgstr "Inconnu"
+
+#: spdx_tool-main.adb
+msgid "Update the license to use a SPDX-License tag"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Verbose execution mode"
+msgstr ""
+
+#: spdx_tool.adb
+msgid "warn"
+msgstr ""
+
+#: spdx_tool-files-manager.adb
+msgid "writing license {0} in {1}"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "{0} is {1}: {2} lines no comment"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "{0} is {1}: {2} lines {3} cmt"
+msgstr ""
+
+#: spdx_tool-languages-manager.adb
+msgid "{0}: language {1} with analyzer"
+msgstr "{0}: langage {1} avec analyseur"
+
+#: spdx_tool-languages-manager.adb
+msgid "{0}: language {1} with default analyzer"
+msgstr "{0}: langage {1} avec analyseur par défaut"
+
+#: spdx_tool-languages-manager.adb
+msgid "{0}: language {1} without analyzer"
+msgstr "{0}: langage {1} sans analyseur"
+
+#: spdx_tool-languages-manager.adb
+msgid "{0}: no language found"
+msgstr "{0}: pas de language identifié"
+
+#: spdx_tool-licenses-manager.adb
+msgid "{0}: no license found"
+msgstr "{0}: pas de license identifié"
+
+#: spdx_tool-configs.adb spdx_tool-licenses-manager.adb
+msgid "{0}: {1}"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "{0}: {1} (ignored)"
+msgstr "{0}: {1} (ignoré)"
+
+#: spdx_tool-licenses-manager.adb
+msgid "{0}: {1} (ignored at lines {2})"
+msgstr "{0}: {1} (ignoré à la ligne {2})"
+
+#: spdx_tool-licenses-manager.adb
+msgid "{0}: {1} at lines {2}"
+msgstr "{0}: {1} à la ligne {2}"
+
+#: spdx_tool-configs.adb
+msgid "{0}:{1}: {2}"
+msgstr ""
