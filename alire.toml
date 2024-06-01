@@ -39,7 +39,7 @@ freebsd = { USE_MAGICADA = "yes" }
 macos = { USE_MAGICADA = "no" }
 windows = { USE_MAGICADA = "no" }
 
-# [[pins]]
-# printer_toolkitada = { url="git@gitlab.com:stcarrez/printer-toolkit.git" }
 [[pins]]
+printer_toolkitada = { url="https://gitlab.com/stcarrez/printer-toolkit.git" }
 sciada = { url="https://gitlab.com/stcarrez/ada-sci.git" }
+utilada = { url="https://github.com/stcarrez/ada-util.git" }
