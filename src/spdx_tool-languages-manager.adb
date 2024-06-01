@@ -181,7 +181,7 @@ package body SPDX_Tool.Languages.Manager is
                Pos  : constant Language_Maps.Cursor := Manager.Languages.Find (Lang);
             begin
                if not Language_Maps.Has_Element (Pos) then
-                  Log.Error ("Language {0}: invalid comment style {1}",
+                  Log.Error ("language {0}: invalid comment style {1}",
                              Name, Lang);
                else
                   declare
@@ -190,9 +190,9 @@ package body SPDX_Tool.Languages.Manager is
                   begin
                      if Ref_Lang.Analyzer = null then
                         if Recurse > MAX_RECURSE then
-                           Log.Error ("Too many recursive depend {0}", Name);
+                           Log.Error ("too many recursive depend {0}", Name);
                         elsif Length (Ref_Lang.Config.Alternative) = 0 then
-                           Log.Error ("Invalid language {0}", Lang);
+                           Log.Error ("invalid language {0}", Lang);
                         else
                            Setup_Language (Lang, Ref_Lang, Recurse + 1);
                         end if;

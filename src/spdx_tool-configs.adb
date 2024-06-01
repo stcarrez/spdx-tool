@@ -59,7 +59,7 @@ package body SPDX_Tool.Configs is
       S      : Default_Input_Stream;
       Result : TOML.Read_Result;
    begin
-      Log.Info ("Loading default configuration");
+      Log.Info ("loading default configuration");
 
       Result := TOML_Parse_String (S);
       if not Result.Success then
@@ -80,7 +80,7 @@ package body SPDX_Tool.Configs is
    procedure Read (Into : in out Config_Type;
                    Path : in String) is
    begin
-      Log.Info ("Reading configuration file '{0}'", Path);
+      Log.Info ("reading configuration file '{0}'", Path);
       declare
          Result : constant TOML.Read_Result := TOML.File_IO.Load_File (Path);
       begin

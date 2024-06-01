@@ -239,6 +239,7 @@ package body SPDX_Tool is
       Log_Config.Set ("spdx_tool.appender.errorConsole.stderr", "true");
       Log_Config.Set ("spdx_tool.appender.errorConsole.prefix", "spdx-tool: ");
       Log_Config.Set ("spdx_tool.appender.errorConsole.formatter", "NLS");
+      Log_Config.Set ("spdx_tool.appender.errorConsole.utf8", "true");
       Log_Config.Set ("spdx_tool.formatter.NLS", "NLS");
       Log_Config.Set ("spdx_tool.logger.Util", "DEBUG");
       Log_Config.Set ("spdx_tool.logger.Util.Events", "ERROR");
@@ -250,6 +251,7 @@ package body SPDX_Tool is
          Log_Config.Set ("spdx_tool.appender.verbose.level", "INFO");
          Log_Config.Set ("spdx_tool.appender.verbose.layout", "level-message");
          Log_Config.Set ("spdx_tool.appender.verbose.formatter", "NLS");
+         Log_Config.Set ("spdx_tool.appender.verbose.utf8", "true");
       end if;
       if Debug then
          Log_Config.Set ("spdx_tool.logger.Util.Processes", "INFO");

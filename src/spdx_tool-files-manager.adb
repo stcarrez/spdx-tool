@@ -115,7 +115,7 @@ package body SPDX_Tool.Files.Manager is
          Output.Write (Buf.Data (Start_Pos .. Last_Pos));
       end Copy_Line;
    begin
-      Log.Info ("Writing license {0} in {1}", License, Path);
+      Log.Info ("writing license {0} in {1}", License, Path);
 
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
 

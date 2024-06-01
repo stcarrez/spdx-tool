@@ -537,7 +537,7 @@ package body SPDX_Tool.Licenses is
                   return Match;
                end if;
                if Match.Last /= null and then Match.Info.First_Line + 1 < Match.Info.Last_Line then
-                  Log.Info ("License '{0}' missmatch at line{1} after {2} lines",
+                  Log.Info ("license '{0}' missmatch at line{1} after {2} lines",
                             Licenses.Files.Names (License).all,
                             Match.Info.Last_Line'Image,
                             Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));

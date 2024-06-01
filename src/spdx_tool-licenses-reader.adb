@@ -280,7 +280,7 @@ package body SPDX_Tool.Licenses.Reader is
 
    exception
       when E : others =>
-         Log.Error ("Exception ", E);
+         Log.Error ("exception", E);
    end Load_License;
 
    procedure Load_License (License : in License_Index;
@@ -397,7 +397,7 @@ package body SPDX_Tool.Licenses.Reader is
 
       exception
          when others =>
-            Log.Error ("Cannot compile regex: '{0}'", Regpat);
+            Log.Error ("cannot compile regex: '{0}'", Regpat);
             return new Token_Type '(Len => Content'Length,
                                     Previous => null,
                                     Next => null,

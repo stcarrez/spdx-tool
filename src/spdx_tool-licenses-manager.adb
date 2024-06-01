@@ -154,11 +154,11 @@ package body SPDX_Tool.Licenses.Manager is
          elsif Path = "spdx-tool:ignore-docs.txt" then
             Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore_docs);
          elsif Util.Strings.Starts_With (Path, "spdx-tool:") then
-            Log.Error ("Invalid builtin ignore file {0}", Path);
+            Log.Error ("invalid builtin ignore file {0}", Path);
          elsif Ada.Directories.Exists (Path) then
             Util.Files.Walk.Load_Ignore (Manager.Ignore_Files_Filter, Path);
          else
-            Log.Error ("Ignore file {} not found", Path);
+            Log.Error ("ignore file {} not found", Path);
          end if;
       end Load_Ignore_File;
 
@@ -224,7 +224,7 @@ package body SPDX_Tool.Licenses.Manager is
                             Path    : in String) is
       Filter : Util.Files.Walk.Filter_Type;
    begin
-      Log.Info ("Loading licenses from {0}", Path);
+      Log.Info ("loading licenses from {0}", Path);
 
       Filter.Include ("*.txt");
       Filter.Exclude ("*");
@@ -273,7 +273,7 @@ package body SPDX_Tool.Licenses.Manager is
       Name : constant String := Ada.Directories.Base_Name (Path);
       Ext  : constant String := Ada.Directories.Extension (Path);
    begin
-      Log.Info ("Load license template {0}", Path);
+      Log.Info ("load license template {0}", Path);
       if Ext = "jsonld" then
          Manager.Load_Jsonld_License (Path);
       else
@@ -313,11 +313,11 @@ package body SPDX_Tool.Licenses.Manager is
    begin
       Filter := Manager.Ignore_Files_Filter.Match (Path);
       if Filter = Util.Files.Walk.Excluded then
-         Log.Info ("Excluded file {0}", Path);
+         Log.Info ("excluded file {0}", Path);
          return;
       end if;
 
-      Log.Info ("Scan file {0}", Path);
+      Log.Info ("scan file {0}", Path);
       case Manager.Job is
          when LOAD_LICENSES =>
             Manager.Load_License (Path);
@@ -517,7 +517,7 @@ package body SPDX_Tool.Licenses.Manager is
             end if;
             if Match.Last /= null then
                if Match.Info.First_Line + 1 < Match.Info.Last_Line then
-                  Log.Info ("License missmatch at line{0} after {1} lines",
+                  Log.Info ("license missmatch at line{0} after {1} lines",
                             Match.Info.Last_Line'Image,
                             Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));
                end if;
@@ -590,7 +590,7 @@ package body SPDX_Tool.Licenses.Manager is
             end if;
             if Match.Last /= null then
                if Match.Info.First_Line + 1 < Match.Info.Last_Line then
-                  Log.Info ("License missmatch at line{0} after {1} lines",
+                  Log.Info ("license missmatch at line{0} after {1} lines",
                             Match.Info.Last_Line'Image,
                             Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));
                end if;
@@ -773,14 +773,14 @@ package body SPDX_Tool.Licenses.Manager is
          new Ada.Unchecked_Deallocation (Object => Freq_Transformers.Frequency_Array,
                                          Name   => Frequency_Array_Access);
    begin
-      Log.Info ("License manager stopping, max fill {0}",
-                Util.Strings.Image (Manager.Max_Fill));
+      Log.Debug ("License manager stopping, max fill {0}",
+                 Util.Strings.Image (Manager.Max_Fill));
       Free (Manager.Executor);
       Free (Manager.License_Frequency);
 
    exception
       when E : others =>
-         Log.Error ("Exception:", E);
+         Log.Error ("exception", E);
    end Finalize;
 
    function Get_File_Manager (Manager : in out License_Manager)
@@ -803,8 +803,8 @@ package body SPDX_Tool.Licenses.Manager is
    procedure Error (Job : in out License_Job_Type;
                     Ex  : in Ada.Exceptions.Exception_Occurrence) is
    begin
-      Log.Error ("Job {0} failed", Job.File.Path);
-      Log.Error ("Exception", Ex, True);
+      Log.Error ("job {0} failed", Job.File.Path);
+      Log.Error ("exception", Ex, True);
    end Error;
 
 end SPDX_Tool.Licenses.Manager;

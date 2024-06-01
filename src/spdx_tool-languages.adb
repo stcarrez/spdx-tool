@@ -573,7 +573,7 @@ package body SPDX_Tool.Languages is
       else
          Find_Headers (Buffer, Lines, Lines'Last, First_Line, Last_Line);
       end if;
-      Log.Info ("Extract license from lines{0} to{1}", First_Line'Image, Last_Line'Image);
+      Log.Info ("extract license from lines{0} to{1}", First_Line'Image, Last_Line'Image);
       if First_Line > Last_Line then
          return null;
       end if;
