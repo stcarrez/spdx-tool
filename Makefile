@@ -2,6 +2,8 @@ BUILD=#coverage
 MAKE_ARGS=
 JSON_PP=json_pp
 
+-include .env.local
+
 ifeq ($(BUILD),coverage)
 MAKE_ARGS=-- -XBUILD=coverage
 endif
@@ -10,7 +12,7 @@ ifeq ($(BUILD),debug)
 MAKE_ARGS=-- -XBUILD=debug
 endif
 
-PREFIX=/usr/local
+PREFIX?=/usr/local
 
 build:
 	alr build $(MAKE_ARGS)
@@ -45,4 +47,9 @@ clean:
 	rm -rf obj bin lib
 
 install:
-	alr exec gprinstall -- -p --mode=usage --prefix=${PREFIX} -q -Pspdx_tool.gpr
+	alr exec gprinstall -- --uninstall -f -p --mode=usage --prefix=${PREFIX} -q -Pspdx_tool.gpr
+	alr exec gprinstall -- -f -p --mode=usage --prefix=${PREFIX} -q -Pspdx_tool.gpr
+
+# Create the .mo file from the translation file.
+pot:
+	msgfmt -o po/locale/fr/LC_MESSAGES/spdx-tool.mo po/fr.po
