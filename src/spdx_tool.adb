@@ -50,15 +50,15 @@ package body SPDX_Tool is
       use Util.Log;
    begin
       if Level = FATAL_LEVEL then
-         return -("FATAL");
+         return -("fatal");
       elsif Level = ERROR_LEVEL then
-         return -("ERROR");
+         return -("error");
       elsif Level = WARN_LEVEL then
-         return -("WARN");
+         return -("warn");
       elsif Level = INFO_LEVEL then
-         return -("INFO");
+         return -("info");
       elsif Level = DEBUG_LEVEL then
-         return -("DEBUG");
+         return -("debug");
       else
          return Level_Type'Image (Level);
       end if;
