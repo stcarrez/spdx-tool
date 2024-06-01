@@ -11,3 +11,4 @@
 /*.ali
 /*.ads
 /*.adb
+/src/spdx_tool-configs-defaults.ads
