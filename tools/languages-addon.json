@@ -154,5 +154,8 @@
       "aliases": [
          "emacs-lisp"
       ],
+   },
+   "XML": {
+      "comment_style": "XML"
    }
 }
