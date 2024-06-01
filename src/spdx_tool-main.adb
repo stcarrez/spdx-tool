@@ -299,7 +299,7 @@ begin
       return;
    end if;
    Load_Configuration;
-   if Opt_Identify then
+   if Opt_Identify or else Opt_Print then
       Opt_No_Color := True;
    end if;
    if not Opt_Files and not Opt_Check and not Opt_Update
