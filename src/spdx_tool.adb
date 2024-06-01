@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------
 
 with Ada.Finalization;
+with Ada.Calendar;
 with Util.Log.Loggers;
 with Util.Log.Formatters.Factories;
 with Util.Properties;
@@ -13,38 +14,100 @@ package body SPDX_Tool is
 
    use Interfaces;
    use Util.Log.Formatters;
+   subtype Level_Type is Util.Log.Level_Type;
+
    function Get_Count (V : in Interfaces.Unsigned_8) return Natural;
+   function Get_Level_Name (Level : Level_Type) return String;
 
    type NLS_Formatter (Length : Positive) is
       new Util.Log.Formatters.Formatter (Length) with null record;
 
    --  Format the message with the list of arguments.
    overriding
-   procedure Format (Format    : in NLS_Formatter;
-                     Into      : in out Util.Strings.Builders.Builder;
-                     Level     : in Util.Log.Level_Type;
-                     Logger    : in String;
-                     Message   : in String;
-                     Arguments : in String_Array_Access);
+   procedure Format_Message (Format    : in NLS_Formatter;
+                             Into      : in out Util.Strings.Builders.Builder;
+                             Level     : in Util.Log.Level_Type;
+                             Logger    : in String;
+                             Message   : in String;
+                             Arguments : in String_Array_Access);
+
+   --  Format the event into a string
+   overriding
+   function Format_Event (Format  : in NLS_Formatter;
+                          Layout  : in Layout_Type;
+                          Date    : in Ada.Calendar.Time;
+                          Use_UTC : in Boolean;
+                          Level   : in Level_Type;
+                          Logger  : in String) return String;
 
    function Create_Formatter (Name    : in String;
                               Config  : in Util.Properties.Manager) return Formatter_Access;
 
+   --  ------------------------------
+   --  Get the log level name.
+   --  ------------------------------
+   function Get_Level_Name (Level : Level_Type) return String is
+      use Util.Log;
+   begin
+      if Level = FATAL_LEVEL then
+         return -("FATAL");
+      elsif Level = ERROR_LEVEL then
+         return -("ERROR");
+      elsif Level = WARN_LEVEL then
+         return -("WARN");
+      elsif Level = INFO_LEVEL then
+         return -("INFO");
+      elsif Level = DEBUG_LEVEL then
+         return -("DEBUG");
+      else
+         return Level_Type'Image (Level);
+      end if;
+   end Get_Level_Name;
+
    --  Format the message with the list of arguments.
    overriding
-   procedure Format (Format    : in NLS_Formatter;
-                     Into      : in out Util.Strings.Builders.Builder;
-                     Level     : in Util.Log.Level_Type;
-                     Logger    : in String;
-                     Message   : in String;
-                     Arguments : in String_Array_Access) is
+   procedure Format_Message (Format    : in NLS_Formatter;
+                             Into      : in out Util.Strings.Builders.Builder;
+                             Level     : in Util.Log.Level_Type;
+                             Logger    : in String;
+                             Message   : in String;
+                             Arguments : in String_Array_Access) is
    begin
       if Level >= Util.Log.INFO_LEVEL then
-         Formatter (Format).Format (Into, Level, Logger, -(Message), Arguments);
+         Formatter (Format).Format_Message (Into, Level, Logger, -(Message), Arguments);
       else
-         Formatter (Format).Format (Into, Level, Logger, Message, Arguments);
+         Formatter (Format).Format_Message (Into, Level, Logger, Message, Arguments);
       end if;
-   end Format;
+   end Format_Message;
+
+   --  ------------------------------
+   --  Format the event into a string
+   --  ------------------------------
+   overriding
+   function Format_Event (Format  : in NLS_Formatter;
+                          Layout  : in Layout_Type;
+                          Date    : in Ada.Calendar.Time;
+                          Use_UTC : in Boolean;
+                          Level   : in Level_Type;
+                          Logger  : in String) return String is
+   begin
+      case Layout is
+         when MESSAGE =>
+            return "";
+
+         when LEVEL_MESSAGE =>
+            return Get_Level_Name (Level) & ": ";
+
+         when DATE_LEVEL_MESSAGE =>
+            return "[" & Formatter'Class (Format).Format_Date (Use_UTC, Date) & "] "
+              & Get_Level_Name (Level) & ": ";
+
+         when FULL =>
+            return "[" & Formatter'Class (Format).Format_Date (Use_UTC, Date)
+              & "] " & Get_Level_Name (Level) & " - " & Logger & " - : ";
+
+      end case;
+   end Format_Event;
 
    --  ------------------------------
    --  Create a formatter instance with a factory with the given name.
@@ -175,6 +238,8 @@ package body SPDX_Tool is
       Log_Config.Set ("spdx_tool.appender.errorConsole.layout", "message");
       Log_Config.Set ("spdx_tool.appender.errorConsole.stderr", "true");
       Log_Config.Set ("spdx_tool.appender.errorConsole.prefix", "spdx-tool: ");
+      Log_Config.Set ("spdx_tool.appender.errorConsole.formatter", "NLS");
+      Log_Config.Set ("spdx_tool.formatter.NLS", "NLS");
       Log_Config.Set ("spdx_tool.logger.Util", "DEBUG");
       Log_Config.Set ("spdx_tool.logger.Util.Events", "ERROR");
       Log_Config.Set ("spdx_tool.logger.SPDX_Tool", "INFO:NLS");
@@ -184,6 +249,7 @@ package body SPDX_Tool is
          Log_Config.Set ("spdx_tool.appender.verbose", "Console");
          Log_Config.Set ("spdx_tool.appender.verbose.level", "INFO");
          Log_Config.Set ("spdx_tool.appender.verbose.layout", "level-message");
+         Log_Config.Set ("spdx_tool.appender.verbose.formatter", "NLS");
       end if;
       if Debug then
          Log_Config.Set ("spdx_tool.logger.Util.Processes", "INFO");
