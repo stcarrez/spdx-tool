@@ -611,7 +611,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_246           : aliased constant String := "PlantUML";
    M_246           : aliased constant String := "";
    K_247           : aliased constant String := "XML";
-   M_247           : aliased constant String := "";
+   M_247           : aliased constant String := "XML";
    K_248           : aliased constant String := "Propeller Spin";
    M_248           : aliased constant String := "";
    K_249           : aliased constant String := "Ballerina";
