@@ -11,6 +11,8 @@ with Ada.Exceptions;
 with GNAT.Command_Line;
 with GNAT.Strings;
 
+with Intl;
+
 with Util.Files.Walk;
 with Util.Log.Loggers;
 with Util.Strings;
@@ -23,7 +25,7 @@ with PT.Colors;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Licenses.Manager;
 with SPDX_Tool.Reports;
-with SPDX_Tool.Configs;
+with SPDX_Tool.Configs.Defaults;
 procedure SPDX_Tool.Main is
 
    package GC renames GNAT.Command_Line;
@@ -52,6 +54,8 @@ procedure SPDX_Tool.Main is
    procedure Setup is
       Default_Tasks : constant String := " (" & Util.Strings.Image (Opt_Tasks) & ")";
    begin
+      Intl.Initialize ("spdx-tool", Configs.Defaults.PREFIX & "/share/locale");
+
       GC.Set_Usage (Config => Command_Config,
                     Usage  => "[options] [files|directories]",
                     Help   => -("spdx-tool - SPDX license management tool"));
@@ -83,12 +87,8 @@ procedure SPDX_Tool.Main is
                         Help   => -("Number of threads to process the files")
                         & Default_Tasks);
       GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Check'Access,
-                        Switch => "-c",
-                        Long_Switch => "--check",
-                        Help   => -("Check and gather licenses used in source files"));
-      GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Configs.Config_Path'Access,
+                        Switch => "-c:",
                         Long_Switch => "--config=",
                         Argument => "PATH",
                         Help   => -("Path of the spdx-tool configuration file"));
@@ -109,13 +109,19 @@ procedure SPDX_Tool.Main is
                         Help   => -("Print license found in header files"));
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Print_Lineno'Access,
-                        Long_Switch => "--print-lineno",
+                        Switch => "-n",
+                        Long_Switch => "--line-number",
                         Help   => -("Add line number when printing license text"));
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Identify'Access,
                         Switch => "-i",
                         Long_Switch => "--identify",
                         Help   => -("Identify the license and only print the SPDX license"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Check'Access,
+                        Switch => "-l",
+                        Long_Switch => "--licenses",
+                        Help   => -("Check and gather licenses used in source files"));
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Languages'Access,
                         Long_Switch => "--languages",
@@ -146,7 +152,6 @@ procedure SPDX_Tool.Main is
                         Help   => -("Ignore the files with languages in the given list"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.License_Dir'Access,
-                        Switch => "-l:",
                         Long_Switch => "--license=",
                         Argument => "PATH",
                         Help   => -("Path of a license file or a directory with licenses"));
@@ -267,7 +272,7 @@ procedure SPDX_Tool.Main is
    begin
       if Configs.Config_Path.all /= "" then
          if not Ada.Directories.Exists (Configs.Config_Path.all) then
-            Log.Error ("Configuration file '{0}' does not exist.",
+            Log.Error ("configuration file '{0}' does not exist.",
                        Configs.Config_Path.all);
             Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
             raise GNAT.Command_Line.Exit_From_Command_Line;
@@ -288,7 +293,7 @@ begin
       Configure_Logs (Opt_Debug, Opt_Verbose);
    end if;
    if not (Opt_Tasks in Task_Count'Range) then
-      Log.Error ("Invalid number of tasks: {0}",
+      Log.Error ("invalid number of tasks: {0}",
                  Util.Strings.Image (Opt_Tasks));
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
       return;

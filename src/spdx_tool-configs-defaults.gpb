@@ -1,0 +1,11 @@
+-- --------------------------------------------------------------------
+--  spdx_tool-configs-defaults -- tool configuration
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+--  SPDX-License-Identifier: Apache-2.0
+-----------------------------------------------------------------------
+
+package SPDX_Tool.Configs.Defaults is
+
+   PREFIX : constant String := $PREFIX;
+
+end SPDX_Tool.Configs.Defaults;
