@@ -1,6 +1,7 @@
 BUILD=#coverage
 MAKE_ARGS=
 JSON_PP=json_pp
+VERSION=0.3.0
 
 -include .env.local
 
@@ -14,7 +15,7 @@ endif
 
 PREFIX?=/usr/local
 
-build:
+build: src/spdx_tool-configs-defaults.ads
 	alr build $(MAKE_ARGS)
 
 build-tests:
@@ -53,3 +54,7 @@ install:
 # Create the .mo file from the translation file.
 pot:
 	msgfmt -o po/locale/fr/LC_MESSAGES/spdx-tool.mo po/fr.po
+
+src/spdx_tool-configs-defaults.ads:   Makefile src/spdx_tool-configs-defaults.gpb
+	gnatprep -DPREFIX='"${PREFIX}"' -DVERSION='"$(VERSION)"' \
+		  src/spdx_tool-configs-defaults.gpb src/spdx_tool-configs-defaults.ads
