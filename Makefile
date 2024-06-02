@@ -2,6 +2,7 @@ BUILD=#coverage
 MAKE_ARGS=
 JSON_PP=json_pp
 VERSION=0.3.0
+DEBUG_MODE=False
 
 -include .env.local
 
@@ -56,5 +57,5 @@ pot:
 	msgfmt -o po/locale/fr/LC_MESSAGES/spdx-tool.mo po/fr.po
 
 src/spdx_tool-configs-defaults.ads:   Makefile src/spdx_tool-configs-defaults.gpb
-	gnatprep -DPREFIX='"${PREFIX}"' -DVERSION='"$(VERSION)"' \
+	gnatprep -DPREFIX='"${PREFIX}"' -DVERSION='"$(VERSION)"' -DDEBUG='$(DEBUG_MODE)'\
 		  src/spdx_tool-configs-defaults.gpb src/spdx_tool-configs-defaults.ads

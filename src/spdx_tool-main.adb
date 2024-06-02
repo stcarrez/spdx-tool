@@ -79,10 +79,12 @@ procedure SPDX_Tool.Main is
                         Output => SPDX_Tool.Licenses.Opt_No_Builtin'Access,
                         Long_Switch => "--no-builtin-licenses",
                         Help   => -("Disable internal builtin license repository"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Opt_Perf_Report'Access,
-                        Long_Switch => "--print-perf-report",
-                        Help   => -("Print performance report (debugging)"));
+      if Configs.Defaults.DEBUG then
+         GC.Define_Switch (Config => Command_Config,
+                           Output => SPDX_Tool.Licenses.Opt_Perf_Report'Access,
+                           Long_Switch => "--print-perf-report",
+                           Help   => "Print performance report (debugging)");
+      end if;
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Tasks'Access,
                         Switch => "-t:",
@@ -189,11 +191,13 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--templates=",
                         Argument => "PATH",
                         Help   => -("Path of a license template or a directory with templates"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Export_Dir'Access,
-                        Long_Switch => "--export=",
-                        Argument => "PATH",
-                        Help   => -("Export the licenses in the directory"));
+      if Configs.Defaults.DEBUG then
+         GC.Define_Switch (Config => Command_Config,
+                           Output => SPDX_Tool.Licenses.Export_Dir'Access,
+                           Long_Switch => "--export=",
+                           Argument => "PATH",
+                           Help   => "Export the licenses in the directory");
+      end if;
    end Setup;
 
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
@@ -385,7 +389,7 @@ begin
          Report_Summary (Manager);
       end if;
    end;
-   if SPDX_Tool.Licenses.Opt_Perf_Report then
+   if Configs.Defaults.DEBUG and then SPDX_Tool.Licenses.Opt_Perf_Report then
       SPDX_Tool.Licenses.Performance_Report;
    end if;
 

@@ -7,5 +7,6 @@
 package SPDX_Tool.Configs.Defaults is
 
    PREFIX : constant String := $PREFIX;
+   DEBUG  : constant Boolean := $DEBUG;
 
 end SPDX_Tool.Configs.Defaults;
