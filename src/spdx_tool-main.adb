@@ -152,36 +152,28 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--update=",
                         Argument => "PATTERN",
                         Help   => -("Update the license to use the SPDX license tag"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Only_Licenses'Access,
-                        Long_Switch => "--only-licenses=",
-                        Argument => "NAMES",
-                        Help   => -("Only consider files with licenses in the given list"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Only_Languages'Access,
-                        Long_Switch => "--only-languages=",
-                        Argument => "NAMES",
-                        Help   => -("Only consider files with languages in the given list"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Ignore_Licenses'Access,
-                        Long_Switch => "--ignore-licenses=",
-                        Argument => "NAMES",
-                        Help   => -("Ignore the files with licenses in the given list"));
+
+      --  Filtering options
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.Ignore_Languages'Access,
                         Long_Switch => "--ignore-languages=",
                         Argument => "NAMES",
                         Help   => -("Ignore the files with languages in the given list"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.License_Dir'Access,
-                        Long_Switch => "--templates=",
-                        Argument => "PATH",
-                        Help   => -("Path of a license template or a directory with templates"));
+                        Output => SPDX_Tool.Licenses.Ignore_Licenses'Access,
+                        Long_Switch => "--ignore-licenses=",
+                        Argument => "NAMES",
+                        Help   => -("Ignore the files with licenses in the given list"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Export_Dir'Access,
-                        Long_Switch => "--export=",
-                        Argument => "PATH",
-                        Help   => -("Export the licenses in the directory"));
+                        Output => SPDX_Tool.Licenses.Only_Languages'Access,
+                        Long_Switch => "--only-languages=",
+                        Argument => "NAMES",
+                        Help   => -("Only consider files with languages in the given list"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Only_Licenses'Access,
+                        Long_Switch => "--only-licenses=",
+                        Argument => "NAMES",
+                        Help   => -("Only consider files with licenses in the given list"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Reports.Json_Path'Access,
                         Long_Switch => "--output-json=",
@@ -192,7 +184,16 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--output-xml=",
                         Argument => "PATH",
                         Help   => -("Generic a XML report with licenses and files"));
-
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.License_Dir'Access,
+                        Long_Switch => "--templates=",
+                        Argument => "PATH",
+                        Help   => -("Path of a license template or a directory with templates"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Export_Dir'Access,
+                        Long_Switch => "--export=",
+                        Argument => "PATH",
+                        Help   => -("Export the licenses in the directory"));
    end Setup;
 
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
