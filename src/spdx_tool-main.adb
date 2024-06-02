@@ -8,6 +8,7 @@ with System.Multiprocessors;
 with Ada.Command_Line;
 with Ada.Directories;
 with Ada.Exceptions;
+with Ada.Text_IO;
 with GNAT.Command_Line;
 with GNAT.Strings;
 
@@ -310,6 +311,10 @@ begin
    GC.Getopt (Config => Command_Config);
    if Opt_Debug or Opt_Verbose then
       Configure_Logs (Opt_Debug, Opt_Verbose);
+   end if;
+   if Opt_Version then
+      Ada.Text_IO.Put_Line ("SPDX tool " & Configs.Defaults.VERSION);
+      return;
    end if;
    if not (Opt_Tasks in Task_Count'Range) then
       Log.Error ("invalid number of tasks: {0}",
