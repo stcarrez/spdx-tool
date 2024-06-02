@@ -1,155 +1,277 @@
 .\"
-.TH SPDX-TOOL 1 "May 19, 2024" "SPDX License Tool"
+.TH SPDX-TOOL 1 "June 2, 2024" "SPDX License Tool"
 .SH NAME
-spdx-tool - SPDX license management tool
+spdx-tool \- SPDX license management tool
 .SH SYNOPSIS
 .B spdx-tool
-[ -v ] [-vv] [-vvv] [-V]
-[-t
+[\-c|\-\-config
+.I config] [\-\-help] [\-\-no-color]  [--no-builtin-licenses]
+[\-t
 .I count
-] [--no-color]
- [-c | --check] [-i | --identify] [-f | --files]
- [-m | --mimes] [-p | --print-license] [--languages]
- [--no-builtin-licenses]
- [--ignore-licenses
-.I spdx-name1,spdx-name2,...
 ]
- [--only-licenses
-.I spdx-name1,spdx-name2,...
-]
- [--ignore-languages
-.I lang1,lang2,...
-]
- [--only-languages
-.I lang1,lang2,...
-]
- [--output-json
-.I file
-] [--output-xml
-.I file
-]
- [--update
+ [\-V|\-\-version] [\-v|\-\-verbose] [\-vv] [\-vvv|\-\-debug]
+ [\-f|\-\-files] [\-i|\-\-identify] [\-L|\-\-languages]  [\-l|\-\-licenses]
+ [-m|--mimes] [\-n|\-\-line-number] [\-p|\-\-print-license] [\-\-update
 .I pattern
-] [--license
+]
+ [\-\-ignore-licenses
+.I spdx-name1,spdx-name2,...
+] [\-\-ignore-languages
+.I lang1,lang2,...
+]
+ [\-\-only-licenses
+.I spdx-name1,spdx-name2,...
+] [\-\-only-languages
+.I lang1,lang2,...
+]
+ [\-\-output-json
 .I file
+] [\-\-output-xml
+.I file
+]
+ [--templates
+.I file|directory
 ]
 .I files|directories
 .br
 .SH DESCRIPTION
-\fIspdx-tool\fR scans the source files to identify licenses and allows to
+.B spdx-tool
+scans the source files to identify licenses and allows to
 update them in order to use the SPDX license format.  It can be used to:
 .\"
-.IP \(bu 4
-identify the license used in source files of a project,
+.IP \(bu 2
+identify the licenses used in source files of a project,
 .\"
-.IP \(bu 4
+.IP \(bu 2
 produce a JSON/XML report for the licenses found with the list of files,
 .\"
-.IP \(bu 4
+.IP \(bu 2
 replace a license header by the SPDX license tag header.
 .\"
 .P
-The tool uses the license templates to identify
-the license used in source files.  The builtin repository contains arround 600 license templates
-and it can be completed by your own templates as long as you use the SPDX license description
-format described in
+The tool uses a collection of license templates to identify
+the license used in source files.  The builtin repository contains arround 600
+license templates and it can be completed by your own templates as long as you
+use the SPDX license description format described in
 \fIThe Software Package Data Exchange® (SPDX®) Specification Version 2.3\fP.
 .\"
 .P
-The spdx-tool scans the directory or files passed as parameter.  Directories are scanned recursively
-and the
+The
+.B spdx-tool
+scans the directory or files passed as parameter.  Directories are scanned
+recursively and the
 .I .gitignore
-file is first looked in each directory to take into account files which are ignored
-in the project.  For each file, the spdx-tool tries to:
-
+file is first looked in each directory to take into account files which are
+ignored in the project.  For each file, the \fIspdx-tool\fR tries to:
 .\"
-.IP \(bu 4
+.IP \(bu 2
 identify the language of the source file,
 .\"
-.IP \(bu 4
+.IP \(bu 2
 extract the license header text at beginning of the source file,
 .\"
-.IP \(bu 4
-identify the license by using the following algorithms:
-.RS 4
+.IP \(bu 2
+identify the license by using several algorithms.
+.PP
+Language detection is the first step to be able to know which comment
+format is used and extract the license header text from the header file
+comment.  The license identification is made in several steps:
 .\"
-.IP \(bu 3
-look for a
+.IP \(bu 2
+first we look for a
 .I SPDX-License-Identifier
-tag, when it was found, the match report indicates
+tag.  When it was found, the match report indicates
 .IR SPDX ,
 .\"
-.IP \(bu 3
-look for a template match from the license templates
-builtin repository or the templates configured for the tool.  When this succeeds, the match
-report indicates
+.IP \(bu 2
+then we look for an exact template match from the license templates
+builtin repository or from the templates configured for the tool.
+When this succeeds, the match report indicates
 .IR TMPL ,
 .\"
-.IP \(bu 3
-guess the best matching license by using an inverted index of license tokens.
+.IP \(bu 2
+last, we guess the best matching license by using an inverted index of license tokens.
 The tool then uses a classical \fIterm frequency inverse document frequency\fP
 algorithm to find the best matching license.  The report will indicate the
 highest \fICosine\fP similarity found.
+.\"
+.PP
+The first step to use the tool to replace license headers by the equivalent
+.I SPDX-License-Identifier
+tag, consists in getting a summary of licenses used in the project.
+.P
+.RS 4
+\fBspdx-tool\fR .
+.RE
+.PP
+Having identified the licenses that must be replaced, you can identify the files
+which are using the license by using the
+.B --only-licenses
+and
+.B --files
+options:
+.P
+.RS 4
+\fBspdx-tool --only-licenses=\fRApache-2.0,MIT \fB--files\fR .
+.RE
+.\"
+.PP
+Before deciding to replace the license header of those files, it is good
+practice to have a look at the license header that is identified by the tool
+in order to double check before the replacement.  For this, you can use the
+.B --print-license
+option:
+.P
+.RS 4
+\fBspdx-tool --only-licenses=\fRApache-2.0,MIT \fB--print-license --line-number\fR .
+.RE
+.\"
+.PP
+The replacement step consists in using the
+.B --update
+option which uses a replacement pattern that gives you some control
+on the replacement.  The
+.I pattern
+string controls the replacement to allow keeping some lines from the existing
+license header.  It indicates which lines must be kept before and after the
+SPDX tag.  The pattern has the following format:
+.\"
+.P
+.RS 4
+[\fInumber\fP[..\fInumber\fP].]spdx[.\fInumber\fP[..number]]
+.RE
+.\"
+.PP
+Line numbers are relative to the first line representing the license header.
+The
+.B --print-license
+together with the
+.B --line-number
+options provide good hints to know how the tool identifies the license
+and decide which lines must be kept.
+.\"
+.PP
+To replace the license header and keep the two first lines, use the command:
+.P
+.RS 4
+\fBspdx-tool --only-licenses=\fRApache-2.0,MIT \fB--update=1..2,spdx\fR .
+.RE
+.\"
+.PP
+if you want to put the license tag before the two lines to keep, use:
+.P
+.RS 4
+\fBspdx-tool --only-licenses=\fRApache-2.0,MIT \fB--update=spdx,1..2\fR .
+.RE
+.\"
+.PP
+It is also possible to replace the header in a single file before applying
+the command to the whole project:
+.P
+.RS 4
+\fBspdx-tool --only-licenses=\fRApache-2.0,MIT \fB--update=spdx,1..2\fR \fIfile...\fP
+.RE
 .\"
 .P
 .SH OPTIONS
 The following options are recognized by \fIspdx-tool\fR:
 .TP 5
--V
-Prints the
-.I spdx-tool
-version.
+.BI \-c\ config
+Load the
+.B spdx-tool
+configuration file to configure default filters, languages and license templates.
 .TP 5
--v
-Enable the verbose mode.
+.B \-\-no-color
+Disable colors in output.
 .TP 5
--vv
-Enable debugging output.
+.B \-\-no-builtin-licenses
+Disable the builtin repository licenses used by the tool.
 .TP 5
--t \fIcount\fP
+.BI \-t\  count
 Defines the number of threads for the encryption and decryption process.
 By default, it uses the number of system CPU cores.
 .TP 5
---no-color
-Disable colors in output.
+.B \-V
+Prints the
+.B spdx-tool
+version.
 .TP 5
---check
-Check and gather licenses used in source files.  The report indicates a list of license with their SPDX name,
-the number of files found and the overall ratio of files per-license.
+.B \-v
+Enable the verbose mode.
 .TP 5
---files
+.B \-vv
+Enable a more verbose execution mode.
+.TP 5
+.B \-vvv
+Enable debugging output.
+.\"
+.TP 5
+.B \-\-files
 Check and gather licenses used in source files.  The report indicates the list of files grouped by the
 license SPDX name.
 .TP 5
---languages
-Produce a report with the list of files grouped by the language identified.  It can be used to identify
-and understand why some files have no license header.
+.B \-\-identify
+After identifying the license, print a single line report with the path and license tag found.
+The output is intended to be easily parsed by tools such as
+.IR sed (1)
+or
+.IR grep (1).
 .TP 5
---mimes
+.B \-\-languages
+Print the report about the languages identified in source files.
+The report contains the list of files grouped by the language identified.
+It can be used to identify and understand why some files have no license header.
+.TP 5
+.B \-\-licenses
+Print the report about the licenses identified in source files.
+The report indicates a list of license with their SPDX name,
+the number of files found and the overall ratio of files per-license.
+.TP 5
+.B \-\-mimes
 Produce a report with the list of files grouped by the mime type that is identified.  This option is
 useful to understand why some files have no license header.
 .TP 5
---print-license
+.B \-\-line-number
+Emit line number when printing the license text that is extracted.
+Line number are relative to the license text since they are intended to help
+for the definition of the
+.B \-\-update
+pattern to decide which line must be kept.
+.TP 5
+.B \-\-print-license
 Print the license which was identified from the source file after the analysis.
 .TP 5
---update \fIpattern\fP
+.BI \-\-update\  pattern
 Update the license header found by the equivalent SPDX license with the
 .I SPDX-License-Identifier
 tag.  The
 .I pattern
 string allows to control the replacement to allow keeping some lines from the existing license header.
-It indicates which lines must be kept before and after the SPDX tag.
-The pattern has the following format:
+.TP 5
+.BI \-\-ignore\-licenses\  spdx\-name1,spdx\-name2,...
+When printing report or updating files, ignore the licenses which correspond to one
+of the SPDX license tag defined in the parameter.
+.TP 5
+.BI \-\-ignore\-languages\  lang1,lang2,...
+When printing report or updating files, ignore the languages which correspond to one
+of the name defined in the parameter.
+.TP 5
+.BI \-\-only\-licenses\  spdx-name1,spdx-name2,...
+When printing report or updating files, only take into account the licenses which correspond to one
+of the SPDX license tag defined in the parameter.
+.TP 5
+.BI \-\-only\-languages\  lang1,lang2,...
+When printing report or updating files, only take into account the languages which correspond to one
+of the name defined in the parameter.
+.TP 5
+.BI \-\-output\-json\  file
+Produce a JSON report in the given file with a summary of licenses, languages and files found
+during the analysis.
+.TP 5
+.BI \-\-output\-xml\  file
+Produce a XML report in the given file with a summary of licenses, languages and files found
+during the analysis.
 .\"
-.RS 8
-[\fInumber\fP[..\fInumber\fP].]spdx[.\fInumber\fP[..number]]
-.\"
-.RE
-Line numbers are relative to the first line representing the license header.
-Use the
-.I --print-license
-option to see how the tool identifies the license and decide which lines must be kept.
-
 .SH SEE ALSO
 .IR file (1)
 .\"
