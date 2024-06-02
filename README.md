@@ -54,6 +54,12 @@ spdx-tool --output-xml=report.xml .
 spdx-tool --output-json=report.json .
 ```
 
+## Version 0.3.0  - June 2024
+  - Cleanup list of options used by the tool,
+  - Add some documentation,
+  - Add minimal French translation
+  - First Debian package
+
 ## Version 0.2.0  - May 2024
   - License identification improvement
   - Update replacement of `SPDX-License-Identifier` and allow keeping some lines from original license header
