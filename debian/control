@@ -1,0 +1,25 @@
+Source: spdx-tool
+Priority: extra
+Section: devel
+Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
+Build-Depends: debhelper (>= 10),
+ gnat,
+# This line is parsed by debian/rules.
+ gprbuild (>= 2015-2),
+ pkg-config,
+ libxmlada-dom10-dev,
+ libxml2-utils,
+ libmagic-dev
+Standards-Version: 4.6.2
+Homepage: https://gitlab.com/stcarrez/spdx-tool/
+
+Package: spdx-tool
+Section: devel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: SPDX license management tool
+ spdx-tool scans the source files to identify licenses and allows to
+ update them in order to use the SPDX license format.  It can be used to:
+ * identify the licenses used in source files of a project,
+ * produce a JSON/XML report for the licenses found with the list of files,
+ * replace a license header by the SPDX license tag header.
