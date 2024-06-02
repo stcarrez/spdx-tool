@@ -183,7 +183,11 @@ package body SPDX_Tool.Files.Manager is
          end if;
          Next_Pos := File.Lines (Last).Style.Text_Last + 1;
          Last_Pos := Next_Pos;
-         Spaces_After := 1;
+         if File.Lines (Last).Comment = END_COMMENT then
+            Spaces_After := 1;
+         else
+            Spaces_After := 0;
+         end if;
       end if;
 
       Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
