@@ -29,6 +29,12 @@ NTP                                      1
    install-sh
 ```
 
+## Check the license header before replacing it
+
+```
+spdx-tool --only-licenses=Apache-2.0 --print-license --line-number src
+```
+
 ## Replace the license header by the `SPDX-License-Identifier` header
 
 ```
