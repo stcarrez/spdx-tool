@@ -3,6 +3,7 @@ MAKE_ARGS=
 JSON_PP=json_pp
 VERSION=0.3.0
 DEBUG_MODE=False
+INSTALL=install
 
 -include .env.local
 
@@ -49,8 +50,14 @@ clean:
 	rm -rf obj bin lib
 
 install:
-	alr exec gprinstall -- --uninstall -f -p --mode=usage --prefix=${PREFIX} -q -Pspdx_tool.gpr
-	alr exec gprinstall -- -f -p --mode=usage --prefix=${PREFIX} -q -Pspdx_tool.gpr
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	$(INSTALL) bin/spdx-tool $(DESTDIR)$(PREFIX)/bin/spdx-tool
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
+	$(INSTALL) man/man1/spdx-tool.1 $(DESTDIR)$(PREFIX)/share/man/man1/spdx-tool.1
+	(cd share && tar --exclude='*~' -cf - .) \
+         | (cd $(DESTDIR)$(PREFIX)/share/ && tar xf -)
+	mkdir -p $(DESTDIR)$(PREFIX)/share/locale/fr/LC_MESSAGES
+	$(INSTALL) po/locale/fr/LC_MESSAGES/spdx-tool.mo $(DESTDIR)$(PREFIX)/share/locale/fr/LC_MESSAGES/spdx-tool.mo
 
 # Create the .mo file from the translation file.
 pot:
