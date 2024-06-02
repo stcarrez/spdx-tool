@@ -59,6 +59,38 @@ procedure SPDX_Tool.Main is
       GC.Set_Usage (Config => Command_Config,
                     Usage  => "[options] [files|directories]",
                     Help   => -("spdx-tool - SPDX license management tool"));
+
+      --  Global configuration.
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Configs.Config_Path'Access,
+                        Switch => "-c:",
+                        Long_Switch => "--config=",
+                        Argument => "PATH",
+                        Help   => -("Path of the spdx-tool configuration file"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_No_Color'Access,
+                        Long_Switch => "--help",
+                        Help   => -("Print program usage"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_No_Color'Access,
+                        Long_Switch => "--no-color",
+                        Help   => -("Disable colors in output"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Opt_No_Builtin'Access,
+                        Long_Switch => "--no-builtin-licenses",
+                        Help   => -("Disable internal builtin license repository"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Opt_Perf_Report'Access,
+                        Long_Switch => "--print-perf-report",
+                        Help   => -("Print performance report (debugging)"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Tasks'Access,
+                        Switch => "-t:",
+                        Long_Switch => "--thread=",
+                        Argument => "COUNT",
+                        Initial  => Opt_Tasks,
+                        Help   => -("Number of threads to process the files")
+                        & Default_Tasks);
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Version'Access,
                         Switch => "-V",
@@ -70,66 +102,56 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--verbose",
                         Help   => -("Verbose execution mode"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Debug'Access,
+                        Output => Opt_Verbose2'Access,
                         Switch => "-vv",
+                        Help   => -("More verbose execution mode"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Debug'Access,
+                        Switch => "-vvv",
                         Long_Switch => "--debug",
                         Help   => -("Enable debug execution"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_No_Color'Access,
-                        Long_Switch => "--no-color",
-                        Help   => -("Disable colors in output"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Tasks'Access,
-                        Switch => "-t:",
-                        Long_Switch => "--thread=",
-                        Argument => "COUNT",
-                        Initial  => Opt_Tasks,
-                        Help   => -("Number of threads to process the files")
-                        & Default_Tasks);
-      GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Configs.Config_Path'Access,
-                        Switch => "-c:",
-                        Long_Switch => "--config=",
-                        Argument => "PATH",
-                        Help   => -("Path of the spdx-tool configuration file"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Mimes'Access,
-                        Switch => "-m",
-                        Long_Switch => "--mimes",
-                        Help   => -("Identify mime types of files"));
+
+      --  Global configuration.
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Files'Access,
                         Switch => "-f",
                         Long_Switch => "--files",
                         Help   => -("List files grouped by license name"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Print'Access,
-                        Switch => "-p",
-                        Long_Switch => "--print-license",
-                        Help   => -("Print license found in header files"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Print_Lineno'Access,
-                        Switch => "-n",
-                        Long_Switch => "--line-number",
-                        Help   => -("Add line number when printing license text"));
-      GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Identify'Access,
                         Switch => "-i",
                         Long_Switch => "--identify",
                         Help   => -("Identify the license and only print the SPDX license"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Languages'Access,
+                        Switch => "-L",
+                        Long_Switch => "--languages",
+                        Help   => -("Print languages used in files"));
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Check'Access,
                         Switch => "-l",
                         Long_Switch => "--licenses",
                         Help   => -("Check and gather licenses used in source files"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Languages'Access,
-                        Long_Switch => "--languages",
-                        Help   => -("Identify languages used in files"));
+                        Output => Opt_Mimes'Access,
+                        Switch => "-m",
+                        Long_Switch => "--mimes",
+                        Help   => -("Identify mime types of files"));
       GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Opt_No_Builtin'Access,
-                        Long_Switch => "--no-builtin-licenses",
-                        Help   => -("Disable internal builtin license repository"));
+                        Output => Opt_Print_Lineno'Access,
+                        Switch => "-n",
+                        Long_Switch => "--line-number",
+                        Help   => -("Add line number when printing license text"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Print'Access,
+                        Switch => "-p",
+                        Long_Switch => "--print-license",
+                        Help   => -("Print license found in header files"));
+      GC.Define_Switch (Config => Command_Config,
+                        Output => SPDX_Tool.Licenses.Update_Pattern'Access,
+                        Long_Switch => "--update=",
+                        Argument => "PATTERN",
+                        Help   => -("Update the license to use the SPDX license tag"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.Only_Licenses'Access,
                         Long_Switch => "--only-licenses=",
@@ -152,9 +174,9 @@ procedure SPDX_Tool.Main is
                         Help   => -("Ignore the files with languages in the given list"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.License_Dir'Access,
-                        Long_Switch => "--license=",
+                        Long_Switch => "--templates=",
                         Argument => "PATH",
-                        Help   => -("Path of a license file or a directory with licenses"));
+                        Help   => -("Path of a license template or a directory with templates"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.Export_Dir'Access,
                         Long_Switch => "--export=",
@@ -170,15 +192,7 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--output-xml=",
                         Argument => "PATH",
                         Help   => -("Generic a XML report with licenses and files"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Update_Pattern'Access,
-                        Long_Switch => "--update=",
-                        Argument => "PATTERN",
-                        Help   => -("Update the license to use a SPDX-License tag"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => SPDX_Tool.Licenses.Opt_Perf_Report'Access,
-                        Long_Switch => "--print-perf-report",
-                        Help   => -("Print performance report (debugging)"));
+
    end Setup;
 
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is

@@ -87,6 +87,7 @@ private
 
    Opt_Debug     : aliased Boolean := False;
    Opt_Verbose   : aliased Boolean := False;
+   Opt_Verbose2  : aliased Boolean := False;
    Opt_Version   : aliased Boolean := False;
    Opt_Check     : aliased Boolean := False;
    Opt_Update    : aliased Boolean := False;
