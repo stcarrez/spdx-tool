@@ -59,7 +59,7 @@ msgstr ""
 
 #: spdx_tool-main.adb
 msgid "Enable debug execution"
-msgstr ""
+msgstr "Activer l'execution debug"
 
 #: spdx_tool.adb
 msgid "error"
@@ -81,11 +81,11 @@ msgstr "fichier exclu {0}"
 
 #: spdx_tool-main.adb
 msgid "Export the licenses in the directory"
-msgstr ""
+msgstr "Exporter les licenses dans le répertoire"
 
 #: spdx_tool-languages.adb
 msgid "extract license from lines{0} to{1}"
-msgstr ""
+msgstr "extraction de la license des lignres{0} à{1}"
 
 #: spdx_tool.adb
 msgid "fatal"
@@ -93,23 +93,23 @@ msgstr ""
 
 #: spdx_tool-main.adb
 msgid "Generic a JSON report with licenses and files"
-msgstr ""
+msgstr "Génère un rapport JSON avec les licenses et fichiers"
 
 #: spdx_tool-main.adb
 msgid "Generic a XML report with licenses and files"
-msgstr ""
+msgstr "Génère un rapport XML avec les licenses et fichiers"
 
 #: spdx_tool-main.adb
 msgid "Identify languages used in files"
-msgstr ""
+msgstr "Identifier les langages des fichiers"
 
 #: spdx_tool-main.adb
 msgid "Identify mime types of files"
-msgstr ""
+msgstr "Identifier le type mime des fichiers"
 
 #: spdx_tool-main.adb
 msgid "Identify the license and only print the SPDX license"
-msgstr ""
+msgstr "Identifier la license et n'afficher que son nom SPDX"
 
 #: spdx_tool-licenses-manager.adb
 msgid "ignore file {} not found"
@@ -117,11 +117,11 @@ msgstr ""
 
 #: spdx_tool-main.adb
 msgid "Ignore the files with languages in the given list"
-msgstr ""
+msgstr "Ignorer les fichiers avec un des langages de la liste"
 
 #: spdx_tool-main.adb
 msgid "Ignore the files with licenses in the given list"
-msgstr ""
+msgstr "Ignorer les fichiers avec une des licenses de la liste"
 
 #: spdx_tool.adb
 msgid "info"
@@ -139,15 +139,15 @@ msgstr ""
 
 #: spdx_tool-configs.adb
 msgid "invalid configuration file:"
-msgstr ""
+msgstr "mauvais fichier de configuration:"
 
 #: spdx_tool-configs.adb
 msgid "invalid configuration {0}"
-msgstr ""
+msgstr "mauvaise configuration {0}"
 
 #: spdx_tool-configs.adb
 msgid "invalid default configuration file"
-msgstr ""
+msgstr "mauvaise configuration par défaut"
 
 #: spdx_tool-languages-manager.adb
 msgid "invalid language {0}"
@@ -171,11 +171,11 @@ msgstr "pattern de mise à jour incorrect"
 
 #: spdx_tool-licenses-manager.adb
 msgid "job {0} failed"
-msgstr ""
+msgstr "échec de l'execution {0}"
 
 #: spdx_tool-reports.adb
 msgid "Language"
-msgstr ""
+msgstr "Langage"
 
 #: spdx_tool-languages-manager.adb
 msgid "language {0}: invalid comment style {1}"
@@ -195,11 +195,11 @@ msgstr ""
 
 #: spdx_tool-main.adb
 msgid "List files grouped by license name"
-msgstr ""
+msgstr "Liste les fichiers groupés par nom de license"
 
 #: spdx_tool-licenses-manager.adb
 msgid "load license template {0}"
-msgstr ""
+msgstr "chargement du template de license {0}"
 
 #: spdx_tool-configs.adb
 msgid "loading default configuration"
@@ -211,7 +211,7 @@ msgstr "chargement des licenses depuis {0}"
 
 #: spdx_tool-reports.adb
 msgid "Match"
-msgstr ""
+msgstr "Type"
 
 #: spdx_tool-reports.adb
 msgid "Mime type"
@@ -227,19 +227,19 @@ msgstr "Aucun"
 
 #: spdx_tool-licenses-reader.adb
 msgid "not with a <<beginOptional>> element"
-msgstr ""
+msgstr "pas dans un élément <<beginOptiona>>"
 
 #: spdx_tool-main.adb
 msgid "Number of threads to process the files"
-msgstr ""
+msgstr "Nombre de tâches pour traiter les fichiers"
 
 #: spdx_tool-main.adb
 msgid "Only consider files with languages in the given list"
-msgstr ""
+msgstr "Ne prendre en compte que les langages de la liste"
 
 #: spdx_tool-main.adb
 msgid "Only consider files with licenses in the given list"
-msgstr ""
+msgstr "Ne prendre en compte que les licenses de la liste"
 
 #: spdx_tool-main.adb
 msgid "path '{0}' does not exist"
@@ -247,18 +247,18 @@ msgstr "le chemin '{0}' n'existe pas"
 
 #: spdx_tool-main.adb
 msgid "Path of a license file or a directory with licenses"
-msgstr ""
+msgstr "Chemin du fichier de license ou répertoire des licenses"
 
 #: spdx_tool-main.adb
 msgid "Path of the spdx-tool configuration file"
-msgstr ""
+msgstr "Chemin du fichier de configuration de spdx-tool"
 
 #: spdx_tool-main.adb
 msgid "Print license found in header files"
-msgstr ""
+msgstr "Affiche la license trouvée dans le fichier"
 
 #: spdx_tool-main.adb
-msgid "Print performance report (debugging"
+msgid "Print performance report (debugging)"
 msgstr ""
 
 #: spdx_tool-main.adb
@@ -267,7 +267,7 @@ msgstr ""
 
 #: spdx_tool-reports.adb
 msgid "Ratio"
-msgstr ""
+msgstr "Rapport"
 
 #: spdx_tool-configs.adb
 msgid "reading configuration file '{0}'"
@@ -311,15 +311,15 @@ msgstr ""
 
 #: spdx_tool-files-manager.adb
 msgid "writing license {0} in {1}"
-msgstr ""
+msgstr "écriture de la license {0} dans {1}"
 
 #: spdx_tool-licenses-manager.adb
 msgid "{0} is {1}: {2} lines no comment"
-msgstr ""
+msgstr "{0} est {1}: {2} lignes sans commentaire"
 
 #: spdx_tool-licenses-manager.adb
 msgid "{0} is {1}: {2} lines {3} cmt"
-msgstr ""
+msgstr "{0} is {1}: {2} lignes {3} commentaires"
 
 #: spdx_tool-languages-manager.adb
 msgid "{0}: language {1} with analyzer"
