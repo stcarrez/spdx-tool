@@ -700,7 +700,7 @@ package body SPDX_Tool.Licenses.Manager is
          end if;
          if not File.Filtered then
             --  Manager.Stats.Increment (Name);
-            if Manager.Job = UPDATE_LICENSES then
+            if Manager.Job = UPDATE_LICENSES and then File.License.Match /= Infos.SPDX_LICENSE then
                File_Mgr.Save
                   (File    => Data,
                    Path    => File.Path,
