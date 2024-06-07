@@ -30,11 +30,11 @@ package SPDX_Tool.Licenses.Manager is
    --  Setup the update pattern when the tool must replace the existing license
    --  with an SPDX-License tag.  The pattern allows to define a set of lines to
    --  keep before and after the SPDX-License tag.  The pattern format is:
-   --     {[line|line-range].}spdx{.[line|line-range]}
+   --     {[line|line-range](.:,)}spdx{(.:,)[line|line-range]}
    --  Example:
    --     spdx
-   --     1..3.spdx
-   --     1.spdx.2
+   --     1..3:spdx
+   --     1,spdx,2
    procedure Set_Update_Pattern (Manager : in out License_Manager;
                                  Pattern : in String);
 

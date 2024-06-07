@@ -63,14 +63,16 @@ package body SPDX_Tool.Licenses.Manager is
    --  Setup the update pattern when the tool must replace the existing license
    --  with an SPDX-License tag.  The pattern allows to define a set of lines to
    --  keep before and after the SPDX-License tag.  The pattern format is:
-   --     {[line|line-range].}spdx{.[line|line-range]}
+   --     {[line|line-range](.:,)}spdx{(.:,)[line|line-range]}
    --  Example:
    --     spdx
-   --     1..3.spdx
-   --     1.spdx.2
+   --     1..3:spdx
+   --     1,spdx,2
    --  ------------------------------
    procedure Set_Update_Pattern (Manager : in out License_Manager;
                                  Pattern : in String) is
+      function Is_Separator (C : Character) return Boolean
+         is (C in '.' | ',' | ':');
       Pos : constant Natural := Ada.Strings.Fixed.Index (Pattern, "spdx");
    begin
       if Pos = 0 then
@@ -80,7 +82,7 @@ package body SPDX_Tool.Licenses.Manager is
       if Pos = Pattern'First then
          Manager.Before.First_Line := 0;
          Manager.Before.Last_Line := 0;
-      elsif Pattern (Pos - 1) /= '.' or else Pos - 1 = Pattern'First then
+      elsif not Is_Separator (Pattern (Pos - 1)) or else Pos - 1 = Pattern'First then
          raise Invalid_Pattern with -("invalid update pattern");
       else
          Manager.Before := Get_Range (Pattern (Pattern'First .. Pos - 2));
@@ -89,7 +91,7 @@ package body SPDX_Tool.Licenses.Manager is
       if Pos + 3 = Pattern'Last then
          Manager.After.First_Line := 0;
          Manager.After.Last_Line := 0;
-      elsif Pattern (Pos + 4) /= '.' or else Pos + 4 = Pattern'Last then
+      elsif not Is_Separator (Pattern (Pos + 4)) or else Pos + 4 = Pattern'Last then
          raise Invalid_Pattern with -("invalid update pattern");
       else
          Manager.After := Get_Range (Pattern (Pos + 5 .. Pattern'Last));
