@@ -19,7 +19,7 @@ msgstr ""
 
 #: spdx_tool-main.adb
 msgid "Add line number when printing license text"
-msgstr ""
+msgstr "Ajoute les numéros de lignes dans l'affichage des textes de license"
 
 #: spdx_tool-licenses-reader.adb
 msgid "cannot compile regex: '{0}'"
@@ -35,7 +35,7 @@ msgstr "impossible de lire le fichier magic {0}: {1}"
 
 #: spdx_tool-main.adb
 msgid "Check and gather licenses used in source files"
-msgstr ""
+msgstr "Identifie les licenses utilisées dans les fichiers sources"
 
 #: spdx_tool-main.adb
 msgid "configuration file '{0}' does not exist."
@@ -51,11 +51,11 @@ msgstr "debug"
 
 #: spdx_tool-main.adb
 msgid "Disable colors in output"
-msgstr ""
+msgstr "Désactiver les couleurs dans l'affichage"
 
 #: spdx_tool-main.adb
 msgid "Disable internal builtin license repository"
-msgstr ""
+msgstr "Désactiver le répository des licenses internes"
 
 #: spdx_tool-main.adb
 msgid "Enable debug execution"
@@ -263,7 +263,7 @@ msgstr ""
 
 #: spdx_tool-main.adb
 msgid "Print the version"
-msgstr ""
+msgstr "Affiche le numéro de version"
 
 #: spdx_tool-reports.adb
 msgid "Ratio"
@@ -287,7 +287,7 @@ msgstr "spdx-tool - Outil de gestion de license SPDX"
 
 #: spdx_tool-licenses-reader.adb
 msgid "too many nested <<beginOptional>>"
-msgstr "trop de <<beginOptional>>"
+msgstr "trop d'éléments <<beginOptional>> imbriqués"
 
 #: spdx_tool-languages-manager.adb
 msgid "too many recursive depend {0}"
@@ -299,11 +299,11 @@ msgstr "Inconnu"
 
 #: spdx_tool-main.adb
 msgid "Update the license to use a SPDX-License tag"
-msgstr ""
+msgstr "Mettre à jour la license pour utiliser le tag SPDX"
 
 #: spdx_tool-main.adb
 msgid "Verbose execution mode"
-msgstr ""
+msgstr "Mode d'exécution détaillé"
 
 #: spdx_tool.adb
 msgid "warn"
