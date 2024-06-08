@@ -9,6 +9,7 @@ with Ada.Command_Line;
 with Ada.Directories;
 with Ada.Exceptions;
 with Ada.Text_IO;
+with Ada.Strings.UTF_Encoding.Strings;
 with GNAT.Command_Line;
 with GNAT.Strings;
 
@@ -45,12 +46,27 @@ procedure SPDX_Tool.Main is
                             Path    : in String);
    function Is_Empty (Arg : in GNAT.Strings.String_Access)
                    return Boolean is (Arg = null or else Arg.all = "");
+   function "-" (Message : in String) return String;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Main");
 
    Command_Config    : GC.Command_Line_Configuration;
    Tool_Config       : SPDX_Tool.Configs.Config_Type;
+
+   function "-" (Message : in String) return String is
+      --  Ada stupidities: we have to convert the UTF-8 string in Latin1 for Ada.Text_IO
+      --  which is used by GNAT.Command_Line to print the program help.  This will be
+      --  converted back to UTF-8 on the console.
+      I18n   : constant String := Intl."-" (Message);
+   begin
+      return Ada.Strings.UTF_Encoding.Strings.Decode (I18n);
+
+   exception
+      when others =>
+         --  Fallback to the English message.
+         return Message;
+   end "-";
 
    procedure Setup is
       Default_Tasks : constant String := " (" & Util.Strings.Image (Opt_Tasks) & ")";
@@ -68,9 +84,11 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--config=",
                         Argument => "PATH",
                         Help   => -("Path of the spdx-tool configuration file"));
+      --  Only for documentation purpose since there is no way to handle it ourselves.
       GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_No_Color'Access,
-                        Long_Switch => "--help",
+                        Output => Opt_Help'Access,
+                        Switch => "-h",
+                        Long_Switch => "-help",
                         Help   => -("Print program usage"));
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_No_Color'Access,
@@ -181,12 +199,12 @@ procedure SPDX_Tool.Main is
                         Output => SPDX_Tool.Reports.Json_Path'Access,
                         Long_Switch => "--output-json=",
                         Argument => "PATH",
-                        Help   => -("Generic a JSON report with licenses and files"));
+                        Help   => -("Generate a JSON report with licenses and files"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Reports.Xml_Path'Access,
                         Long_Switch => "--output-xml=",
                         Argument => "PATH",
-                        Help   => -("Generic a XML report with licenses and files"));
+                        Help   => -("Generate a XML report with licenses and files"));
       GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.License_Dir'Access,
                         Long_Switch => "--templates=",
@@ -308,7 +326,7 @@ begin
    Setup;
    Configure_Logs (False, False);
    GC.Initialize_Option_Scan (Stop_At_First_Non_Switch => True);
-   GC.Getopt (Config => Command_Config);
+   GC.Getopt (Config => Command_Config, Quiet => True);
    if Opt_Debug or Opt_Verbose then
       Configure_Logs (Opt_Debug, Opt_Verbose);
    end if;
