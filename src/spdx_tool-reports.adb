@@ -184,7 +184,9 @@ package body SPDX_Tool.Reports is
             Add (Set, Get_License (File.License), 1);
          end if;
       end loop;
-      Print_Occurences (Printer, Styles, Set, -("License"));
+      if not Set.Is_Empty then
+         Print_Occurences (Printer, Styles, Set, -("License"));
+      end if;
    end Print_Licenses;
 
    --  ------------------------------
@@ -254,7 +256,9 @@ package body SPDX_Tool.Reports is
             Add (Set, (File.Mime, False, 1.0), 1);
          end if;
       end loop;
-      Print_Occurences (Printer, Styles, Set, -("Mime type"));
+      if not Set.Is_Empty then
+         Print_Occurences (Printer, Styles, Set, -("Mime type"));
+      end if;
    end Print_Mimes;
 
    --  ------------------------------
@@ -270,7 +274,9 @@ package body SPDX_Tool.Reports is
             Add (Set, (File.Language, False, 1.0), 1);
          end if;
       end loop;
-      Print_Occurences (Printer, Styles, Set, -("Language"));
+      if not Set.Is_Empty then
+         Print_Occurences (Printer, Styles, Set, -("Language"));
+      end if;
    end Print_Languages;
 
    function Visible_File_Count (Files : in SPDX_Tool.Infos.File_Map) return Natural is
