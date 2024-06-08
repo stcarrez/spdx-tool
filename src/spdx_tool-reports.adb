@@ -68,6 +68,10 @@ package body SPDX_Tool.Reports is
    procedure Write_Report (Output : in out Util.Serialize.IO.Output_Stream'Class;
                            Files  : in SPDX_Tool.Infos.File_Map);
 
+   function Get_Occurrence (Set     : in Occurrences.Set;
+                            Item    : in License_Tag;
+                            Default : in Natural) return Natural renames Occurrences.Get;
+
    To_Digit : constant array (0 .. 9) of Character := "0123456789";
 
    function Get_License (Info : in Infos.License_Info) return License_Tag is
@@ -384,6 +388,8 @@ package body SPDX_Tool.Reports is
                            Files  : in SPDX_Tool.Infos.File_Map) is
       Set  : Occurrences.Set;
       List : Occurrences.Vector;
+      --  Lang : Item_Occurrences.Set;
+      --  Lic  : Item_Occurrences.Set;
    begin
       Output.Start_Document;
       Output.Start_Entity ("report");
@@ -399,12 +405,13 @@ package body SPDX_Tool.Reports is
          Output.Write_Attribute ("name", To_String (Item.Element.Name));
          Output.Write_Attribute ("spdx", Item.Element.SPDX);
          Output.Write_Attribute ("confidence", Image (Item.Element.Rate));
+         Output.Write_Attribute ("count", Get_Occurrence (Set, Item.Element, 0));
          Output.Start_Array ("files");
          for File of Files loop
             declare
                L : constant License_Tag := Get_License (File.License);
             begin
-               if Item.Element = L then
+               if Item.Element = L and then not File.Filtered then
                   Output.Write_Entity ("file", File.Path);
                end if;
             end;
@@ -426,9 +433,10 @@ package body SPDX_Tool.Reports is
       for Item of List loop
          Output.Start_Entity ("language");
          Output.Write_Attribute ("name", To_String (Item.Element.Name));
+         Output.Write_Attribute ("count", Get_Occurrence (Set, Item.Element, 0));
          Output.Start_Array ("files");
          for File of Files loop
-            if Item.Element.Name = File.Language then
+            if Item.Element.Name = File.Language and then not File.Filtered then
                Output.Write_Entity ("file", File.Path);
             end if;
          end loop;
