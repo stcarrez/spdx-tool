@@ -114,10 +114,12 @@ package body SPDX_Tool.Reports is
    begin
       List_Occurrences (Set, List);
       declare
-         Total  : constant Natural := Sum (List, 0);
-         Max    : constant PT.X_Type := PT.X_Type (Longest (List));
-         Chart  : PT.Charts.Printer_Type := PT.Charts.Create (Writer, 0);
-         Fields : PT.Texts.Field_Array (1 .. 5);
+         Total    : constant Natural := Sum (List, 0);
+         Max_Item : constant Natural := Longest (List);
+         Max      : constant Natural := (if Max_Item > Title'Length
+                                           then Max_Item else Title'Length);
+         Chart    : PT.Charts.Printer_Type := PT.Charts.Create (Writer, 0);
+         Fields   : PT.Texts.Field_Array (1 .. 5);
       begin
          Writer.Create_Field (Fields (1), Styles.Title, 0.0);
          Writer.Create_Field (Fields (2), Styles.Title, 5.0);
@@ -125,7 +127,7 @@ package body SPDX_Tool.Reports is
          Writer.Create_Field (Fields (4), Styles.Title, 10.0);
          Writer.Create_Field (Fields (5), Styles.Title, 20.0);
          Writer.Set_Bottom_Right_Padding (Fields (4), (W => 2, H => 0));
-         Writer.Set_Max_Dimension (Fields (1), (W => Max, H => 1));
+         Writer.Set_Max_Dimension (Fields (1), (W => PT.X_Type (Max), H => 1));
          Writer.Set_Justify (Fields (1), PT.J_LEFT);
          Writer.Set_Justify (Fields (2), PT.J_RIGHT);
          Writer.Set_Justify (Fields (3), PT.J_RIGHT);
