@@ -423,7 +423,7 @@ package body SPDX_Tool.Licenses.Manager is
       return To_License_Index_Array (Licenses);
    end Find_License_Templates;
 
-   MIN_CONFIDENCE : constant := 700 * Confidence_Type'Small;
+   MIN_CONFIDENCE : constant := 500 * Confidence_Type'Small;
 
    function Compute_Frequency (Manager : in License_Manager;
                                Lines   : in SPDX_Tool.Languages.Line_Array;
