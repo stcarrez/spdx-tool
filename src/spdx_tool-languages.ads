@@ -167,17 +167,21 @@ private
    end record;
 
    --  Update the language detection result with the language and the given confidence.
-   --  Confidence are added
+   --  Confidence are added when they are found by different methods.  The `Method` is
+   --  only helpful to provide hint about how the detection was made.
    procedure Set_Language (Result     : in out Detector_Result;
+                           Method     : in String;
                            Language   : in String;
                            Confidence : in Confidence_Type);
 
    --  If the languages string is not null, add every language that is contains
    --  Languages are separated by ','.
    procedure Set_Languages (Result     : in out Detector_Result;
+                            Method     : in String;
                             Languages  : access constant String;
                             Confidence : in Confidence_Type);
    procedure Set_Languages (Result     : in out Detector_Result;
+                            Method     : in String;
                             Languages  : in String;
                             Confidence : in Confidence_Type);
 

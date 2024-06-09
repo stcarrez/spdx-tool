@@ -24,9 +24,9 @@ package body SPDX_Tool.Languages.Modelines is
       Lang : constant access constant String := AliasMap.Get_Mapping (Alias);
    begin
       if Lang /= null then
-         Set_Language (Result, Lang.all, 1.0);
+         Set_Language (Result, "modeline", Lang.all, 1.0);
       else
-         Set_Language (Result, Alias, 900 * Confidence_Type'Small);
+         Set_Language (Result, "modeline", Alias, 900 * Confidence_Type'Small);
       end if;
    end Set_Language;
 

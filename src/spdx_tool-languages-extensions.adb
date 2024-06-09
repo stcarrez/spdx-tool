@@ -35,7 +35,7 @@ package body SPDX_Tool.Languages.Extensions is
 
       Language : constant access constant String := Get_Language_From_Extension (File.Path);
    begin
-      Set_Languages (Result, Language, 1.0);
+      Set_Languages (Result, "extension", Language, 1.0);
    end Detect;
 
 end SPDX_Tool.Languages.Extensions;

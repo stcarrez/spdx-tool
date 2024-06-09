@@ -83,7 +83,7 @@ package SPDX_Tool is
 
 private
 
-   procedure Configure_Logs (Debug : Boolean; Verbose : Boolean);
+   procedure Configure_Logs (Debug : Boolean; Verbose : Boolean; Verbose2 : Boolean);
 
    Opt_Debug     : aliased Boolean := False;
    Opt_Verbose   : aliased Boolean := False;

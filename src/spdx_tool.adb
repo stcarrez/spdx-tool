@@ -229,7 +229,7 @@ package body SPDX_Tool is
       return Result;
    end To_License_Index_Array;
 
-   procedure Configure_Logs (Debug : Boolean; Verbose : Boolean) is
+   procedure Configure_Logs (Debug : Boolean; Verbose : Boolean; Verbose2 : Boolean) is
       Log_Config  : Util.Properties.Manager;
    begin
       Log_Config.Set ("spdx_tool.rootCategory", "DEBUG,errorConsole");
@@ -244,7 +244,7 @@ package body SPDX_Tool is
       Log_Config.Set ("spdx_tool.logger.Util", "DEBUG");
       Log_Config.Set ("spdx_tool.logger.Util.Events", "ERROR");
       Log_Config.Set ("spdx_tool.logger.SPDX_Tool", "INFO:NLS");
-      if Verbose or Debug then
+      if Verbose or Debug or Verbose2 then
          Log_Config.Set ("spdx_tool.logger.Util", "DEBUG");
          Log_Config.Set ("spdx_tool.rootCategory", "INFO,errorConsole,verbose");
          Log_Config.Set ("spdx_tool.appender.verbose", "Console");

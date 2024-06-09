@@ -324,11 +324,14 @@ procedure SPDX_Tool.Main is
 begin
    Opt_Tasks := Integer (System.Multiprocessors.Number_Of_CPUs);
    Setup;
-   Configure_Logs (False, False);
+   Configure_Logs (False, False, False);
    GC.Initialize_Option_Scan (Stop_At_First_Non_Switch => True);
    GC.Getopt (Config => Command_Config, Quiet => True);
+   if Opt_Verbose2 then
+      Opt_Verbose := True;
+   end if;
    if Opt_Debug or Opt_Verbose then
-      Configure_Logs (Opt_Debug, Opt_Verbose);
+      Configure_Logs (Opt_Debug, Opt_Verbose, Opt_Verbose2);
    end if;
    if Opt_Version then
       Ada.Text_IO.Put_Line ("SPDX tool " & Configs.Defaults.VERSION);

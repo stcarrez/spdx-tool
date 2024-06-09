@@ -16,26 +16,26 @@ package body SPDX_Tool.Languages.Mimes is
    begin
       if Util.Strings.Starts_With (Mime, "text/") then
          if Util.Strings.Starts_With (Mime, "text/x-shellscript") then
-            Set_Language (Result, "Shell", Detector.Confidence);
+            Set_Language (Result, "mime", "Shell", Detector.Confidence);
          elsif Util.Strings.Starts_With (Mime, "text/x-m4") then
-            Set_Language (Result, "M4", Detector.Confidence);
+            Set_Language (Result, "mime", "M4", Detector.Confidence);
          elsif Util.Strings.Starts_With (Mime, "text/x-makefile") then
-            Set_Language (Result, "Makefile", Detector.Confidence);
+            Set_Language (Result, "mime", "Makefile", Detector.Confidence);
          elsif Util.Strings.Starts_With (Mime, "text/xml") then
-            Set_Language (Result, "XML", Detector.Confidence);
+            Set_Language (Result, "mime", "XML", Detector.Confidence);
          else
-            Set_Language (Result, "Text file", Detector.Confidence);
+            Set_Language (Result, "mime", "Text file", Detector.Confidence);
          end if;
       elsif Util.Strings.Starts_With (Mime, "image/") then
-         Set_Language (Result, "Image", Detector.Confidence);
+         Set_Language (Result, "mime", "Image", Detector.Confidence);
       elsif Util.Strings.Starts_With (Mime, "video/") then
-         Set_Language (Result, "Video", Detector.Confidence);
+         Set_Language (Result, "mime", "Video", Detector.Confidence);
       elsif Util.Strings.Starts_With (Mime, "application/pdf") then
-         Set_Language (Result, "PDF", Detector.Confidence);
+         Set_Language (Result, "mime", "PDF", Detector.Confidence);
       elsif Util.Strings.Starts_With (Mime, "application/zip") then
-         Set_Language (Result, "ZIP", Detector.Confidence);
+         Set_Language (Result, "mime", "ZIP", Detector.Confidence);
       elsif Util.Strings.Starts_With (Mime, "application/x-tar") then
-         Set_Language (Result, "TAR", Detector.Confidence);
+         Set_Language (Result, "mime", "TAR", Detector.Confidence);
       end if;
    end Detect;
 

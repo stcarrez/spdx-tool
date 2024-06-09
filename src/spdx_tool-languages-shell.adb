@@ -23,7 +23,7 @@ package body SPDX_Tool.Languages.Shell is
 
       Language : constant access constant String := InterpreterMap.Get_Mapping (Interpreter);
    begin
-      Set_Languages (Result, Language, 1.0);
+      Set_Languages (Result, "shell", Language, 1.0);
    end Check_Interpreter;
 
    overriding

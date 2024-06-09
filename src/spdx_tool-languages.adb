@@ -20,9 +20,14 @@ package body SPDX_Tool.Languages is
    use all type Files.Comment_Category;
 
    procedure Set_Language (Result     : in out Detector_Result;
+                           Method     : in String;
                            Language   : in String;
                            Confidence : in Confidence_Type) is
    begin
+      if Opt_Verbose2 then
+         Log.Info ("language {0} identified by {1} with confidence{2}",
+                   Language, Method, Confidence_Type'Image (Confidence));
+      end if;
       for Iter in Result.Languages.Iterate loop
          declare
             Lang : constant Detected_Language_Vectors.Reference_Type
@@ -46,15 +51,17 @@ package body SPDX_Tool.Languages is
    --  Languages are separated by ','.
    --  ------------------------------
    procedure Set_Languages (Result     : in out Detector_Result;
+                            Method     : in String;
                             Languages  : access constant String;
                             Confidence : in Confidence_Type) is
    begin
       if Languages /= null then
-         Set_Languages (Result, Languages.all, Confidence);
+         Set_Languages (Result, Method, Languages.all, Confidence);
       end if;
    end Set_Languages;
 
    procedure Set_Languages (Result     : in out Detector_Result;
+                            Method     : in String;
                             Languages  : in String;
                             Confidence : in Confidence_Type) is
    begin
@@ -65,11 +72,11 @@ package body SPDX_Tool.Languages is
                := Confidence_Type (Float (Confidence) / Float (List.Length));
          begin
             for Lang of List loop
-               Set_Language (Result, Ada.Strings.Fixed.Trim (Lang, Ada.Strings.Both), C);
+               Set_Language (Result, Method, Ada.Strings.Fixed.Trim (Lang, Ada.Strings.Both), C);
             end loop;
          end;
       else
-         Set_Language (Result, Languages, Confidence);
+         Set_Language (Result, Method, Languages, Confidence);
       end if;
    end Set_Languages;
 

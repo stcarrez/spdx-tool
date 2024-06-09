@@ -113,12 +113,16 @@ package body SPDX_Tool.Licenses.Manager is
       begin
          if Pattern'Length > 0 then
             if Pattern (Pattern'First) = '!' then
-               Log.Debug ("Include pattern {0}",
-                          Pattern (Pattern'First + 1 .. Pattern'Last));
+               if Opt_Verbose2 then
+                  Log.Info ("Include pattern {0}",
+                  Pattern (Pattern'First + 1 .. Pattern'Last));
+               end if;
                Manager.Ignore_Files_Filter.Include
                  (Pattern (Pattern'First + 1 .. Pattern'Last));
             else
-               Log.Debug ("Exclude pattern {0}", Pattern);
+               if Opt_Verbose2 then
+                  Log.Info ("Exclude pattern {0}", Pattern);
+               end if;
                Manager.Ignore_Files_Filter.Exclude (Pattern);
             end if;
          end if;

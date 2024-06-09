@@ -23,10 +23,10 @@ package body SPDX_Tool.Languages.Filenames is
          declare
             Language : constant String := Language_Mappers.Get_Value (Match);
          begin
-            Set_Languages (Result, Language, 1.0);
+            Set_Languages (Result, "filename", Language, 1.0);
          end;
       end if;
-      Set_Languages (Result, Kind, 1.0);
+      Set_Languages (Result, "filename", Kind, 1.0);
    end Detect;
 
 end SPDX_Tool.Languages.Filenames;
