@@ -18,6 +18,11 @@ package SPDX_Tool.Infos is
       Last_Line  : Line_Count := 0;
    end record;
 
+   --  Convert the string into a range of two integers.
+   --  The string format is either <num> or <first>..<last>.
+   --  A Constraint_Error exception is raised with a message if it is invalid.
+   function Get_Range (Pattern : in String) return Line_Range_Type;
+
    subtype Line_Number is Line_Count range 1 .. Line_Count'Last;
 
    function Image (Line : in Line_Count)
