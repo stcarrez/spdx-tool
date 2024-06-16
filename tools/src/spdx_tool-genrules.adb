@@ -167,8 +167,10 @@ procedure SPDX_Tool.Genrules is
       Item6 : constant String := Util.Strings.Replace (Item5, "?!", "", First => False);
       Item7 : constant String := Util.Strings.Replace (Item6, "?=", "", First => False);
       Item8 : constant String := Util.Strings.Replace (Item7, "?-", "", First => False);
+      Item9 : constant String := Util.Strings.Replace (Item8, "(?x)", "", First => False);
+      Item10 : constant String := Util.Strings.Replace (Item8, "*+", "*", First => False);
    begin
-      return Get_String_Index (From, Item8);
+      return Get_String_Index (From, Item10);
    end Get_Pattern_Index;
 
    function To_String (List : in UBO.Object) return String is

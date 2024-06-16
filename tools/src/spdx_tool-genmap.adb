@@ -143,7 +143,7 @@ procedure SPDX_Tool.Genmap is
    function Get_Priority (Name : in String) return Natural is
    begin
       if Name in "Perl" | "Python" | "C" | "C++" then
-         return 10;
+         return 5;
       end if;
       if Name in "INI" | "XML" | "YAML" | "JSON" then
          return 5;

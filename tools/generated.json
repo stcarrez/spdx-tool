@@ -22,7 +22,7 @@
                   "pattern": "^{\"version\":\\d+,"
                },
                {
-                  "pattern": "^/** Begin line maps. **"
+                  "pattern": "^/\\*\\* Begin line maps. \\*\\*"
                }
             ]
          },
@@ -30,7 +30,7 @@
             "generator": "Minified Map",
             "and": [
                { "pattern": "^{\"version\":\\d+,"},
-               { "pattern": "^/** Begin line maps. **" }
+               { "pattern": "^/\\*\\* Begin line maps. \\*\\*" }
             ]
          }
       ]
