@@ -436,6 +436,22 @@ procedure SPDX_Tool.Genrules is
       Root : constant UBO.Object := Util.Serialize.IO.JSON.Read (Filename);
       Iter : UBO.Iterators.Iterator := UBO.Iterators.First (Root);
    begin
+      --  Pass 1: collect the named patterns only.
+      while UBO.Iterators.Has_Element (Iter) loop
+         declare
+            Item  : constant UBO.Object := UBO.Iterators.Element (Iter);
+         begin
+            if UBO.Iterators.Has_Key (Iter) then
+               if UBO.Iterators.Key (Iter) = "named_patterns" then
+                  Register_Patterns (Item);
+               end if;
+            end if;
+         end;
+         UBO.Iterators.Next (Iter);
+      end loop;
+
+      --  Pass 2: collect the disambiguations or generators.
+      Iter := UBO.Iterators.First (Root);
       while UBO.Iterators.Has_Element (Iter) loop
          declare
             Item  : constant UBO.Object := UBO.Iterators.Element (Iter);
@@ -443,8 +459,6 @@ procedure SPDX_Tool.Genrules is
             if UBO.Iterators.Has_Key (Iter) then
                if UBO.Iterators.Key (Iter) = "disambiguations" then
                   Register_Disambiguations (Item);
-               elsif UBO.Iterators.Key (Iter) = "patterns" then
-                  Register_Patterns (Item);
                elsif UBO.Iterators.Key (Iter) = "generators" then
                   Register_Disambiguations (Item);
                end if;
@@ -628,10 +642,10 @@ procedure SPDX_Tool.Genrules is
             Writer.Write ("      " & Util.Strings.Image (Index));
             Writer.Write (" => (");
             if Rule_Pos = Natural (Def.Rules.Length) then
-               if Rule.Mode = RULE_MATCH then
+               if Rule.Mode in RULE_MATCH | RULE_MATCH_AND then
                   Writer.Write ("RULE_MATCH, ");
                   Value := Get_Mapping (Pat_Cvt, Rule.Pattern);
-               elsif Rule.Mode = RULE_CONTAINS then
+               elsif Rule.Mode in RULE_CONTAINS | RULE_CONTAINS_AND then
                   Writer.Write ("RULE_CONTAINS, ");
                   Value := Get_Mapping (Str_Cvt, Rule.Pattern);
                else
@@ -640,9 +654,15 @@ procedure SPDX_Tool.Genrules is
                end if;
             else
                if Rule.Mode = RULE_MATCH then
+                  Writer.Write ("RULE_MATCH, ");
+                  Value := Get_Mapping (Pat_Cvt, Rule.Pattern);
+               elsif Rule.Mode = RULE_MATCH_AND then
                   Writer.Write ("RULE_MATCH_AND, ");
                   Value := Get_Mapping (Pat_Cvt, Rule.Pattern);
                elsif Rule.Mode = RULE_CONTAINS then
+                  Writer.Write ("RULE_CONTAINS, ");
+                  Value := Get_Mapping (Str_Cvt, Rule.Pattern);
+               elsif Rule.Mode = RULE_CONTAINS_AND then
                   Writer.Write ("RULE_CONTAINS_AND, ");
                   Value := Get_Mapping (Str_Cvt, Rule.Pattern);
                else
