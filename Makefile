@@ -34,6 +34,8 @@ generate:
 	bin/spdx_tool-genmap --aliases $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/aliases.json
 	bin/spdx_tool-genmap --comments $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/comments.json
 	bin/spdx_tool-gentmpl src/generated/spdx_tool-licenses-templates.ads
+	bin/spdx_tool-genrules src/generated/spdx_tool-languages-rules-generated.ads tools/generated.json
+	bin/spdx_tool-genrules src/generated/spdx_tool-languages-rules-disambiguations.ads tools/disambiguations.json
 	are --rule=are-package.xml -o src/generated .
 	# cd tools && alr build $(MAKE_ARGS)
 	# bin/gendecisiontree > src/generated/spdx_tool-licenses-decisions.ads
