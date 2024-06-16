@@ -7,7 +7,6 @@ with Ada.Unchecked_Deallocation;
 with Util.Log.Loggers;
 with Util.Strings.Vectors;
 with Util.Strings.Split;
-with Util.Measures;
 with SPDX_Tool.Languages.CommentsMap;
 with SPDX_Tool.Licenses.Templates;
 with SPDX_Tool.Languages.Rules.Generated;
@@ -68,12 +67,17 @@ package body SPDX_Tool.Languages.Manager is
          File.Generated := Result.Generated;
          if Language'Length = 0 then
             Analyzer := null;
-            if Length (Result.Generated) > 0 then
+            if Length (Result.Generated) = 0 then
+               Log.Info ("{0}: no language found", File.Path);
+            elsif not Opt_Keep_Generated then
+               Log.Info ("{0}: generated file by {1} (ignored)",
+                      File.Path, To_String (Result.Generated));
+               Content.Cmt_Style := NO_COMMENT;
+               File.Filtered := True;
+            else
                Log.Info ("{0}: generated file by {1}",
                       File.Path, To_String (Result.Generated));
                Content.Cmt_Style := NO_COMMENT;
-            else
-               Log.Info ("{0}: no language found", File.Path);
             end if;
             return;
          end if;
@@ -94,9 +98,10 @@ package body SPDX_Tool.Languages.Manager is
             Log.Info ("{0}: language {1} without analyzer", File.Path, Language);
          end if;
          if not Opt_Keep_Generated and then Length (Result.Generated) > 0 then
-            Log.Info ("{0}: generated file by {1} is ignored",
+            Log.Info ("{0}: generated file by {1} (ignored)",
                       File.Path, To_String (Result.Generated));
             Content.Cmt_Style := NO_COMMENT;
+            File.Filtered := True;
             return;
          end if;
          if Analyzer /= null then

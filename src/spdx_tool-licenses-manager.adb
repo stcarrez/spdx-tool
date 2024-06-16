@@ -621,12 +621,27 @@ package body SPDX_Tool.Licenses.Manager is
    end Set_Filter;
 
    --  ------------------------------
+   --  Returns true if the language is filtered.
+   --  ------------------------------
+   function Is_Language_Filtered (Manager : in License_Manager;
+                                  File    : in SPDX_Tool.Infos.File_Info) return Boolean is
+      Language : constant String := To_String (File.Language);
+   begin
+      if Manager.Include_Languages.Contains (Language) then
+         return False;
+      end if;
+      if Manager.Exclude_Languages.Contains (Language) then
+         return True;
+      end if;
+      return not Manager.Include_Languages.Is_Empty;
+   end Is_Language_Filtered;
+
+   --  ------------------------------
    --  Returns true if the license is filtered.
    --  ------------------------------
-   function Is_Filtered (Manager : in License_Manager;
-                         File    : in SPDX_Tool.Infos.File_Info) return Boolean is
+   function Is_License_Filtered (Manager : in License_Manager;
+                                 File    : in SPDX_Tool.Infos.File_Info) return Boolean is
       Name     : constant String := To_String (File.License.Name);
-      Language : constant String := To_String (File.Language);
    begin
       if Manager.Include_Filters.Contains (Name) then
          return False;
@@ -634,14 +649,8 @@ package body SPDX_Tool.Licenses.Manager is
       if Manager.Exclude_Filters.Contains (Name) then
          return True;
       end if;
-      if Manager.Include_Languages.Contains (Language) then
-         return False;
-      end if;
-      if Manager.Exclude_Languages.Contains (Language) then
-         return True;
-      end if;
       return not Manager.Include_Filters.Is_Empty;
-   end Is_Filtered;
+   end Is_License_Filtered;
 
    --  ------------------------------
    --  Analyze the file to find license information in the header comment.
@@ -659,6 +668,19 @@ package body SPDX_Tool.Licenses.Manager is
       Result : License_Match;
    begin
       File_Mgr.Open (Data, File, Manager.Languages);
+      if File.Filtered then
+         return;
+      end if;
+
+      --  Check if the language is filtered (no need to identify the license).
+      File.Filtered := Manager.Is_Language_Filtered (File);
+      if File.Filtered then
+         if Is_Info_Log then
+            Log.Info ("{0}: {1} (ignored)", File.Path, To_String (File.Language));
+         end if;
+         return;
+      end if;
+
       Result := Manager.Find_License (Data);
       File.License := Result.Info;
       if Opt_Print then
@@ -667,7 +689,7 @@ package body SPDX_Tool.Licenses.Manager is
       end if;
       if File.License.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE | Infos.GUESSED_LICENSE
       then
-         File.Filtered := Manager.Is_Filtered (File);
+         File.Filtered := Manager.Is_License_Filtered (File);
          if Is_Info_Log then
             declare
                Name : constant String := To_String (File.License.Name);
@@ -695,7 +717,7 @@ package body SPDX_Tool.Licenses.Manager is
          end if;
       elsif Data.Last_Offset = 0 then
          File.License.Name := To_UString (Empty_File);
-         File.Filtered := Manager.Is_Filtered (File);
+         File.Filtered := Manager.Is_License_Filtered (File);
          if File.Filtered then
             Log.Info ("{0}: {1} (ignored)", File.Path, Empty_File);
          else
@@ -712,7 +734,7 @@ package body SPDX_Tool.Licenses.Manager is
             end loop;
             if Cmt_Count = 0 then
                File.License.Name := To_UString (No_License);
-               File.Filtered := Manager.Is_Filtered (File);
+               File.Filtered := Manager.Is_License_Filtered (File);
                if File.Filtered then
                   Log.Info ("{0}: {1} (ignored)", File.Path, No_License);
                else
@@ -722,7 +744,7 @@ package body SPDX_Tool.Licenses.Manager is
                end if;
             else
                File.License.Name := To_UString (Unknown_License);
-               File.Filtered := Manager.Is_Filtered (File);
+               File.Filtered := Manager.Is_License_Filtered (File);
                if File.Filtered then
                   Log.Info ("{0}: {1} (ignored)", File.Path, Unknown_License);
                else

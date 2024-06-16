@@ -76,9 +76,12 @@ package SPDX_Tool.Licenses.Manager is
                          Language : in Boolean;
                          Exclude  : in Boolean);
 
-   --  Returns true if the license is filtered.
-   function Is_Filtered (Manager : in License_Manager;
-                         File    : in SPDX_Tool.Infos.File_Info) return Boolean;
+   --  Returns true if the language is filtered.
+   function Is_Language_Filtered (Manager : in License_Manager;
+                                  File    : in SPDX_Tool.Infos.File_Info) return Boolean;
+
+   function Is_License_Filtered (Manager : in License_Manager;
+                                 File    : in SPDX_Tool.Infos.File_Info) return Boolean;
 
    --  Analyze the file to find license information in the header comment.
    procedure Analyze (Manager  : in out License_Manager;
