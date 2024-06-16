@@ -13,7 +13,8 @@ package SPDX_Tool.Languages.Rules is
    subtype Pattern_Index is Pattern_Length range 1 .. Pattern_Length'Last;
    type Rule_Index is new Natural;
    type Rule_Result_Index is new Natural;
-   type Rule_Mode is (RULE_FILENAME_MATCH, RULE_FILENAME_MATCH_AND,
+   type Rule_Mode is (RULE_SUCCESS,
+                      RULE_FILENAME_MATCH, RULE_FILENAME_MATCH_AND,
                       RULE_STARTS_WITH, RULE_STARTS_WITH_AND,
                       RULE_CONTAINS, RULE_CONTAINS_AND,
                       RULE_MATCH, RULE_MATCH_AND);
@@ -22,7 +23,7 @@ package SPDX_Tool.Languages.Rules is
       Mode      : Rule_Mode;
       Min_Lines : Natural;
       Lines     : Line_Range_Type;
-      Pattern   : Pattern_Index;
+      Pattern   : Pattern_Length;
       Result    : Pattern_Length;
    end record;
    type Rule_Array is array (Rule_Index range <>) of Rule_Definition;

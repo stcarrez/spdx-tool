@@ -74,6 +74,9 @@ package body SPDX_Tool.Languages.Rules is
                      return FOUND;
                   end if;
 
+               when RULE_SUCCESS =>
+                  return FOUND;
+
             end case;
          end;
       end loop;
