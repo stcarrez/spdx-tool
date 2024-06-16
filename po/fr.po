@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: spdx-tool 0.1.0\n"
 "Report-Msgid-Bugs-To: Stephane.Carrez@gmail.com\n"
-"POT-Creation-Date: 2024-06-08\n"
+"POT-Creation-Date: 2024-06-09\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Scarrez\n"
 "Language-Team: \n"
@@ -65,9 +65,9 @@ msgstr "Activer l'execution debug"
 msgid "error"
 msgstr "erreur"
 
-#: spdx_tool-licenses-reader.adb spdx_tool-languages-manager.adb
-#: spdx_tool-configs.adb spdx_tool-licenses-manager.adb
-#: spdx_tool-files-manager.adb spdx_tool-magic_manager.adb spdx_tool-main.adb
+#: spdx_tool-main.adb spdx_tool-configs.adb spdx_tool-magic_manager.adb
+#: spdx_tool-files-manager.adb spdx_tool-languages-manager.adb
+#: spdx_tool-licenses-manager.adb spdx_tool-licenses-reader.adb
 msgid "Error"
 msgstr "erreur"
 
@@ -76,12 +76,16 @@ msgid "exception"
 msgstr ""
 
 #: spdx_tool-licenses-manager.adb
+msgid "Exclude pattern {0}"
+msgstr "Exclusion avec le modèle {0}"
+
+#: spdx_tool-licenses-manager.adb
 msgid "excluded file {0}"
 msgstr "fichier exclu {0}"
 
 #: spdx_tool-languages.adb
 msgid "extract license from lines{0} to{1}"
-msgstr "extraction de la license des lignres{0} à{1}"
+msgstr "extraction de la license des lignes{0} à{1}"
 
 #: spdx_tool.adb
 msgid "fatal"
@@ -115,19 +119,23 @@ msgstr "Ignorer les fichiers avec un des langages de la liste"
 msgid "Ignore the files with licenses in the given list"
 msgstr "Ignorer les fichiers avec une des licenses de la liste"
 
-#: spdx_tool-languages.adb spdx_tool-languages-manager.adb
-#: spdx_tool-licenses.adb spdx_tool-configs.adb spdx_tool-files-manager.adb
 #: spdx_tool-licenses-manager.adb
-msgid "Info"
-msgstr ""
+msgid "Include pattern {0}"
+msgstr "Inclusion avec le modèle {0}"
 
 #: spdx_tool.adb
 msgid "info"
 msgstr ""
 
+#: spdx_tool-languages.adb spdx_tool-languages-manager.adb
+#: spdx_tool-configs.adb spdx_tool-files-manager.adb
+#: spdx_tool-licenses-manager.adb spdx_tool-licenses.adb
+msgid "Info"
+msgstr ""
+
 #: spdx_tool-licenses-manager.adb
 msgid "invalid builtin ignore file {0}"
-msgstr ""
+msgstr "fichier d'exclusion est invalide {0}"
 
 #: spdx_tool-configs.adb
 msgid "invalid configuration file:"
@@ -155,7 +163,7 @@ msgstr "option --update invalide: {}"
 
 #: spdx_tool-licenses-manager.adb
 msgid "Invalid range of line"
-msgstr ""
+msgstr "Mauvaise définition de lignes"
 
 #: spdx_tool-licenses-manager.adb
 msgid "invalid update pattern"
@@ -169,6 +177,10 @@ msgstr "échec de l'execution {0}"
 msgid "Language"
 msgstr "Langage"
 
+#: spdx_tool-languages.adb
+msgid "language {0} identified by {1} with confidence{2}"
+msgstr "langage {0} identifié par {1} avec une confidence de{2}"
+
 #: spdx_tool-languages-manager.adb
 msgid "language {0}: invalid comment style {1}"
 msgstr "language {0}: style de commentaire invalid {1}"
@@ -179,11 +191,11 @@ msgstr ""
 
 #: spdx_tool-licenses.adb
 msgid "license '{0}' missmatch at line{1} after {2} lines"
-msgstr ""
+msgstr "license '{0}' rejetée à la ligne{1} après {2} lignes"
 
 #: spdx_tool-licenses-manager.adb
 msgid "license missmatch at line{0} after {1} lines"
-msgstr ""
+msgstr "license rejetée à la ligne{0} après {1} lignes"
 
 #: spdx_tool-main.adb
 msgid "List files grouped by license name"
@@ -275,7 +287,7 @@ msgstr "lecture du fichier de configuration '{0}"
 
 #: spdx_tool-licenses-manager.adb
 msgid "scan file {0}"
-msgstr "scan du fichier {0}"
+msgstr "analyse du fichier {0}"
 
 #: spdx_tool-main.adb
 msgid "some internal error occurred"
