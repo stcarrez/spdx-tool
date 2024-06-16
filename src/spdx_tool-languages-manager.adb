@@ -14,8 +14,33 @@ with SPDX_Tool.Languages.Rules.Generated;
 with SPDX_Tool.Languages.Rules.Disambiguations;
 package body SPDX_Tool.Languages.Manager is
 
+   use type Ada.Containers.Count_Type;
+
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Languages");
+
+   --  ------------------------------
+   --  Look at the detected languages and disambiguate if several are identified.
+   --  ------------------------------
+   procedure Disambiguate (Manager : in Language_Manager;
+                           File    : in SPDX_Tool.Infos.File_Info;
+                           Content : in File_Type;
+                           Result  : in out Detector_Result) is
+      Definition : Rules.Rules_List renames Rules.Disambiguations.Definition;
+   begin
+      if Result.Languages.Length <= 1 then
+         return;
+      end if;
+      declare
+         use type Rules.Rule_Index, Rules.Pattern_Length;
+         Pos : constant Rules.Rule_Index := Rules.Find (Definition, File, Content);
+      begin
+         if Pos > 0 and then Definition.Rules (Pos).Result > 0 then
+            Set_Language (Result, "disambiguate",
+                          Definition.Strings (Definition.Rules (Pos).Result).all, 0.5);
+         end if;
+      end;
+   end Disambiguate;
 
    --  ------------------------------
    --  Identify the language used by the given file.
@@ -34,6 +59,7 @@ package body SPDX_Tool.Languages.Manager is
       Manager.Shell_Detect.Detect (File, Content, Result);
       Manager.Modeline_Detect.Detect (File, Content, Result);
       Manager.Generated_Detect.Detect (File, Content, Result);
+      Manager.Disambiguate (File, Content, Result);
       declare
          Language : constant String := Get_Language (Result);
          Comment  : constant access constant String := CommentsMap.Get_Mapping (Language);

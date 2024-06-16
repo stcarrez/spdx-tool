@@ -77,7 +77,7 @@ package body SPDX_Tool.Languages.Rules is
             end case;
          end;
       end loop;
-      return FOUND;
+      return SKIP;
    end Check;
 
    --  ------------------------------
@@ -145,8 +145,8 @@ package body SPDX_Tool.Languages.Rules is
             Rules.Patterns (I) := Compile (Rules.Strings (I).all);
          exception
             when E : GNAT.Regpat.Expression_Error =>
-               Log.Info ("Invalid regex '{0}': {1}", Rules.Strings (I).all,
-                         Ada.Exceptions.Exception_Message (E));
+               Log.Debug ("Invalid regex '{0}': {1}", Rules.Strings (I).all,
+                          Ada.Exceptions.Exception_Message (E));
          end;
       end loop;
    end Initialize;

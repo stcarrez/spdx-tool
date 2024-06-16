@@ -34,6 +34,12 @@ package SPDX_Tool.Languages.Manager is
 
 private
 
+   --  Look at the detected languages and disambiguate if several are identified.
+   procedure Disambiguate (Manager : in Language_Manager;
+                           File    : in SPDX_Tool.Infos.File_Info;
+                           Content : in File_Type;
+                           Result  : in out Detector_Result);
+
    --  Map which gives the analyzer to use for a given language.
    package Language_Maps is
       new Ada.Containers.Indefinite_Hashed_Maps (Key_Type     => String,
