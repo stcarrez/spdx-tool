@@ -295,11 +295,12 @@ package body SPDX_Tool.Reports is
    end Visible_File_Count;
 
    --  ------------------------------
-   --  Print the license name with the file name as prefix.
+   --  Print the license or language name with the file name as prefix.
    --  ------------------------------
    procedure Print_Identify (Printer : in out PT.Printer_Type'Class;
                              Styles  : in Style_Configuration;
-                             Files   : in SPDX_Tool.Infos.File_Map) is
+                             Files   : in SPDX_Tool.Infos.File_Map;
+                             Mode    : in Identify_Mode) is
       pragma Unreferenced (Styles);
 
       Visible_Files : constant Natural := Visible_File_Count (Files);
@@ -310,7 +311,11 @@ package body SPDX_Tool.Reports is
             if Visible_Files > 1 then
                Writer.Put_UTF8 (File.Path & ": ");
             end if;
-            Writer.Put_UTF8 (To_String (File.License.Name));
+            if Mode = PRINT_LICENSE then
+               Writer.Put_UTF8 (To_String (File.License.Name));
+            else
+               Writer.Put_UTF8 (To_String (File.Language));
+            end if;
             Writer.New_Line;
          end if;
       end loop;

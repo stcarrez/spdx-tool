@@ -246,10 +246,12 @@ procedure SPDX_Tool.Main is
       Driver.Set_Fill (Styles.Marker2, PT.Drivers.Texts.F_HLINE2);
       Driver.Set_Fill (Styles.Marker1, PT.Drivers.Texts.F_HLINE2);
       Driver.Set_Flush (PT.Drivers.Texts.GNAT_IO.Flush'Access);
-      if Opt_Check then
+      if Opt_Identify then
+         SPDX_Tool.Reports.Print_Identify (Driver, Styles, Files,
+                                           (if Opt_Languages then Reports.PRINT_LANGUAGE
+                                            else Reports.PRINT_LICENSE));
+      elsif Opt_Check then
          SPDX_Tool.Reports.Print_Licenses (Driver, Styles, Files);
-      elsif Opt_Identify then
-         SPDX_Tool.Reports.Print_Identify (Driver, Styles, Files);
       end if;
       if Opt_Files then
          if Opt_Check then
@@ -263,7 +265,7 @@ procedure SPDX_Tool.Main is
          end if;
          SPDX_Tool.Reports.Print_Mimes (Driver, Styles, Files);
       end if;
-      if Opt_Languages then
+      if Opt_Languages and then not Opt_Identify then
          if Opt_Check or else Opt_Files or else Opt_Mimes then
             Writer.New_Line;
          end if;
