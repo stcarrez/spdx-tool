@@ -1,0 +1,30 @@
+regtests/files/identify/antlr-pd-1.c: C
+regtests/files/identify/antlr-pd-2.c: C
+regtests/files/identify/apache-2.0-1.ads: Ada
+regtests/files/identify/apache-2.0-2.ads: Ada
+regtests/files/identify/apache-2.0-3.c: C
+regtests/files/identify/apache-2.0-4.erl: Erlang
+regtests/files/identify/apache-2.0-5.xhtml: HTML
+regtests/files/identify/apache-2.0-6.jsp: Java Server Pages
+regtests/files/identify/apache-2.0-7.cs: C#
+regtests/files/identify/apache-2.0-8.ts: TypeScript
+regtests/files/identify/bsd-3-clause.c: C
+regtests/files/identify/bsd-3-clause.ps1: PowerShell
+regtests/files/identify/bsd-3-clause.tex: TeX
+regtests/files/identify/gnat-3.0.ads: Ada
+regtests/files/identify/gpl-2.0-1.C: C++
+regtests/files/identify/gpl-2.0-2.st: Smalltalk
+regtests/files/identify/gpl-2.0-3.rs: Rust
+regtests/files/identify/gpl-2.0-only-1.sh: Shell
+regtests/files/identify/gpl-2.0-or-bsd.c: C
+regtests/files/identify/gpl-3.0-1.sub: Shell
+regtests/files/identify/gpl-3.0-2.el: Emacs Lisp
+regtests/files/identify/gpl-3.0.c: C
+regtests/files/identify/gpl2-or-later.java: Java
+regtests/files/identify/lgpl-2.1.c: C
+regtests/files/identify/lgpl-2.1.java: Java
+regtests/files/identify/lgpl-2.1.ml: OCaml
+regtests/files/identify/misc-1.ml: OCaml
+regtests/files/identify/mit-1.tex: TeX
+regtests/files/identify/mit-2.c: C
+regtests/files/identify/uri.d: D

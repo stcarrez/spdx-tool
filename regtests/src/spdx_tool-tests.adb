@@ -32,6 +32,10 @@ package body SPDX_Tool.Tests is
                        Test_Report_Ignore_Licenses_Files'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --identify",
                        Test_Identify'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --identify --licenses",
+                       Test_Identify_Licenses'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --identify --languages",
+                       Test_Identify_Languages'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --output-json",
                        Test_Json_Report'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --output-xml",
@@ -112,6 +116,36 @@ package body SPDX_Tool.Tests is
       Util.Tests.Assert_Matches (T, "BSD-3-Clause", Result,
                                 "Identify failed");
    end Test_Identify;
+
+   procedure Test_Identify_Licenses (T : in out Test) is
+      Path : constant String
+        := Util.Tests.Get_Test_Path ("identify-licenses.txt");
+      Result : UString;
+   begin
+      T.Execute (Tool & " --identify --licenses regtests/files/identify",
+                 "", Path,
+                 Result, 0);
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/identify-licenses.txt"),
+         Test    => Path,
+         Message => "Invalid identify licenses list");
+   end Test_Identify_Licenses;
+
+   procedure Test_Identify_Languages (T : in out Test) is
+      Path : constant String
+        := Util.Tests.Get_Test_Path ("identify-languages.txt");
+      Result : UString;
+   begin
+      T.Execute (Tool & " --identify --languages regtests/files/identify",
+                 "", Path,
+                 Result, 0);
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/identify-languages.txt"),
+         Test    => Path,
+         Message => "Invalid identify languages list");
+   end Test_Identify_Languages;
 
    procedure Test_Json_Report (T : in out Test) is
       Path : constant String

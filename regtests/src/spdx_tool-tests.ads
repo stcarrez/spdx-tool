@@ -19,6 +19,8 @@ package SPDX_Tool.Tests is
    procedure Test_Report_Only_Licenses_Files (T : in out Test);
    procedure Test_Report_Ignore_Licenses_Files (T : in out Test);
    procedure Test_Identify (T : in out Test);
+   procedure Test_Identify_Licenses (T : in out Test);
+   procedure Test_Identify_Languages (T : in out Test);
    procedure Test_Json_Report (T : in out Test);
    procedure Test_Xml_Report (T : in out Test);
    procedure Test_Print_License_Apache (T : in out Test);

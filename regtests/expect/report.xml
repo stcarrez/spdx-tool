@@ -1,49 +1,68 @@
 
 <report>
-  <license name="Apache-2.0" spdx="false" confidence="1.000">
+  <license name="Apache-2.0" spdx="false" confidence="1.000" count="8">
     <file>regtests/files/identify/apache-2.0-1.ads</file>
     <file>regtests/files/identify/apache-2.0-2.ads</file>
     <file>regtests/files/identify/apache-2.0-3.c</file>
     <file>regtests/files/identify/apache-2.0-4.erl</file>
     <file>regtests/files/identify/apache-2.0-5.xhtml</file>
+    <file>regtests/files/identify/apache-2.0-6.jsp</file>
+    <file>regtests/files/identify/apache-2.0-8.ts</file>
   </license>
-  <license name="None" spdx="false" confidence="0.000">
+  <license name="None" spdx="false" confidence="0.000" count="4">
     <file>regtests/files/identify/gpl-3.0-1.sub</file>
     <file>regtests/files/identify/lgpl-2.1.ml</file>
     <file>regtests/files/identify/misc-1.ml</file>
+    <file>regtests/files/identify/uri.d</file>
   </license>
-  <license name="BSD-3-Clause" spdx="false" confidence="1.000">
+  <license name="BSD-3-Clause" spdx="false" confidence="1.000" count="3">
     <file>regtests/files/identify/bsd-3-clause.c</file>
+    <file>regtests/files/identify/bsd-3-clause.ps1</file>
     <file>regtests/files/identify/bsd-3-clause.tex</file>
   </license>
-  <license name="GPL-1.0-or-later" spdx="false" confidence="0.958">
-    <file>regtests/files/identify/lgpl-2.1.java</file>
+  <license name="ANTLR-PD" spdx="false" confidence="1.000" count="2">
+    <file>regtests/files/identify/antlr-pd-1.c</file>
+    <file>regtests/files/identify/antlr-pd-2.c</file>
   </license>
-  <license name="GPL-2.0+ OR BSD-3-Clause" spdx="true" confidence="1.000">
-    <file>regtests/files/identify/gpl-2.0-or-bsd.c</file>
+  <license name="eCos-2.0" spdx="false" confidence="0.506" count="2">
+    <file>regtests/files/identify/gpl-3.0-2.el</file>
   </license>
-  <license name="GPL-2.0-only" spdx="false" confidence="0.858">
+  <license name="GPL-1.0+" spdx="false" confidence="0.757" count="1">
+    <file>regtests/files/identify/gpl-2.0-1.C</file>
+  </license>
+  <license name="GPL-2.0" spdx="true" confidence="1.000" count="1">
+    <file>regtests/files/identify/gpl-2.0-3.rs</file>
+  </license>
+  <license name="GPL-2.0+" spdx="false" confidence="0.834" count="1">
     <file>regtests/files/identify/gpl2-or-later.java</file>
   </license>
-  <license name="GPL-2.0-only" spdx="true" confidence="1.000">
+  <license name="GPL-2.0+ OR BSD-3-Clause" spdx="true" confidence="1.000" count="1">
+    <file>regtests/files/identify/gpl-2.0-or-bsd.c</file>
+  </license>
+  <license name="GPL-2.0-only" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-2.0-only-1.sh</file>
   </license>
-  <license name="GPL-3.0+" spdx="false" confidence="1.000">
+  <license name="GPL-3.0+" spdx="false" confidence="0.884" count="1">
     <file>regtests/files/identify/gpl-3.0.c</file>
   </license>
-  <license name="LGPL-2.1+" spdx="false" confidence="1.000">
+  <license name="LGPL-2.1" spdx="false" confidence="0.813" count="1">
+    <file>regtests/files/identify/lgpl-2.1.java</file>
+  </license>
+  <license name="LGPL-2.1+" spdx="false" confidence="1.000" count="1">
     <file>regtests/files/identify/lgpl-2.1.c</file>
   </license>
-  <license name="MIT" spdx="false" confidence="1.000">
+  <license name="MIT" spdx="false" confidence="1.000" count="1">
     <file>regtests/files/identify/mit-1.tex</file>
   </license>
-  <license name="MIT" spdx="true" confidence="1.000">
+  <license name="MIT" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/mit-2.c</file>
   </license>
-  <license name="gnat-gcc" spdx="false" confidence="0.927">
+  <license name="gnat-gcc" spdx="false" confidence="0.976" count="1">
     <file>regtests/files/identify/gnat-3.0.ads</file>
   </license>
-  <language name="C">
+  <language name="C" count="8">
+    <file>regtests/files/identify/antlr-pd-1.c</file>
+    <file>regtests/files/identify/antlr-pd-2.c</file>
     <file>regtests/files/identify/apache-2.0-3.c</file>
     <file>regtests/files/identify/bsd-3-clause.c</file>
     <file>regtests/files/identify/gpl-2.0-or-bsd.c</file>
@@ -51,34 +70,58 @@
     <file>regtests/files/identify/lgpl-2.1.c</file>
     <file>regtests/files/identify/mit-2.c</file>
   </language>
-  <language name="Ada">
+  <language name="Ada" count="3">
     <file>regtests/files/identify/apache-2.0-1.ads</file>
     <file>regtests/files/identify/apache-2.0-2.ads</file>
     <file>regtests/files/identify/gnat-3.0.ads</file>
   </language>
-  <language name="Java">
+  <language name="Java" count="2">
     <file>regtests/files/identify/gpl2-or-later.java</file>
     <file>regtests/files/identify/lgpl-2.1.java</file>
   </language>
-  <language name="OCaml">
+  <language name="OCaml" count="2">
     <file>regtests/files/identify/lgpl-2.1.ml</file>
     <file>regtests/files/identify/misc-1.ml</file>
   </language>
-  <language name="Shell">
+  <language name="Shell" count="2">
     <file>regtests/files/identify/gpl-2.0-only-1.sh</file>
     <file>regtests/files/identify/gpl-3.0-1.sub</file>
   </language>
-  <language name="TeX">
+  <language name="TeX" count="2">
     <file>regtests/files/identify/bsd-3-clause.tex</file>
     <file>regtests/files/identify/mit-1.tex</file>
   </language>
-  <language name="C++">
+  <language name="C#" count="1">
+    <file>regtests/files/identify/apache-2.0-7.cs</file>
+  </language>
+  <language name="C++" count="1">
     <file>regtests/files/identify/gpl-2.0-1.C</file>
   </language>
-  <language name="Erlang">
+  <language name="D" count="1">
+    <file>regtests/files/identify/uri.d</file>
+  </language>
+  <language name="Emacs Lisp" count="1">
+    <file>regtests/files/identify/gpl-3.0-2.el</file>
+  </language>
+  <language name="Erlang" count="1">
     <file>regtests/files/identify/apache-2.0-4.erl</file>
   </language>
-  <language name="HTML">
+  <language name="HTML" count="1">
     <file>regtests/files/identify/apache-2.0-5.xhtml</file>
+  </language>
+  <language name="Java Server Pages" count="1">
+    <file>regtests/files/identify/apache-2.0-6.jsp</file>
+  </language>
+  <language name="PowerShell" count="1">
+    <file>regtests/files/identify/bsd-3-clause.ps1</file>
+  </language>
+  <language name="Rust" count="1">
+    <file>regtests/files/identify/gpl-2.0-3.rs</file>
+  </language>
+  <language name="Smalltalk" count="1">
+    <file>regtests/files/identify/gpl-2.0-2.st</file>
+  </language>
+  <language name="TypeScript" count="1">
+    <file>regtests/files/identify/apache-2.0-8.ts</file>
   </language>
 </report>
