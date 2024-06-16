@@ -145,10 +145,12 @@ package body SPDX_Tool.Languages.Rules is
    end Find;
 
    procedure Initialize (Rules : in Rules_List) is
-      function Compile (Pattern : in String) return Matcher_Access;
+      function Compile (Pattern : in String;
+                        Flags   : in GNAT.Regpat.Regexp_Flags) return Matcher_Access;
 
-      function Compile (Pattern : in String) return Matcher_Access is
-         C : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Pattern);
+      function Compile (Pattern : in String;
+                        Flags   : in GNAT.Regpat.Regexp_Flags) return Matcher_Access is
+         C : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Pattern, Flags);
          P : constant Matcher_Access := new GNAT.Regpat.Pattern_Matcher (Size => C.Size);
       begin
          P.all := C;
@@ -157,8 +159,22 @@ package body SPDX_Tool.Languages.Rules is
 
    begin
       for I in Rules.Patterns'Range loop
+         declare
+            use type GNAT.Regpat.Regexp_Flags;
+
+            Pattern : constant Name_Access := Rules.Strings (I);
+            Flags   : GNAT.Regpat.Regexp_Flags := GNAT.Regpat.No_Flags;
+            Pos     : Positive := Pattern'First;
          begin
-            Rules.Patterns (I) := Compile (Rules.Strings (I).all);
+            if Util.Strings.Starts_With (Pattern.all, "(?im)") then
+               Flags := GNAT.Regpat.Case_Insensitive or GNAT.Regpat.Multiple_Lines;
+               Pos := Pos + 5;
+            elsif Util.Strings.Starts_With (Pattern.all, "(?i)") then
+               Flags := GNAT.Regpat.Case_Insensitive;
+               Pos := Pos + 4;
+            end if;
+            Rules.Patterns (I) := Compile (Pattern (Pos .. Pattern'Last), Flags);
+
          exception
             when E : GNAT.Regpat.Expression_Error =>
                Log.Debug ("Invalid regex '{0}': {1}", Rules.Strings (I).all,
