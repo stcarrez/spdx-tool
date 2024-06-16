@@ -46,414 +46,466 @@ private
    S18 : aliased constant String := "(\^(this|super)\.|^\s*~\w+\s*=\.)";
    S19 : aliased constant String := "(\bRebol\b)";
    S20 : aliased constant String := "(\w+\.prototype\.\w+|===|\bvar\b)";
-   S21 : aliased constant String := "(^\.!|^\f|\f$|^\.end lit(eral)?\b|^\.[a-z"
+   S21 : aliased constant String := "(^[-A-Za-z0-9=#!\*\[|>])|<\/";
+   S22 : aliased constant String := "(^\.!|^\f|\f$|^\.end lit(eral)?\b|^\.[a-z"
        & "A-Z].*?;\.[a-zA-Z]([; \t])|\^\*[^\s*][^*]*\\\*($|\s)|^\.c;[ \t]*\w+)";
-   S22 : aliased constant String := "(^\\i\b|AS\s+\$\$|LANGUAGE\s+'?plpgsql'?|"
+   S23 : aliased constant String := "(^\\i\b|AS\s+\$\$|LANGUAGE\s+'?plpgsql'?|"
        & "BEGIN(\s+WORK)?\s*;)";
-   S23 : aliased constant String := "(^\s*(<\?xml|xmlns))";
-   S24 : aliased constant String := "(^\s*(graph|node)\s+\[$)";
-   S25 : aliased constant String := "(^\s*<\?xml\s+version)";
-   S26 : aliased constant String := "(^\s*GO\b|BEGIN(\s+TRY|\s+CATCH)|OUTPUT\s"
+   S24 : aliased constant String := "(^\s*(<\?xml|xmlns))";
+   S25 : aliased constant String := "(^\s*(^function\s)(function\s*\w+\(.*?\)\"
+       & "s*as\s*\w*)|(:\s*function\(.*?\)\s*as\s*\w*)$)";
+   S26 : aliased constant String := "(^\s*(^sub\s)(sub\s*\w+\(.*?\))|(:\s*sub\"
+       & "(.*?\))$)";
+   S27 : aliased constant String := "(^\s*(end\sfunction)$)";
+   S28 : aliased constant String := "(^\s*(end\ssub)$)";
+   S29 : aliased constant String := "(^\s*(graph|node)\s+\[$)";
+   S30 : aliased constant String := "(^\s*<\?xml\s+version)";
+   S31 : aliased constant String := "(^\s*GO\b|BEGIN(\s+TRY|\s+CATCH)|OUTPUT\s"
        & "+INSERTED|DECLARE\s+@|\[dbo\])";
-   S27 : aliased constant String := "(^\s*import (scala|java)\.|^\s*class\b)";
-   S28 : aliased constant String := "(^\s*module)|let rec |match\s+(\S+\s)+wit"
+   S32 : aliased constant String := "(^\s*\{\$(mode|ifdef|undef|define)[ ]+[a-"
+       & "z0-9_]+\})";
+   S33 : aliased constant String := "(^\s*import (scala|java)\.|^\s*class\b)";
+   S34 : aliased constant String := "(^\s*module)|let rec |match\s+(\S+\s)+wit"
        & "h";
-   S29 : aliased constant String := "(^\|\s*(where|extend|project|limit|summar"
+   S35 : aliased constant String := "(^\|\s*(where|extend|project|limit|summar"
        & "ize))|(^\.\w+)";
-   S30 : aliased constant String := "(^|<)\s*[A-Za-z0-9_]+\s*=\s*<";
-   S31 : aliased constant String := "(^|\s)(Proof|Qed)\.($|\s)|(^|\s)Require[ "
+   S36 : aliased constant String := "(^|<)\s*[A-Za-z0-9_]+\s*=\s*<";
+   S37 : aliased constant String := "(^|\s)(Proof|Qed)\.($|\s)|(^|\s)Require[ "
        & "\t]+(Import|Export)\s";
-   S32 : aliased constant String := "(m)^\s*using\s+(System|Beefy)(\.(.*))?;\s"
+   S38 : aliased constant String := "(m)^\s*#include\s+"".*"";\s*$";
+   S39 : aliased constant String := "(m)^\s*using\s+(System|Beefy)(\.(.*))?;\s"
        & "*$";
-   S33 : aliased constant String := ":- module";
-   S34 : aliased constant String := ":=";
-   S35 : aliased constant String := "<!ENTITY ";
-   S36 : aliased constant String := "<%[@!=\s]?\s*(taglib|tag|include|attribut"
+   S40 : aliased constant String := ":- module";
+   S41 : aliased constant String := ":=";
+   S42 : aliased constant String := "<!ENTITY ";
+   S43 : aliased constant String := "<%[@!=\s]?\s*(taglib|tag|include|attribut"
        & "e|variable)\s";
-   S37 : aliased constant String := "<-|^\s*#";
-   S38 : aliased constant String := "<TS\b";
-   S39 : aliased constant String := "<UTIL.BEANS.OBJECTS.VECTORS.VECTOR_BEAN>";
-   S40 : aliased constant String := "<\?[^h]";
-   S41 : aliased constant String := "<\?hh";
-   S42 : aliased constant String := "<emu-(alg|annex|biblio|clause|eqn|example"
+   S44 : aliased constant String := "<-|^\s*#";
+   S45 : aliased constant String := "<TS\b";
+   S46 : aliased constant String := "<\?[^h]";
+   S47 : aliased constant String := "<\?hh";
+   S48 : aliased constant String := "<emu-(alg|annex|biblio|clause|eqn|example"
        & "|figure|gann|gmod|gprose|grammar|intro|not-ref|note|nt|prodref|product"
        & "ion|rhs|table|t|xref)($|\s|>)";
-   S43 : aliased constant String := "=> |case\s+(\S+\s)+of";
-   S44 : aliased constant String := "HEADERS";
-   S45 : aliased constant String := "OUTPUT_ARCH\(|OUTPUT_FORMAT\(|SECTIONS";
-   S46 : aliased constant String := "SOURCES";
-   S47 : aliased constant String := "THE_TITLE";
-   S48 : aliased constant String := "\""modelName\""\:\s*\""GM";
-   S49 : aliased constant String := "\$(if|else)[ \t]|^[ \t]*fn\s+[^\s()]+\(.*"
+   S49 : aliased constant String := "=> |case\s+(\S+\s)+of";
+   S50 : aliased constant String := "AC_DEFUN|AC_PREREQ|AC_INIT";
+   S51 : aliased constant String := "HEADERS";
+   S52 : aliased constant String := "OUTPUT_ARCH\(|OUTPUT_FORMAT\(|SECTIONS";
+   S53 : aliased constant String := "SOURCES";
+   S54 : aliased constant String := "THE_TITLE";
+   S55 : aliased constant String := "\""modelName\""\:\s*\""GM";
+   S56 : aliased constant String := "\$(if|else)[ \t]|^[ \t]*fn\s+[^\s()]+\(.*"
        & "?\).*?\{|^[ \t]*for\s*\{";
-   S50 : aliased constant String := "\$\w+[($]|(.)!\s*.+?\s*!\1|<!\s*.+?\s*!>|"
+   S57 : aliased constant String := "\$\w+[($]|(.)!\s*.+?\s*!\1|<!\s*.+?\s*!>|"
        & "\[!\s*.+?\s*!\]|\{!\s*.+?\s*!\}";
-   S51 : aliased constant String := "\((def|defn|defmacro|let)\s";
-   S52 : aliased constant String := "\(\*";
-   S53 : aliased constant String := "\(def(un|macro)\s";
-   S54 : aliased constant String := "\*\)$";
-   S55 : aliased constant String := "\/\* |\/\/ |^\}";
-   S56 : aliased constant String := "\/\/|(""|')use strict\1|export\s+default\"
+   S58 : aliased constant String := "\((def|defn|defmacro|let)\s";
+   S59 : aliased constant String := "\(\*";
+   S60 : aliased constant String := "\(def(un|macro)\s";
+   S61 : aliased constant String := "\*\)$";
+   S62 : aliased constant String := "\/\* |\/\/ |^\}";
+   S63 : aliased constant String := "\/\/|(""|')use strict\1|export\s+default\"
        & "s|\/\*(.|[\r\n])*?\*\/";
-   S57 : aliased constant String := "\A\s*[\[{(^""'\w#]|[a-zA-Z_]\w*\s*:=\s*[a"
+   S64 : aliased constant String := "\A\s*[\[{(^""'\w#]|[a-zA-Z_]\w*\s*:=\s*[a"
        & "-zA-Z_]\w*|class\s*>>\s*[a-zA-Z_]\w*|^[a-zA-Z_]\w*\s+[a-zA-Z_]\w*:|^Cl"
        & "ass\s*\{|if(True|False):\s*\[";
-   S58 : aliased constant String := "\A\s*[{\[]";
-   S59 : aliased constant String := "\A\s*\d";
-   S60 : aliased constant String := "\A\s*solid($|\s)[\s\S]*^endsolid($|\s)";
-   S61 : aliased constant String := "\b((CODEUNIT|PAGE|PAGEEXTENSION|PAGECUSTO"
+   S65 : aliased constant String := "\A\s*[{\[]";
+   S66 : aliased constant String := "\A\s*\d";
+   S67 : aliased constant String := "\A\s*solid($|\s)[\s\S]*^endsolid($|\s)";
+   S68 : aliased constant String := "\A\z";
+   S69 : aliased constant String := "\b((CODEUNIT|PAGE|PAGEEXTENSION|PAGECUSTO"
        & "MIZATION|DOTNET|ENUM|ENUMEXTENSION|VALUE|QUERY|REPORT|TABLE|TABLEEXTEN"
        & "SION|XMLPORT|PROFILE|CONTROLADDIN|REPORTEXTENSION|INTERFACE|PERMISSION"
        & "SET|PERMISSIONSETEXTENSION|ENTITLEMENT))\b";
-   S62 : aliased constant String := "\b(program|version)\s+\w+\s*\{|\bunion\s+"
+   S70 : aliased constant String := "\b(program|version)\s+\w+\s*\{|\bunion\s+"
        & "\w+\s+switch\s*\(";
-   S63 : aliased constant String := "\b(using|module|function|class|var)\s+\w";
-   S64 : aliased constant String := "\bpragma\s+solidity\b|\b(abstract\s+)?con"
+   S71 : aliased constant String := "\b(using|module|function|class|var)\s+\w";
+   S72 : aliased constant String := "\bpragma\s+solidity\b|\b(abstract\s+)?con"
        & "tract\s+(\d)[a-zA-Z0-9$_]+(\s+is\s+([a-zA-Z0-9$_][^\{]*?)?)?\s*\{";
-   S65 : aliased constant String := "\bprocess\s*[(=]|\b(library|import)\s*\(\"
+   S73 : aliased constant String := "\bprocess\s*[(=]|\b(library|import)\s*\(\"
        & "s*""|\bdeclare\s+(name|version|author|copyright|license)\s+""";
-   S66 : aliased constant String := "\s*(Declare|BindGlobal|KeyDependentOperat"
+   S74 : aliased constant String := "\s*(Declare|BindGlobal|KeyDependentOperat"
        & "ion)";
-   S67 : aliased constant String := "\s*(Declare|BindGlobal|KeyDependentOperat"
+   S75 : aliased constant String := "\s*(Declare|BindGlobal|KeyDependentOperat"
        & "ion|Install(Method|GlobalFunction)|SetPackageInfo)";
-   S68 : aliased constant String := "\s*(extends|var|const|enum|func|class|sig"
+   S76 : aliased constant String := "\s*(extends|var|const|enum|func|class|sig"
        & "nal|tool|yield|assert|onready)";
-   S69 : aliased constant String := "^## |@no-lib-strip@";
-   S70 : aliased constant String := "^#(import|show|let|set)";
-   S71 : aliased constant String := "^#+\s+(NAME|SYNOPSIS|DESCRIPTION)";
-   S72 : aliased constant String := "^#version\s+[0-9]+\b";
-   S73 : aliased constant String := "^%(end|ctor|hook|group)\b";
-   S74 : aliased constant String := "^(# |include|require|inherit)\b";
-   S75 : aliased constant String := "^(%[%{}]xs|<.*>)";
-   S76 : aliased constant String := "^((\/{2,3})?\s*(namespace|operation)\b)";
-   S77 : aliased constant String := "^(----[- ]BEGIN|ssh-(rsa|dss)) ";
-   S78 : aliased constant String := "^(: |also |new-device|previous )";
-   S79 : aliased constant String := "^(: |new-device)";
-   S80 : aliased constant String := "^(;;|\(define_)";
-   S81 : aliased constant String := "^(<pre\s+class)\s*=\s*('|\""|\b)metadata\"
+   S77 : aliased constant String := "\sfprintf\s*\(";
+   S78 : aliased constant String := "^## |@no-lib-strip@";
+   S79 : aliased constant String := "^#(import|show|let|set)";
+   S80 : aliased constant String := "^#+\s+(NAME|SYNOPSIS|DESCRIPTION)";
+   S81 : aliased constant String := "^#version\s+[0-9]+\b";
+   S82 : aliased constant String := "^%(end|ctor|hook|group)\b";
+   S83 : aliased constant String := "^(# |include|require|inherit)\b";
+   S84 : aliased constant String := "^(%[%{}]xs|<.*>)";
+   S85 : aliased constant String := "^((\/{2,3})?\s*(namespace|operation)\b)";
+   S86 : aliased constant String := "^(----[- ]BEGIN|ssh-(rsa|dss)) ";
+   S87 : aliased constant String := "^(: |also |new-device|previous )";
+   S88 : aliased constant String := "^(: |new-device)";
+   S89 : aliased constant String := "^(;;|\(define_)";
+   S90 : aliased constant String := "^(<pre\s+class)\s*=\s*('|\""|\b)metadata\"
        & "b\1[^>\r\n]*>";
-   S82 : aliased constant String := "^(<|[a-zA-Z-][a-zA-Z0-9_-]+[ \t]+\w)|\$\{"
+   S91 : aliased constant String := "^(<|[a-zA-Z-][a-zA-Z0-9_-]+[ \t]+\w)|\$\{"
        & "\w+[^\r\n]*?\}|^[ \t]*(<#--.*->|<#([a-z]+)(\s|>)[^>]*>.*?</#\1>|\[#--."
        & "*-\]|\[#([a-z]+)(\s|\])[^\]]*\].*?\[#\2\])";
-   S83 : aliased constant String := "^(\/\/.+|((import|export)\s+)?(function|i"
+   S92 : aliased constant String := "^(\/\/.+|((import|export)\s+)?(function|i"
        & "nt|float|char)\s+((room|repeatedly|on|game)_)?([A-Za-z]+[A-Za-z_0-9]+)"
        & "\s*[;\(])";
-   S84 : aliased constant String := "^(\d{2}:\d{2}:\d{2},\d{3})\s*(-->)\s*(\d{"
+   S93 : aliased constant String := "^(\d{2}:\d{2}:\d{2},\d{3})\s*(-->)\s*(\d{"
        & "2}:\d{2}:\d{2},\d{3})$";
-   S85 : aliased constant String := "^(\s*)(<Project|<Import|<Property|<?xml|x"
+   S94 : aliased constant String := "^(\s*)(<Project|<Import|<Property|<?xml|x"
        & "mlns)";
-   S86 : aliased constant String := "^(\w+:\w*:\w*:\w*|BEGIN|END|provider\s+|("
+   S95 : aliased constant String := "^(\w+:\w*:\w*:\w*|BEGIN|END|provider\s+|("
        & "tick|profile)-\w+\s+\{[^}]*\}|#pragma\s+D\s+(option|attributes|depends"
        & "_on)\s|#pragma\s+ident\s)";
-   S87 : aliased constant String := "^(b|g)[0-9]+ ";
-   S88 : aliased constant String := "^(import|from|class|def)\s";
-   S89 : aliased constant String := "^(module|namespace|using)\s";
-   S90 : aliased constant String := "^(use |fn |mod |pub |macro_rules|impl|#!?"
+   S96 : aliased constant String := "^(b|g)[0-9]+ ";
+   S97 : aliased constant String := "^(import|from|class|def)\s";
+   S98 : aliased constant String := "^(module|namespace|using)\s";
+   S99 : aliased constant String := "^(use |fn |mod |pub |macro_rules|impl|#!?"
        & "\[)";
-   S91 : aliased constant String := "^-(include\b.*\.pro$|keep\b|keepclassmemb"
+   S100 : aliased constant String := "^-(include\b.*\.pro$|keep\b|keepclassmemb"
        & "ers\b|keepattributes\b)";
-   S92 : aliased constant String := "^-?[a-zA-Z][a-zA-Z0-9_-]* *=|\{\$-?[a-zA-"
+   S101 : aliased constant String := "^-?[a-zA-Z][a-zA-Z0-9_-]* *=|\{\$-?[a-zA-"
        & "Z][-\w]*(\.[a-zA-Z][-\w]*)?\}";
-   S93 : aliased constant String := "^: ";
-   S94 : aliased constant String := "^<\?(php)?";
-   S95 : aliased constant String := "^@(<|\w+\.)";
-   S96 : aliased constant String := "^Class\s";
-   S97 : aliased constant String := "^G0.";
-   S98 : aliased constant String := "^SymbolType[ \t]";
-   S99 : aliased constant String := "^UseVimball";
-   S100 : aliased constant String := "^[ \t]*#(define|endif|endmacro|ifn?def|if"
+   S102 : aliased constant String := "^: ";
+   S103 : aliased constant String := "^<\?(php)?";
+   S104 : aliased constant String := "^@(<|\w+\.)";
+   S105 : aliased constant String := "^Class\s";
+   S106 : aliased constant String := "^G0.";
+   S107 : aliased constant String := "^SymbolType[ \t]";
+   S108 : aliased constant String := "^UseVimball";
+   S109 : aliased constant String := "^[ \t]*#(define|endif|endmacro|ifn?def|if"
        & "|include|lang|macro)($|\s)";
-   S101 : aliased constant String := "^[ \t]*#(define|endif|endmacro|ifn?def|in"
+   S110 : aliased constant String := "^[ \t]*#(define|endif|endmacro|ifn?def|in"
        & "clude|lang|macro)($|\s)";
-   S102 : aliased constant String := "^[ \t]*%[a-z_]+\b|^%[{}]$";
-   S103 : aliased constant String := "^[ \t]*(\/\*\s*)?MessageId=|^\.$";
-   S104 : aliased constant String := "^[ \t]*module\s+[^\s()]+\s+\#?\(|^[ \t]*`"
+   S111 : aliased constant String := "^[ \t]*%[a-z_]+\b|^%[{}]$";
+   S112 : aliased constant String := "^[ \t]*(\/\*\s*)?MessageId=|^\.$";
+   S113 : aliased constant String := "^[ \t]*module\s+[^\s()]+\s+\#?\(|^[ \t]*`"
        & "(define|ifdef|ifndef|include|timescale)|^[ \t]*always[ \t]+@|^[ \t]*in"
        & "itial[ \t]+(begin|@)";
-   S105 : aliased constant String := "^[#!]";
-   S106 : aliased constant String := "^[.']";
-   S107 : aliased constant String := "^[.'][A-Za-z]{2}(\s|$)";
-   S108 : aliased constant String := "^[;\[]";
-   S109 : aliased constant String := "^[=-]+\s|\{\{[A-Za-z]";
-   S110 : aliased constant String := "^[DGMT][0-9]{2}\*$";
-   S111 : aliased constant String := "^[DGMT][0-9]{2}\*(\r?\n|\r)";
-   S112 : aliased constant String := "^[MG][0-9]+(\r?\n|\r)";
-   S113 : aliased constant String := "^[\s&&[^\r\n]]*=(comment|begin pod|begin "
+   S114 : aliased constant String := "^[#!]";
+   S115 : aliased constant String := "^[.']";
+   S116 : aliased constant String := "^[.'][A-Za-z]{2}(\s|$)";
+   S117 : aliased constant String := "^[;\[]";
+   S118 : aliased constant String := "^[=-]+\s|\{\{[A-Za-z]";
+   S119 : aliased constant String := "^[DGMT][0-9]{2}\*$";
+   S120 : aliased constant String := "^[DGMT][0-9]{2}\*(\r?\n|\r)";
+   S121 : aliased constant String := "^[MG][0-9]+(\r?\n|\r)";
+   S122 : aliased constant String := "^[\s&&[^\r\n]]*=(comment|begin pod|begin "
        & "para|item\d+)";
-   S114 : aliased constant String := "^[^#!][^:]*:";
-   S115 : aliased constant String := "^[^#]*:-";
-   S116 : aliased constant String := "^[^#]+:-";
-   S117 : aliased constant String := "^[^\[#]+:-";
-   S118 : aliased constant String := "^\((de|class|rel|code|data|must)\s";
-   S119 : aliased constant String := "^\.([A-Za-z]{2}(\s|$)|\\"")";
-   S120 : aliased constant String := "^\.[A-Za-z]{2}(\s|$)";
-   S121 : aliased constant String := "^\.\\"" ";
-   S122 : aliased constant String := "^\[InternetShortcut\](\r?\n|\r)([^\s\[][^"
+   S123 : aliased constant String := "^[^#!][^:]*:";
+   S124 : aliased constant String := "^[^#]*:-";
+   S125 : aliased constant String := "^[^#]+:-";
+   S126 : aliased constant String := "^[^\[#]+:-";
+   S127 : aliased constant String := "^\((de|class|rel|code|data|must)\s";
+   S128 : aliased constant String := "^\.([A-Za-z]{2}(\s|$)|\\"")";
+   S129 : aliased constant String := "^\.[A-Za-z]{2}(\s|$)";
+   S130 : aliased constant String := "^\.\\"" ";
+   S131 : aliased constant String := "^\[InternetShortcut\](\r?\n|\r)([^\s\[][^"
        & "\r\n]*(\r?\n|\r))*URL=";
-   S123 : aliased constant String := "^\[indent=[0-9]+\]";
-   S124 : aliased constant String := "^\\(contentsline|defcounter|beamer|boolfa"
+   S132 : aliased constant String := "^\[indent=[0-9]+\]";
+   S133 : aliased constant String := "^\\(contentsline|defcounter|beamer|boolfa"
        & "lse)";
-   S125 : aliased constant String := "^\\.{0,10}TLV_version";
-   S126 : aliased constant String := "^\s*#(declare|local|macro|while)\s";
-   S127 : aliased constant String := "^\s*#\s*(if|ifdef|ifndef|define|command|x"
+   S134 : aliased constant String := "^\\.{0,10}TLV_version";
+   S135 : aliased constant String := "^\s*#((if|ifdef|define|pragma)\s+\w|\s*in"
+       & "clude\s+<[^>]+>)";
+   S136 : aliased constant String := "^\s*#(declare|local|macro|while)\s";
+   S137 : aliased constant String := "^\s*#\s*(if|ifdef|ifndef|define|command|x"
        & "command|translate|xtranslate|include|pragma|undef)\b";
-   S128 : aliased constant String := "^\s*%";
-   S129 : aliased constant String := "^\s*%[ \t]+|^\s*var\s+\w+(\s*:\s*\w+)?\s*"
+   S138 : aliased constant String := "^\s*%";
+   S139 : aliased constant String := "^\s*%[ \t]+|^\s*var\s+\w+(\s*:\s*\w+)?\s*"
        & ":=\s*\w+";
-   S130 : aliased constant String := "^\s*(#light|import|let|module|namespace|o"
+   S140 : aliased constant String := "^\s*(#light|import|let|module|namespace|o"
        & "pen|type)";
-   S131 : aliased constant String := "^\s*(#version|precision|uniform|varying|v"
+   S141 : aliased constant String := "^\s*(#version|precision|uniform|varying|v"
        & "ec[234])";
-   S132 : aliased constant String := "^\s*(%%|main\s*\(.*?\)\s*->)";
-   S133 : aliased constant String := "^\s*((abi|dep|fn|impl|mod|pub|trait)\s|#\"
+   S142 : aliased constant String := "^\s*(%%|main\s*\(.*?\)\s*->)";
+   S143 : aliased constant String := "^\s*((abi|dep|fn|impl|mod|pub|trait)\s|#\"
        & "[)";
-   S134 : aliased constant String := "^\s*(<\?xml\s|<!DOCTYPE\s+plist|<plist(\s"
+   S144 : aliased constant String := "^\s*(<\?xml\s|<!DOCTYPE\s+plist|<plist(\s"
        & "+version\s*=\s*([""'])\d+(\.\d+)?\1)?\s*>\s*$)";
-   S135 : aliased constant String := "^\s*(MODULE|END) [\w\.]+;";
-   S136 : aliased constant String := "^\s*(alias|def|from|fn|import|struct|trai"
+   S145 : aliased constant String := "^\s*(MODULE|END) [\w\.]+;";
+   S146 : aliased constant String := "^\s*(across|deferred|elseif|ensure|featur"
+       & "e|from|inherit|inspect|invariant|note|once|require|undefine|variant|wh"
+       & "en)\s*$";
+   S147 : aliased constant String := "^\s*(alias|def|from|fn|import|struct|trai"
        & "t)\s";
-   S137 : aliased constant String := "^\s*(function|pro|compile_opt) \w[ \w,:]*"
+   S148 : aliased constant String := "^\s*(cond|import|quote|unless)\s";
+   S149 : aliased constant String := "^\s*(def|to)\s+(\w+)(\(.+\))?\s+\{";
+   S150 : aliased constant String := "^\s*(def|var)\s+(.+):=";
+   S151 : aliased constant String := "^\s*(function|pro|compile_opt) \w[ \w,:]*"
        & "$";
-   S138 : aliased constant String := "^\s*(import.+(from\s+|require\()['""]reac"
+   S152 : aliased constant String := "^\s*(global|local)_var\s+(\w+(\s*=\s*[\w\"
+       & "-""']+)?\s*)(,\s*\w+(\s*=\s*[\w\-""']+)?\s*)*+\s*;";
+   S153 : aliased constant String := "^\s*(import.+(from\s+|require\()['""]reac"
        & "t|\/\/\/\s*<reference\s)";
-   S139 : aliased constant String := "^\s*(import|export|module|def|let|let-env"
+   S154 : aliased constant String := "^\s*(import|export|module|def|let|let-env"
        & ") ";
-   S140 : aliased constant String := "^\s*(import|module|package|data|type) ";
-   S141 : aliased constant String := "^\s*(package(\s+[\w.]+)?\s+(\{|$)|import\"
+   S155 : aliased constant String := "^\s*(import|module|package|data|type) ";
+   S156 : aliased constant String := "^\s*(include|open)\s+\w+\s*$";
+   S157 : aliased constant String := "^\s*(include|open)\s+\w+\s*;\s*$";
+   S158 : aliased constant String := "^\s*(let|module|type)\s+\w*\s+=\s+";
+   S159 : aliased constant String := "^\s*(package(\s+[\w.]+)?\s+(\{|$)|import\"
        & "s+[\w.*]+\s*;|(.*?(intrinsic|extends))(intrinsic\s+)?class\s+[\w<>.]+("
        & "\s+extends\s+[\w<>.]+)?|((public|protected|private|static)\s+)*((var|c"
        & "onst|local)\s+\w+\s*:\s*[\w<>.]+(\s*=.*)?\s*;|function\s+\w+\s*\((\s*\"
        & "w+\s*:\s*[\w<>.]+\s*(,\s*\w+\s*:\s*[\w<>.]+\s*)*)?\)))";
-   S142 : aliased constant String := "^\s*(use\s+v6\b|\bmodule\b|\bmy\s+class\b"
+   S160 : aliased constant String := "^\s*(public\s+|private\s+|\s*)function\s+"
+       & "\w+\s*\([\w\s,]*\)\s*\{";
+   S161 : aliased constant String := "^\s*(use\s+v6\b|\bmodule\b|\bmy\s+class\b"
        & ")";
-   S143 : aliased constant String := "^\s*(using\s+[A-Z][\s\w.]+;|namespace\s*["
+   S162 : aliased constant String := "^\s*(using\s+[A-Z][\s\w.]+;|namespace\s*["
        & "\w\.]+\s*(\{|;)|\/\/)";
-   S144 : aliased constant String := "^\s*:-";
-   S145 : aliased constant String := "^\s*;";
-   S146 : aliased constant String := "^\s*<\?xml";
-   S147 : aliased constant String := "^\s*<\?xml\s+version";
-   S148 : aliased constant String := "^\s*BEGIN(\r?\n|\r)\s*MultiUse\s*=.*(\r?\"
+   S163 : aliased constant String := "^\s*(when)\s+(\(.+\))\s+->\s+\{";
+   S164 : aliased constant String := "^\s*:-";
+   S165 : aliased constant String := "^\s*;";
+   S166 : aliased constant String := "^\s*<\?xml";
+   S167 : aliased constant String := "^\s*<\?xml\s+version";
+   S168 : aliased constant String := "^\s*@moduledoc\s";
+   S169 : aliased constant String := "^\s*BEGIN(\r?\n|\r)\s*MultiUse\s*=.*(\r?\"
        & "n|\r)\s*Persistable\s*=";
-   S149 : aliased constant String := "^\s*Begin\s+VB\.Form\s+";
-   S150 : aliased constant String := "^\s*Begin\s+\{[0-9A-Z\-]*\}\s?";
-   S151 : aliased constant String := "^\s*\((defun|in-package|defpackage) ";
-   S152 : aliased constant String := "^\s*\(define ";
-   S153 : aliased constant String := "^\s*\.(include\s|globa?l\s|[A-Za-z][_A-Za"
+   S170 : aliased constant String := "^\s*Begin\s+VB\.Form\s+";
+   S171 : aliased constant String := "^\s*Begin\s+\{[0-9A-Z\-]*\}\s?";
+   S172 : aliased constant String := "^\s*MarkNativeAsOptional\s*\(";
+   S173 : aliased constant String := "^\s*\((defun|in-package|defpackage) ";
+   S174 : aliased constant String := "^\s*\(define ";
+   S175 : aliased constant String := "^\s*\.(include\s|globa?l\s|[A-Za-z][_A-Za"
        & "-z0-9]*:)";
-   S154 : aliased constant String := "^\s*\/\* XPM \*\/";
-   S155 : aliased constant String := "^\s*\\(NeedsTeXFormat|ProvidesClass)\{";
-   S156 : aliased constant String := "^\s*end[.;]";
-   S157 : aliased constant String := "^\s*package\s*[\w\.\/\*\s]*\s*\{";
-   S158 : aliased constant String := "^\s+\w+\s+=>\s";
-   S159 : aliased constant String := "^\t+.*?[^\s:].*?:";
-   S160 : aliased constant String := "^\w+\s*:\s*module\s*\{";
-   S161 : aliased constant String := "^\{\s*(application|'application')\s*,\s*("
+   S176 : aliased constant String := "^\s*\/\* XPM \*\/";
+   S177 : aliased constant String := "^\s*\\(NeedsTeXFormat|ProvidesClass)\{";
+   S178 : aliased constant String := "^\s*\w+\s*(,\s*\w+)*[:]\s*\w+\s";
+   S179 : aliased constant String := "^\s*\w+\s*(\(\s*\w+[:][^)]+\))?([:]\s*\w+"
+       & ")?(--.+\s+)*\s+(do|local)\s";
+   S180 : aliased constant String := "^\s*def(exception|impl|macro|module|proto"
+       & "col)[(\s]";
+   S181 : aliased constant String := "^\s*end[.;]";
+   S182 : aliased constant String := "^\s*end[.;]\s*$";
+   S183 : aliased constant String := "^\s*include\s*\(\s*(""|')[\\/\w\-\.:\s]+\"
+       & ".(nasl|inc)\s*(""|')\s*\)\s*;";
+   S184 : aliased constant String := "^\s*let\s+(module\s\w+\s*=\s*\{|\w+:\s+.*"
+       & "=.*;\s*$)";
+   S185 : aliased constant String := "^\s*module\s+type\s";
+   S186 : aliased constant String := "^\s*namespace\s+\w+\s*\{";
+   S187 : aliased constant String := "^\s*object\s+\w+\s*(extends\s+\w+(::\w+)?"
+       & ")?\s*\{";
+   S188 : aliased constant String := "^\s*package\s*[\w\.\/\*\s]*\s*\{";
+   S189 : aliased constant String := "^\s*template\s*<";
+   S190 : aliased constant String := "^\s+\w+\s+=>\s";
+   S191 : aliased constant String := "^\t+.*?[^\s:].*?:";
+   S192 : aliased constant String := "^\w+\s*:\s*module\s*\{";
+   S193 : aliased constant String := "^\{\s*(application|'application')\s*,\s*("
        & "[a-z]+[\w@]*|'[^']+')\s*,\s*\[(.|[\r\n])*\]\s*\}\.[ \t]*$";
-   S162 : aliased constant String := "^class";
-   S163 : aliased constant String := "^dnl|^divert\((-?\d+)?\)|^\w+\(`[^\r\n]*?"
+   S194 : aliased constant String := "^_?m4_";
+   S195 : aliased constant String := "^class";
+   S196 : aliased constant String := "^dnl|^divert\((-?\d+)?\)|^\w+\(`[^\r\n]*?"
        & "'[),]";
-   S164 : aliased constant String := "^import [A-Z]";
-   S165 : aliased constant String := "^import [a-z]";
-   S166 : aliased constant String := "^inherit(\s+[\w.-]+)+\s*$";
-   S167 : aliased constant String := "^loop_\s*$";
-   S168 : aliased constant String := "^module\s+[\w.]*\s*;|import\s+[\w\s,.:]*;"
+   S197 : aliased constant String := "^import [A-Z]";
+   S198 : aliased constant String := "^import [a-z]";
+   S199 : aliased constant String := "^inherit(\s+[\w.-]+)+\s*$";
+   S200 : aliased constant String := "^loop_\s*$";
+   S201 : aliased constant String := "^methodmap\s+\w+\s+<\s+\w+";
+   S202 : aliased constant String := "^module\s+[\w.]*\s*;|import\s+[\w\s,.:]*;"
        & "|\w+\s+\w+\s*\(.*\)(\(.*\))?\s*\{[^}]*\}|unittest\s*(\(.*\))?\s*\{[^}]"
        & "*\}";
-   S169 : aliased constant String := "^package\s+[A-Za-z_][A-Za-z0-9_']*(\s*\(|"
+   S203 : aliased constant String := "^package\s+[A-Za-z_][A-Za-z0-9_']*(\s*\(|"
        & "\s+where)";
-   S170 : aliased constant String := "^uses (java|gw)\.";
-   S171 : aliased constant String := "^xof 030(2|3)(txt|bin|tzip|bzip)\b";
-   S172 : aliased constant String := "flowop";
-   S173 : aliased constant String := "gap> ";
-   S174 : aliased constant String := "last_client=";
-   S175 : aliased constant String := "openapi:\s?'?""?3.[0-9.]+'?""?";
-   S176 : aliased constant String := "package\s+\w+|\b(im|ex)port\s*""[\w:./]+"
+   S204 : aliased constant String := "^public\s+(SharedPlugin(\s+|:)__pl_\w+\s*"
+       & "=(\s*\{)?|(void\s+)?__pl_\w+_SetNTVOptional\(\)(\s*\{)?)";
+   S205 : aliased constant String := "^s?plot\b";
+   S206 : aliased constant String := "^set\s+(term|terminal|out|output|[xy]tics"
+       & "|[xy]label|[xy]range|style)\b";
+   S207 : aliased constant String := "^uses (java|gw)\.";
+   S208 : aliased constant String := "^xof 030(2|3)(txt|bin|tzip|bzip)\b";
+   S209 : aliased constant String := "flowop";
+   S210 : aliased constant String := "gap> ";
+   S211 : aliased constant String := "last_client=";
+   S212 : aliased constant String := "openapi:\s?'?""?3.[0-9.]+'?""?";
+   S213 : aliased constant String := "package\s+\w+|\b(im|ex)port\s*""[\w:./]+"
        & """|\w+\s*::\s*(proc|struct)\s*\(|^\s*//\s";
-   S177 : aliased constant String := "swagger:\s?'?""?2.[0-9.]+'?""?";
-   S178 : aliased constant String := "tag:unity3d.com";
-   S179 : aliased constant String := "<UTIL.BEANS.OBJECTS.VECTORS.VECTOR_BEAN>";
-   S180 : aliased constant String := "AGS Script";
-   S181 : aliased constant String := "AL";
-   S182 : aliased constant String := "ActionScript";
-   S183 : aliased constant String := "Adblock Filter List";
-   S184 : aliased constant String := "AsciiDoc";
-   S185 : aliased constant String := "Asymptote";
-   S186 : aliased constant String := "BASIC";
-   S187 : aliased constant String := "Beef";
-   S188 : aliased constant String := "Bikeshed";
-   S189 : aliased constant String := "BitBake";
-   S190 : aliased constant String := "BlitzBasic";
-   S191 : aliased constant String := "Bluespec BH";
-   S192 : aliased constant String := "Brainfuck";
-   S193 : aliased constant String := "BrighterScript";
-   S194 : aliased constant String := "C";
-   S195 : aliased constant String := "C#";
-   S196 : aliased constant String := "C++";
-   S197 : aliased constant String := "CWeb";
-   S198 : aliased constant String := "Clojure";
-   S199 : aliased constant String := "Common Lisp";
-   S200 : aliased constant String := "Cool";
-   S201 : aliased constant String := "Coq";
-   S202 : aliased constant String := "D";
-   S203 : aliased constant String := "DTrace";
-   S204 : aliased constant String := "DirectX 3D File";
-   S205 : aliased constant String := "E";
-   S206 : aliased constant String := "ECL";
-   S207 : aliased constant String := "ECLiPSe";
-   S208 : aliased constant String := "Ecmarkup";
-   S209 : aliased constant String := "Eiffel";
-   S210 : aliased constant String := "Elixir";
-   S211 : aliased constant String := "Erlang";
-   S212 : aliased constant String := "Euphoria";
-   S213 : aliased constant String := "F#";
-   S214 : aliased constant String := "Faust";
-   S215 : aliased constant String := "Filebench WML";
-   S216 : aliased constant String := "Filterscript";
-   S217 : aliased constant String := "Fluent";
-   S218 : aliased constant String := "Forth";
-   S219 : aliased constant String := "Fortran";
-   S220 : aliased constant String := "FreeBasic";
-   S221 : aliased constant String := "FreeMarker";
-   S222 : aliased constant String := "Frege";
-   S223 : aliased constant String := "G-code";
-   S224 : aliased constant String := "GAP";
-   S225 : aliased constant String := "GCC Machine Description";
-   S226 : aliased constant String := "GDScript";
-   S227 : aliased constant String := "GLSL";
-   S228 : aliased constant String := "GSC";
-   S229 : aliased constant String := "Game Maker Language";
-   S230 : aliased constant String := "Genie";
-   S231 : aliased constant String := "Gerber Image";
-   S232 : aliased constant String := "Glimmer TS";
-   S233 : aliased constant String := "Gnuplot";
-   S234 : aliased constant String := "Gosu";
-   S235 : aliased constant String := "Graph Modeling Language";
-   S236 : aliased constant String := "HTML";
-   S237 : aliased constant String := "Hack";
-   S238 : aliased constant String := "HiveQL";
-   S239 : aliased constant String := "HyPhy";
-   S240 : aliased constant String := "IDL";
-   S241 : aliased constant String := "INI";
-   S242 : aliased constant String := "JSON";
-   S243 : aliased constant String := "Java Properties";
-   S244 : aliased constant String := "Java Server Pages";
-   S245 : aliased constant String := "JavaScript";
-   S246 : aliased constant String := "Kusto";
-   S247 : aliased constant String := "LTspice Symbol";
-   S248 : aliased constant String := "Lean";
-   S249 : aliased constant String := "Lean 4";
-   S250 : aliased constant String := "Lex";
-   S251 : aliased constant String := "Limbo";
-   S252 : aliased constant String := "Linker Script";
-   S253 : aliased constant String := "LiveScript";
-   S254 : aliased constant String := "Logos";
-   S255 : aliased constant String := "LoomScript";
-   S256 : aliased constant String := "M";
-   S257 : aliased constant String := "M4";
-   S258 : aliased constant String := "M4Sugar";
-   S259 : aliased constant String := "MATLAB";
-   S260 : aliased constant String := "MAXScript";
-   S261 : aliased constant String := "MUF";
-   S262 : aliased constant String := "Makefile";
-   S263 : aliased constant String := "Markdown";
-   S264 : aliased constant String := "Mathematica";
-   S265 : aliased constant String := "Mercury";
-   S266 : aliased constant String := "Microsoft Developer Studio Project";
-   S267 : aliased constant String := "MiniYAML";
-   S268 : aliased constant String := "Modula-2";
-   S269 : aliased constant String := "Mojo";
-   S270 : aliased constant String := "Monkey C";
-   S271 : aliased constant String := "Motorola 68K Assembly";
-   S272 : aliased constant String := "NASL";
-   S273 : aliased constant String := "NL";
-   S274 : aliased constant String := "Nemerle";
-   S275 : aliased constant String := "NewLisp";
-   S276 : aliased constant String := "Nu";
-   S277 : aliased constant String := "Nushell";
-   S278 : aliased constant String := "OASv2-json";
-   S279 : aliased constant String := "OASv2-yaml";
-   S280 : aliased constant String := "OASv3-json";
-   S281 : aliased constant String := "OASv3-yaml";
-   S282 : aliased constant String := "OCaml";
-   S283 : aliased constant String := "Object Data Instance Notation";
-   S284 : aliased constant String := "ObjectScript";
-   S285 : aliased constant String := "Objective-C";
-   S286 : aliased constant String := "Odin";
-   S287 : aliased constant String := "OpenCL";
-   S288 : aliased constant String := "OpenEdge ABL";
-   S289 : aliased constant String := "OpenStep Property List";
-   S290 : aliased constant String := "PHP";
-   S291 : aliased constant String := "PLSQL";
-   S292 : aliased constant String := "PLpgSQL";
-   S293 : aliased constant String := "POV-Ray SDL";
-   S294 : aliased constant String := "Pascal";
-   S295 : aliased constant String := "Perl";
-   S296 : aliased constant String := "PicoLisp";
-   S297 : aliased constant String := "Pod";
-   S298 : aliased constant String := "Pod 6";
-   S299 : aliased constant String := "Proguard";
-   S300 : aliased constant String := "Prolog";
-   S301 : aliased constant String := "Public Key";
-   S302 : aliased constant String := "Puppet";
-   S303 : aliased constant String := "Python";
-   S304 : aliased constant String := "Q#";
-   S305 : aliased constant String := "QMake";
-   S306 : aliased constant String := "Qt Script";
-   S307 : aliased constant String := "R";
-   S308 : aliased constant String := "RPC";
-   S309 : aliased constant String := "RUNOFF";
-   S310 : aliased constant String := "Raku";
-   S311 : aliased constant String := "ReScript";
-   S312 : aliased constant String := "Reason";
-   S313 : aliased constant String := "Rebol";
-   S314 : aliased constant String := "Ren'Py";
-   S315 : aliased constant String := "RenderScript";
-   S316 : aliased constant String := "Rez";
-   S317 : aliased constant String := "Roff";
-   S318 : aliased constant String := "Roff Manpage";
-   S319 : aliased constant String := "Rust";
-   S320 : aliased constant String := "SQL";
-   S321 : aliased constant String := "SQLPL";
-   S322 : aliased constant String := "STAR";
-   S323 : aliased constant String := "STL";
-   S324 : aliased constant String := "SWIG";
-   S325 : aliased constant String := "Scala";
-   S326 : aliased constant String := "Scilab";
-   S327 : aliased constant String := "Slice";
-   S328 : aliased constant String := "Smalltalk";
-   S329 : aliased constant String := "Solidity";
-   S330 : aliased constant String := "SourcePawn";
-   S331 : aliased constant String := "Standard ML";
-   S332 : aliased constant String := "Starlark";
-   S333 : aliased constant String := "StringTemplate";
-   S334 : aliased constant String := "SubRip Text";
-   S335 : aliased constant String := "SuperCollider";
-   S336 : aliased constant String := "Sway";
-   S337 : aliased constant String := "TL-Verilog";
-   S338 : aliased constant String := "TSQL";
-   S339 : aliased constant String := "TSX";
-   S340 : aliased constant String := "TeX";
-   S341 : aliased constant String := "Text";
-   S342 : aliased constant String := "Turing";
-   S343 : aliased constant String := "TypeScript";
-   S344 : aliased constant String := "Typst";
-   S345 : aliased constant String := "Unity3D Asset";
-   S346 : aliased constant String := "Unix Assembly";
-   S347 : aliased constant String := "V";
-   S348 : aliased constant String := "VBA";
-   S349 : aliased constant String := "Verilog";
-   S350 : aliased constant String := "Vim Help File";
-   S351 : aliased constant String := "Vim Script";
-   S352 : aliased constant String := "Visual Basic 6.0";
-   S353 : aliased constant String := "Win32 Message File";
-   S354 : aliased constant String := "World of Warcraft Addon Data";
-   S355 : aliased constant String := "X PixMap";
-   S356 : aliased constant String := "XML";
-   S357 : aliased constant String := "XML Property List";
-   S358 : aliased constant String := "YAML";
-   S359 : aliased constant String := "Yacc";
-   S360 : aliased constant String := "q";
-   S361 : aliased constant String := "xBase";
+   S214 : aliased constant String := "swagger:\s?'?""?2.[0-9.]+'?""?";
+   S215 : aliased constant String := "tag:unity3d.com";
+   S216 : aliased constant String := "<UTIL.BEANS.OBJECTS.VECTORS.VECTOR_BEAN>";
+   S217 : aliased constant String := "AGS Script";
+   S218 : aliased constant String := "AL";
+   S219 : aliased constant String := "ActionScript";
+   S220 : aliased constant String := "Adblock Filter List";
+   S221 : aliased constant String := "AsciiDoc";
+   S222 : aliased constant String := "Asymptote";
+   S223 : aliased constant String := "BASIC";
+   S224 : aliased constant String := "Beef";
+   S225 : aliased constant String := "Bikeshed";
+   S226 : aliased constant String := "BitBake";
+   S227 : aliased constant String := "BlitzBasic";
+   S228 : aliased constant String := "Bluespec BH";
+   S229 : aliased constant String := "Brainfuck";
+   S230 : aliased constant String := "BrighterScript";
+   S231 : aliased constant String := "C";
+   S232 : aliased constant String := "C#";
+   S233 : aliased constant String := "C++";
+   S234 : aliased constant String := "CWeb";
+   S235 : aliased constant String := "Clojure";
+   S236 : aliased constant String := "Common Lisp";
+   S237 : aliased constant String := "Cool";
+   S238 : aliased constant String := "Coq";
+   S239 : aliased constant String := "D";
+   S240 : aliased constant String := "DTrace";
+   S241 : aliased constant String := "DirectX 3D File";
+   S242 : aliased constant String := "E";
+   S243 : aliased constant String := "ECL";
+   S244 : aliased constant String := "ECLiPSe";
+   S245 : aliased constant String := "Ecmarkup";
+   S246 : aliased constant String := "Eiffel";
+   S247 : aliased constant String := "Elixir";
+   S248 : aliased constant String := "Erlang";
+   S249 : aliased constant String := "Euphoria";
+   S250 : aliased constant String := "F#";
+   S251 : aliased constant String := "Faust";
+   S252 : aliased constant String := "Filebench WML";
+   S253 : aliased constant String := "Filterscript";
+   S254 : aliased constant String := "Fluent";
+   S255 : aliased constant String := "Forth";
+   S256 : aliased constant String := "Fortran";
+   S257 : aliased constant String := "FreeBasic";
+   S258 : aliased constant String := "FreeMarker";
+   S259 : aliased constant String := "Frege";
+   S260 : aliased constant String := "G-code";
+   S261 : aliased constant String := "GAP";
+   S262 : aliased constant String := "GCC Machine Description";
+   S263 : aliased constant String := "GDScript";
+   S264 : aliased constant String := "GLSL";
+   S265 : aliased constant String := "GSC";
+   S266 : aliased constant String := "Game Maker Language";
+   S267 : aliased constant String := "Genie";
+   S268 : aliased constant String := "Gerber Image";
+   S269 : aliased constant String := "Glimmer TS";
+   S270 : aliased constant String := "Gnuplot";
+   S271 : aliased constant String := "Gosu";
+   S272 : aliased constant String := "Graph Modeling Language";
+   S273 : aliased constant String := "HTML";
+   S274 : aliased constant String := "Hack";
+   S275 : aliased constant String := "HiveQL";
+   S276 : aliased constant String := "HyPhy";
+   S277 : aliased constant String := "IDL";
+   S278 : aliased constant String := "INI";
+   S279 : aliased constant String := "JSON";
+   S280 : aliased constant String := "Java Properties";
+   S281 : aliased constant String := "Java Server Pages";
+   S282 : aliased constant String := "JavaScript";
+   S283 : aliased constant String := "Kusto";
+   S284 : aliased constant String := "LTspice Symbol";
+   S285 : aliased constant String := "Lean";
+   S286 : aliased constant String := "Lean 4";
+   S287 : aliased constant String := "Lex";
+   S288 : aliased constant String := "Limbo";
+   S289 : aliased constant String := "Linker Script";
+   S290 : aliased constant String := "LiveScript";
+   S291 : aliased constant String := "Logos";
+   S292 : aliased constant String := "LoomScript";
+   S293 : aliased constant String := "M";
+   S294 : aliased constant String := "M4";
+   S295 : aliased constant String := "M4Sugar";
+   S296 : aliased constant String := "MATLAB";
+   S297 : aliased constant String := "MAXScript";
+   S298 : aliased constant String := "MUF";
+   S299 : aliased constant String := "Makefile";
+   S300 : aliased constant String := "Markdown";
+   S301 : aliased constant String := "Mathematica";
+   S302 : aliased constant String := "Mercury";
+   S303 : aliased constant String := "Microsoft Developer Studio Project";
+   S304 : aliased constant String := "MiniYAML";
+   S305 : aliased constant String := "Modula-2";
+   S306 : aliased constant String := "Mojo";
+   S307 : aliased constant String := "Monkey C";
+   S308 : aliased constant String := "Motorola 68K Assembly";
+   S309 : aliased constant String := "NASL";
+   S310 : aliased constant String := "NL";
+   S311 : aliased constant String := "Nemerle";
+   S312 : aliased constant String := "NewLisp";
+   S313 : aliased constant String := "Nu";
+   S314 : aliased constant String := "Nushell";
+   S315 : aliased constant String := "OASv2-json";
+   S316 : aliased constant String := "OASv2-yaml";
+   S317 : aliased constant String := "OASv3-json";
+   S318 : aliased constant String := "OASv3-yaml";
+   S319 : aliased constant String := "OCaml";
+   S320 : aliased constant String := "Object Data Instance Notation";
+   S321 : aliased constant String := "ObjectScript";
+   S322 : aliased constant String := "Objective-C";
+   S323 : aliased constant String := "Odin";
+   S324 : aliased constant String := "OpenCL";
+   S325 : aliased constant String := "OpenEdge ABL";
+   S326 : aliased constant String := "OpenStep Property List";
+   S327 : aliased constant String := "PHP";
+   S328 : aliased constant String := "PLSQL";
+   S329 : aliased constant String := "PLpgSQL";
+   S330 : aliased constant String := "POV-Ray SDL";
+   S331 : aliased constant String := "Pascal";
+   S332 : aliased constant String := "Perl";
+   S333 : aliased constant String := "PicoLisp";
+   S334 : aliased constant String := "Pod";
+   S335 : aliased constant String := "Pod 6";
+   S336 : aliased constant String := "Proguard";
+   S337 : aliased constant String := "Prolog";
+   S338 : aliased constant String := "Public Key";
+   S339 : aliased constant String := "Puppet";
+   S340 : aliased constant String := "Python";
+   S341 : aliased constant String := "Q#";
+   S342 : aliased constant String := "QMake";
+   S343 : aliased constant String := "Qt Script";
+   S344 : aliased constant String := "R";
+   S345 : aliased constant String := "RPC";
+   S346 : aliased constant String := "RUNOFF";
+   S347 : aliased constant String := "Raku";
+   S348 : aliased constant String := "ReScript";
+   S349 : aliased constant String := "Reason";
+   S350 : aliased constant String := "Rebol";
+   S351 : aliased constant String := "Ren'Py";
+   S352 : aliased constant String := "RenderScript";
+   S353 : aliased constant String := "Rez";
+   S354 : aliased constant String := "Roff";
+   S355 : aliased constant String := "Roff Manpage";
+   S356 : aliased constant String := "Rust";
+   S357 : aliased constant String := "SQL";
+   S358 : aliased constant String := "SQLPL";
+   S359 : aliased constant String := "STAR";
+   S360 : aliased constant String := "STL";
+   S361 : aliased constant String := "SWIG";
+   S362 : aliased constant String := "Scala";
+   S363 : aliased constant String := "Scilab";
+   S364 : aliased constant String := "Slice";
+   S365 : aliased constant String := "Smalltalk";
+   S366 : aliased constant String := "Solidity";
+   S367 : aliased constant String := "SourcePawn";
+   S368 : aliased constant String := "Standard ML";
+   S369 : aliased constant String := "Starlark";
+   S370 : aliased constant String := "StringTemplate";
+   S371 : aliased constant String := "SubRip Text";
+   S372 : aliased constant String := "SuperCollider";
+   S373 : aliased constant String := "Sway";
+   S374 : aliased constant String := "TL-Verilog";
+   S375 : aliased constant String := "TSQL";
+   S376 : aliased constant String := "TSX";
+   S377 : aliased constant String := "TeX";
+   S378 : aliased constant String := "Text";
+   S379 : aliased constant String := "Turing";
+   S380 : aliased constant String := "TypeScript";
+   S381 : aliased constant String := "Typst";
+   S382 : aliased constant String := "Unity3D Asset";
+   S383 : aliased constant String := "Unix Assembly";
+   S384 : aliased constant String := "V";
+   S385 : aliased constant String := "VBA";
+   S386 : aliased constant String := "Verilog";
+   S387 : aliased constant String := "Vim Help File";
+   S388 : aliased constant String := "Vim Script";
+   S389 : aliased constant String := "Visual Basic 6.0";
+   S390 : aliased constant String := "Win32 Message File";
+   S391 : aliased constant String := "World of Warcraft Addon Data";
+   S392 : aliased constant String := "X PixMap";
+   S393 : aliased constant String := "XML";
+   S394 : aliased constant String := "XML Property List";
+   S395 : aliased constant String := "YAML";
+   S396 : aliased constant String := "Yacc";
+   S397 : aliased constant String := "q";
+   S398 : aliased constant String := "xBase";
 
    Strings : aliased constant String_Array_Access := (
       S1'Access, S2'Access, S3'Access, S4'Access,
@@ -546,7 +598,16 @@ private
       S349'Access, S350'Access, S351'Access, S352'Access,
       S353'Access, S354'Access, S355'Access, S356'Access,
       S357'Access, S358'Access, S359'Access, S360'Access,
-      S361'Access);
+      S361'Access, S362'Access, S363'Access, S364'Access,
+      S365'Access, S366'Access, S367'Access, S368'Access,
+      S369'Access, S370'Access, S371'Access, S372'Access,
+      S373'Access, S374'Access, S375'Access, S376'Access,
+      S377'Access, S378'Access, S379'Access, S380'Access,
+      S381'Access, S382'Access, S383'Access, S384'Access,
+      S385'Access, S386'Access, S387'Access, S388'Access,
+      S389'Access, S390'Access, S391'Access, S392'Access,
+      S393'Access, S394'Access, S395'Access, S396'Access,
+      S397'Access, S398'Access);
 
    Ext_1 : aliased constant String := ".1";
    Ext_2 : aliased constant String := ".1in";
@@ -679,351 +740,420 @@ private
    Ext_129 : aliased constant String := ".yy";
 
    Rules : aliased constant Rule_Array := (
-      1 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      2 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      3 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      4 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      5 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      6 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      7 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      8 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      9 => (RULE_MATCH, 0, (0, 0), 119, 317),
-      10 => (RULE_MATCH, 0, (0, 0), 61, 181),
-      11 => (RULE_MATCH, 0, (0, 0), 161, 211),
-      12 => (RULE_MATCH, 0, (0, 0), 141, 182),
-      13 => (RULE_MATCH, 0, (0, 0), 77, 301),
-      14 => (RULE_MATCH, 0, (0, 0), 109, 184),
-      15 => (RULE_MATCH, 0, (0, 0), 83, 180),
-      16 => (RULE_MATCH, 0, (0, 0), 98, 247),
-      17 => (RULE_MATCH, 0, (0, 0), 101, 220),
-      18 => (RULE_MATCH, 0, (0, 0), 59, 186),
-      19 => (RULE_MATCH, 0, (0, 0), 10, 190),
-      20 => (RULE_MATCH, 0, (0, 0), 74, 189),
-      21 => (RULE_MATCH, 0, (0, 0), 51, 198),
-      22 => (RULE_MATCH, 0, (0, 0), 32, 187),
-      23 => (RULE_MATCH, 0, (0, 0), 39, 239),
-      24 => (RULE_MATCH, 0, (0, 0), 11, 192),
-      25 => (RULE_MATCH, 0, (0, 0), 100, 220),
-      26 => (RULE_MATCH, 0, (0, 0), 81, 188),
-      27 => (RULE_MATCH, 0, (0, 0), 39, 193),
-      28 => (RULE_MATCH, 0, (0, 0), 169, 191),
-      29 => (RULE_MATCH, 0, (0, 0), 85, 356),
-      30 => (RULE_MATCH, 0, (0, 0), 127, 361),
-      31 => (RULE_MATCH, 0, (0, 0), 151, 199),
-      32 => (RULE_MATCH, 0, (0, 0), 162, 200),
-      33 => (RULE_MATCH, 0, (0, 0), 55, 287),
-      34 => (RULE_MATCH, 0, (0, 0), 148, 352),
-      35 => (RULE_MATCH, 0, (0, 0), 155, 340),
-      36 => (RULE_MATCH, 0, (0, 0), 96, 284),
-      37 => (RULE_MATCH, 0, (0, 0), 111, 231),
-      38 => (RULE_MATCH, 0, (0, 0), 1, 328),
-      39 => (RULE_MATCH, 0, (0, 0), 143, 195),
-      40 => (RULE_MATCH, 0, (0, 0), 23, 356),
-      41 => (RULE_MATCH, 0, (0, 0), 29, 246),
-      42 => (RULE_MATCH, 0, (0, 0), 168, 202),
-      43 => (RULE_MATCH, 0, (0, 0), 86, 203),
-      44 => (RULE_MATCH, 0, (0, 0), 15, 262),
-      45 => (RULE_MATCH, 0, (0, 0), 4, 266),
-      46 => (RULE_MATCH, 0, (0, 0), 65, 214),
-      47 => (RULE_MATCH, 0, (0, 0), 39, 205),
-      48 => (RULE_MATCH, 0, (0, 0), 39, 209),
-      49 => (RULE_MATCH, 0, (0, 0), 116, 207),
-      50 => (RULE_MATCH, 0, (0, 0), 34, 206),
-      51 => (RULE_MATCH, 0, (0, 0), 132, 211),
-      52 => (RULE_MATCH, 0, (0, 0), 56, 245),
-      53 => (RULE_MATCH, 0, (0, 0), 39, 210),
-      54 => (RULE_MATCH, 0, (0, 0), 93, 218),
-      55 => (RULE_MATCH, 0, (0, 0), 172, 215),
-      56 => (RULE_MATCH, 0, (0, 0), 93, 218),
-      57 => (RULE_MATCH, 0, (0, 0), 78, 218),
-      58 => (RULE_MATCH, 0, (0, 0), 140, 222),
-      59 => (RULE_MATCH, 0, (0, 0), 150, 348),
-      60 => (RULE_MATCH, 0, (0, 0), 149, 352),
-      61 => (RULE_MATCH, 0, (0, 0), 79, 218),
-      62 => (RULE_MATCH, 0, (0, 0), 130, 213),
-      63 => (RULE_MATCH, 0, (0, 0), 131, 227),
-      64 => (RULE_MATCH, 0, (0, 0), 5, 216),
-      65 => (RULE_MATCH, 0, (0, 0), 82, 221),
-      66 => (RULE_MATCH, 0, (0, 0), 92, 217),
-      67 => (RULE_MATCH, 0, (0, 0), 67, 224),
-      68 => (RULE_MATCH, 0, (0, 0), 112, 223),
-      69 => (RULE_MATCH, 0, (0, 0), 66, 224),
-      70 => (RULE_MATCH, 0, (0, 0), 68, 226),
-      71 => (RULE_MATCH, 0, (0, 0), 23, 356),
-      72 => (RULE_MATCH, 0, (0, 0), 24, 235),
-      73 => (RULE_MATCH, 0, (0, 0), 110, 231),
-      74 => (RULE_MATCH, 0, (0, 0), 72, 227),
-      75 => (RULE_MATCH, 0, (0, 0), 170, 234),
-      76 => (RULE_MATCH, 0, (0, 0), 123, 230),
-      77 => (RULE_MATCH, 0, (0, 0), 97, 231),
-      78 => (RULE_MATCH, 0, (0, 0), 41, 237),
-      79 => (RULE_MATCH, 0, (0, 0), 42, 208),
-      80 => (RULE_MATCH, 0, (0, 0), 102, 324),
-      81 => (RULE_MATCH, 0, (0, 0), 58, 242),
-      82 => (RULE_MATCH, 0, (0, 0), 94, 290),
-      83 => (RULE_MATCH, 0, (0, 0), 39, 330),
-      84 => (RULE_MATCH, 0, (0, 0), 39, 272),
-      85 => (RULE_MATCH, 0, (0, 0), 126, 293),
-      86 => (RULE_MATCH, 0, (0, 0), 39, 294),
-      87 => (RULE_MATCH, 0, (0, 0), 166, 189),
-      88 => (RULE_MATCH, 0, (0, 0), 3, 278),
-      89 => (RULE_MATCH, 0, (0, 0), 2, 280),
-      90 => (RULE_MATCH, 0, (0, 0), 53, 199),
-      91 => (RULE_MATCH, 0, (0, 0), 75, 250),
-      92 => (RULE_MATCH, 0, (0, 0), 120, 317),
-      93 => (RULE_MATCH, 0, (0, 0), 118, 296),
-      94 => (RULE_MATCH, 0, (0, 0), 165, 248),
-      95 => (RULE_MATCH, 0, (0, 0), 164, 249),
-      96 => (RULE_MATCH, 0, (0, 0), 151, 199),
-      97 => (RULE_MATCH, 0, (0, 0), 152, 275),
-      98 => (RULE_MATCH, 0, (0, 0), 157, 255),
-      99 => (RULE_MATCH, 0, (0, 0), 151, 199),
-      100 => (RULE_MATCH, 0, (0, 0), 152, 275),
-      101 => (RULE_MATCH, 0, (0, 0), 33, 265),
-      102 => (RULE_MATCH, 0, (0, 0), 93, 261),
-      103 => (RULE_MATCH, 0, (0, 0), 145, 256),
-      104 => (RULE_MATCH_AND, 0, (0, 0), 52, 264),
-      105 => (RULE_MATCH, 0, (0, 0), 54, 264),
-      106 => (RULE_MATCH, 0, (0, 0), 128, 259),
-      107 => (RULE_MATCH, 0, (0, 0), 160, 251),
-      108 => (RULE_MATCH, 0, (0, 0), 39, 258),
-      109 => (RULE_MATCH, 0, (0, 0), 178, 345),
-      110 => (RULE_MATCH, 0, (0, 0), 103, 353),
-      111 => (RULE_MATCH, 0, (0, 0), 163, 257),
-      112 => (RULE_MATCH, 0, (0, 0), 63, 270),
-      113 => (RULE_MATCH, 0, (0, 0), 39, 263),
-      114 => (RULE_MATCH, 0, (0, 0), 80, 225),
-      115 => (RULE_MATCH, 0, (0, 0), 28, 282),
-      116 => (RULE_MATCH, 0, (0, 0), 43, 331),
-      117 => (RULE_MATCH, 0, (0, 0), 35, 356),
-      118 => (RULE_MATCH, 0, (0, 0), 135, 268),
-      119 => (RULE_MATCH, 0, (0, 0), 136, 269),
-      120 => (RULE_MATCH, 0, (0, 0), 146, 356),
-      121 => (RULE_MATCH, 0, (0, 0), 107, 317),
-      122 => (RULE_MATCH, 0, (0, 0), 153, 346),
-      123 => (RULE_MATCH, 0, (0, 0), 106, 317),
-      124 => (RULE_MATCH, 0, (0, 0), 89, 274),
-      125 => (RULE_MATCH, 0, (0, 0), 147, 356),
-      126 => (RULE_MATCH, 0, (0, 0), 111, 231),
-      127 => (RULE_MATCH, 0, (0, 0), 47, 341),
-      128 => (RULE_MATCH, 0, (0, 0), 87, 273),
-      129 => (RULE_MATCH, 0, (0, 0), 139, 277),
-      130 => (RULE_MATCH, 0, (0, 0), 30, 283),
-      131 => (RULE_MATCH, 0, (0, 0), 176, 286),
-      132 => (RULE_MATCH, 0, (0, 0), 39, 233),
-      133 => (RULE_MATCH, 0, (0, 0), 41, 237),
-      134 => (RULE_MATCH, 0, (0, 0), 40, 290),
-      135 => (RULE_MATCH, 0, (0, 0), 115, 300),
-      136 => (RULE_MATCH, 0, (0, 0), 134, 357),
-      137 => (RULE_MATCH, 0, (0, 0), 144, 300),
-      138 => (RULE_MATCH, 0, (0, 0), 154, 355),
-      139 => (RULE_MATCH, 0, (0, 0), 113, 298),
-      140 => (RULE_MATCH, 0, (0, 0), 156, 294),
-      141 => (RULE_MATCH, 0, (0, 0), 158, 302),
-      142 => (RULE_MATCH, 0, (0, 0), 91, 299),
-      143 => (RULE_MATCH, 0, (0, 0), 117, 300),
-      144 => (RULE_MATCH, 0, (0, 0), 174, 241),
-      145 => (RULE_MATCH_AND, 0, (0, 0), 44, 305),
-      146 => (RULE_MATCH, 0, (0, 0), 46, 305),
-      147 => (RULE_MATCH, 0, (0, 0), 137, 240),
-      148 => (RULE_MATCH, 0, (0, 0), 108, 241),
-      149 => (RULE_MATCH, 0, (0, 0), 105, 243),
-      150 => (RULE_MATCH, 0, (0, 0), 114, 243),
-      151 => (RULE_MATCH, 0, (0, 0), 8, 360),
-      152 => (RULE_MATCH, 0, (0, 0), 14, 238),
-      153 => (RULE_MATCH, 0, (0, 0), 76, 304),
-      154 => (RULE_MATCH, 0, (0, 0), 20, 306),
-      155 => (RULE_MATCH, 0, (0, 0), 19, 313),
-      156 => (RULE_MATCH, 0, (0, 0), 7, 316),
-      157 => (RULE_MATCH, 0, (0, 0), 37, 307),
-      158 => (RULE_MATCH, 0, (0, 0), 39, 312),
-      159 => (RULE_MATCH, 0, (0, 0), 39, 196),
-      160 => (RULE_MATCH, 0, (0, 0), 39, 311),
-      161 => (RULE_MATCH, 0, (0, 0), 21, 309),
-      162 => (RULE_MATCH, 0, (0, 0), 121, 317),
-      163 => (RULE_MATCH, 0, (0, 0), 88, 303),
-      164 => (RULE_MATCH, 0, (0, 0), 90, 319),
-      165 => (RULE_MATCH, 0, (0, 0), 5, 315),
-      166 => (RULE_MATCH, 0, (0, 0), 146, 356),
-      167 => (RULE_MATCH, 0, (0, 0), 18, 335),
-      168 => (RULE_MATCH, 0, (0, 0), 27, 325),
-      169 => (RULE_MATCH, 0, (0, 0), 17, 335),
-      170 => (RULE_MATCH, 0, (0, 0), 71, 263),
-      171 => (RULE_MATCH, 0, (0, 0), 64, 329),
-      172 => (RULE_MATCH, 0, (0, 0), 111, 231),
-      173 => (RULE_MATCH, 0, (0, 0), 22, 292),
-      174 => (RULE_MATCH, 0, (0, 0), 13, 321),
-      175 => (RULE_MATCH, 0, (0, 0), 16, 291),
-      176 => (RULE_MATCH, 0, (0, 0), 26, 338),
-      177 => (RULE_MATCH, 0, (0, 0), 84, 334),
-      178 => (RULE_MATCH, 0, (0, 0), 50, 333),
-      179 => (RULE_MATCH, 0, (0, 0), 57, 328),
-      180 => (RULE_MATCH, 0, (0, 0), 167, 322),
-      181 => (RULE_MATCH, 0, (0, 0), 60, 323),
-      182 => (RULE_MATCH, 0, (0, 0), 133, 336),
-      183 => (RULE_MATCH, 0, (0, 0), 147, 356),
-      184 => (RULE_MATCH, 0, (0, 0), 142, 310),
-      185 => (RULE_MATCH, 0, (0, 0), 129, 342),
-      186 => (RULE_MATCH, 0, (0, 0), 36, 244),
-      187 => (RULE_MATCH, 0, (0, 0), 125, 337),
-      188 => (RULE_MATCH, 0, (0, 0), 69, 354),
-      189 => (RULE_MATCH, 0, (0, 0), 124, 340),
-      190 => (RULE_MATCH, 0, (0, 0), 38, 356),
-      191 => (RULE_MATCH, 0, (0, 0), 173, 224),
-      192 => (RULE_MATCH, 0, (0, 0), 138, 339),
-      193 => (RULE_MATCH, 0, (0, 0), 25, 356),
-      194 => (RULE_MATCH, 0, (0, 0), 9, 350),
-      195 => (RULE_MATCH, 0, (0, 0), 12, 183),
-      196 => (RULE_MATCH, 0, (0, 0), 70, 344),
-      197 => (RULE_MATCH, 0, (0, 0), 122, 241),
-      198 => (RULE_MATCH, 0, (0, 0), 31, 201),
-      199 => (RULE_MATCH, 0, (0, 0), 104, 349),
-      200 => (RULE_MATCH, 0, (0, 0), 49, 347),
-      201 => (RULE_MATCH, 0, (0, 0), 99, 351),
-      202 => (RULE_MATCH, 0, (0, 0), 6, 288),
-      203 => (RULE_MATCH, 0, (0, 0), 95, 197),
-      204 => (RULE_MATCH, 0, (0, 0), 171, 204),
-      205 => (RULE_MATCH, 0, (0, 0), 62, 308),
-      206 => (RULE_MATCH, 0, (0, 0), 73, 254),
-      207 => (RULE_MATCH, 0, (0, 0), 45, 252),
-      208 => (RULE_MATCH, 0, (0, 0), 159, 267),
-      209 => (RULE_MATCH, 0, (0, 0), 177, 279),
-      210 => (RULE_MATCH, 0, (0, 0), 175, 281),
-      211 => (RULE_MATCH, 0, (0, 0), 159, 267),
-      212 => (RULE_MATCH, 0, (0, 0), 177, 279),
-      213 => (RULE_MATCH, 0, (0, 0), 175, 281),
-      214 => (RULE_MATCH, 0, (0, 0), 48, 242));
+      1 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      2 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      3 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      4 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      5 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      6 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      7 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      8 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      9 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      10 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      11 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      12 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      13 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      14 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      15 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      16 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      17 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      18 => (RULE_MATCH, 0, (0, 0), 128, 354),
+      19 => (RULE_SUCCESS, 0, (0, 0), 0, 218),
+      20 => (RULE_SUCCESS, 0, (0, 0), 0, 332),
+      21 => (RULE_MATCH, 0, (0, 0), 193, 248),
+      22 => (RULE_MATCH, 0, (0, 0), 159, 219),
+      23 => (RULE_MATCH, 0, (0, 0), 86, 338),
+      24 => (RULE_MATCH, 0, (0, 0), 118, 221),
+      25 => (RULE_MATCH, 0, (0, 0), 92, 217),
+      26 => (RULE_MATCH, 0, (0, 0), 107, 284),
+      27 => (RULE_SUCCESS, 0, (0, 0), 0, 222),
+      28 => (RULE_MATCH, 0, (0, 0), 110, 257),
+      29 => (RULE_MATCH, 0, (0, 0), 66, 223),
+      30 => (RULE_MATCH, 0, (0, 0), 10, 227),
+      31 => (RULE_MATCH, 0, (0, 0), 83, 226),
+      32 => (RULE_MATCH, 0, (0, 0), 58, 235),
+      33 => (RULE_MATCH, 0, (0, 0), 39, 224),
+      34 => (RULE_MATCH_AND, 0, (0, 0), 38, 276),
+      35 => (RULE_MATCH, 0, (0, 0), 77, 276),
+      36 => (RULE_MATCH, 0, (0, 0), 11, 229),
+      37 => (RULE_MATCH, 0, (0, 0), 109, 257),
+      38 => (RULE_MATCH, 0, (0, 0), 90, 225),
+      39 => (RULE_MATCH_AND, 0, (0, 0), 26, 230),
+      40 => (RULE_MATCH_AND, 0, (0, 0), 28, 230),
+      41 => (RULE_MATCH_AND, 0, (0, 0), 25, 230),
+      42 => (RULE_MATCH, 0, (0, 0), 27, 230),
+      43 => (RULE_MATCH, 0, (0, 0), 203, 228),
+      44 => (RULE_MATCH, 0, (0, 0), 94, 393),
+      45 => (RULE_MATCH, 0, (0, 0), 137, 398),
+      46 => (RULE_MATCH, 0, (0, 0), 173, 236),
+      47 => (RULE_MATCH, 0, (0, 0), 195, 237),
+      48 => (RULE_MATCH, 0, (0, 0), 62, 324),
+      49 => (RULE_SUCCESS, 0, (0, 0), 0, 389),
+      50 => (RULE_MATCH, 0, (0, 0), 177, 377),
+      51 => (RULE_MATCH, 0, (0, 0), 105, 321),
+      52 => (RULE_MATCH, 0, (0, 0), 120, 268),
+      53 => (RULE_MATCH, 0, (0, 0), 1, 365),
+      54 => (RULE_MATCH, 0, (0, 0), 162, 232),
+      55 => (RULE_MATCH, 0, (0, 0), 24, 393),
+      56 => (RULE_MATCH, 0, (0, 0), 35, 283),
+      57 => (RULE_MATCH, 0, (0, 0), 202, 239),
+      58 => (RULE_MATCH, 0, (0, 0), 95, 240),
+      59 => (RULE_MATCH, 0, (0, 0), 15, 299),
+      60 => (RULE_MATCH, 0, (0, 0), 4, 303),
+      61 => (RULE_MATCH, 0, (0, 0), 73, 251),
+      62 => (RULE_MATCH_AND, 0, (0, 0), 150, 242),
+      63 => (RULE_MATCH_AND, 0, (0, 0), 149, 242),
+      64 => (RULE_MATCH, 0, (0, 0), 163, 242),
+      65 => (RULE_MATCH_AND, 0, (0, 0), 178, 246),
+      66 => (RULE_MATCH_AND, 0, (0, 0), 179, 246),
+      67 => (RULE_MATCH, 0, (0, 0), 146, 246),
+      68 => (RULE_MATCH, 0, (0, 0), 125, 244),
+      69 => (RULE_MATCH, 0, (0, 0), 41, 243),
+      70 => (RULE_MATCH, 0, (0, 0), 142, 248),
+      71 => (RULE_MATCH, 0, (0, 0), 63, 282),
+      72 => (RULE_MATCH_AND, 0, (0, 0), 168, 247),
+      73 => (RULE_MATCH_AND, 0, (0, 0), 148, 247),
+      74 => (RULE_MATCH, 0, (0, 0), 180, 247),
+      75 => (RULE_MATCH, 0, (0, 0), 102, 255),
+      76 => (RULE_MATCH, 0, (0, 0), 209, 252),
+      77 => (RULE_MATCH, 0, (0, 0), 102, 255),
+      78 => (RULE_MATCH, 0, (0, 0), 87, 255),
+      79 => (RULE_MATCH, 0, (0, 0), 155, 259),
+      80 => (RULE_SUCCESS, 0, (0, 0), 0, 378),
+      81 => (RULE_SUCCESS, 0, (0, 0), 0, 385),
+      82 => (RULE_SUCCESS, 0, (0, 0), 0, 389),
+      83 => (RULE_MATCH, 0, (0, 0), 88, 255),
+      84 => (RULE_MATCH, 0, (0, 0), 140, 250),
+      85 => (RULE_MATCH, 0, (0, 0), 141, 264),
+      86 => (RULE_MATCH, 0, (0, 0), 5, 253),
+      87 => (RULE_MATCH, 0, (0, 0), 91, 258),
+      88 => (RULE_MATCH, 0, (0, 0), 101, 254),
+      89 => (RULE_MATCH, 0, (0, 0), 75, 261),
+      90 => (RULE_MATCH, 0, (0, 0), 121, 260),
+      91 => (RULE_MATCH, 0, (0, 0), 74, 261),
+      92 => (RULE_MATCH, 0, (0, 0), 76, 263),
+      93 => (RULE_MATCH, 0, (0, 0), 24, 393),
+      94 => (RULE_MATCH, 0, (0, 0), 29, 272),
+      95 => (RULE_MATCH, 0, (0, 0), 119, 268),
+      96 => (RULE_SUCCESS, 0, (0, 0), 0, 266),
+      97 => (RULE_MATCH, 0, (0, 0), 81, 264),
+      98 => (RULE_MATCH, 0, (0, 0), 207, 271),
+      99 => (RULE_MATCH, 0, (0, 0), 132, 267),
+      100 => (RULE_MATCH, 0, (0, 0), 106, 268),
+      101 => (RULE_SUCCESS, 0, (0, 0), 0, 269),
+      102 => (RULE_SUCCESS, 0, (0, 0), 0, 231),
+      103 => (RULE_MATCH, 0, (0, 0), 47, 274),
+      104 => (RULE_MATCH, 0, (0, 0), 48, 245),
+      105 => (RULE_SUCCESS, 0, (0, 0), 0, 273),
+      106 => (RULE_MATCH, 0, (0, 0), 111, 361),
+      107 => (RULE_MATCH, 0, (0, 0), 65, 279),
+      108 => (RULE_SUCCESS, 0, (0, 0), 0, 364),
+      109 => (RULE_MATCH, 0, (0, 0), 103, 327),
+      110 => (RULE_MATCH_AND, 0, (0, 0), 204, 367),
+      111 => (RULE_MATCH_AND, 0, (0, 0), 201, 367),
+      112 => (RULE_MATCH, 0, (0, 0), 172, 367),
+      113 => (RULE_MATCH_AND, 0, (0, 0), 183, 309),
+      114 => (RULE_MATCH_AND, 0, (0, 0), 152, 309),
+      115 => (RULE_MATCH_AND, 0, (0, 0), 186, 309),
+      116 => (RULE_MATCH_AND, 0, (0, 0), 187, 309),
+      117 => (RULE_MATCH, 0, (0, 0), 160, 309),
+      118 => (RULE_MATCH, 0, (0, 0), 136, 330),
+      119 => (RULE_MATCH_AND, 0, (0, 0), 32, 331),
+      120 => (RULE_MATCH, 0, (0, 0), 182, 331),
+      121 => (RULE_MATCH, 0, (0, 0), 199, 226),
+      122 => (RULE_MATCH, 0, (0, 0), 3, 315),
+      123 => (RULE_MATCH, 0, (0, 0), 2, 317),
+      124 => (RULE_SUCCESS, 0, (0, 0), 0, 279),
+      125 => (RULE_MATCH, 0, (0, 0), 60, 236),
+      126 => (RULE_MATCH, 0, (0, 0), 84, 287),
+      127 => (RULE_MATCH, 0, (0, 0), 129, 354),
+      128 => (RULE_MATCH, 0, (0, 0), 127, 333),
+      129 => (RULE_MATCH, 0, (0, 0), 198, 285),
+      130 => (RULE_MATCH, 0, (0, 0), 197, 286),
+      131 => (RULE_MATCH, 0, (0, 0), 173, 236),
+      132 => (RULE_MATCH, 0, (0, 0), 174, 312),
+      133 => (RULE_MATCH, 0, (0, 0), 188, 292),
+      134 => (RULE_SUCCESS, 0, (0, 0), 0, 290),
+      135 => (RULE_MATCH, 0, (0, 0), 173, 236),
+      136 => (RULE_MATCH, 0, (0, 0), 174, 312),
+      137 => (RULE_MATCH, 0, (0, 0), 40, 302),
+      138 => (RULE_MATCH, 0, (0, 0), 102, 298),
+      139 => (RULE_MATCH, 0, (0, 0), 165, 293),
+      140 => (RULE_SUCCESS, 0, (0, 0), 0, 301),
+      141 => (RULE_SUCCESS, 0, (0, 0), 0, 301),
+      142 => (RULE_MATCH, 0, (0, 0), 138, 296),
+      143 => (RULE_MATCH, 0, (0, 0), 192, 288),
+      144 => (RULE_MATCH_AND, 0, (0, 0), 50, 295),
+      145 => (RULE_MATCH, 0, (0, 0), 194, 295),
+      146 => (RULE_SUCCESS, 0, (0, 0), 0, 294),
+      147 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      148 => (RULE_MATCH, 0, (0, 0), 215, 382),
+      149 => (RULE_MATCH, 0, (0, 0), 112, 390),
+      150 => (RULE_MATCH, 0, (0, 0), 196, 294),
+      151 => (RULE_MATCH, 0, (0, 0), 71, 307),
+      152 => (RULE_MATCH_AND, 0, (0, 0), 21, 300),
+      153 => (RULE_MATCH, 0, (0, 0), 68, 300),
+      154 => (RULE_MATCH, 0, (0, 0), 89, 262),
+      155 => (RULE_SUCCESS, 0, (0, 0), 0, 300),
+      156 => (RULE_SUCCESS, 0, (0, 0), 0, 354),
+      157 => (RULE_MATCH, 0, (0, 0), 34, 319),
+      158 => (RULE_MATCH, 0, (0, 0), 49, 368),
+      159 => (RULE_MATCH, 0, (0, 0), 42, 393),
+      160 => (RULE_MATCH, 0, (0, 0), 145, 305),
+      161 => (RULE_SUCCESS, 0, (0, 0), 0, 216),
+      162 => (RULE_MATCH, 0, (0, 0), 147, 306),
+      163 => (RULE_MATCH, 0, (0, 0), 166, 393),
+      164 => (RULE_MATCH, 0, (0, 0), 116, 354),
+      165 => (RULE_SUCCESS, 0, (0, 0), 0, 383),
+      166 => (RULE_SUCCESS, 0, (0, 0), 0, 383),
+      167 => (RULE_SUCCESS, 0, (0, 0), 0, 297),
+      168 => (RULE_MATCH, 0, (0, 0), 115, 354),
+      169 => (RULE_MATCH, 0, (0, 0), 98, 311),
+      170 => (RULE_MATCH, 0, (0, 0), 167, 393),
+      171 => (RULE_MATCH, 0, (0, 0), 120, 268),
+      172 => (RULE_MATCH, 0, (0, 0), 54, 378),
+      173 => (RULE_MATCH, 0, (0, 0), 96, 310),
+      174 => (RULE_SUCCESS, 0, (0, 0), 0, 312),
+      175 => (RULE_MATCH, 0, (0, 0), 154, 314),
+      176 => (RULE_SUCCESS, 0, (0, 0), 0, 313),
+      177 => (RULE_MATCH, 0, (0, 0), 36, 320),
+      178 => (RULE_MATCH, 0, (0, 0), 213, 323),
+      179 => (RULE_MATCH_AND, 0, (0, 0), 205, 270),
+      180 => (RULE_MATCH, 0, (0, 0), 206, 270),
+      181 => (RULE_SUCCESS, 0, (0, 0), 0, 325),
+      182 => (RULE_MATCH, 0, (0, 0), 47, 274),
+      183 => (RULE_MATCH, 0, (0, 0), 46, 327),
+      184 => (RULE_MATCH, 0, (0, 0), 124, 337),
+      185 => (RULE_SUCCESS, 0, (0, 0), 0, 332),
+      186 => (RULE_MATCH, 0, (0, 0), 144, 394),
+      187 => (RULE_SUCCESS, 0, (0, 0), 0, 326),
+      188 => (RULE_MATCH, 0, (0, 0), 164, 337),
+      189 => (RULE_SUCCESS, 0, (0, 0), 0, 332),
+      190 => (RULE_MATCH, 0, (0, 0), 176, 392),
+      191 => (RULE_MATCH, 0, (0, 0), 122, 335),
+      192 => (RULE_SUCCESS, 0, (0, 0), 0, 334),
+      193 => (RULE_MATCH, 0, (0, 0), 181, 331),
+      194 => (RULE_MATCH, 0, (0, 0), 190, 339),
+      195 => (RULE_MATCH, 0, (0, 0), 100, 336),
+      196 => (RULE_MATCH, 0, (0, 0), 126, 337),
+      197 => (RULE_MATCH, 0, (0, 0), 211, 278),
+      198 => (RULE_SUCCESS, 0, (0, 0), 0, 342),
+      199 => (RULE_SUCCESS, 0, (0, 0), 0, 342),
+      200 => (RULE_MATCH, 0, (0, 0), 151, 277),
+      201 => (RULE_SUCCESS, 0, (0, 0), 0, 278),
+      202 => (RULE_SUCCESS, 0, (0, 0), 0, 280),
+      203 => (RULE_MATCH, 0, (0, 0), 123, 280),
+      204 => (RULE_MATCH, 0, (0, 0), 8, 397),
+      205 => (RULE_MATCH, 0, (0, 0), 14, 275),
+      206 => (RULE_MATCH, 0, (0, 0), 85, 341),
+      207 => (RULE_MATCH, 0, (0, 0), 20, 343),
+      208 => (RULE_MATCH, 0, (0, 0), 19, 350),
+      209 => (RULE_MATCH, 0, (0, 0), 7, 353),
+      210 => (RULE_MATCH, 0, (0, 0), 44, 344),
+      211 => (RULE_MATCH_AND, 0, (0, 0), 185, 349),
+      212 => (RULE_MATCH_AND, 0, (0, 0), 157, 349),
+      213 => (RULE_MATCH, 0, (0, 0), 184, 349),
+      214 => (RULE_MATCH_AND, 0, (0, 0), 135, 233),
+      215 => (RULE_MATCH, 0, (0, 0), 189, 233),
+      216 => (RULE_MATCH_AND, 0, (0, 0), 158, 348),
+      217 => (RULE_MATCH, 0, (0, 0), 156, 348),
+      218 => (RULE_MATCH, 0, (0, 0), 22, 346),
+      219 => (RULE_MATCH, 0, (0, 0), 130, 354),
+      220 => (RULE_MATCH, 0, (0, 0), 97, 340),
+      221 => (RULE_SUCCESS, 0, (0, 0), 0, 351),
+      222 => (RULE_MATCH, 0, (0, 0), 99, 356),
+      223 => (RULE_MATCH, 0, (0, 0), 5, 352),
+      224 => (RULE_MATCH, 0, (0, 0), 166, 393),
+      225 => (RULE_MATCH, 0, (0, 0), 18, 372),
+      226 => (RULE_MATCH, 0, (0, 0), 33, 362),
+      227 => (RULE_MATCH, 0, (0, 0), 17, 372),
+      228 => (RULE_MATCH, 0, (0, 0), 80, 300),
+      229 => (RULE_MATCH, 0, (0, 0), 72, 366),
+      230 => (RULE_MATCH, 0, (0, 0), 120, 268),
+      231 => (RULE_MATCH, 0, (0, 0), 23, 329),
+      232 => (RULE_MATCH, 0, (0, 0), 13, 358),
+      233 => (RULE_MATCH, 0, (0, 0), 16, 328),
+      234 => (RULE_MATCH, 0, (0, 0), 31, 375),
+      235 => (RULE_SUCCESS, 0, (0, 0), 0, 357),
+      236 => (RULE_MATCH, 0, (0, 0), 93, 371),
+      237 => (RULE_MATCH, 0, (0, 0), 57, 370),
+      238 => (RULE_MATCH, 0, (0, 0), 64, 365),
+      239 => (RULE_MATCH, 0, (0, 0), 200, 359),
+      240 => (RULE_SUCCESS, 0, (0, 0), 0, 369),
+      241 => (RULE_MATCH, 0, (0, 0), 67, 360),
+      242 => (RULE_MATCH, 0, (0, 0), 143, 373),
+      243 => (RULE_MATCH, 0, (0, 0), 167, 393),
+      244 => (RULE_SUCCESS, 0, (0, 0), 0, 332),
+      245 => (RULE_MATCH, 0, (0, 0), 161, 347),
+      246 => (RULE_MATCH, 0, (0, 0), 139, 379),
+      247 => (RULE_MATCH, 0, (0, 0), 43, 281),
+      248 => (RULE_MATCH, 0, (0, 0), 134, 374),
+      249 => (RULE_MATCH, 0, (0, 0), 78, 391),
+      250 => (RULE_MATCH, 0, (0, 0), 133, 377),
+      251 => (RULE_MATCH, 0, (0, 0), 45, 393),
+      252 => (RULE_SUCCESS, 0, (0, 0), 0, 380),
+      253 => (RULE_MATCH, 0, (0, 0), 210, 261),
+      254 => (RULE_SUCCESS, 0, (0, 0), 0, 363),
+      255 => (RULE_MATCH, 0, (0, 0), 153, 376),
+      256 => (RULE_MATCH, 0, (0, 0), 30, 393),
+      257 => (RULE_MATCH, 0, (0, 0), 9, 387),
+      258 => (RULE_MATCH, 0, (0, 0), 12, 220),
+      259 => (RULE_SUCCESS, 0, (0, 0), 0, 378),
+      260 => (RULE_MATCH, 0, (0, 0), 79, 381),
+      261 => (RULE_SUCCESS, 0, (0, 0), 0, 393),
+      262 => (RULE_MATCH, 0, (0, 0), 131, 278),
+      263 => (RULE_MATCH, 0, (0, 0), 37, 238),
+      264 => (RULE_MATCH, 0, (0, 0), 113, 386),
+      265 => (RULE_MATCH, 0, (0, 0), 56, 384),
+      266 => (RULE_MATCH, 0, (0, 0), 108, 388),
+      267 => (RULE_SUCCESS, 0, (0, 0), 0, 385),
+      268 => (RULE_MATCH, 0, (0, 0), 6, 325),
+      269 => (RULE_MATCH, 0, (0, 0), 104, 234),
+      270 => (RULE_MATCH, 0, (0, 0), 208, 241),
+      271 => (RULE_MATCH, 0, (0, 0), 70, 345),
+      272 => (RULE_MATCH, 0, (0, 0), 82, 291),
+      273 => (RULE_MATCH, 0, (0, 0), 52, 289),
+      274 => (RULE_MATCH, 0, (0, 0), 191, 304),
+      275 => (RULE_MATCH, 0, (0, 0), 214, 316),
+      276 => (RULE_MATCH, 0, (0, 0), 212, 318),
+      277 => (RULE_SUCCESS, 0, (0, 0), 0, 395),
+      278 => (RULE_MATCH, 0, (0, 0), 191, 304),
+      279 => (RULE_MATCH, 0, (0, 0), 214, 316),
+      280 => (RULE_MATCH, 0, (0, 0), 212, 318),
+      281 => (RULE_SUCCESS, 0, (0, 0), 0, 395),
+      282 => (RULE_MATCH, 0, (0, 0), 55, 279),
+      283 => (RULE_SUCCESS, 0, (0, 0), 0, 396));
 
    Extensions : aliased constant Extension_Rules_Array := (
       (Ext_1'Access, 1, 1),
-      (Ext_2'Access, 2, 1),
-      (Ext_3'Access, 2, 1),
-      (Ext_4'Access, 2, 1),
-      (Ext_5'Access, 2, 2),
-      (Ext_6'Access, 3, 3),
-      (Ext_7'Access, 4, 3),
-      (Ext_8'Access, 4, 3),
-      (Ext_9'Access, 4, 3),
-      (Ext_10'Access, 4, 3),
-      (Ext_11'Access, 4, 3),
-      (Ext_12'Access, 4, 3),
-      (Ext_13'Access, 4, 4),
-      (Ext_14'Access, 5, 5),
-      (Ext_15'Access, 6, 6),
-      (Ext_16'Access, 7, 7),
-      (Ext_17'Access, 8, 8),
-      (Ext_18'Access, 9, 9),
-      (Ext_19'Access, 10, 10),
-      (Ext_20'Access, 11, 11),
-      (Ext_21'Access, 12, 12),
-      (Ext_22'Access, 13, 15),
-      (Ext_23'Access, 16, 15),
-      (Ext_24'Access, 16, 16),
-      (Ext_25'Access, 17, 18),
-      (Ext_26'Access, 19, 21),
-      (Ext_27'Access, 22, 24),
-      (Ext_28'Access, 25, 25),
-      (Ext_29'Access, 26, 28),
-      (Ext_30'Access, 29, 29),
-      (Ext_31'Access, 30, 30),
-      (Ext_32'Access, 31, 33),
-      (Ext_33'Access, 34, 36),
-      (Ext_34'Access, 37, 37),
-      (Ext_35'Access, 38, 39),
-      (Ext_36'Access, 40, 39),
-      (Ext_37'Access, 40, 41),
-      (Ext_38'Access, 42, 44),
-      (Ext_39'Access, 45, 46),
-      (Ext_40'Access, 47, 48),
-      (Ext_41'Access, 49, 50),
-      (Ext_42'Access, 51, 52),
-      (Ext_43'Access, 53, 53),
-      (Ext_44'Access, 54, 55),
-      (Ext_45'Access, 56, 56),
-      (Ext_46'Access, 57, 58),
-      (Ext_47'Access, 59, 60),
-      (Ext_48'Access, 61, 64),
-      (Ext_49'Access, 65, 66),
-      (Ext_50'Access, 67, 68),
-      (Ext_51'Access, 69, 70),
-      (Ext_52'Access, 71, 73),
-      (Ext_53'Access, 74, 76),
-      (Ext_54'Access, 77, 76),
-      (Ext_55'Access, 77, 76),
-      (Ext_56'Access, 77, 77),
-      (Ext_57'Access, 78, 77),
-      (Ext_58'Access, 78, 78),
-      (Ext_59'Access, 79, 79),
-      (Ext_60'Access, 80, 80),
-      (Ext_61'Access, 81, 81),
-      (Ext_62'Access, 82, 87),
-      (Ext_63'Access, 88, 89),
-      (Ext_64'Access, 90, 93),
-      (Ext_65'Access, 94, 95),
-      (Ext_66'Access, 96, 97),
-      (Ext_67'Access, 98, 98),
-      (Ext_68'Access, 99, 100),
-      (Ext_69'Access, 101, 107),
-      (Ext_70'Access, 108, 108),
-      (Ext_71'Access, 109, 108),
-      (Ext_72'Access, 109, 109),
-      (Ext_73'Access, 110, 112),
-      (Ext_74'Access, 113, 114),
-      (Ext_75'Access, 115, 114),
-      (Ext_76'Access, 115, 116),
-      (Ext_77'Access, 117, 118),
-      (Ext_78'Access, 119, 120),
-      (Ext_79'Access, 121, 122),
-      (Ext_80'Access, 123, 124),
-      (Ext_81'Access, 125, 127),
-      (Ext_82'Access, 128, 128),
-      (Ext_83'Access, 129, 129),
-      (Ext_84'Access, 130, 131),
-      (Ext_85'Access, 132, 132),
-      (Ext_86'Access, 133, 134),
-      (Ext_87'Access, 135, 135),
-      (Ext_88'Access, 136, 136),
-      (Ext_89'Access, 137, 137),
-      (Ext_90'Access, 138, 138),
-      (Ext_91'Access, 139, 139),
-      (Ext_92'Access, 140, 141),
-      (Ext_93'Access, 142, 147),
-      (Ext_94'Access, 148, 150),
-      (Ext_95'Access, 151, 152),
-      (Ext_96'Access, 153, 154),
-      (Ext_97'Access, 155, 157),
-      (Ext_98'Access, 158, 159),
-      (Ext_99'Access, 160, 160),
-      (Ext_100'Access, 161, 162),
-      (Ext_101'Access, 163, 163),
-      (Ext_102'Access, 164, 166),
-      (Ext_103'Access, 167, 166),
-      (Ext_104'Access, 167, 168),
-      (Ext_105'Access, 169, 170),
-      (Ext_106'Access, 171, 172),
-      (Ext_107'Access, 173, 176),
-      (Ext_108'Access, 177, 177),
-      (Ext_109'Access, 178, 179),
-      (Ext_110'Access, 180, 180),
-      (Ext_111'Access, 181, 181),
-      (Ext_112'Access, 182, 183),
-      (Ext_113'Access, 184, 185),
-      (Ext_114'Access, 186, 186),
-      (Ext_115'Access, 187, 187),
-      (Ext_116'Access, 188, 189),
-      (Ext_117'Access, 190, 190),
-      (Ext_118'Access, 191, 191),
-      (Ext_119'Access, 192, 193),
-      (Ext_120'Access, 194, 195),
-      (Ext_121'Access, 196, 196),
-      (Ext_122'Access, 197, 197),
-      (Ext_123'Access, 198, 200),
-      (Ext_124'Access, 201, 201),
-      (Ext_125'Access, 202, 203),
-      (Ext_126'Access, 204, 207),
-      (Ext_127'Access, 208, 210),
-      (Ext_128'Access, 211, 213),
-      (Ext_129'Access, 214, 214));
+      (Ext_2'Access, 2, 2),
+      (Ext_3'Access, 3, 3),
+      (Ext_4'Access, 4, 4),
+      (Ext_5'Access, 5, 5),
+      (Ext_6'Access, 6, 6),
+      (Ext_7'Access, 7, 7),
+      (Ext_8'Access, 8, 8),
+      (Ext_9'Access, 9, 9),
+      (Ext_10'Access, 10, 10),
+      (Ext_11'Access, 11, 11),
+      (Ext_12'Access, 12, 12),
+      (Ext_13'Access, 13, 13),
+      (Ext_14'Access, 14, 14),
+      (Ext_15'Access, 15, 15),
+      (Ext_16'Access, 16, 16),
+      (Ext_17'Access, 17, 17),
+      (Ext_18'Access, 18, 18),
+      (Ext_19'Access, 19, 20),
+      (Ext_20'Access, 21, 21),
+      (Ext_21'Access, 22, 22),
+      (Ext_22'Access, 23, 25),
+      (Ext_23'Access, 26, 25),
+      (Ext_24'Access, 26, 27),
+      (Ext_25'Access, 28, 29),
+      (Ext_26'Access, 30, 32),
+      (Ext_27'Access, 33, 36),
+      (Ext_28'Access, 37, 37),
+      (Ext_29'Access, 38, 43),
+      (Ext_30'Access, 44, 44),
+      (Ext_31'Access, 45, 45),
+      (Ext_32'Access, 46, 48),
+      (Ext_33'Access, 49, 51),
+      (Ext_34'Access, 52, 52),
+      (Ext_35'Access, 53, 54),
+      (Ext_36'Access, 55, 54),
+      (Ext_37'Access, 55, 56),
+      (Ext_38'Access, 57, 59),
+      (Ext_39'Access, 60, 61),
+      (Ext_40'Access, 62, 67),
+      (Ext_41'Access, 68, 69),
+      (Ext_42'Access, 70, 71),
+      (Ext_43'Access, 72, 74),
+      (Ext_44'Access, 75, 76),
+      (Ext_45'Access, 77, 77),
+      (Ext_46'Access, 78, 80),
+      (Ext_47'Access, 81, 82),
+      (Ext_48'Access, 83, 86),
+      (Ext_49'Access, 87, 88),
+      (Ext_50'Access, 89, 90),
+      (Ext_51'Access, 91, 92),
+      (Ext_52'Access, 93, 96),
+      (Ext_53'Access, 97, 99),
+      (Ext_54'Access, 100, 99),
+      (Ext_55'Access, 100, 99),
+      (Ext_56'Access, 100, 101),
+      (Ext_57'Access, 102, 102),
+      (Ext_58'Access, 103, 103),
+      (Ext_59'Access, 104, 105),
+      (Ext_60'Access, 106, 106),
+      (Ext_61'Access, 107, 108),
+      (Ext_62'Access, 109, 121),
+      (Ext_63'Access, 122, 124),
+      (Ext_64'Access, 125, 128),
+      (Ext_65'Access, 129, 130),
+      (Ext_66'Access, 131, 132),
+      (Ext_67'Access, 133, 134),
+      (Ext_68'Access, 135, 136),
+      (Ext_69'Access, 137, 143),
+      (Ext_70'Access, 144, 146),
+      (Ext_71'Access, 147, 147),
+      (Ext_72'Access, 148, 148),
+      (Ext_73'Access, 149, 151),
+      (Ext_74'Access, 152, 155),
+      (Ext_75'Access, 156, 156),
+      (Ext_76'Access, 157, 158),
+      (Ext_77'Access, 159, 161),
+      (Ext_78'Access, 162, 163),
+      (Ext_79'Access, 164, 167),
+      (Ext_80'Access, 168, 169),
+      (Ext_81'Access, 170, 172),
+      (Ext_82'Access, 173, 174),
+      (Ext_83'Access, 175, 176),
+      (Ext_84'Access, 177, 178),
+      (Ext_85'Access, 179, 181),
+      (Ext_86'Access, 182, 183),
+      (Ext_87'Access, 184, 185),
+      (Ext_88'Access, 186, 187),
+      (Ext_89'Access, 188, 188),
+      (Ext_90'Access, 189, 190),
+      (Ext_91'Access, 191, 192),
+      (Ext_92'Access, 193, 194),
+      (Ext_93'Access, 195, 200),
+      (Ext_94'Access, 201, 203),
+      (Ext_95'Access, 204, 205),
+      (Ext_96'Access, 206, 207),
+      (Ext_97'Access, 208, 210),
+      (Ext_98'Access, 211, 215),
+      (Ext_99'Access, 216, 217),
+      (Ext_100'Access, 218, 219),
+      (Ext_101'Access, 220, 221),
+      (Ext_102'Access, 222, 224),
+      (Ext_103'Access, 225, 224),
+      (Ext_104'Access, 225, 226),
+      (Ext_105'Access, 227, 228),
+      (Ext_106'Access, 229, 230),
+      (Ext_107'Access, 231, 235),
+      (Ext_108'Access, 236, 236),
+      (Ext_109'Access, 237, 238),
+      (Ext_110'Access, 239, 240),
+      (Ext_111'Access, 241, 241),
+      (Ext_112'Access, 242, 243),
+      (Ext_113'Access, 244, 246),
+      (Ext_114'Access, 247, 247),
+      (Ext_115'Access, 248, 248),
+      (Ext_116'Access, 249, 250),
+      (Ext_117'Access, 251, 252),
+      (Ext_118'Access, 253, 254),
+      (Ext_119'Access, 255, 256),
+      (Ext_120'Access, 257, 259),
+      (Ext_121'Access, 260, 261),
+      (Ext_122'Access, 262, 262),
+      (Ext_123'Access, 263, 265),
+      (Ext_124'Access, 266, 267),
+      (Ext_125'Access, 268, 269),
+      (Ext_126'Access, 270, 273),
+      (Ext_127'Access, 274, 277),
+      (Ext_128'Access, 278, 281),
+      (Ext_129'Access, 282, 283));
 
    Patterns : aliased Matcher_Array_Access :=
       (null, null, null, null, null, null, null, null,
@@ -1048,7 +1178,11 @@ null, null, null, null, null, null, null, null,
 null, null, null, null, null, null, null, null,
 null, null, null, null, null, null, null, null,
 null, null, null, null, null, null, null, null,
-null, null);
+null, null, null, null, null, null, null, null,
+null, null, null, null, null, null, null, null,
+null, null, null, null, null, null, null, null,
+null, null, null, null, null, null, null, null,
+null, null, null, null, null, null, null);
 
    Definition : constant Rules_List :=
       (Strings    => Strings'Access,
