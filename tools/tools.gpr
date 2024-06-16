@@ -11,7 +11,8 @@ project Tools is
    for Create_Missing_Dirs use "True";
    for Exec_Dir use "../bin";
    for Main use ("spdx_tool-gentmpl.adb",
-                 "spdx_tool-genmap.adb", "spdx_tool-genlicenses.adb");
+                 "spdx_tool-genmap.adb",
+                 "spdx_tool-genrules.adb");
 
    package Builder  renames Spdx_Tool.Builder;
    package Compiler renames Spdx_Tool.Compiler;
