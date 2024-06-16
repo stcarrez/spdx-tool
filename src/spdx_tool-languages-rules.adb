@@ -33,10 +33,29 @@ package body SPDX_Tool.Languages.Rules is
    function Check (Rules   : in Rules_List;
                    Rule    : in Rule_Definition;
                    File    : in File_Info;
+                   Content : in File_Type) return Match_Type;
+
+   function Check (Rules   : in Rules_List;
+                   Rule    : in Rule_Definition;
+                   File    : in File_Info;
                    Content : in File_Type) return Match_Type is
       Lines : Line_Range_Type := Rule.Lines;
       Buf  : constant Buffer_Accessor := Content.Buffer.Value;
    begin
+      case Rule.Mode is
+         when RULE_SUCCESS =>
+            return FOUND;
+
+         when RULE_FILENAME_MATCH | RULE_FILENAME_MATCH_AND =>
+            if GNAT.Regpat.Match (Rules.Patterns (Rule.Pattern).all, File.Path) then
+               return FOUND;
+            else
+               return SKIP;
+            end if;
+
+         when others =>
+            null;
+      end case;
       if Lines.First_Line = 0 then
          Lines.First_Line := 1;
       end if;
@@ -44,14 +63,12 @@ package body SPDX_Tool.Languages.Rules is
          Lines.Last_Line := Content.Count;
       end if;
       for Line_No in Lines.First_Line .. Lines.Last_Line loop
-         if Line_No > Content.Count then
-            return NO_MATCH;
-         end if;
+         exit when Line_No > Content.Count;
          declare
             First     : constant Buffer_Index := Content.Lines (Line_No).Line_Start;
             Last      : constant Buffer_Size := Content.Lines (Line_No).Line_End;
-            Line      : String (Natural (First) .. Natural (Last));
-            for Line'Address use Buf.Data'Address;
+            Line      : String (1 .. Natural (Last - First + 1));
+            for Line'Address use Buf.Data (First)'Address;
          begin
             case Rule.Mode is
                when RULE_STARTS_WITH | RULE_STARTS_WITH_AND =>
@@ -69,18 +86,14 @@ package body SPDX_Tool.Languages.Rules is
                      return FOUND;
                   end if;
 
-               when RULE_FILENAME_MATCH | RULE_FILENAME_MATCH_AND =>
-                  if GNAT.Regpat.Match (Rules.Patterns (Rule.Pattern).all, File.Path) then
-                     return FOUND;
-                  end if;
-
-               when RULE_SUCCESS =>
-                  return FOUND;
+               when others =>
+                  null;
 
             end case;
          end;
       end loop;
-      return SKIP;
+      return (if Rule.Mode in RULE_MATCH_AND | RULE_STARTS_WITH_AND | RULE_CONTAINS_AND
+                then SKIP else NO_MATCH);
    end Check;
 
    --  ------------------------------
