@@ -7,8 +7,11 @@ with Ada.Unchecked_Deallocation;
 with Util.Log.Loggers;
 with Util.Strings.Vectors;
 with Util.Strings.Split;
+with Util.Measures;
 with SPDX_Tool.Languages.CommentsMap;
 with SPDX_Tool.Licenses.Templates;
+with SPDX_Tool.Languages.Rules.Generated;
+with SPDX_Tool.Languages.Rules.Disambiguations;
 package body SPDX_Tool.Languages.Manager is
 
    Log : constant Util.Log.Loggers.Logger :=
@@ -30,14 +33,22 @@ package body SPDX_Tool.Languages.Manager is
       Manager.Mime_Detect.Detect (File, Content, Result);
       Manager.Shell_Detect.Detect (File, Content, Result);
       Manager.Modeline_Detect.Detect (File, Content, Result);
+      Manager.Generated_Detect.Detect (File, Content, Result);
       declare
          Language : constant String := Get_Language (Result);
          Comment  : constant access constant String := CommentsMap.Get_Mapping (Language);
          Pos      : Language_Maps.Cursor;
       begin
+         File.Generated := Result.Generated;
          if Language'Length = 0 then
             Analyzer := null;
-            Log.Info ("{0}: no language found", File.Path);
+            if Length (Result.Generated) > 0 then
+               Log.Info ("{0}: generated file by {1}",
+                      File.Path, To_String (Result.Generated));
+               Content.Cmt_Style := NO_COMMENT;
+            else
+               Log.Info ("{0}: no language found", File.Path);
+            end if;
             return;
          end if;
          if Comment /= null then
@@ -55,6 +66,12 @@ package body SPDX_Tool.Languages.Manager is
          else
             Analyzer := null;
             Log.Info ("{0}: language {1} without analyzer", File.Path, Language);
+         end if;
+         if not Opt_Keep_Generated and then Length (Result.Generated) > 0 then
+            Log.Info ("{0}: generated file by {1} is ignored",
+                      File.Path, To_String (Result.Generated));
+            Content.Cmt_Style := NO_COMMENT;
+            return;
          end if;
          if Analyzer /= null then
             Analyzer.all.Find_Comments (Manager.Tokens, Buf.Data (Buf.Data'First .. Len),
@@ -220,6 +237,8 @@ package body SPDX_Tool.Languages.Manager is
 
       Basic_Analyzer_Count : Natural := 0;
    begin
+      SPDX_Tool.Languages.Rules.Initialize (Rules.Generated.Definition);
+      SPDX_Tool.Languages.Rules.Initialize (Rules.Disambiguations.Definition);
       if Manager.Tokens.Is_Empty then
          Initialize_Tokens;
       end if;
@@ -285,7 +304,6 @@ package body SPDX_Tool.Languages.Manager is
             end if;
          end;
       end loop;
-
    end Initialize;
 
    overriding

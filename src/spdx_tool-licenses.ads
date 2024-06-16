@@ -15,7 +15,7 @@ with SPDX_Tool.Infos;
 with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Languages;
 with SPDX_Tool.Counter_Arrays;
-private with Util.Measures;
+with Util.Measures;
 package SPDX_Tool.Licenses is
 
    SPDX_License_Tag : constant String := "SPDX-License-Identifier:";
@@ -122,6 +122,10 @@ package SPDX_Tool.Licenses is
 
    --  Get a printable representation of a list of licenses.
    function To_String (List : in License_Index_Array) return String;
+
+   procedure Report (Stamp : in out Util.Measures.Stamp;
+                     Title : in String;
+                     Count : in Positive := 1);
 
 private
 
@@ -265,9 +269,5 @@ private
                            return License_Match;
 
    Perf : aliased Util.Measures.Measure_Set;
-
-   procedure Report (Stamp : in out Util.Measures.Stamp;
-                     Title : in String;
-                     Count : in Positive := 1);
 
 end SPDX_Tool.Licenses;

@@ -99,6 +99,7 @@ private
    Opt_Identify  : aliased Boolean := False;
    Opt_Help      : aliased Boolean := False;
    Opt_Print_Lineno : aliased Boolean := False;
+   Opt_Keep_Generated : aliased Boolean := False;
    Opt_Tasks     : aliased Integer := 1;
 
    LF          : constant Byte := 16#0A#;

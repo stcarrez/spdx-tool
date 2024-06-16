@@ -15,6 +15,7 @@ private with SPDX_Tool.Languages.Mimes;
 private with SPDX_Tool.Languages.Shell;
 private with SPDX_Tool.Languages.Filenames;
 private with SPDX_Tool.Languages.Modelines;
+private with SPDX_Tool.Languages.Generated;
 package SPDX_Tool.Languages.Manager is
 
    type Language_Manager is tagged limited private;
@@ -49,6 +50,7 @@ private
       Shell_Detect     : Shell.Shell_Detector_Type;
       Filename_Detect  : Filenames.Filename_Detector_Type;
       Modeline_Detect  : Modelines.Modeline_Detector_Type;
+      Generated_Detect : Generated.Generated_Detector_Type;
    end record;
 
    function Create_Analyzer (Manager : in Language_Manager;

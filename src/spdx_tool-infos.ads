@@ -69,12 +69,13 @@ package SPDX_Tool.Infos is
    --  by a separate thread which populates the `Language`, `Mime` and
    --  `License` info.
    type File_Info (Len : Natural) is record
-      License  : License_Info;
-      Mime     : UString;
-      Language : UString;
-      Path     : String (1 .. Len);
-      Filtered : Boolean := False;
-      Text     : License_Text_Access;
+      License   : License_Info;
+      Mime      : UString;
+      Language  : UString;
+      Generated : UString;
+      Path      : String (1 .. Len);
+      Filtered  : Boolean := False;
+      Text      : License_Text_Access;
    end record;
    type File_Info_Access is access all File_Info;
 

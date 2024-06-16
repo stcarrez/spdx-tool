@@ -186,6 +186,10 @@ procedure SPDX_Tool.Main is
                         Argument => "NAMES",
                         Help   => -("Ignore the files with licenses in the given list"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Keep_Generated'Access,
+                        Long_Switch => "--keep-generated",
+                        Help   => -("Keep generated files"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.Only_Languages'Access,
                         Long_Switch => "--only-languages=",
                         Argument => "NAMES",
