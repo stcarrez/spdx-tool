@@ -41,9 +41,9 @@ private
        & ASCII.LF & "    ([ \t][Pp]lus)?" & ASCII.LF & "    |" & ASCII.LF & " "
        & "   u[Bb]lock" & ASCII.LF & "    ([ \t][Oo]rigin)?" & ASCII.LF & " "
        & "   |" & ASCII.LF & "    [Aa]d[Gg]uard" & ASCII.LF & "  )"
-       & ASCII.LF & "  ([ \t] \d+(\.\d+)*+)?" & ASCII.LF & ")" & ASCII.LF & "("
+       & ASCII.LF & "  ([ \t] \d+(\.\d+)*)?" & ASCII.LF & ")" & ASCII.LF & "("
        & ASCII.LF & "  [ \t]?;[ \t]?" & ASCII.LF & "  \g<version>" & ASCII.LF
-       & ")*+" & ASCII.LF & "\]";
+       & ")*" & ASCII.LF & "\]";
    S21 : aliased constant String := "(ALTER\s+MODULE|MODE\s+DB2SQL|\bSYS(CAT|P"
        & "ROC)\.|ASSOCIATE\s+RESULT\s+SET|\bEND!\s*$)";
    S22 : aliased constant String := "(SELECT\s+[\w*,]+\s+FROM|(CREATE|ALTER|DR"
@@ -299,7 +299,7 @@ private
    S192 : aliased constant String := "^\s*(function|pro|compile_opt) \w[ \w,:]*"
        & "$";
    S193 : aliased constant String := "^\s*(global|local)_var\s+(\w+(\s*=\s*[\w\"
-       & "-""']+)?\s*)(,\s*\w+(\s*=\s*[\w\-""']+)?\s*)*+\s*;";
+       & "-""']+)?\s*)(,\s*\w+(\s*=\s*[\w\-""']+)?\s*)*\s*;";
    S194 : aliased constant String := "^\s*(import.+(from\s+|require\()['""]reac"
        & "t|\/\/\/\s*<reference\s)";
    S195 : aliased constant String := "^\s*(import|export|module|def|let|let-env"

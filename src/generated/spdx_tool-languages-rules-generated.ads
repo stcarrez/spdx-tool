@@ -8,8 +8,8 @@ private
 
    S1 : aliased constant String := ".*pport.h$";
    S2 : aliased constant String := "^--  Advanced Resource Embedder ";
-   S3 : aliased constant String := "^/** Begin line maps. **";
-   S4 : aliased constant String := "^// Code generated .*";
+   S3 : aliased constant String := "^// Code generated .*";
+   S4 : aliased constant String := "^/\*\* Begin line maps. \*\*";
    S5 : aliased constant String := "^{""version"":\d+,";
    S6 : aliased constant String := "generated code\W{2,3}do not modify";
    S7 : aliased constant String := "# Microsoft Developer Studio Generated Bu"
@@ -123,14 +123,14 @@ private
       13 => (RULE_CONTAINS, 1, (1, 4), 28, 31),
       14 => (RULE_SUCCESS, 1, (0, 0), 0, 37),
       15 => (RULE_MATCH_AND, 0, (0, 0), 5, 38),
-      16 => (RULE_MATCH, 0, (0, 0), 3, 38),
+      16 => (RULE_MATCH, 0, (0, 0), 4, 38),
       17 => (RULE_MATCH_AND, 0, (0, 0), 5, 38),
-      18 => (RULE_MATCH, 0, (0, 0), 3, 38),
+      18 => (RULE_MATCH, 0, (0, 0), 4, 38),
       19 => (RULE_MATCH, 2, (1, 1), 6, 23),
       20 => (RULE_CONTAINS, 3, (1, 4), 7, 47),
       21 => (RULE_CONTAINS, 3, (2, 2), 50, 17),
       22 => (RULE_CONTAINS, 6, (1, 6), 20, 19),
-      23 => (RULE_MATCH, 2, (1, 41), 4, 30),
+      23 => (RULE_MATCH, 2, (1, 41), 3, 30),
       24 => (RULE_CONTAINS, 2, (1, 4), 29, 41),
       25 => (RULE_CONTAINS, 6, (1, 6), 20, 19),
       26 => (RULE_CONTAINS_AND, 2, (1, 1), 11, 33),
@@ -152,9 +152,9 @@ private
       42 => (RULE_CONTAINS, 2, (1, 1), 13, 35),
       43 => (RULE_CONTAINS, 1, (1, 4), 28, 31),
       44 => (RULE_MATCH_AND, 0, (0, 0), 5, 38),
-      45 => (RULE_MATCH, 0, (0, 0), 3, 38),
+      45 => (RULE_MATCH, 0, (0, 0), 4, 38),
       46 => (RULE_MATCH_AND, 0, (0, 0), 5, 38),
-      47 => (RULE_MATCH, 0, (0, 0), 3, 38),
+      47 => (RULE_MATCH, 0, (0, 0), 4, 38),
       48 => (RULE_CONTAINS, 1, (1, 4), 28, 31),
       49 => (RULE_CONTAINS, 2, (1, 4), 29, 41),
       50 => (RULE_CONTAINS, 6, (1, 6), 20, 19),
