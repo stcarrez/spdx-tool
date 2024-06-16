@@ -25,9 +25,7 @@ private
        & "help)($|\s|:)";
    S10 : aliased constant String := "(<^\s*; |End Function)";
    S11 : aliased constant String := "(>\+>|>\+<)";
-   S12 : aliased constant String := "(?-m)^\s*using\s+(System|Beefy)(\.(.*))?;"
-       & "\s*$";
-   S13 : aliased constant String := "(?x)\A" & ASCII.LF & "\[" & ASCII.LF & "("
+   S12 : aliased constant String := "(?x)\A" & ASCII.LF & "\[" & ASCII.LF & "("
        & "?<version>" & ASCII.LF & "  (" & ASCII.LF & "    [Aa]d[Bb]lock"
        & ASCII.LF & "    ([ \t][Pp]lus)?" & ASCII.LF & "    |" & ASCII.LF & " "
        & "   u[Bb]lock" & ASCII.LF & "    ([ \t][Oo]rigin)?" & ASCII.LF & " "
@@ -35,36 +33,38 @@ private
        & ASCII.LF & "  ([ \t] \d+(\.\d+)*+)?" & ASCII.LF & ")" & ASCII.LF & "("
        & ASCII.LF & "  [ \t]?;[ \t]?" & ASCII.LF & "  \g<version>" & ASCII.LF
        & ")*+" & ASCII.LF & "\]";
-   S14 : aliased constant String := "(ALTER\s+MODULE|MODE\s+DB2SQL|\bSYS(CAT|P"
+   S13 : aliased constant String := "(ALTER\s+MODULE|MODE\s+DB2SQL|\bSYS(CAT|P"
        & "ROC)\.|ASSOCIATE\s+RESULT\s+SET|\bEND!\s*$)";
-   S15 : aliased constant String := "(SELECT\s+[\w*,]+\s+FROM|(CREATE|ALTER|DR"
+   S14 : aliased constant String := "(SELECT\s+[\w*,]+\s+FROM|(CREATE|ALTER|DR"
        & "OP)\s(DATABASE|SCHEMA|TABLE))";
-   S16 : aliased constant String := "([\/\\].*:\s+.*\s\\$|: \\$|^[ %]:|^[\w\s\"
+   S15 : aliased constant String := "([\/\\].*:\s+.*\s\\$|: \\$|^[ %]:|^[\w\s\"
        & "/\\.]+\w+\.\w+\s*:\s+[\w\s\/\\.]+\w+\.\w+)";
-   S17 : aliased constant String := "(\$\$PLSQL_|XMLTYPE|systimestamp|\.nextva"
+   S16 : aliased constant String := "(\$\$PLSQL_|XMLTYPE|systimestamp|\.nextva"
        & "l|CONNECT\s+BY|AUTHID\s+(DEFINER|CURRENT_USER)|constructor\W+function)";
-   S18 : aliased constant String := "(\^(this|super)\.|^\s*(~\w+\s*=\.|SynthDe"
+   S17 : aliased constant String := "(\^(this|super)\.|^\s*(~\w+\s*=\.|SynthDe"
        & "f\b))";
-   S19 : aliased constant String := "(\^(this|super)\.|^\s*~\w+\s*=\.)";
-   S20 : aliased constant String := "(\bRebol\b)";
-   S21 : aliased constant String := "(\w+\.prototype\.\w+|===|\bvar\b)";
-   S22 : aliased constant String := "(^\.!|^\f|\f$|^\.end lit(eral)?\b|^\.[a-z"
+   S18 : aliased constant String := "(\^(this|super)\.|^\s*~\w+\s*=\.)";
+   S19 : aliased constant String := "(\bRebol\b)";
+   S20 : aliased constant String := "(\w+\.prototype\.\w+|===|\bvar\b)";
+   S21 : aliased constant String := "(^\.!|^\f|\f$|^\.end lit(eral)?\b|^\.[a-z"
        & "A-Z].*?;\.[a-zA-Z]([; \t])|\^\*[^\s*][^*]*\\\*($|\s)|^\.c;[ \t]*\w+)";
-   S23 : aliased constant String := "(^\\i\b|AS\s+\$\$|LANGUAGE\s+'?plpgsql'?|"
+   S22 : aliased constant String := "(^\\i\b|AS\s+\$\$|LANGUAGE\s+'?plpgsql'?|"
        & "BEGIN(\s+WORK)?\s*;)";
-   S24 : aliased constant String := "(^\s*(<\?xml|xmlns))";
-   S25 : aliased constant String := "(^\s*(graph|node)\s+\[$)";
-   S26 : aliased constant String := "(^\s*<\?xml\s+version)";
-   S27 : aliased constant String := "(^\s*GO\b|BEGIN(\s+TRY|\s+CATCH)|OUTPUT\s"
+   S23 : aliased constant String := "(^\s*(<\?xml|xmlns))";
+   S24 : aliased constant String := "(^\s*(graph|node)\s+\[$)";
+   S25 : aliased constant String := "(^\s*<\?xml\s+version)";
+   S26 : aliased constant String := "(^\s*GO\b|BEGIN(\s+TRY|\s+CATCH)|OUTPUT\s"
        & "+INSERTED|DECLARE\s+@|\[dbo\])";
-   S28 : aliased constant String := "(^\s*import (scala|java)\.|^\s*class\b)";
-   S29 : aliased constant String := "(^\s*module)|let rec |match\s+(\S+\s)+wit"
+   S27 : aliased constant String := "(^\s*import (scala|java)\.|^\s*class\b)";
+   S28 : aliased constant String := "(^\s*module)|let rec |match\s+(\S+\s)+wit"
        & "h";
-   S30 : aliased constant String := "(^\|\s*(where|extend|project|limit|summar"
+   S29 : aliased constant String := "(^\|\s*(where|extend|project|limit|summar"
        & "ize))|(^\.\w+)";
-   S31 : aliased constant String := "(^|<)\s*[A-Za-z0-9_]+\s*=\s*<";
-   S32 : aliased constant String := "(^|\s)(Proof|Qed)\.($|\s)|(^|\s)Require[ "
+   S30 : aliased constant String := "(^|<)\s*[A-Za-z0-9_]+\s*=\s*<";
+   S31 : aliased constant String := "(^|\s)(Proof|Qed)\.($|\s)|(^|\s)Require[ "
        & "\t]+(Import|Export)\s";
+   S32 : aliased constant String := "(m)^\s*using\s+(System|Beefy)(\.(.*))?;\s"
+       & "*$";
    S33 : aliased constant String := ":- module";
    S34 : aliased constant String := ":=";
    S35 : aliased constant String := "<!ENTITY ";
@@ -133,8 +133,8 @@ private
    S81 : aliased constant String := "^(<pre\s+class)\s*=\s*('|\""|\b)metadata\"
        & "b\1[^>\r\n]*>";
    S82 : aliased constant String := "^(<|[a-zA-Z-][a-zA-Z0-9_-]+[ \t]+\w)|\$\{"
-       & "\w+[^\r\n]*?\}|^[ \t]*(<#--.*?-->|<#([a-z]+)(\s|>)[^>]*>.*?</#\1>|\[#-"
-       & "-.*?--\]|\[#([a-z]+)(\s|\])[^\]]*\].*?\[#\2\])";
+       & "\w+[^\r\n]*?\}|^[ \t]*(<#--.*->|<#([a-z]+)(\s|>)[^>]*>.*?</#\1>|\[#--."
+       & "*-\]|\[#([a-z]+)(\s|\])[^\]]*\].*?\[#\2\])";
    S83 : aliased constant String := "^(\/\/.+|((import|export)\s+)?(function|i"
        & "nt|float|char)\s+((room|repeatedly|on|game)_)?([A-Za-z]+[A-Za-z_0-9]+)"
        & "\s*[;\(])";
@@ -700,7 +700,7 @@ private
       19 => (RULE_MATCH, 0, (0, 0), 10, 190),
       20 => (RULE_MATCH, 0, (0, 0), 74, 189),
       21 => (RULE_MATCH, 0, (0, 0), 51, 198),
-      22 => (RULE_MATCH, 0, (0, 0), 12, 187),
+      22 => (RULE_MATCH, 0, (0, 0), 32, 187),
       23 => (RULE_MATCH, 0, (0, 0), 39, 239),
       24 => (RULE_MATCH, 0, (0, 0), 11, 192),
       25 => (RULE_MATCH, 0, (0, 0), 100, 220),
@@ -718,11 +718,11 @@ private
       37 => (RULE_MATCH, 0, (0, 0), 111, 231),
       38 => (RULE_MATCH, 0, (0, 0), 1, 328),
       39 => (RULE_MATCH, 0, (0, 0), 143, 195),
-      40 => (RULE_MATCH, 0, (0, 0), 24, 356),
-      41 => (RULE_MATCH, 0, (0, 0), 30, 246),
+      40 => (RULE_MATCH, 0, (0, 0), 23, 356),
+      41 => (RULE_MATCH, 0, (0, 0), 29, 246),
       42 => (RULE_MATCH, 0, (0, 0), 168, 202),
       43 => (RULE_MATCH, 0, (0, 0), 86, 203),
-      44 => (RULE_MATCH, 0, (0, 0), 16, 262),
+      44 => (RULE_MATCH, 0, (0, 0), 15, 262),
       45 => (RULE_MATCH, 0, (0, 0), 4, 266),
       46 => (RULE_MATCH, 0, (0, 0), 65, 214),
       47 => (RULE_MATCH, 0, (0, 0), 39, 205),
@@ -749,8 +749,8 @@ private
       68 => (RULE_MATCH, 0, (0, 0), 112, 223),
       69 => (RULE_MATCH, 0, (0, 0), 66, 224),
       70 => (RULE_MATCH, 0, (0, 0), 68, 226),
-      71 => (RULE_MATCH, 0, (0, 0), 24, 356),
-      72 => (RULE_MATCH, 0, (0, 0), 25, 235),
+      71 => (RULE_MATCH, 0, (0, 0), 23, 356),
+      72 => (RULE_MATCH, 0, (0, 0), 24, 235),
       73 => (RULE_MATCH, 0, (0, 0), 110, 231),
       74 => (RULE_MATCH, 0, (0, 0), 72, 227),
       75 => (RULE_MATCH, 0, (0, 0), 170, 234),
@@ -793,7 +793,7 @@ private
       112 => (RULE_MATCH, 0, (0, 0), 63, 270),
       113 => (RULE_MATCH, 0, (0, 0), 39, 263),
       114 => (RULE_MATCH, 0, (0, 0), 80, 225),
-      115 => (RULE_MATCH, 0, (0, 0), 29, 282),
+      115 => (RULE_MATCH, 0, (0, 0), 28, 282),
       116 => (RULE_MATCH, 0, (0, 0), 43, 331),
       117 => (RULE_MATCH, 0, (0, 0), 35, 356),
       118 => (RULE_MATCH, 0, (0, 0), 135, 268),
@@ -808,7 +808,7 @@ private
       127 => (RULE_MATCH, 0, (0, 0), 47, 341),
       128 => (RULE_MATCH, 0, (0, 0), 87, 273),
       129 => (RULE_MATCH, 0, (0, 0), 139, 277),
-      130 => (RULE_MATCH, 0, (0, 0), 31, 283),
+      130 => (RULE_MATCH, 0, (0, 0), 30, 283),
       131 => (RULE_MATCH, 0, (0, 0), 176, 286),
       132 => (RULE_MATCH, 0, (0, 0), 39, 233),
       133 => (RULE_MATCH, 0, (0, 0), 41, 237),
@@ -830,31 +830,31 @@ private
       149 => (RULE_MATCH, 0, (0, 0), 105, 243),
       150 => (RULE_MATCH, 0, (0, 0), 114, 243),
       151 => (RULE_MATCH, 0, (0, 0), 8, 360),
-      152 => (RULE_MATCH, 0, (0, 0), 15, 238),
+      152 => (RULE_MATCH, 0, (0, 0), 14, 238),
       153 => (RULE_MATCH, 0, (0, 0), 76, 304),
-      154 => (RULE_MATCH, 0, (0, 0), 21, 306),
-      155 => (RULE_MATCH, 0, (0, 0), 20, 313),
+      154 => (RULE_MATCH, 0, (0, 0), 20, 306),
+      155 => (RULE_MATCH, 0, (0, 0), 19, 313),
       156 => (RULE_MATCH, 0, (0, 0), 7, 316),
       157 => (RULE_MATCH, 0, (0, 0), 37, 307),
       158 => (RULE_MATCH, 0, (0, 0), 39, 312),
       159 => (RULE_MATCH, 0, (0, 0), 39, 196),
       160 => (RULE_MATCH, 0, (0, 0), 39, 311),
-      161 => (RULE_MATCH, 0, (0, 0), 22, 309),
+      161 => (RULE_MATCH, 0, (0, 0), 21, 309),
       162 => (RULE_MATCH, 0, (0, 0), 121, 317),
       163 => (RULE_MATCH, 0, (0, 0), 88, 303),
       164 => (RULE_MATCH, 0, (0, 0), 90, 319),
       165 => (RULE_MATCH, 0, (0, 0), 5, 315),
       166 => (RULE_MATCH, 0, (0, 0), 146, 356),
-      167 => (RULE_MATCH, 0, (0, 0), 19, 335),
-      168 => (RULE_MATCH, 0, (0, 0), 28, 325),
-      169 => (RULE_MATCH, 0, (0, 0), 18, 335),
+      167 => (RULE_MATCH, 0, (0, 0), 18, 335),
+      168 => (RULE_MATCH, 0, (0, 0), 27, 325),
+      169 => (RULE_MATCH, 0, (0, 0), 17, 335),
       170 => (RULE_MATCH, 0, (0, 0), 71, 263),
       171 => (RULE_MATCH, 0, (0, 0), 64, 329),
       172 => (RULE_MATCH, 0, (0, 0), 111, 231),
-      173 => (RULE_MATCH, 0, (0, 0), 23, 292),
-      174 => (RULE_MATCH, 0, (0, 0), 14, 321),
-      175 => (RULE_MATCH, 0, (0, 0), 17, 291),
-      176 => (RULE_MATCH, 0, (0, 0), 27, 338),
+      173 => (RULE_MATCH, 0, (0, 0), 22, 292),
+      174 => (RULE_MATCH, 0, (0, 0), 13, 321),
+      175 => (RULE_MATCH, 0, (0, 0), 16, 291),
+      176 => (RULE_MATCH, 0, (0, 0), 26, 338),
       177 => (RULE_MATCH, 0, (0, 0), 84, 334),
       178 => (RULE_MATCH, 0, (0, 0), 50, 333),
       179 => (RULE_MATCH, 0, (0, 0), 57, 328),
@@ -871,12 +871,12 @@ private
       190 => (RULE_MATCH, 0, (0, 0), 38, 356),
       191 => (RULE_MATCH, 0, (0, 0), 173, 224),
       192 => (RULE_MATCH, 0, (0, 0), 138, 339),
-      193 => (RULE_MATCH, 0, (0, 0), 26, 356),
+      193 => (RULE_MATCH, 0, (0, 0), 25, 356),
       194 => (RULE_MATCH, 0, (0, 0), 9, 350),
-      195 => (RULE_MATCH, 0, (0, 0), 13, 183),
+      195 => (RULE_MATCH, 0, (0, 0), 12, 183),
       196 => (RULE_MATCH, 0, (0, 0), 70, 344),
       197 => (RULE_MATCH, 0, (0, 0), 122, 241),
-      198 => (RULE_MATCH, 0, (0, 0), 32, 201),
+      198 => (RULE_MATCH, 0, (0, 0), 31, 201),
       199 => (RULE_MATCH, 0, (0, 0), 104, 349),
       200 => (RULE_MATCH, 0, (0, 0), 49, 347),
       201 => (RULE_MATCH, 0, (0, 0), 99, 351),
