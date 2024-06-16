@@ -39,7 +39,7 @@ procedure SPDX_Tool.Genrules is
       new Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                                   Element_Type => Natural);
    package Integer_Maps is
-      new Ada.Containers.Ordered_Maps (Key_Type     => Natural,
+      new Ada.Containers.Ordered_Maps (Key_Type     => Integer,
                                        Element_Type => Natural);
    function Get_Mapping (From : in Integer_Maps.Map; Value : in Integer) return Integer;
 
@@ -111,6 +111,7 @@ procedure SPDX_Tool.Genrules is
    Patterns       : String_Maps.Map;
    Output   : aliased Util.Streams.Files.File_Stream;
    Writer   : aliased Util.Streams.Texts.Print_Stream;
+   Empty_List : Util.Strings.Vectors.Vector;
 
    function Get_Int_Value (From : in UBO.Object;
                            Name : in String;
@@ -146,6 +147,16 @@ procedure SPDX_Tool.Genrules is
          end;
       end if;
    end Get_String_Index;
+
+   function Get_Named_Pattern (Name : in String) return Util.Strings.Vectors.Vector is
+      Pos : constant SMaps.Cursor := Named_Patterns.Find (Name);
+   begin
+      if SMaps.Has_Element (Pos) then
+         return SMaps.Element (Pos);
+      else
+         return Empty_List;
+      end if;
+   end Get_Named_Pattern;
 
    function Get_Pattern_Index (From : in out String_Maps.Map; Item : in String) return Integer is
       Item1 : constant String := Util.Strings.Replace (Item, "?i:", "", First => False);
@@ -212,25 +223,26 @@ procedure SPDX_Tool.Genrules is
       Min  : constant Integer := Get_Int_Value (Rule, "min-lines", 0);
       File : constant UBO.Object := UBO.Get_Value (Rule, "filename");
       Def  : Rule_Definition;
+      Is_And : Boolean := False;
 
       procedure Process_Rule (Position : in Positive;
                               Item     : in UBO.Object) is
          pragma Unreferenced (Position);
+         procedure Add_Rule (Pos : in Positive; Pat : in UBO.Object);
 
          Line     : constant UBO.Object := UBO.Get_Value (Item, "line");
          Contains : constant UBO.Object := UBO.Get_Value (Item, "contains");
          Pattern  : constant UBO.Object := UBO.Get_Value (Item, "pattern");
+         Named_Pattern : constant UBO.Object := UBO.Get_Value (Item, "named_pattern");
          R : Rule_Type;
+
+         procedure Add_Rule (Pos : in Positive; Pat : in UBO.Object) is
+            pragma Unreferenced (Pos);
+         begin
+            R.Pattern := Get_Pattern_Index (Patterns, UBO.To_String (Pat));
+            Def.Rules.Append (R);
+         end Add_Rule;
       begin
-         if not UBO.Is_Null (Pattern) then
-            R.Pattern := Get_Pattern_Index (Patterns, UBO.To_String (Pattern));
-            R.Mode := RULE_MATCH;
-         elsif not UBO.Is_Null (Contains) then
-            R.Pattern := Get_String_Index (Strings, UBO.To_String (Contains));
-            R.Mode := RULE_CONTAINS;
-         else
-            return;
-         end if;
          if not UBO.Is_Null (Line) then
             begin
                R.Lines := SPDX_Tool.Infos.Get_Range (UBO.To_String (Line));
@@ -242,7 +254,32 @@ procedure SPDX_Tool.Genrules is
          end if;
          R.Min_Lines := Min;
          R.Result := (if Def.Language > 0 then Def.Language else Def.Generator);
-         Def.Rules.Append (R);
+         if not UBO.Is_Null (Pattern) then
+            R.Mode := (if Is_And then RULE_MATCH_AND else RULE_MATCH);
+            if not UBO.Is_Array (Pattern) then
+               R.Pattern := Get_Pattern_Index (Patterns, UBO.To_String (Pattern));
+               Def.Rules.Append (R);
+            else
+               UBO.Vectors.Iterate (Pattern, Add_Rule'Access);
+            end if;
+         elsif not UBO.Is_Null (Contains) then
+            R.Mode := (if Is_And then RULE_CONTAINS_AND else RULE_CONTAINS);
+            R.Pattern := Get_String_Index (Strings, UBO.To_String (Contains));
+            Def.Rules.Append (R);
+         elsif not UBO.Is_Null (Named_Pattern) then
+            R.Mode := (if Is_And then RULE_MATCH_AND else RULE_MATCH);
+            declare
+               List : Util.Strings.Vectors.Vector := Get_Named_Pattern (UBO.To_String (Named_Pattern));
+            begin
+               for Pat of List loop
+                  R.Pattern := Get_Pattern_Index (Patterns, Pat);
+                  Def.Rules.Append (R);
+               end loop;
+            end;
+         else
+            R.Mode := RULE_SUCCESS;
+            Def.Rules.Append (R);
+         end if;
       end Process_Rule;
 
       List  : UBO.Object;
@@ -271,12 +308,14 @@ procedure SPDX_Tool.Genrules is
 
       List := UBO.Get_Value (Rule, "and");
       if not UBO.Is_Null (List) then
+         Is_And := True;
          UBO.Vectors.Iterate (List, Process_Rule'Access);
          Empty := False;
       end if;
 
       List := UBO.Get_Value (Rule, "or");
       if not UBO.Is_Null (List) then
+         Is_And := False;
          UBO.Vectors.Iterate (List, Process_Rule'Access);
          Empty := False;
       end if;
@@ -566,7 +605,7 @@ procedure SPDX_Tool.Genrules is
       if Integer_Maps.Has_Element (Pos) then
          return Integer_Maps.Element (Pos);
       else
-         return 0;
+         return 1;
       end if;
    end Get_Mapping;
 
@@ -592,17 +631,23 @@ procedure SPDX_Tool.Genrules is
                if Rule.Mode = RULE_MATCH then
                   Writer.Write ("RULE_MATCH, ");
                   Value := Get_Mapping (Pat_Cvt, Rule.Pattern);
-               else
+               elsif Rule.Mode = RULE_CONTAINS then
                   Writer.Write ("RULE_CONTAINS, ");
                   Value := Get_Mapping (Str_Cvt, Rule.Pattern);
+               else
+                  Writer.Write ("RULE_SUCCESS, ");
+                  Value := 0;
                end if;
             else
                if Rule.Mode = RULE_MATCH then
                   Writer.Write ("RULE_MATCH_AND, ");
                   Value := Get_Mapping (Pat_Cvt, Rule.Pattern);
-               else
+               elsif Rule.Mode = RULE_CONTAINS then
                   Writer.Write ("RULE_CONTAINS_AND, ");
                   Value := Get_Mapping (Str_Cvt, Rule.Pattern);
+               else
+                  Writer.Write ("RULE_SUCCESS, ");
+                  Value := 0;
                end if;
             end if;
             Writer.Write (Util.Strings.Image (Rule.Min_Lines));
