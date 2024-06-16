@@ -1,4 +1,10 @@
 {
     "ada.defaultCharset": "utf-8",
-    "ada.projectFile": "spdx_tool.gpr"
+    "ada.projectFile": "regtests/spdx_tool_regtests.gpr",
+    'ada.documentationStyle': 'leading',
+    'ada.trace.server': 'verbose',
+    'ada.enableDiagnostics': false,
+    'enableDiagnostics': false,
+    'enableIndexing': false,
+    'ada.enableIndexing': false
 }
