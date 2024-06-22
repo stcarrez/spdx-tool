@@ -154,7 +154,9 @@ package body SPDX_Tool.Licenses.Manager is
       Configs.Configure (Config,
                          Configs.Names.IGNORE_FILES,
                          Load_Ignore_File'Access);
-      Manager.Languages.Initialize (Config);
+      Manager.Languages.Initialize (Config, (if Job = FIND_LANGUAGES
+                                               then Languages.Manager.IDENTIFY_LANGUAGE
+                                               else Languages.Manager.IDENTIFY_COMMENTS));
 
       --  Setup the list of license tokens
       if not Opt_No_Builtin then
@@ -214,7 +216,7 @@ package body SPDX_Tool.Licenses.Manager is
       Filter.Exclude ("*");
       Manager.Job := LOAD_LICENSES;
       Manager.Scan (Path, Filter);
-      Manager.Job := READ_LICENSES;
+      Manager.Job := FIND_LICENSES;
    end Load_Licenses;
 
    procedure Load_Jsonld_License (Manager : in out License_Manager;
@@ -289,18 +291,10 @@ package body SPDX_Tool.Licenses.Manager is
    procedure Scan_File (Manager : in out License_Manager;
                         Path    : in String) is
       use SPDX_Tool.Infos;
-      use type Util.Files.Walk.Filter_Mode;
       Job   : License_Job_Type;
       Count : Natural;
       First : Natural;
-      Filter : Util.Files.Walk.Filter_Mode;
    begin
-      Filter := Manager.Ignore_Files_Filter.Match (Path);
-      if Filter = Util.Files.Walk.Excluded then
-         Log.Info ("excluded file {0}", Path);
-         return;
-      end if;
-
       Log.Info ("scan file {0}", Path);
       case Manager.Job is
          when LOAD_LICENSES =>
@@ -316,7 +310,12 @@ package body SPDX_Tool.Licenses.Manager is
                                         Path => Path (First .. Path'Last),
                                         others => <>);
             Job.Manager := Manager.Manager;
-            Manager.Files.Insert (Path (First .. Path'Last), Job.File);
+            begin
+               Manager.Files.Insert (Path (First .. Path'Last), Job.File);
+            exception
+               when others =>
+                  Log.Error ("Exception for " & Path (First .. Path'Last));
+            end;
             Manager.Executor.Execute (Job);
             Count := Manager.Executor.Get_Count;
             if Count > Manager.Max_Fill then
@@ -664,9 +663,18 @@ package body SPDX_Tool.Licenses.Manager is
    procedure Analyze (Manager  : in out License_Manager;
                       File_Mgr : in out SPDX_Tool.Files.Manager.File_Manager;
                       File     : in out SPDX_Tool.Infos.File_Info) is
+      use type Util.Files.Walk.Filter_Mode;
       Data   : SPDX_Tool.Files.File_Type (100);
       Result : License_Match;
+      Filter : Util.Files.Walk.Filter_Mode;
    begin
+      Filter := Manager.Ignore_Files_Filter.Match (File.Path);
+      if Filter = Util.Files.Walk.Excluded then
+         File.Filtered := True;
+         Log.Info ("excluded file {0}", File.Path);
+         return;
+      end if;
+
       File_Mgr.Open (Data, File, Manager.Languages);
       if File.Filtered then
          return;
@@ -678,6 +686,10 @@ package body SPDX_Tool.Licenses.Manager is
          if Is_Info_Log then
             Log.Info ("{0}: {1} (ignored)", File.Path, To_String (File.Language));
          end if;
+         return;
+      end if;
+
+      if Manager.Job = FIND_LANGUAGES then
          return;
       end if;
 

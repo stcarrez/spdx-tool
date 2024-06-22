@@ -18,11 +18,14 @@ private with SPDX_Tool.Languages.Modelines;
 private with SPDX_Tool.Languages.Generated;
 package SPDX_Tool.Languages.Manager is
 
+   type Level_Type is (IDENTIFY_LANGUAGE, IDENTIFY_COMMENTS);
+
    type Language_Manager is tagged limited private;
 
    --  Initialize the language manager with the given configuration.
    procedure Initialize (Manager : in out Language_Manager;
-                         Config  : in SPDX_Tool.Configs.Config_Type);
+                         Config  : in SPDX_Tool.Configs.Config_Type;
+                         Level   : in Level_Type := IDENTIFY_COMMENTS);
 
    --  Identify the language used by the given file.  The identification can be
    --  made by looking at the file extension, the mime type or by looking at
@@ -57,6 +60,7 @@ private
       Filename_Detect  : Filenames.Filename_Detector_Type;
       Modeline_Detect  : Modelines.Modeline_Detector_Type;
       Generated_Detect : Generated.Generated_Detector_Type;
+      Level            : Level_Type := IDENTIFY_COMMENTS;
    end record;
 
    function Create_Analyzer (Manager : in Language_Manager;

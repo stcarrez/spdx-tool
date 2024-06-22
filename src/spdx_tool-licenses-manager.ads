@@ -22,7 +22,7 @@ package SPDX_Tool.Licenses.Manager is
 
    Invalid_Pattern : exception;
 
-   type Job_Type is (READ_LICENSES, UPDATE_LICENSES, LOAD_LICENSES);
+   type Job_Type is (FIND_LANGUAGES, FIND_LICENSES, UPDATE_LICENSES, LOAD_LICENSES);
 
    type License_Manager (Count : Task_Count) is
    limited new UFW.Walker_Type with private;
@@ -149,7 +149,7 @@ private
       Languages : SPDX_Tool.Languages.Manager.Language_Manager;
       Max_Fill  : Natural := 0;
       Started   : Boolean := False;
-      Job       : Job_Type := READ_LICENSES;
+      Job       : Job_Type := FIND_LICENSES;
 
       --  Filters to identify license files (ex: COPYING, LICENSE.txt, ...)
       --  Filters to ignore files when looking at file headers.  The two filters

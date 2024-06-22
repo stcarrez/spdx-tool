@@ -82,7 +82,9 @@ package body SPDX_Tool.Languages.Rules is
                   end if;
 
                when RULE_MATCH | RULE_MATCH_AND =>
-                  if GNAT.Regpat.Match (Rules.Patterns (Rule.Pattern).all, Line) then
+                  if Rules.Patterns (Rule.Pattern) /= null
+                     and then GNAT.Regpat.Match (Rules.Patterns (Rule.Pattern).all, Line)
+                  then
                      return FOUND;
                   end if;
 

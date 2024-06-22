@@ -104,7 +104,7 @@ package body SPDX_Tool.Languages.Manager is
             File.Filtered := True;
             return;
          end if;
-         if Analyzer /= null then
+         if Analyzer /= null and then Manager.Level = IDENTIFY_COMMENTS then
             Analyzer.all.Find_Comments (Manager.Tokens, Buf.Data (Buf.Data'First .. Len),
                                         Content.Lines, Content.Count);
             for Line of Content.Lines (1 .. Content.Count) loop
@@ -160,7 +160,8 @@ package body SPDX_Tool.Languages.Manager is
    --  Initialize the language manager with the given configuration.
    --  ------------------------------
    procedure Initialize (Manager : in out Language_Manager;
-                         Config  : in SPDX_Tool.Configs.Config_Type) is
+                         Config  : in SPDX_Tool.Configs.Config_Type;
+                         Level   : in Level_Type := IDENTIFY_COMMENTS) is
       procedure Initialize_Tokens;
       procedure Set_Comments (Conf : in Comment_Configuration);
       procedure Set_Language (Conf : in Language_Configuration);
@@ -268,9 +269,10 @@ package body SPDX_Tool.Languages.Manager is
 
       Basic_Analyzer_Count : Natural := 0;
    begin
+      Manager.Level := Level;
       SPDX_Tool.Languages.Rules.Initialize (Rules.Generated.Definition);
       SPDX_Tool.Languages.Rules.Initialize (Rules.Disambiguations.Definition);
-      if Manager.Tokens.Is_Empty then
+      if Manager.Tokens.Is_Empty and then Level /= IDENTIFY_LANGUAGE then
          Initialize_Tokens;
       end if;
       Add_Builtin ("dash-style", "--");

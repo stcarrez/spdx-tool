@@ -34,8 +34,14 @@ package body SPDX_Tool.Languages.Mimes is
          Set_Language (Result, "mime", "PDF", Detector.Confidence);
       elsif Util.Strings.Starts_With (Mime, "application/zip") then
          Set_Language (Result, "mime", "ZIP", Detector.Confidence);
+      elsif Util.Strings.Starts_With (Mime, "application/gzip") then
+         Set_Language (Result, "mime", "GZIP", Detector.Confidence);
       elsif Util.Strings.Starts_With (Mime, "application/x-tar") then
          Set_Language (Result, "mime", "TAR", Detector.Confidence);
+      elsif Util.Strings.Starts_With (Mime, "application/x-executable") then
+         Set_Language (Result, "mime", "Executable", Detector.Confidence);
+      elsif Util.Strings.Starts_With (Mime, "application/octet-stream") then
+         Set_Language (Result, "mime", "Binary", Detector.Confidence);
       end if;
    end Detect;
 

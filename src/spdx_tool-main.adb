@@ -362,40 +362,40 @@ begin
    declare
       Manager : License_Manager (Opt_Tasks);
       Filter  : Util.Files.Walk.Filter_Type;
+      Mode    : Licenses.Manager.Job_Type := Licenses.Manager.FIND_LANGUAGES;
    begin
-      if Licenses.Only_Licenses /= null then
+      if not Is_Empty (Licenses.Only_Licenses) then
+         Mode := Licenses.Manager.FIND_LICENSES;
          Manager.Set_Filter (List     => Licenses.Only_Licenses.all,
                              Language => False,
                              Exclude  => False);
       end if;
-      if Licenses.Ignore_Licenses /= null then
+      if not Is_Empty (Licenses.Ignore_Licenses) then
+         Mode := Licenses.Manager.FIND_LICENSES;
          Manager.Set_Filter (List     => Licenses.Ignore_Licenses.all,
                              Language => False,
                              Exclude  => True);
       end if;
-      if Licenses.Only_Languages /= null then
+      if not Is_Empty (Licenses.Only_Languages) then
          Manager.Set_Filter (List     => Licenses.Only_Languages.all,
                              Language => True,
                              Exclude  => False);
       end if;
-      if Licenses.Ignore_Languages /= null then
+      if not Is_Empty (Licenses.Ignore_Languages) then
          Manager.Set_Filter (List     => Licenses.Ignore_Languages.all,
                              Language => True,
                              Exclude  => True);
       end if;
-      if Licenses.License_Dir /= null
-        and then Licenses.License_Dir.all /= ""
-      then
+      if not Is_Empty (Licenses.License_Dir) then
          Read_Licenses (Manager, Licenses.License_Dir.all);
       end if;
-      if SPDX_Tool.Licenses.Update_Pattern /= null
-        and then SPDX_Tool.Licenses.Update_Pattern.all /= ""
-      then
-         Manager.Configure (Tool_Config, Licenses.Manager.UPDATE_LICENSES);
+      if not Is_Empty (SPDX_Tool.Licenses.Update_Pattern) then
+         Mode := Licenses.Manager.UPDATE_LICENSES;
          Manager.Set_Update_Pattern (SPDX_Tool.Licenses.Update_Pattern.all);
-      else
-         Manager.Configure (Tool_Config, Licenses.Manager.READ_LICENSES);
+      elsif not Opt_Languages or else Opt_Check then
+         Mode := Licenses.Manager.FIND_LICENSES;
       end if;
+      Manager.Configure (Tool_Config, Mode);
       Filter.Exclude (".git");
       loop
          declare
