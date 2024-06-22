@@ -159,7 +159,7 @@ package body SPDX_Tool.Licenses.Manager is
                                                else Languages.Manager.IDENTIFY_COMMENTS));
 
       --  Setup the list of license tokens
-      if not Opt_No_Builtin then
+      if not Opt_No_Builtin and then Job /= FIND_LANGUAGES then
          Manager.Token_Counters.Default := 0;
          Manager.Token_Frequency.Default := 0.0;
          for I in Licenses.Templates.List'Range loop
@@ -454,8 +454,10 @@ package body SPDX_Tool.Licenses.Manager is
                                             Manager.License_Squares (License));
                   SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
                end;
-               Log.Debug ("Confidence with {0} -> {1}",
-                          Get_License_Name (License), C'Image);
+               if Opt_Verbose2 then
+                  Log.Info ("Confidence with {0} -> {1}",
+                            Get_License_Name (License), C'Image);
+               end if;
                if Confidence < C then
                   Confidence := C;
                   Guess := License;
