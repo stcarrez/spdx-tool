@@ -88,18 +88,6 @@ package body SPDX_Tool.Licenses is
 
    end License_Tree;
 
-   procedure Collect_License_Tokens (License : in Token_Access;
-                                     Tokens  : in out Buffer_Sets.Set) is
-      Token : Token_Access := License;
-   begin
-      while Token /= null loop
-         if Token.Kind = TOK_WORD then
-            Tokens.Include (Token.Content);
-         end if;
-         Token := Token.Next;
-      end loop;
-   end Collect_License_Tokens;
-
    function Depth (Token : in Token_Type'Class) return Natural is
       Result : Natural := 0;
       Parent : Token_Access := Token.Previous;

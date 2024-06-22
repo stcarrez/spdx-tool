@@ -91,10 +91,6 @@ package SPDX_Tool.Licenses is
    function Is_Loaded (License : in License_Template)
                        return Boolean is (License.Root /= null);
 
-   --  Collect in the Tokens set, the list of tokens used by the license text.
-   procedure Collect_License_Tokens (License : in Token_Access;
-                                     Tokens  : in out Buffer_Sets.Set);
-
    type License_Template_Array is array (License_Index range <>) of License_Template;
 
    type Content_Access is access constant Buffer_Type;
