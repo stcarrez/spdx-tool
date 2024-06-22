@@ -3,7 +3,6 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-with Ada.Containers.Indefinite_Ordered_Maps;
 
 with GNAT.Strings;
 with GNAT.Regpat;
@@ -97,10 +96,6 @@ package SPDX_Tool.Licenses is
                                      Tokens  : in out Buffer_Sets.Set);
 
    type License_Template_Array is array (License_Index range <>) of License_Template;
-
-   package Count_Maps is new Ada.Containers.Indefinite_Ordered_Maps
-     (Key_Type     => String,
-      Element_Type => Natural);
 
    type Content_Access is access constant Buffer_Type;
 
