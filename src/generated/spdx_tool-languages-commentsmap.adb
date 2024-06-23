@@ -10,94 +10,94 @@ package body SPDX_Tool.Languages.CommentsMap is
      (1, 2, 3, 4, 5, 6, 8, 9, 11, 12, 16, 24);
 
    T1 : constant array (0 .. 11) of Unsigned_16 :=
-     (616, 1077, 44, 838, 69, 214, 739, 576, 637, 850, 1106, 14);
+     (96, 569, 820, 604, 833, 871, 116, 1441, 30, 1390, 693, 864);
 
    T2 : constant array (0 .. 11) of Unsigned_16 :=
-     (547, 381, 1218, 396, 1094, 514, 529, 460, 984, 1201, 300, 1076);
+     (141, 784, 781, 422, 631, 582, 1115, 235, 359, 1284, 1255, 945);
 
-   G : constant array (0 .. 1448) of Unsigned_16 :=
-     (4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 718, 500, 0, 0, 403, 361, 0, 0, 0, 258,
-      0, 0, 0, 0, 0, 661, 382, 529, 0, 0, 61, 196, 0, 0, 524, 0, 205, 0, 1,
-      0, 215, 0, 0, 0, 0, 550, 706, 0, 0, 189, 0, 0, 0, 0, 497, 0, 579, 418,
-      0, 0, 0, 0, 56, 0, 141, 0, 36, 601, 0, 10, 0, 0, 702, 0, 57, 0, 41, 0,
-      356, 0, 0, 0, 0, 0, 0, 622, 328, 0, 0, 592, 0, 0, 0, 36, 0, 0, 0, 0,
-      635, 287, 394, 0, 493, 0, 503, 0, 0, 708, 235, 0, 0, 43, 607, 0, 0, 0,
-      0, 182, 58, 0, 615, 0, 0, 0, 0, 0, 570, 645, 0, 0, 0, 0, 0, 0, 665, 0,
-      162, 586, 0, 0, 0, 0, 90, 684, 0, 503, 660, 0, 509, 0, 0, 361, 0, 0,
-      0, 0, 0, 0, 376, 0, 0, 0, 0, 0, 0, 0, 589, 0, 0, 600, 0, 577, 449, 0,
-      556, 0, 395, 0, 0, 0, 632, 0, 251, 11, 0, 102, 371, 0, 0, 403, 0, 665,
-      0, 0, 0, 84, 336, 0, 0, 306, 0, 0, 0, 578, 0, 0, 551, 0, 0, 524, 153,
-      557, 0, 0, 0, 0, 0, 0, 193, 0, 0, 271, 0, 467, 0, 0, 0, 0, 0, 0, 181,
-      109, 671, 21, 0, 0, 0, 142, 494, 0, 0, 0, 595, 0, 0, 0, 195, 0, 0, 0,
-      220, 0, 317, 0, 0, 429, 567, 0, 704, 550, 628, 0, 0, 0, 630, 0, 37, 0,
-      0, 558, 0, 0, 415, 376, 0, 0, 0, 68, 0, 0, 19, 265, 274, 388, 224, 0,
-      0, 0, 713, 150, 0, 0, 231, 403, 22, 0, 0, 575, 126, 0, 0, 0, 145, 651,
-      250, 0, 0, 682, 665, 538, 0, 0, 167, 0, 0, 719, 0, 50, 0, 0, 0, 0, 48,
-      0, 0, 0, 446, 542, 165, 185, 341, 44, 662, 0, 0, 195, 228, 0, 210,
-      552, 0, 342, 324, 0, 145, 398, 0, 0, 699, 34, 6, 0, 720, 624, 0, 0, 0,
-      520, 0, 0, 280, 448, 0, 0, 0, 0, 0, 0, 681, 700, 0, 672, 0, 0, 571, 0,
-      320, 0, 314, 450, 461, 116, 159, 0, 250, 0, 0, 0, 0, 52, 0, 0, 0, 0,
-      254, 0, 0, 0, 0, 0, 82, 123, 0, 0, 0, 0, 0, 553, 0, 0, 0, 0, 0, 0,
-      305, 0, 57, 0, 353, 0, 0, 517, 0, 325, 447, 520, 0, 0, 0, 0, 0, 94, 0,
-      0, 682, 0, 0, 0, 142, 0, 200, 0, 581, 0, 0, 223, 0, 181, 338, 633,
-      294, 57, 331, 35, 0, 413, 660, 642, 100, 0, 0, 0, 0, 466, 651, 0, 0,
-      179, 0, 304, 233, 0, 0, 526, 85, 0, 0, 0, 496, 0, 0, 590, 0, 61, 612,
-      527, 0, 129, 280, 576, 0, 0, 49, 0, 0, 0, 369, 373, 0, 0, 0, 0, 698,
-      0, 0, 0, 88, 40, 491, 451, 0, 680, 511, 17, 268, 0, 509, 0, 0, 614,
-      14, 26, 71, 0, 0, 461, 0, 0, 0, 249, 293, 0, 181, 461, 0, 440, 65, 0,
-      277, 719, 0, 383, 0, 320, 690, 118, 0, 0, 0, 0, 165, 410, 0, 0, 0, 0,
-      0, 0, 0, 0, 305, 338, 474, 0, 0, 0, 91, 0, 561, 14, 502, 174, 25, 112,
-      341, 0, 0, 538, 521, 0, 525, 704, 0, 418, 0, 0, 328, 0, 346, 193, 75,
-      0, 461, 0, 581, 0, 0, 0, 433, 0, 0, 0, 0, 443, 0, 45, 0, 0, 637, 0, 0,
-      0, 0, 463, 0, 569, 0, 0, 614, 300, 0, 459, 140, 0, 600, 0, 50, 382,
-      32, 0, 0, 0, 53, 200, 0, 554, 0, 0, 149, 321, 0, 684, 157, 275, 521,
-      2, 0, 423, 20, 0, 309, 322, 682, 0, 315, 212, 281, 404, 0, 0, 373,
-      223, 401, 0, 569, 0, 0, 475, 125, 0, 119, 152, 0, 647, 161, 0, 0, 536,
-      159, 0, 0, 0, 241, 0, 0, 0, 207, 120, 0, 414, 596, 0, 0, 0, 0, 0, 0,
-      0, 74, 525, 345, 83, 0, 0, 0, 0, 61, 617, 0, 9, 189, 0, 681, 560, 224,
-      322, 0, 0, 238, 229, 303, 87, 0, 275, 0, 0, 0, 0, 0, 0, 715, 0, 355,
-      0, 0, 0, 0, 0, 75, 0, 192, 575, 0, 612, 85, 0, 0, 212, 298, 0, 617,
-      219, 0, 210, 0, 250, 190, 0, 569, 423, 219, 0, 0, 0, 549, 0, 686, 0,
-      626, 160, 0, 139, 0, 3, 0, 215, 0, 0, 478, 515, 87, 0, 0, 0, 659, 0,
-      0, 0, 295, 606, 692, 297, 501, 44, 189, 489, 411, 76, 0, 0, 0, 334,
-      489, 543, 0, 0, 454, 0, 0, 0, 115, 0, 661, 0, 399, 636, 45, 388, 648,
-      0, 513, 0, 0, 10, 219, 0, 300, 551, 0, 631, 533, 558, 0, 0, 0, 127, 0,
-      36, 708, 624, 0, 0, 0, 0, 0, 190, 0, 0, 0, 0, 0, 407, 239, 0, 0, 40,
-      0, 418, 0, 0, 320, 0, 0, 652, 608, 0, 672, 3, 614, 365, 419, 0, 0,
-      667, 0, 0, 187, 84, 5, 81, 0, 374, 144, 402, 0, 392, 0, 431, 0, 577,
-      0, 659, 469, 0, 30, 0, 147, 587, 0, 6, 0, 632, 0, 580, 130, 333, 0, 0,
-      394, 0, 27, 0, 615, 0, 0, 0, 22, 91, 358, 144, 446, 366, 486, 0, 0,
-      482, 56, 422, 589, 0, 0, 71, 0, 0, 237, 0, 0, 0, 0, 154, 666, 216, 0,
-      273, 0, 0, 0, 0, 0, 0, 0, 456, 0, 270, 0, 489, 312, 0, 0, 452, 477, 0,
-      0, 0, 140, 386, 291, 58, 0, 68, 0, 0, 0, 0, 0, 526, 0, 309, 418, 0,
-      286, 182, 0, 332, 308, 177, 610, 254, 445, 661, 135, 33, 0, 0, 0, 0,
-      0, 129, 0, 245, 0, 208, 0, 489, 0, 0, 537, 292, 39, 0, 0, 607, 506, 8,
-      0, 0, 239, 150, 0, 42, 576, 0, 0, 0, 610, 0, 0, 456, 0, 638, 266, 614,
-      461, 0, 603, 0, 12, 56, 114, 0, 598, 0, 0, 723, 0, 638, 80, 62, 0, 17,
-      0, 82, 392, 0, 264, 31, 652, 620, 375, 0, 484, 0, 693, 0, 175, 0, 0,
-      604, 210, 485, 68, 0, 0, 381, 0, 327, 0, 0, 516, 0, 0, 0, 0, 0, 0,
-      540, 349, 614, 0, 0, 319, 0, 0, 107, 0, 0, 635, 0, 533, 555, 0, 0, 0,
-      27, 621, 236, 377, 602, 618, 0, 64, 0, 179, 0, 718, 16, 0, 205, 0, 0,
-      235, 336, 50, 327, 130, 0, 200, 0, 318, 48, 0, 180, 0, 0, 485, 0, 0,
-      46, 636, 102, 280, 221, 283, 0, 251, 488, 473, 0, 346, 559, 0, 0, 0,
-      0, 259, 0, 472, 373, 521, 144, 105, 375, 579, 672, 293, 0, 0, 176, 18,
-      199, 0, 289, 290, 291, 0, 281, 295, 132, 586, 226, 99, 0, 0, 331, 51,
-      0, 0, 463, 0, 0, 0, 0, 0, 211, 79, 539, 0, 0, 106, 0, 647, 0, 0, 230,
-      341, 368, 0, 14, 0, 537, 0, 227, 0, 385, 355, 15, 335, 0, 68, 28, 597,
-      279, 133, 0, 13, 0, 256, 0, 367, 0, 670, 0, 342, 0, 0, 0, 0, 110, 722,
-      135, 8, 182, 498, 162, 0, 482, 414, 516, 0, 395, 21, 322, 280, 0, 250,
-      0, 499, 205, 0, 0, 637, 453, 612, 349, 0, 1, 0, 76, 0, 587, 0, 146, 0,
-      47, 0, 0, 264, 0, 405, 0, 7, 653, 0, 320, 0, 329, 135, 33, 63, 0, 588,
-      57, 0, 0, 438, 521, 0, 0, 467, 0, 0, 579, 604, 0, 0, 436, 8, 46, 0,
-      350, 194, 518, 449, 0, 0, 713, 69, 0, 103, 0, 429, 85, 0, 520, 0, 606,
-      452, 84, 6, 599, 0, 60, 118, 0, 273, 363, 0, 0, 89, 0, 649, 605, 585,
-      175, 0, 0, 421, 0, 0, 0, 216, 47, 119, 0, 0, 81, 388, 0, 696, 0, 59,
-      0, 0, 305, 199, 0, 0, 0, 0, 0, 684, 372, 0, 0, 75, 398, 0, 480, 698,
-      0, 0, 121, 250, 279, 404, 587, 472, 0, 245, 0, 0, 340, 409, 0, 0, 0,
-      0, 568, 575, 296, 617, 125, 464, 0, 0, 662, 0, 324, 527, 0, 0, 154,
-      47, 134, 267, 0, 152, 0, 0, 0, 0, 0, 0, 0, 0, 118, 307, 0, 435, 0, 0,
-      165, 168, 548, 77, 283, 0, 0, 117, 56, 0, 0, 295, 167, 0, 0, 246, 0,
-      669);
+   G : constant array (0 .. 1450) of Unsigned_16 :=
+     (650, 0, 0, 0, 0, 0, 0, 703, 0, 0, 524, 686, 217, 137, 46, 0, 0, 325,
+      0, 138, 590, 0, 0, 0, 0, 455, 0, 0, 0, 0, 327, 0, 0, 0, 0, 583, 0, 0,
+      0, 660, 0, 0, 152, 0, 454, 0, 558, 0, 0, 511, 0, 0, 0, 0, 0, 0, 294,
+      0, 0, 0, 245, 219, 149, 0, 396, 0, 31, 0, 364, 0, 0, 0, 391, 423, 0,
+      0, 112, 640, 135, 0, 663, 0, 0, 0, 0, 0, 524, 0, 372, 0, 0, 538, 0,
+      336, 0, 76, 158, 0, 134, 167, 0, 0, 631, 292, 47, 0, 0, 120, 0, 0,
+      358, 0, 0, 0, 0, 291, 164, 710, 0, 0, 0, 0, 686, 77, 0, 0, 0, 403, 0,
+      0, 392, 0, 102, 0, 0, 33, 647, 0, 345, 105, 0, 0, 0, 0, 0, 0, 381, 0,
+      605, 629, 0, 0, 580, 0, 717, 0, 0, 4, 0, 461, 395, 0, 0, 0, 0, 79, 0,
+      0, 382, 0, 0, 0, 674, 566, 0, 525, 223, 351, 605, 436, 0, 494, 106,
+      703, 335, 0, 0, 0, 485, 348, 0, 0, 295, 299, 0, 0, 409, 0, 28, 593, 0,
+      422, 0, 0, 0, 327, 0, 545, 0, 595, 0, 534, 0, 0, 0, 0, 0, 0, 371, 384,
+      0, 603, 0, 0, 0, 0, 0, 0, 13, 325, 724, 0, 4, 0, 0, 0, 92, 175, 394,
+      0, 380, 0, 662, 621, 242, 388, 0, 0, 0, 0, 241, 309, 0, 0, 0, 0, 0,
+      312, 162, 0, 242, 0, 0, 0, 0, 87, 596, 0, 0, 575, 251, 0, 0, 0, 0, 62,
+      403, 0, 0, 0, 0, 0, 97, 0, 0, 2, 0, 487, 0, 221, 99, 76, 0, 0, 0, 4,
+      125, 0, 0, 0, 445, 0, 8, 112, 596, 215, 628, 0, 661, 298, 85, 0, 0,
+      358, 435, 0, 0, 0, 0, 704, 0, 0, 28, 359, 0, 0, 0, 698, 0, 169, 100,
+      0, 318, 0, 0, 211, 0, 345, 656, 0, 0, 675, 0, 0, 116, 0, 636, 0, 226,
+      0, 199, 537, 0, 0, 169, 0, 0, 376, 230, 0, 149, 0, 308, 265, 249, 0,
+      0, 428, 640, 0, 0, 163, 135, 0, 0, 488, 433, 0, 0, 637, 0, 0, 384, 0,
+      0, 0, 207, 0, 592, 0, 29, 188, 196, 176, 430, 477, 0, 386, 0, 0, 508,
+      0, 0, 0, 0, 258, 0, 685, 0, 0, 0, 0, 0, 116, 133, 342, 413, 642, 0,
+      427, 402, 721, 0, 638, 482, 0, 0, 259, 0, 0, 0, 0, 0, 724, 0, 333,
+      311, 163, 514, 11, 0, 0, 441, 0, 0, 0, 146, 624, 0, 0, 269, 0, 0, 0,
+      0, 44, 549, 457, 139, 490, 0, 483, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 305,
+      0, 230, 0, 0, 266, 0, 0, 45, 0, 377, 0, 0, 0, 0, 0, 517, 0, 542, 0, 0,
+      249, 701, 0, 144, 38, 350, 0, 0, 0, 0, 0, 661, 0, 0, 0, 228, 0, 428,
+      202, 401, 0, 433, 0, 630, 0, 0, 270, 0, 0, 0, 0, 0, 390, 0, 0, 331, 0,
+      402, 0, 364, 0, 0, 0, 0, 539, 599, 404, 0, 0, 180, 175, 476, 0, 0,
+      599, 253, 0, 0, 0, 646, 415, 0, 0, 28, 389, 344, 0, 393, 0, 285, 183,
+      0, 109, 0, 276, 0, 0, 614, 0, 288, 56, 0, 168, 295, 112, 0, 0, 0, 373,
+      604, 254, 0, 0, 0, 23, 318, 330, 71, 158, 0, 0, 186, 0, 0, 0, 88, 452,
+      0, 429, 0, 401, 0, 388, 117, 0, 616, 119, 497, 29, 0, 0, 193, 0, 248,
+      198, 0, 145, 0, 0, 0, 0, 660, 74, 435, 194, 0, 618, 296, 0, 499, 198,
+      129, 0, 0, 679, 642, 671, 48, 0, 0, 622, 0, 0, 630, 0, 527, 0, 0, 0,
+      0, 252, 0, 0, 0, 0, 52, 0, 92, 0, 0, 0, 0, 0, 366, 0, 6, 550, 0, 0, 0,
+      303, 21, 0, 0, 0, 204, 0, 443, 417, 0, 546, 0, 32, 0, 0, 0, 107, 126,
+      5, 0, 380, 195, 0, 0, 0, 0, 0, 86, 105, 0, 0, 0, 381, 493, 0, 0, 697,
+      8, 0, 0, 0, 0, 0, 0, 0, 20, 267, 0, 0, 0, 0, 199, 0, 0, 253, 0, 0, 0,
+      47, 0, 662, 45, 19, 0, 0, 278, 254, 655, 68, 0, 0, 92, 152, 0, 166,
+      684, 174, 0, 710, 0, 204, 0, 0, 0, 485, 0, 0, 0, 0, 0, 298, 273, 0,
+      59, 279, 0, 0, 251, 697, 369, 0, 386, 0, 650, 0, 0, 571, 224, 41, 231,
+      0, 374, 617, 530, 0, 535, 0, 23, 595, 95, 0, 148, 438, 528, 0, 0, 119,
+      0, 0, 643, 0, 254, 0, 0, 354, 0, 394, 534, 0, 0, 333, 0, 0, 263, 0,
+      470, 688, 475, 456, 0, 210, 0, 404, 319, 440, 0, 0, 411, 0, 186, 208,
+      427, 209, 0, 707, 0, 61, 0, 0, 631, 0, 671, 616, 127, 229, 126, 214,
+      91, 0, 15, 0, 594, 0, 458, 629, 88, 506, 0, 0, 479, 173, 0, 595, 668,
+      0, 138, 0, 0, 0, 0, 0, 58, 529, 0, 227, 178, 113, 104, 0, 595, 0, 0,
+      97, 315, 554, 573, 591, 506, 0, 0, 278, 371, 0, 694, 0, 0, 0, 395,
+      294, 95, 557, 0, 562, 708, 0, 0, 0, 0, 262, 479, 302, 678, 0, 0, 0, 0,
+      313, 0, 0, 0, 0, 517, 584, 169, 0, 0, 406, 0, 707, 317, 93, 164, 0,
+      105, 307, 349, 374, 39, 696, 0, 489, 248, 200, 0, 0, 0, 0, 9, 0, 31,
+      2, 625, 689, 0, 348, 713, 0, 16, 0, 0, 0, 0, 0, 0, 412, 0, 28, 10, 0,
+      464, 0, 432, 0, 533, 0, 0, 322, 0, 0, 237, 0, 128, 0, 0, 0, 0, 0, 523,
+      0, 347, 249, 36, 0, 0, 99, 708, 322, 0, 98, 429, 103, 417, 0, 36, 648,
+      484, 0, 0, 333, 129, 190, 0, 0, 0, 0, 0, 0, 240, 383, 317, 321, 547,
+      338, 84, 34, 697, 0, 416, 99, 0, 324, 2, 262, 0, 0, 56, 0, 0, 62, 161,
+      0, 0, 593, 0, 444, 0, 0, 0, 0, 286, 0, 182, 0, 696, 334, 556, 0, 319,
+      531, 0, 0, 507, 551, 460, 389, 241, 0, 279, 472, 0, 129, 495, 0, 572,
+      24, 0, 0, 0, 0, 348, 698, 0, 208, 607, 0, 0, 0, 147, 0, 531, 0, 0, 0,
+      164, 600, 265, 0, 0, 0, 0, 25, 0, 722, 0, 0, 5, 311, 218, 177, 393, 0,
+      0, 0, 431, 0, 163, 0, 0, 452, 0, 712, 0, 0, 0, 274, 0, 0, 58, 361,
+      367, 536, 551, 541, 0, 0, 187, 257, 0, 284, 0, 0, 568, 370, 0, 163,
+      90, 195, 567, 0, 653, 675, 660, 372, 407, 341, 22, 0, 277, 284, 610,
+      418, 0, 379, 197, 672, 0, 0, 342, 0, 0, 63, 0, 410, 0, 0, 0, 96, 71,
+      191, 677, 53, 667, 0, 0, 0, 226, 607, 69, 10, 43, 0, 389, 317, 0, 0,
+      0, 0, 0, 172, 475, 304, 42, 0, 0, 0, 117, 493, 0, 0, 491, 0, 588, 498,
+      0, 698, 584, 0, 0, 0, 0, 266, 0, 0, 25, 120, 0, 350, 0, 0, 85, 0, 0,
+      0, 348, 0, 191, 8, 0, 0, 0, 0, 238, 0, 0, 0, 0, 118, 0, 0, 390, 577,
+      0, 138, 0, 0, 0, 625, 0, 353, 461, 64, 0, 60, 0, 638, 407, 575, 0,
+      447, 0, 0, 0, 696, 106, 3, 0, 0, 362, 313, 0, 718, 0, 0, 459, 598,
+      350, 0, 141, 0, 82, 0, 45, 365, 711, 0, 162, 299, 81, 85, 0, 0, 0, 0,
+      137, 454, 0, 223, 430, 0, 0, 645, 72, 0, 0, 376, 0, 0, 0, 624, 650,
+      242, 0, 676, 104, 226, 0, 539, 205, 328, 248, 375, 0, 0, 533, 0, 715,
+      0, 334, 0, 339, 0, 35, 360, 64, 0, 0, 301, 395, 635, 424, 468, 154,
+      201, 0, 179, 0, 0, 171, 68, 171, 621, 0, 0, 508, 38, 80, 572, 50, 181,
+      0, 0, 633, 269, 0, 408, 0, 0, 0, 537, 149, 540, 0, 7, 0, 604, 0, 0,
+      444, 0, 0, 0, 0, 0, 0, 18, 449, 289, 99, 483, 0, 434, 0, 621, 180, 0,
+      0, 0, 679, 394, 335, 51, 0, 153, 251, 0, 1, 501, 236, 390, 414, 120,
+      505, 70, 0, 150, 546, 0, 571, 0, 455, 270, 0, 400, 389, 103, 164, 252,
+      0, 193, 0, 334, 263, 456, 145, 0, 523, 0, 612);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -108,10 +108,10 @@ package body SPDX_Tool.Languages.CommentsMap is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 1449;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 1449;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 1451;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 1451;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 724;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 725;
    end Hash;
 
    type Name_Array is array (Natural range <>) of Content_Access;
@@ -1366,204 +1366,206 @@ package body SPDX_Tool.Languages.CommentsMap is
    M_623           : aliased constant String := "";
    K_624           : aliased constant String := "Astro";
    M_624           : aliased constant String := "";
-   K_625           : aliased constant String := "Rust";
-   M_625           : aliased constant String := "C-style";
-   K_626           : aliased constant String := "OpenAPI Specification v2";
-   M_626           : aliased constant String := "";
-   K_627           : aliased constant String := "FLUX";
+   K_625           : aliased constant String := "DTD";
+   M_625           : aliased constant String := "XML";
+   K_626           : aliased constant String := "Rust";
+   M_626           : aliased constant String := "C-style";
+   K_627           : aliased constant String := "OpenAPI Specification v2";
    M_627           : aliased constant String := "";
-   K_628           : aliased constant String := "Opal";
+   K_628           : aliased constant String := "FLUX";
    M_628           : aliased constant String := "";
-   K_629           : aliased constant String := "OpenAPI Specification v3";
+   K_629           : aliased constant String := "Opal";
    M_629           : aliased constant String := "";
-   K_630           : aliased constant String := "Xtend";
+   K_630           : aliased constant String := "OpenAPI Specification v3";
    M_630           : aliased constant String := "";
-   K_631           : aliased constant String := "WebAssembly";
+   K_631           : aliased constant String := "Xtend";
    M_631           : aliased constant String := "";
-   K_632           : aliased constant String := "Mathematica";
+   K_632           : aliased constant String := "WebAssembly";
    M_632           : aliased constant String := "";
-   K_633           : aliased constant String := "NewLisp";
+   K_633           : aliased constant String := "Mathematica";
    M_633           : aliased constant String := "";
-   K_634           : aliased constant String := "HTML+EEX";
+   K_634           : aliased constant String := "NewLisp";
    M_634           : aliased constant String := "";
-   K_635           : aliased constant String := "XC";
+   K_635           : aliased constant String := "HTML+EEX";
    M_635           : aliased constant String := "";
-   K_636           : aliased constant String := "Cap'n Proto";
+   K_636           : aliased constant String := "XC";
    M_636           : aliased constant String := "";
-   K_637           : aliased constant String := "PEG.js";
+   K_637           : aliased constant String := "Cap'n Proto";
    M_637           : aliased constant String := "";
-   K_638           : aliased constant String := "ECL";
+   K_638           : aliased constant String := "PEG.js";
    M_638           : aliased constant String := "";
-   K_639           : aliased constant String := "Just";
+   K_639           : aliased constant String := "ECL";
    M_639           : aliased constant String := "";
-   K_640           : aliased constant String := "Nemerle";
+   K_640           : aliased constant String := "Just";
    M_640           : aliased constant String := "";
-   K_641           : aliased constant String := "Stylus";
+   K_641           : aliased constant String := "Nemerle";
    M_641           : aliased constant String := "";
-   K_642           : aliased constant String := "Uno";
+   K_642           : aliased constant String := "Stylus";
    M_642           : aliased constant String := "";
-   K_643           : aliased constant String := "Vim Help File";
+   K_643           : aliased constant String := "Uno";
    M_643           : aliased constant String := "";
-   K_644           : aliased constant String := "Ant Build System";
+   K_644           : aliased constant String := "Vim Help File";
    M_644           : aliased constant String := "";
-   K_645           : aliased constant String := "AL";
+   K_645           : aliased constant String := "Ant Build System";
    M_645           : aliased constant String := "";
-   K_646           : aliased constant String := "Vim Snippet";
+   K_646           : aliased constant String := "AL";
    M_646           : aliased constant String := "";
-   K_647           : aliased constant String := "Dylan";
+   K_647           : aliased constant String := "Vim Snippet";
    M_647           : aliased constant String := "";
-   K_648           : aliased constant String := "Agda";
+   K_648           : aliased constant String := "Dylan";
    M_648           : aliased constant String := "";
-   K_649           : aliased constant String := "Mask";
+   K_649           : aliased constant String := "Agda";
    M_649           : aliased constant String := "";
-   K_650           : aliased constant String := "XS";
+   K_650           : aliased constant String := "Mask";
    M_650           : aliased constant String := "";
-   K_651           : aliased constant String := "Nu";
+   K_651           : aliased constant String := "XS";
    M_651           : aliased constant String := "";
-   K_652           : aliased constant String := "Rascal";
+   K_652           : aliased constant String := "Nu";
    M_652           : aliased constant String := "";
-   K_653           : aliased constant String := "IDL";
+   K_653           : aliased constant String := "Rascal";
    M_653           : aliased constant String := "";
-   K_654           : aliased constant String := "NetLogo";
+   K_654           : aliased constant String := "IDL";
    M_654           : aliased constant String := "";
-   K_655           : aliased constant String := "Factor";
+   K_655           : aliased constant String := "NetLogo";
    M_655           : aliased constant String := "";
-   K_656           : aliased constant String := "POV-Ray SDL";
+   K_656           : aliased constant String := "Factor";
    M_656           : aliased constant String := "";
-   K_657           : aliased constant String := "Nginx";
+   K_657           : aliased constant String := "POV-Ray SDL";
    M_657           : aliased constant String := "";
-   K_658           : aliased constant String := "Jasmin";
+   K_658           : aliased constant String := "Nginx";
    M_658           : aliased constant String := "";
-   K_659           : aliased constant String := "RAML";
+   K_659           : aliased constant String := "Jasmin";
    M_659           : aliased constant String := "";
-   K_660           : aliased constant String := "RBS";
+   K_660           : aliased constant String := "RAML";
    M_660           : aliased constant String := "";
-   K_661           : aliased constant String := "Emacs Lisp";
+   K_661           : aliased constant String := "RBS";
    M_661           : aliased constant String := "";
-   K_662           : aliased constant String := "SSH Config";
+   K_662           : aliased constant String := "Emacs Lisp";
    M_662           : aliased constant String := "";
-   K_663           : aliased constant String := "mIRC Script";
+   K_663           : aliased constant String := "SSH Config";
    M_663           : aliased constant String := "";
-   K_664           : aliased constant String := "ReasonLIGO";
+   K_664           : aliased constant String := "mIRC Script";
    M_664           : aliased constant String := "";
-   K_665           : aliased constant String := "Twig";
+   K_665           : aliased constant String := "ReasonLIGO";
    M_665           : aliased constant String := "";
-   K_666           : aliased constant String := "4D";
+   K_666           : aliased constant String := "Twig";
    M_666           : aliased constant String := "";
-   K_667           : aliased constant String := "Harbour";
+   K_667           : aliased constant String := "4D";
    M_667           : aliased constant String := "";
-   K_668           : aliased constant String := "Module Management System";
+   K_668           : aliased constant String := "Harbour";
    M_668           : aliased constant String := "";
-   K_669           : aliased constant String := "Wavefront Material";
+   K_669           : aliased constant String := "Module Management System";
    M_669           : aliased constant String := "";
-   K_670           : aliased constant String := "CLIPS";
+   K_670           : aliased constant String := "Wavefront Material";
    M_670           : aliased constant String := "";
-   K_671           : aliased constant String := "OpenRC runscript";
+   K_671           : aliased constant String := "CLIPS";
    M_671           : aliased constant String := "";
-   K_672           : aliased constant String := "HolyC";
+   K_672           : aliased constant String := "OpenRC runscript";
    M_672           : aliased constant String := "";
-   K_673           : aliased constant String := "Parrot";
+   K_673           : aliased constant String := "HolyC";
    M_673           : aliased constant String := "";
-   K_674           : aliased constant String := "PigLatin";
+   K_674           : aliased constant String := "Parrot";
    M_674           : aliased constant String := "";
-   K_675           : aliased constant String := "VCL";
+   K_675           : aliased constant String := "PigLatin";
    M_675           : aliased constant String := "";
-   K_676           : aliased constant String := "Fennel";
+   K_676           : aliased constant String := "VCL";
    M_676           : aliased constant String := "";
-   K_677           : aliased constant String := "LiveScript";
+   K_677           : aliased constant String := "Fennel";
    M_677           : aliased constant String := "";
-   K_678           : aliased constant String := "Jest Snapshot";
+   K_678           : aliased constant String := "LiveScript";
    M_678           : aliased constant String := "";
-   K_679           : aliased constant String := "TeX";
+   K_679           : aliased constant String := "Jest Snapshot";
    M_679           : aliased constant String := "";
-   K_680           : aliased constant String := "AngelScript";
+   K_680           : aliased constant String := "TeX";
    M_680           : aliased constant String := "";
-   K_681           : aliased constant String := "PureScript";
+   K_681           : aliased constant String := "AngelScript";
    M_681           : aliased constant String := "";
-   K_682           : aliased constant String := "INI";
+   K_682           : aliased constant String := "PureScript";
    M_682           : aliased constant String := "";
-   K_683           : aliased constant String := "Fortran Free Form";
+   K_683           : aliased constant String := "INI";
    M_683           : aliased constant String := "";
-   K_684           : aliased constant String := "Perl";
-   M_684           : aliased constant String := "Shell";
-   K_685           : aliased constant String := "Tea";
-   M_685           : aliased constant String := "";
-   K_686           : aliased constant String := "OpenStep Property List";
+   K_684           : aliased constant String := "Fortran Free Form";
+   M_684           : aliased constant String := "";
+   K_685           : aliased constant String := "Perl";
+   M_685           : aliased constant String := "Shell";
+   K_686           : aliased constant String := "Tea";
    M_686           : aliased constant String := "";
-   K_687           : aliased constant String := "Slint";
+   K_687           : aliased constant String := "OpenStep Property List";
    M_687           : aliased constant String := "";
-   K_688           : aliased constant String := "VHDL";
+   K_688           : aliased constant String := "Slint";
    M_688           : aliased constant String := "";
-   K_689           : aliased constant String := "Game Maker Language";
+   K_689           : aliased constant String := "VHDL";
    M_689           : aliased constant String := "";
-   K_690           : aliased constant String := "SQLPL";
+   K_690           : aliased constant String := "Game Maker Language";
    M_690           : aliased constant String := "";
-   K_691           : aliased constant String := "MTML";
+   K_691           : aliased constant String := "SQLPL";
    M_691           : aliased constant String := "";
-   K_692           : aliased constant String := "Coq";
+   K_692           : aliased constant String := "MTML";
    M_692           : aliased constant String := "";
-   K_693           : aliased constant String := "TXL";
+   K_693           : aliased constant String := "Coq";
    M_693           : aliased constant String := "";
-   K_694           : aliased constant String := "Textile";
+   K_694           : aliased constant String := "TXL";
    M_694           : aliased constant String := "";
-   K_695           : aliased constant String := "CameLIGO";
+   K_695           : aliased constant String := "Textile";
    M_695           : aliased constant String := "";
-   K_696           : aliased constant String := "Protocol Buffer";
+   K_696           : aliased constant String := "CameLIGO";
    M_696           : aliased constant String := "";
-   K_697           : aliased constant String := "COBOL";
+   K_697           : aliased constant String := "Protocol Buffer";
    M_697           : aliased constant String := "";
-   K_698           : aliased constant String := "NetLinx";
+   K_698           : aliased constant String := "COBOL";
    M_698           : aliased constant String := "";
-   K_699           : aliased constant String := "Ecere Projects";
+   K_699           : aliased constant String := "NetLinx";
    M_699           : aliased constant String := "";
-   K_700           : aliased constant String := "KiCad Schematic";
+   K_700           : aliased constant String := "Ecere Projects";
    M_700           : aliased constant String := "";
-   K_701           : aliased constant String := "HLSL";
+   K_701           : aliased constant String := "KiCad Schematic";
    M_701           : aliased constant String := "";
-   K_702           : aliased constant String := "Bluespec";
+   K_702           : aliased constant String := "HLSL";
    M_702           : aliased constant String := "";
-   K_703           : aliased constant String := "PDDL";
+   K_703           : aliased constant String := "Bluespec";
    M_703           : aliased constant String := "";
-   K_704           : aliased constant String := "Windows Registry Entries";
+   K_704           : aliased constant String := "PDDL";
    M_704           : aliased constant String := "";
-   K_705           : aliased constant String := "XPages";
+   K_705           : aliased constant String := "Windows Registry Entries";
    M_705           : aliased constant String := "";
-   K_706           : aliased constant String := "CUE";
+   K_706           : aliased constant String := "XPages";
    M_706           : aliased constant String := "";
-   K_707           : aliased constant String := "MATLAB";
+   K_707           : aliased constant String := "CUE";
    M_707           : aliased constant String := "";
-   K_708           : aliased constant String := "Git Revision List";
+   K_708           : aliased constant String := "MATLAB";
    M_708           : aliased constant String := "";
-   K_709           : aliased constant String := "SCSS";
+   K_709           : aliased constant String := "Git Revision List";
    M_709           : aliased constant String := "";
-   K_710           : aliased constant String := "Kotlin";
-   M_710           : aliased constant String := "C-style";
-   K_711           : aliased constant String := "Scala";
+   K_710           : aliased constant String := "SCSS";
+   M_710           : aliased constant String := "";
+   K_711           : aliased constant String := "Kotlin";
    M_711           : aliased constant String := "C-style";
-   K_712           : aliased constant String := "Formatted";
-   M_712           : aliased constant String := "";
-   K_713           : aliased constant String := "Boogie";
+   K_712           : aliased constant String := "Scala";
+   M_712           : aliased constant String := "C-style";
+   K_713           : aliased constant String := "Formatted";
    M_713           : aliased constant String := "";
-   K_714           : aliased constant String := "Handlebars";
+   K_714           : aliased constant String := "Boogie";
    M_714           : aliased constant String := "";
-   K_715           : aliased constant String := "REXX";
+   K_715           : aliased constant String := "Handlebars";
    M_715           : aliased constant String := "";
-   K_716           : aliased constant String := "Pure Data";
+   K_716           : aliased constant String := "REXX";
    M_716           : aliased constant String := "";
-   K_717           : aliased constant String := "Elixir";
-   M_717           : aliased constant String := "Shell";
-   K_718           : aliased constant String := "Grammatical Framework";
-   M_718           : aliased constant String := "";
-   K_719           : aliased constant String := "LSL";
+   K_717           : aliased constant String := "Pure Data";
+   M_717           : aliased constant String := "";
+   K_718           : aliased constant String := "Elixir";
+   M_718           : aliased constant String := "Shell";
+   K_719           : aliased constant String := "Grammatical Framework";
    M_719           : aliased constant String := "";
-   K_720           : aliased constant String := "XProc";
+   K_720           : aliased constant String := "LSL";
    M_720           : aliased constant String := "";
-   K_721           : aliased constant String := "Csound Score";
+   K_721           : aliased constant String := "XProc";
    M_721           : aliased constant String := "";
-   K_722           : aliased constant String := "AutoHotkey";
+   K_722           : aliased constant String := "Csound Score";
    M_722           : aliased constant String := "";
-   K_723           : aliased constant String := "X BitMap";
+   K_723           : aliased constant String := "AutoHotkey";
    M_723           : aliased constant String := "";
+   K_724           : aliased constant String := "X BitMap";
+   M_724           : aliased constant String := "";
 
    Names : constant Name_Array := (
       K_0'Access, K_1'Access, K_2'Access, K_3'Access,
@@ -1746,7 +1748,8 @@ package body SPDX_Tool.Languages.CommentsMap is
       K_708'Access, K_709'Access, K_710'Access, K_711'Access,
       K_712'Access, K_713'Access, K_714'Access, K_715'Access,
       K_716'Access, K_717'Access, K_718'Access, K_719'Access,
-      K_720'Access, K_721'Access, K_722'Access, K_723'Access);
+      K_720'Access, K_721'Access, K_722'Access, K_723'Access,
+      K_724'Access);
 
    Contents : constant Name_Array := (
       M_0'Access, M_1'Access, M_2'Access, M_3'Access,
@@ -1929,7 +1932,8 @@ package body SPDX_Tool.Languages.CommentsMap is
       M_708'Access, M_709'Access, M_710'Access, M_711'Access,
       M_712'Access, M_713'Access, M_714'Access, M_715'Access,
       M_716'Access, M_717'Access, M_718'Access, M_719'Access,
-      M_720'Access, M_721'Access, M_722'Access, M_723'Access);
+      M_720'Access, M_721'Access, M_722'Access, M_723'Access,
+      M_724'Access);
 
    function Get_Mapping (Name : String) return access constant String is
       H : constant Natural := Hash (Name);
