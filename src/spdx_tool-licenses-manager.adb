@@ -502,9 +502,10 @@ package body SPDX_Tool.Licenses.Manager is
             end if;
             if Match.Last /= null then
                if Match.Info.First_Line + 1 < Match.Info.Last_Line then
-                  Log.Info ("license missmatch at line{0} after {1} lines",
+                  Log.Info ("license missmatch at line{0} after {1} lines ({2} matched)",
                             Match.Info.Last_Line'Image,
-                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));
+                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line),
+                            Infos.Percent_Image (Match.Confidence));
                end if;
                Match.Depth := Match.Last.Depth;
                if Result.Last = null or else Match.Depth > Result.Depth then
@@ -575,9 +576,10 @@ package body SPDX_Tool.Licenses.Manager is
             end if;
             if Match.Last /= null then
                if Match.Info.First_Line + 1 < Match.Info.Last_Line then
-                  Log.Info ("license missmatch at line{0} after {1} lines",
+                  Log.Info ("license missmatch at line{0} after {1} lines ({2} matched)",
                             Match.Info.Last_Line'Image,
-                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));
+                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line),
+                            Infos.Percent_Image (Match.Confidence));
                end if;
                Match.Depth := Match.Last.Depth;
                if Result.Last = null or else Match.Depth > Result.Depth then

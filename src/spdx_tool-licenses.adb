@@ -392,12 +392,37 @@ package body SPDX_Tool.Licenses is
                                From    : in Line_Number;
                                To      : in Line_Number)
                           return License_Match is
+      function Count_Remaining (From : Token_Access) return Natural;
+      function Confidence (Current, Remain : Natural) return Infos.Confidence_Type;
+
+      function Count_Remaining (From : Token_Access) return Natural is
+         Count : Natural := 0;
+         Node  : Token_Access := From;
+      begin
+         while Node /= null loop
+            Node := Node.Next;
+            Count := Count + 1;
+         end loop;
+         return Count;
+      end Count_Remaining;
+
+      function Confidence (Current, Remain : Natural) return Infos.Confidence_Type is
+         use Infos;
+      begin
+         if Remain = 0 then
+            return 1.0;
+         else
+            return Confidence_Type (Float (Current) / Float (Current + Remain));
+         end if;
+      end Confidence;
+
       Current : Token_Access := null;
       Result  : License_Match;
       Pos, First : Line_Pos;
       Next_Token : Token_Access;
       Last : Line_Pos;
       Len        : Buffer_Size;
+      Match_Count : Natural := 0;
    begin
       Result.Info.First_Line := From;
       Pos.Line := From;
@@ -435,8 +460,10 @@ package body SPDX_Tool.Licenses is
                if Next_Token = null then
                   Result.Info.Last_Line := Pos.Line;
                   Result.Last := Current;
+                  Result.Confidence := Confidence (Match_Count, Count_Remaining (Current));
                   return Result;
                end if;
+               Match_Count := Match_Count + 1;
                Current := Next_Token;
                if Current.Next /= null
                  and then Current.Next.Kind = TOK_LICENSE
@@ -448,6 +475,7 @@ package body SPDX_Tool.Licenses is
                   Result.Info.Last_Line := Pos.Line;
                   Result.Info.Match := Infos.TEMPLATE_LICENSE;
                   Result.Last := Current;
+                  Result.Confidence := 1.0;
                   return Result;
                end if;
             end loop;
@@ -460,6 +488,7 @@ package body SPDX_Tool.Licenses is
       Result.Info.Last_Line := Pos.Line;
       Result.Info.Match := Infos.UNKNOWN_LICENSE;
       Result.Last := null;
+      Result.Confidence := Confidence (Match_Count, Count_Remaining (Current));
       return Result;
    end Look_License_Tree;
 
@@ -525,10 +554,11 @@ package body SPDX_Tool.Licenses is
                   return Match;
                end if;
                if Match.Last /= null and then Match.Info.First_Line + 1 < Match.Info.Last_Line then
-                  Log.Info ("license '{0}' missmatch at line{1} after {2} lines",
+                  Log.Info ("license '{0}' missmatch at line{1} after {2} lines ({3} matched)",
                             Licenses.Files.Names (License).all,
                             Match.Info.Last_Line'Image,
-                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line));
+                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line),
+                            Infos.Percent_Image (Match.Confidence));
                end if;
                exit when Match.Info.First_Line + 1 < Match.Info.Last_Line;
                if Match.Last /= null then

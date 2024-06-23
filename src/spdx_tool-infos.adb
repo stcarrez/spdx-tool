@@ -8,6 +8,29 @@ with Ada.Strings.Fixed;
 package body SPDX_Tool.Infos is
 
    --  ------------------------------
+   --  Print the confidence as a percentage (0.0 .. 100.0%).
+   --  ------------------------------
+   function Percent_Image (Confidence : in Confidence_Type) return String is
+   begin
+      if Confidence = 1.0 then
+         return "100%";
+      elsif Confidence = 0.0 then
+         return "0%";
+      else
+         declare
+            Value  : constant Natural := Natural (Float (Confidence) * 1000.0);
+            Div    : constant Natural := Value mod 10;
+         begin
+            if Div = 0 then
+               return Util.Strings.Image (Value / 10) & '%';
+            else
+               return Util.Strings.Image (Value / 10) & '.' & Util.Strings.Image (Div) & '%';
+            end if;
+         end;
+      end if;
+   end Percent_Image;
+
+   --  ------------------------------
    --  Convert the string into a range of two integers.
    --  The string format is either <num> or <first>..<last>.
    --  A Constraint_Error exception is raised with a message if it is invalid.

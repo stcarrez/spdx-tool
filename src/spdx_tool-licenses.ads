@@ -11,7 +11,6 @@ with Util.Algorithms.Arrays;
 
 with SPDX_Tool.Files;
 with SPDX_Tool.Infos;
-with SPDX_Tool.Buffer_Sets;
 with SPDX_Tool.Languages;
 with SPDX_Tool.Counter_Arrays;
 with Util.Measures;
@@ -47,9 +46,10 @@ package SPDX_Tool.Licenses is
    type Token_Access is access all Token_Type'Class;
 
    type License_Match is record
-      Info  : Infos.License_Info;
-      Last  : Token_Access;
-      Depth : Natural := 0;
+      Info       : Infos.License_Info;
+      Last       : Token_Access;
+      Depth      : Natural := 0;
+      Confidence : Infos.Confidence_Type := 0.0;
    end record;
 
    type License_Template is record

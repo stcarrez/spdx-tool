@@ -46,6 +46,9 @@ package SPDX_Tool.Infos is
    --  The confidence of guessing the license.
    type Confidence_Type is delta 0.001 range 0.0 .. 1.0;
 
+   --  Print the confidence as a percentage (0.0 .. 100.0%).
+   function Percent_Image (Confidence : in Confidence_Type) return String;
+
    --  Information about the license that was identified in the file.
    type License_Info is record
       First_Line : Line_Count := 0;
