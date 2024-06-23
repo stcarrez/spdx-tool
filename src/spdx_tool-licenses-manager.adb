@@ -557,6 +557,8 @@ package body SPDX_Tool.Licenses.Manager is
                end loop;
             end;
          end loop;
+         Log.Info ("No exact match on {0} licenses",
+                   Util.Strings.Image (Get_Count (Checked)));
          for Line in First_Line .. Last_Line loop
             Match := Manager.Guess_License (File.Lines, Line, Last_Line);
             if Match.Info.Match = Infos.GUESSED_LICENSE then
