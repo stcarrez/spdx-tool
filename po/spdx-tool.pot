@@ -68,7 +68,7 @@ msgstr ""
 msgid "error"
 msgstr ""
 
-#: spdx_tool-files-manager.adb spdx_tool-main.adb spdx_tool-magic_manager.adb spdx_tool-licenses-manager.adb spdx_tool-licenses-reader.adb spdx_tool-configs.adb spdx_tool-languages-manager.adb
+#: spdx_tool-licenses-reader.adb spdx_tool-configs.adb spdx_tool-languages-manager.adb spdx_tool-magic_manager.adb spdx_tool-files-manager.adb spdx_tool-main.adb spdx_tool-licenses-manager.adb
 msgid "Error"
 msgstr ""
 
@@ -124,12 +124,12 @@ msgstr ""
 msgid "Include pattern {0}"
 msgstr ""
 
-#: spdx_tool-licenses-manager.adb spdx_tool-licenses.adb spdx_tool-languages.adb spdx_tool-files-manager.adb spdx_tool-configs.adb spdx_tool-languages-manager.adb
-msgid "Info"
-msgstr ""
-
 #: spdx_tool.adb
 msgid "info"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb spdx_tool-files-manager.adb spdx_tool-languages.adb spdx_tool-languages-manager.adb spdx_tool-licenses.adb spdx_tool-configs.adb
+msgid "Info"
 msgstr ""
 
 #: spdx_tool-licenses-manager.adb
@@ -297,6 +297,10 @@ msgid "scan file {0}"
 msgstr ""
 
 #: spdx_tool-main.adb
+msgid "Scan git submodules"
+msgstr ""
+
+#: spdx_tool-main.adb
 msgid "some internal error occurred"
 msgstr ""
 
@@ -376,7 +380,7 @@ msgstr ""
 msgid "{0}: no license found"
 msgstr ""
 
-#: spdx_tool-configs.adb spdx_tool-licenses-manager.adb
+#: spdx_tool-licenses-manager.adb spdx_tool-configs.adb
 msgid "{0}: {1}"
 msgstr ""
 
