@@ -30,6 +30,14 @@
       ],
       "comment_style": "C-style"
    },
+   "DTD": {
+      "type": "programming",
+      "extensions": [
+         ".dtd",
+         ".ent"
+      ],
+      "comment_style": "XML"
+   },
    "Ada": {
       "comment_style": "dash-style"
    },

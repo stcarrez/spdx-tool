@@ -1547,6 +1547,9 @@
         {
           "language": "XML",
           "pattern": "^\\s*<\\?xml"
+        },
+        {
+           "language": "Rust"
         }
       ]
     },
