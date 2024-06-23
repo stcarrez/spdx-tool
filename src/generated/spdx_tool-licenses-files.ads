@@ -12,7 +12,6 @@ package SPDX_Tool.Licenses.Files is
 
 private
 
-
    K_0             : aliased constant String := "Apache-2.0-alt";
    K_1             : aliased constant String := "gnat-asis";
    K_2             : aliased constant String := "gnat-gcc";

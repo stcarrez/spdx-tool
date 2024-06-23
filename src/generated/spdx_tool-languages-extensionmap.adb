@@ -192,7 +192,6 @@ package body SPDX_Tool.Languages.ExtensionMap is
       return (Natural (G (F1)) + Natural (G (F2))) mod 1363;
    end Hash;
 
-
    function Get_Mapping (Name : String) return access constant String is
       H : constant Natural := Hash (Name);
    begin
