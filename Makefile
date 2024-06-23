@@ -1,7 +1,7 @@
 BUILD=#coverage
 MAKE_ARGS=
 JSON_PP=json_pp
-VERSION=0.3.0
+VERSION=0.4.0
 DEBUG_MODE=False
 INSTALL=install
 
@@ -36,9 +36,7 @@ generate:
 	bin/spdx_tool-gentmpl src/generated/spdx_tool-licenses-templates.ads
 	bin/spdx_tool-genrules src/generated/spdx_tool-languages-rules-generated.ads tools/generated.json
 	bin/spdx_tool-genrules src/generated/spdx_tool-languages-rules-disambiguations.ads tools/disambiguations.json
-	are --rule=are-package.xml -o src/generated .
-	# cd tools && alr build $(MAKE_ARGS)
-	# bin/gendecisiontree > src/generated/spdx_tool-licenses-decisions.ads
+	cd tools && alr exec are -- --rule=../are-package.xml -o ../src/generated ..
 
 import-licenses:
 	cd tools && alr build $(MAKE_ARGS)
