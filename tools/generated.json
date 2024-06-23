@@ -308,7 +308,7 @@
       ],
       "rules": [
          {
-            "generator": "Abdanced Resource Embedder",
+            "generator": "Advanced Resource Embedder",
             "min-lines": 5,
             "pattern": "^--  Advanced Resource Embedder ",
             "line": "1"
