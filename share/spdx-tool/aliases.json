@@ -238,6 +238,7 @@
    "dosini" : "INI",
    "dotenv" : "Dotenv",
    "dpatch" : "Darcs Patch",
+   "dtd" : "DTD",
    "dtrace" : "DTrace",
    "dtrace-script" : "DTrace",
    "dylan" : "Dylan",
