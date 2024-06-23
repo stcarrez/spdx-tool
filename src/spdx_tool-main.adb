@@ -210,6 +210,10 @@ procedure SPDX_Tool.Main is
                         Argument => "PATH",
                         Help   => -("Generate a XML report with licenses and files"));
       GC.Define_Switch (Config => Command_Config,
+                        Output => Opt_Scan_Submodules'Access,
+                        Long_Switch => "--scan-submodules",
+                        Help   => -("Scan git submodules"));
+      GC.Define_Switch (Config => Command_Config,
                         Output => SPDX_Tool.Licenses.License_Dir'Access,
                         Long_Switch => "--templates=",
                         Argument => "PATH",

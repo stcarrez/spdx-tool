@@ -29,6 +29,7 @@ package body SPDX_Tool.Licenses.Manager is
       is (Util.Log.Loggers.Get_Level (Log) <= Util.Log.INFO_LEVEL);
 
    function To_Float (Value : Float) return Float is (Value);
+   function Is_Git_Submodule (Path : in String) return Boolean;
 
    package Similarities is
       new SCI.Similarities.COO_Arrays (Arrays      => Freq_Transformers.Frequency_Arrays,
@@ -323,6 +324,28 @@ package body SPDX_Tool.Licenses.Manager is
             end if;
       end case;
    end Scan_File;
+
+   function Is_Git_Submodule (Path : in String) return Boolean is
+      Git : constant String := Util.Files.Compose (Path, ".git");
+   begin
+      return Ada.Directories.Exists (Git);
+   end Is_Git_Submodule;
+
+   --  ------------------------------
+   --  Called when a directory is found during a directory tree walk.
+   --  We overide it to check for .git directory or file and skip
+   --  that subdirectory unless an option tells us to scan other repos.
+   --  ------------------------------
+   overriding
+   procedure Scan_Subdir (Walker : in out License_Manager;
+                          Path   : in String;
+                          Filter : in Util.Files.Walk.Filter_Context_Type;
+                          Match  : in Util.Files.Walk.Filter_Result) is
+   begin
+      if Opt_Scan_Submodules or else not Is_Git_Submodule (Path) then
+         Util.Files.Walk.Walker_Type (Walker).Scan_Subdir (Path, Filter, Match);
+      end if;
+   end Scan_Subdir;
 
    procedure Wait (Manager : in out License_Manager) is
    begin

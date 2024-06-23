@@ -51,14 +51,24 @@ package SPDX_Tool.Licenses.Manager is
    --  Get the path of a file that can be read to get a list of files to ignore
    --  in the given directory (ie, .gitignore).
    overriding
-   function Get_Ignore_Path (Walker : License_Manager;
-                             Path   : String) return String;
+   function Get_Ignore_Path (Walker : in License_Manager;
+                             Path   : in String) return String;
 
    --  Called when a file is found during the directory tree walk.
    overriding
    procedure Scan_File (Manager : in out License_Manager;
-                        Path    : String) with
+                        Path    : in String) with
      Pre'Class => Path'Length > 0 and then Ada.Directories.Exists (Path);
+
+   --  Called when a directory is found during a directory tree walk.
+   --  We overide it to check for .git directory or file and skip
+   --  that subdirectory unless an option tells us to scan other repos.
+   overriding
+   procedure Scan_Subdir (Walker : in out License_Manager;
+                          Path   : in String;
+                          Filter : in Util.Files.Walk.Filter_Context_Type;
+                          Match  : in Util.Files.Walk.Filter_Result) with
+     Pre => Path'Length > 0 and then Ada.Directories.Exists (Path);
 
    procedure Wait (Manager : in out License_Manager);
 

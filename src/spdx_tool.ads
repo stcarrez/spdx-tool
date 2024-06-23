@@ -101,6 +101,7 @@ private
    Opt_Print_Lineno : aliased Boolean := False;
    Opt_Keep_Generated : aliased Boolean := False;
    Opt_Tasks     : aliased Integer := 1;
+   Opt_Scan_Submodules : aliased Boolean := False;
 
    LF          : constant Byte := 16#0A#;
    CR          : constant Byte := 16#0D#;
