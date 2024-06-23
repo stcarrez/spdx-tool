@@ -20,3 +20,9 @@ disabled = true
 
 [[pins]]
 spdx_tool = { path='..' }
+
+[[depends-on]]
+are = "^1.4.0"
+
+[[pins]]
+are = { url="https://gitlab.com/stcarrez/resource-embedder.git" }
