@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: spdx-tool 0.1.0\n"
 "Report-Msgid-Bugs-To: Stephane.Carrez@gmail.com\n"
-"POT-Creation-Date: 2024-06-09\n"
+"POT-Creation-Date: 2024-06-23\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Scarrez\n"
 "Language-Team: \n"
@@ -36,6 +36,10 @@ msgstr ""
 msgid "Check and gather licenses used in source files"
 msgstr ""
 
+#: spdx_tool-licenses-manager.adb
+msgid "Confidence with {0} -> {1}"
+msgstr ""
+
 #: spdx_tool-main.adb
 msgid "configuration file '{0}' does not exist."
 msgstr ""
@@ -64,11 +68,11 @@ msgstr ""
 msgid "error"
 msgstr ""
 
-#: spdx_tool-main.adb spdx_tool-configs.adb spdx_tool-magic_manager.adb spdx_tool-files-manager.adb spdx_tool-languages-manager.adb spdx_tool-licenses-manager.adb spdx_tool-licenses-reader.adb
+#: spdx_tool-files-manager.adb spdx_tool-main.adb spdx_tool-magic_manager.adb spdx_tool-licenses-manager.adb spdx_tool-licenses-reader.adb spdx_tool-configs.adb spdx_tool-languages-manager.adb
 msgid "Error"
 msgstr ""
 
-#: spdx_tool-licenses-manager.adb spdx_tool-licenses-reader.adb
+#: spdx_tool-licenses-reader.adb spdx_tool-licenses-manager.adb
 msgid "exception"
 msgstr ""
 
@@ -120,12 +124,12 @@ msgstr ""
 msgid "Include pattern {0}"
 msgstr ""
 
-#: spdx_tool.adb
-msgid "info"
+#: spdx_tool-licenses-manager.adb spdx_tool-licenses.adb spdx_tool-languages.adb spdx_tool-files-manager.adb spdx_tool-configs.adb spdx_tool-languages-manager.adb
+msgid "Info"
 msgstr ""
 
-#: spdx_tool-languages.adb spdx_tool-languages-manager.adb spdx_tool-configs.adb spdx_tool-files-manager.adb spdx_tool-licenses-manager.adb spdx_tool-licenses.adb
-msgid "Info"
+#: spdx_tool.adb
+msgid "info"
 msgstr ""
 
 #: spdx_tool-licenses-manager.adb
@@ -156,8 +160,8 @@ msgstr ""
 msgid "invalid option --update: {}"
 msgstr ""
 
-#: spdx_tool-licenses-manager.adb
-msgid "Invalid range of line"
+#: spdx_tool-infos.adb
+msgid "Invalid range of line: "
 msgstr ""
 
 #: spdx_tool-licenses-manager.adb
@@ -166,6 +170,10 @@ msgstr ""
 
 #: spdx_tool-licenses-manager.adb
 msgid "job {0} failed"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "Keep generated files"
 msgstr ""
 
 #: spdx_tool-reports.adb
@@ -185,11 +193,11 @@ msgid "License"
 msgstr ""
 
 #: spdx_tool-licenses.adb
-msgid "license '{0}' missmatch at line{1} after {2} lines"
+msgid "license '{0}' missmatch at line{1} after {2} lines ({3} matched)"
 msgstr ""
 
 #: spdx_tool-licenses-manager.adb
-msgid "license missmatch at line{0} after {1} lines"
+msgid "license missmatch at line{0} after {1} lines ({2} matched)"
 msgstr ""
 
 #: spdx_tool-main.adb
@@ -222,6 +230,10 @@ msgstr ""
 
 #: spdx_tool-main.adb
 msgid "More verbose execution mode"
+msgstr ""
+
+#: spdx_tool-licenses-manager.adb
+msgid "No exact match on {0} licenses"
 msgstr ""
 
 #: spdx_tool-reports.adb
@@ -300,8 +312,16 @@ msgstr ""
 msgid "too many recursive depend {0}"
 msgstr ""
 
+#: spdx_tool-main.adb
+msgid "try 'spdx-tool --help' for more information."
+msgstr ""
+
 #: spdx_tool-reports.adb
 msgid "Unknown"
+msgstr ""
+
+#: spdx_tool-main.adb
+msgid "unrecognized option '{}'"
 msgstr ""
 
 #: spdx_tool-main.adb
@@ -329,6 +349,14 @@ msgid "{0} is {1}: {2} lines {3} cmt"
 msgstr ""
 
 #: spdx_tool-languages-manager.adb
+msgid "{0}: generated file by {1}"
+msgstr ""
+
+#: spdx_tool-languages-manager.adb
+msgid "{0}: generated file by {1} (ignored)"
+msgstr ""
+
+#: spdx_tool-languages-manager.adb
 msgid "{0}: language {1} with analyzer"
 msgstr ""
 
@@ -348,7 +376,7 @@ msgstr ""
 msgid "{0}: no license found"
 msgstr ""
 
-#: spdx_tool-licenses-manager.adb spdx_tool-configs.adb
+#: spdx_tool-configs.adb spdx_tool-licenses-manager.adb
 msgid "{0}: {1}"
 msgstr ""
 

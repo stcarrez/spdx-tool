@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: spdx-tool 0.1.0\n"
 "Report-Msgid-Bugs-To: Stephane.Carrez@gmail.com\n"
-"POT-Creation-Date: 2024-06-09\n"
+"POT-Creation-Date: 2024-06-23\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Scarrez\n"
 "Language-Team: \n"
@@ -37,6 +37,10 @@ msgstr "impossible de lire le fichier magic {0}: {1}"
 msgid "Check and gather licenses used in source files"
 msgstr "Identifie les licenses utilisées dans les fichiers sources"
 
+#: spdx_tool-licenses-manager.adb
+msgid "Confidence with {0} -> {1}"
+msgstr "Confiance avec {0} -> {1}"
+
 #: spdx_tool-main.adb
 msgid "configuration file '{0}' does not exist."
 msgstr "le fichier de configuration '{0}' n'existe pas"
@@ -65,13 +69,13 @@ msgstr "Activer l'execution debug"
 msgid "error"
 msgstr "erreur"
 
-#: spdx_tool-main.adb spdx_tool-configs.adb spdx_tool-magic_manager.adb
-#: spdx_tool-files-manager.adb spdx_tool-languages-manager.adb
+#: spdx_tool-files-manager.adb spdx_tool-main.adb spdx_tool-magic_manager.adb
 #: spdx_tool-licenses-manager.adb spdx_tool-licenses-reader.adb
+#: spdx_tool-configs.adb spdx_tool-languages-manager.adb
 msgid "Error"
 msgstr "erreur"
 
-#: spdx_tool-licenses-manager.adb spdx_tool-licenses-reader.adb
+#: spdx_tool-licenses-reader.adb spdx_tool-licenses-manager.adb
 msgid "exception"
 msgstr ""
 
@@ -123,14 +127,14 @@ msgstr "Ignorer les fichiers avec une des licenses de la liste"
 msgid "Include pattern {0}"
 msgstr "Inclusion avec le modèle {0}"
 
-#: spdx_tool.adb
-msgid "info"
+#: spdx_tool-licenses-manager.adb spdx_tool-licenses.adb
+#: spdx_tool-languages.adb spdx_tool-files-manager.adb spdx_tool-configs.adb
+#: spdx_tool-languages-manager.adb
+msgid "Info"
 msgstr ""
 
-#: spdx_tool-languages.adb spdx_tool-languages-manager.adb
-#: spdx_tool-configs.adb spdx_tool-files-manager.adb
-#: spdx_tool-licenses-manager.adb spdx_tool-licenses.adb
-msgid "Info"
+#: spdx_tool.adb
+msgid "info"
 msgstr ""
 
 #: spdx_tool-licenses-manager.adb
@@ -161,9 +165,9 @@ msgstr "nombre de taches incorrect: {0}"
 msgid "invalid option --update: {}"
 msgstr "option --update invalide: {}"
 
-#: spdx_tool-licenses-manager.adb
-msgid "Invalid range of line"
-msgstr "Mauvaise définition de lignes"
+#: spdx_tool-infos.adb
+msgid "Invalid range of line: "
+msgstr "Mauvaise définition de lignes: "
 
 #: spdx_tool-licenses-manager.adb
 msgid "invalid update pattern"
@@ -172,6 +176,10 @@ msgstr "pattern de mise à jour incorrect"
 #: spdx_tool-licenses-manager.adb
 msgid "job {0} failed"
 msgstr "échec de l'execution {0}"
+
+#: spdx_tool-main.adb
+msgid "Keep generated files"
+msgstr "Conserver les fichiers générés"
 
 #: spdx_tool-reports.adb
 msgid "Language"
@@ -190,12 +198,12 @@ msgid "License"
 msgstr ""
 
 #: spdx_tool-licenses.adb
-msgid "license '{0}' missmatch at line{1} after {2} lines"
-msgstr "license '{0}' rejetée à la ligne{1} après {2} lignes"
+msgid "license '{0}' missmatch at line{1} after {2} lines ({3} matched)"
+msgstr "license '{0}' rejetée à la ligne{1} après {2} lignes ({3} correct)"
 
 #: spdx_tool-licenses-manager.adb
-msgid "license missmatch at line{0} after {1} lines"
-msgstr "license rejetée à la ligne{0} après {1} lignes"
+msgid "license missmatch at line{0} after {1} lines ({2} matched)"
+msgstr "license rejetée à la ligne{0} après {1} lignes ({2} correct)"
 
 #: spdx_tool-main.adb
 msgid "List files grouped by license name"
@@ -229,13 +237,17 @@ msgstr "manque le tag 'spdx' dans le pattern"
 msgid "More verbose execution mode"
 msgstr "Mode d'exécution encore plus détaillé"
 
+#: spdx_tool-licenses-manager.adb
+msgid "No exact match on {0} licenses"
+msgstr "Pas de correspondance pour {0} licenses"
+
 #: spdx_tool-reports.adb
 msgid "None"
 msgstr "Aucun"
 
 #: spdx_tool-licenses-reader.adb
 msgid "not with a <<beginOptional>> element"
-msgstr "pas dans un élément <<beginOptiona>>"
+msgstr "pas dans un élément <<beginOptional>>"
 
 #: spdx_tool-main.adb
 msgid "Number of threads to process the files"
@@ -305,9 +317,17 @@ msgstr "trop d'éléments <<beginOptional>> imbriqués"
 msgid "too many recursive depend {0}"
 msgstr "trop de dépendances récursives {0}"
 
+#: spdx_tool-main.adb
+msgid "try 'spdx-tool --help' for more information."
+msgstr "essayez 'spdx-tool --help' pour plus d'information"
+
 #: spdx_tool-reports.adb
 msgid "Unknown"
 msgstr "Inconnu"
+
+#: spdx_tool-main.adb
+msgid "unrecognized option '{}'"
+msgstr "option non reconnue '{}'"
 
 #: spdx_tool-main.adb
 msgid "Update the license to use the SPDX license tag"
@@ -334,6 +354,14 @@ msgid "{0} is {1}: {2} lines {3} cmt"
 msgstr "{0} is {1}: {2} lignes {3} commentaires"
 
 #: spdx_tool-languages-manager.adb
+msgid "{0}: generated file by {1}"
+msgstr ""
+
+#: spdx_tool-languages-manager.adb
+msgid "{0}: generated file by {1} (ignored)"
+msgstr "{0}: fichier généré par {1} (ignoré)"
+
+#: spdx_tool-languages-manager.adb
 msgid "{0}: language {1} with analyzer"
 msgstr "{0}: langage {1} avec analyseur"
 
@@ -353,7 +381,7 @@ msgstr "{0}: pas de language identifié"
 msgid "{0}: no license found"
 msgstr "{0}: pas de license identifié"
 
-#: spdx_tool-licenses-manager.adb spdx_tool-configs.adb
+#: spdx_tool-configs.adb spdx_tool-licenses-manager.adb
 msgid "{0}: {1}"
 msgstr ""
 
