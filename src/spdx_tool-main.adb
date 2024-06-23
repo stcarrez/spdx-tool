@@ -432,7 +432,7 @@ exception
 
    when GNAT.Command_Line.Invalid_Switch =>
       Log.Error ("unrecognized option '{}'", GNAT.Command_Line.Full_Switch);
-      Log.Error ("try ""spdx-tool --help"" for more information.");
+      Log.Error ("try 'spdx-tool --help' for more information.");
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
    when SPDX_Tool.Configs.Error |
