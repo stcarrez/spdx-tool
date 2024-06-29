@@ -61,8 +61,12 @@ package body SPDX_Tool.Tests is
                        Test_Print_License_Antlr'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --update (Ada)",
                        Test_Update_License_Ada'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --update (C)",
+                       Test_Update_License_C'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --update (XHTML)",
                        Test_Update_License_XHTML'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --update (JSP)",
+                       Test_Update_License_JSP'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -288,9 +292,19 @@ package body SPDX_Tool.Tests is
       Test_Update_License (T, "update-apache-2.0-1.txt", "apache-2.0-1.ads", "1..2,spdx");
    end Test_Update_License_Ada;
 
+   procedure Test_Update_License_C (T : in out Test) is
+   begin
+      Test_Update_License (T, "update-bsd-3-clause.txt", "bsd-3-clause.c", "1,spdx");
+   end Test_Update_License_C;
+
    procedure Test_Update_License_XHTML (T : in out Test) is
    begin
       Test_Update_License (T, "update-apache-2.0-5.txt", "apache-2.0-5.xhtml", "spdx");
    end Test_Update_License_XHTML;
+
+   procedure Test_Update_License_JSP (T : in out Test) is
+   begin
+      Test_Update_License (T, "update-apache-2.0-6.txt", "apache-2.0-6.jsp", "1,spdx");
+   end Test_Update_License_JSP;
 
 end SPDX_Tool.Tests;

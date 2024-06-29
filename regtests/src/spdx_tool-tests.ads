@@ -32,6 +32,8 @@ package SPDX_Tool.Tests is
 
    --  Test spdx-tool --update option on various languages
    procedure Test_Update_License_Ada (T : in out Test);
+   procedure Test_Update_License_C (T : in out Test);
    procedure Test_Update_License_XHTML (T : in out Test);
+   procedure Test_Update_License_JSP (T : in out Test);
 
 end SPDX_Tool.Tests;
