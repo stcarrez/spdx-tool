@@ -97,6 +97,32 @@ in the project.  For each file, the spdx-tool tries to:
     indicate the highest Tversky index found.
 
 
+# Improving the tool
+
+## Adding new languages
+
+New languages can be easily added by editing the `tools/languages-addon.json` file
+and declaring the language with the corresponding file extensions and the comment
+type that must be used to parse the header and extract the license.  A typical
+configuration looks like:
+
+```
+"GNAT Project": {
+   "type": "programming",
+      "extensions": [
+         ".gpr"
+      ],
+   "comment_style": "dash-style"
+},
+```
+
+After updating the `tools/languages-addon.json` file, rebuild the generated Ada
+files by running:
+
+```
+make generate
+```
+
 # References
 
 * https://github.com/spdx/license-list-data
