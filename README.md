@@ -109,9 +109,9 @@ configuration looks like:
 ```
 "GNAT Project": {
    "type": "programming",
-      "extensions": [
-         ".gpr"
-      ],
+   "extensions": [
+      ".gpr"
+   ],
    "comment_style": "dash-style"
 },
 ```
@@ -121,6 +121,41 @@ files by running:
 
 ```
 make generate
+```
+
+## Fixing language comment style
+
+When a language is recognized but the analyser does not know how to extract
+comments, it can be fixed by adding a definition in `tools/languages-addon.json` file:
+
+```
+"Dart": {
+   "comment_style": "C-style"
+},
+```
+
+Recognized comment styles include:
+
+```
+"dash-style", "--"
+"C-line", "//"
+"Shell", "#"
+"Latex-style", "%"
+"Forth", "\"
+"C-block", "/*", "*/"
+"XML", "<!--", "-->"
+"OCaml-style", "(*", "*)"
+"Erlang-style", "%%"
+"Semicolon", ";"
+"JSP-style", "<%--", "--%>"
+"Smarty-style", "{*", "*}"
+"Haskell-style", "{-", "-}"
+"Smalltalk-style", """", """"
+"PowerShell-block", "<#", "#>"
+"CoffeeScript-block", "###", "###"
+"PowerShell-style", "", "", "PowerShell-block,Shell"
+"CoffeeScript-style", "", "", "Shell,CoffeeScript-block"
+"C-style", "", "", "C-line,C-block"
 ```
 
 # References
