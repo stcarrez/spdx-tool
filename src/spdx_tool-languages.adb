@@ -590,14 +590,13 @@ package body SPDX_Tool.Languages is
          Find_Headers (Buffer, Lines, Lines'Last, First_Line, Last_Line);
       end if;
       Log.Info ("extract license from lines{0} to{1}", First_Line'Image, Last_Line'Image);
-      if First_Line > Last_Line then
+      if First_Line > Last_Line or else Lines (First_Line).Style.Mode = NO_COMMENT then
          return null;
       end if;
       Skip := Common_Start_Length (Lines, Buffer, First_Line, Last_Line);
       Size := Buffer_Size (Last_Line - First_Line + 1);
       for I in First_Line .. Last_Line loop
-         Len := Lines (I).Style.Text_Last
-           - Lines (I).Style.Text_Start + 1;
+         Len := Lines (I).Style.Text_Last - Lines (I).Style.Text_Start + 1;
          if Len > Skip then
             Len := Len - Skip;
          end if;
