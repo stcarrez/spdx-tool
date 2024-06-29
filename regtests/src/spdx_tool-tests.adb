@@ -290,7 +290,7 @@ package body SPDX_Tool.Tests is
 
    procedure Test_Update_License_XHTML (T : in out Test) is
    begin
-      Test_Update_License (T, "update-apache-2.0-5.txt", "apache-2.0-5.xhtml", "1..2,spdx");
+      Test_Update_License (T, "update-apache-2.0-5.txt", "apache-2.0-5.xhtml", "spdx");
    end Test_Update_License_XHTML;
 
 end SPDX_Tool.Tests;
