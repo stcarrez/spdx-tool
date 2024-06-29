@@ -233,15 +233,17 @@ package body SPDX_Tool.Reports is
             Writer.New_Line;
 
             for File of Files loop
-               declare
-                  L : constant License_Tag := Get_License (File.License);
-               begin
-                  if Item.Element = L then
-                     Writer.Put (File_Fields (1), "");
-                     Writer.Put (File_Fields (2), File.Path);
-                     Writer.New_Line;
-                  end if;
-               end;
+               if not File.Filtered then
+                  declare
+                     L : constant License_Tag := Get_License (File.License);
+                  begin
+                     if Item.Element = L then
+                        Writer.Put (File_Fields (1), "");
+                        Writer.Put (File_Fields (2), File.Path);
+                        Writer.New_Line;
+                     end if;
+                  end;
+               end if;
             end loop;
          end loop;
       end;
