@@ -354,6 +354,7 @@ begin
       return;
    end if;
    Load_Configuration;
+   Opt_Update := not Is_Empty (SPDX_Tool.Licenses.Update_Pattern);
    if Opt_Identify or else Opt_Print then
       Opt_No_Color := True;
    end if;
