@@ -9,10 +9,11 @@
     <file>regtests/files/identify/apache-2.0-6.jsp</file>
     <file>regtests/files/identify/apache-2.0-8.ts</file>
   </license>
-  <license name="None" spdx="false" confidence="0.000" count="4">
+  <license name="None" spdx="false" confidence="0.000" count="5">
     <file>regtests/files/identify/gpl-3.0-1.sub</file>
     <file>regtests/files/identify/lgpl-2.1.ml</file>
     <file>regtests/files/identify/misc-1.ml</file>
+    <file>regtests/files/identify/none.keywords</file>
     <file>regtests/files/identify/uri.d</file>
   </license>
   <license name="BSD-3-Clause" spdx="false" confidence="1.000" count="3">
@@ -120,6 +121,9 @@
   </language>
   <language name="Smalltalk" count="1">
     <file>regtests/files/identify/gpl-2.0-2.st</file>
+  </language>
+  <language name="Text file" count="1">
+    <file>regtests/files/identify/none.keywords</file>
   </language>
   <language name="TypeScript" count="1">
     <file>regtests/files/identify/apache-2.0-8.ts</file>

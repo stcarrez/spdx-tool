@@ -48,6 +48,8 @@ package body SPDX_Tool.Tests is
                        Test_Print_License_Bsd'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (Ocaml, boxed)",
                        Test_Print_License_Ocaml'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (None)",
+                       Test_Print_License_None'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -213,5 +215,10 @@ package body SPDX_Tool.Tests is
    begin
       Test_Print_License (T, "print-ocaml.txt", "lgpl-2.1.ml");
    end Test_Print_License_Ocaml;
+
+   procedure Test_Print_License_None (T : in out Test) is
+   begin
+      Test_Print_License (T, "print-none.txt", "none.keywords");
+   end Test_Print_License_None;
 
 end SPDX_Tool.Tests;
