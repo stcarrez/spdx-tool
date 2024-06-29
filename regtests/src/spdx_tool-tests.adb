@@ -3,7 +3,7 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-
+with Ada.Directories;
 with GNAT.Source_Info;
 with Util.Test_Caller;
 package body SPDX_Tool.Tests is
@@ -13,6 +13,13 @@ package body SPDX_Tool.Tests is
                                  File   : in String;
                                  Source : in String := GNAT.Source_Info.File;
                                  Line   : in Natural := GNAT.Source_Info.Line);
+
+   procedure Test_Update_License (T       : in out Test;
+                                  Name    : in String;
+                                  File    : in String;
+                                  Pattern : in String;
+                                  Source  : in String := GNAT.Source_Info.File;
+                                  Line    : in Natural := GNAT.Source_Info.Line);
 
    package Caller is new Util.Test_Caller (Test, "SPDX_Tool.Tests");
 
@@ -52,6 +59,8 @@ package body SPDX_Tool.Tests is
                        Test_Print_License_None'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --line-number --print-license (Antlr)",
                        Test_Print_License_Antlr'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --update (XHTML)",
+                       Test_Update_License_XHTML'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -237,5 +246,44 @@ package body SPDX_Tool.Tests is
          Test    => Path,
          Message => "Invalid license extraction");
    end Test_Print_License_Antlr;
+
+   procedure Test_Update_License (T       : in out Test;
+                                  Name    : in String;
+                                  File    : in String;
+                                  Pattern : in String;
+                                  Source  : in String := GNAT.Source_Info.File;
+                                  Line    : in Natural := GNAT.Source_Info.Line) is
+      Path : constant String := Util.Tests.Get_Test_Path (Name);
+      Dst_Path : constant String := Util.Tests.Get_Test_Path ("update-" & File);
+      Src_Path : constant String := Util.Tests.Get_Path ("regtests/files/identify/" & File);
+      Result : UString;
+   begin
+      if Ada.Directories.Exists (Dst_Path) then
+         Ada.Directories.Delete_File (Dst_Path);
+      end if;
+      Ada.Directories.Copy_File (Src_Path, Dst_Path);
+      T.Execute (Tool & " --update " & Pattern & " " & Dst_Path, "",
+                 Path, Result, 0);
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/" & Name),
+         Test    => Path,
+         Message => "Invalid license update",
+         Source  => Source,
+         Line    => Line);
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/update-" & File),
+         Test    => Dst_Path,
+         Message => "Invalid update replacement",
+         Source  => Source,
+         Line    => Line);
+   end Test_Update_License;
+
+   --  Test spdx-tool --update option on various languages
+   procedure Test_Update_License_XHTML (T : in out Test) is
+   begin
+      Test_Update_License (T, "update-apache-2.0-5.txt", "apache-2.0-5.xhtml", "1..2,spdx");
+   end Test_Update_License_XHTML;
 
 end SPDX_Tool.Tests;
