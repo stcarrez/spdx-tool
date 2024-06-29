@@ -627,6 +627,23 @@ package body SPDX_Tool.Licenses.Manager is
                          Language : in Boolean;
                          Exclude  : in Boolean) is
       procedure Process (Token : in String; Done : out Boolean);
+      function Translate (Token : in String) return String;
+
+      --  Allow users to type these two keywords in their native language.
+      Unknown_Label : constant String := -("Unknown");
+      None_Label : constant String := -("None");
+
+      function Translate (Token : in String) return String is
+      begin
+         if Token = None_Label then
+            return "None";
+         elsif Token = Unknown_Label then
+            return "Unknown";
+         else
+            return Token;
+         end if;
+      end Translate;
+
       procedure Process (Token : in String; Done : out Boolean) is
       begin
          if Language then
@@ -637,9 +654,9 @@ package body SPDX_Tool.Licenses.Manager is
             end if;
          else
             if Exclude then
-               Manager.Exclude_Filters.Include (Token);
+               Manager.Exclude_Filters.Include (Translate (Token));
             else
-               Manager.Include_Filters.Include (Token);
+               Manager.Include_Filters.Include (Translate (Token));
             end if;
          end if;
          Done := False;
