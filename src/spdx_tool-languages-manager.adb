@@ -14,6 +14,7 @@ with SPDX_Tool.Languages.Rules.Disambiguations;
 package body SPDX_Tool.Languages.Manager is
 
    use type Ada.Containers.Count_Type;
+   use type Infos.File_Kind;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Languages");
@@ -65,6 +66,7 @@ package body SPDX_Tool.Languages.Manager is
          Pos      : Language_Maps.Cursor;
       begin
          File.Generated := Result.Generated;
+         File.Kind := Result.Kind;
          if Language'Length = 0 then
             Analyzer := null;
             if Length (Result.Generated) = 0 then
@@ -81,7 +83,13 @@ package body SPDX_Tool.Languages.Manager is
             end if;
             return;
          end if;
-         if Comment /= null then
+         if File.Kind /= Infos.FILE_PROGRAMMING then
+            Log.Info ("{0}: {1} (skipped)", File.Path, Language);
+            Content.Cmt_Style := NO_COMMENT;
+            File.Filtered := True;
+            return;
+         end if;
+         if Comment /= null and then Comment.all /= "" then
             Pos := Manager.Languages.Find (Comment.all);
          else
             Pos := Manager.Languages.Find (Language);

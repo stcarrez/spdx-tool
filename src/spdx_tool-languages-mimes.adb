@@ -28,20 +28,28 @@ package body SPDX_Tool.Languages.Mimes is
          end if;
       elsif Util.Strings.Starts_With (Mime, "image/") then
          Set_Language (Result, "mime", "Image", Detector.Confidence);
+         Result.Kind := Infos.FILE_IMAGE;
       elsif Util.Strings.Starts_With (Mime, "video/") then
          Set_Language (Result, "mime", "Video", Detector.Confidence);
+         Result.Kind := Infos.FILE_IMAGE;
       elsif Util.Strings.Starts_With (Mime, "application/pdf") then
          Set_Language (Result, "mime", "PDF", Detector.Confidence);
+         Result.Kind := Infos.FILE_BINARY;
       elsif Util.Strings.Starts_With (Mime, "application/zip") then
          Set_Language (Result, "mime", "ZIP", Detector.Confidence);
+         Result.Kind := Infos.FILE_BINARY;
       elsif Util.Strings.Starts_With (Mime, "application/gzip") then
          Set_Language (Result, "mime", "GZIP", Detector.Confidence);
+         Result.Kind := Infos.FILE_BINARY;
       elsif Util.Strings.Starts_With (Mime, "application/x-tar") then
          Set_Language (Result, "mime", "TAR", Detector.Confidence);
+         Result.Kind := Infos.FILE_BINARY;
       elsif Util.Strings.Starts_With (Mime, "application/x-executable") then
          Set_Language (Result, "mime", "Executable", Detector.Confidence);
+         Result.Kind := Infos.FILE_BINARY;
       elsif Util.Strings.Starts_With (Mime, "application/octet-stream") then
          Set_Language (Result, "mime", "Binary", Detector.Confidence);
+         Result.Kind := Infos.FILE_BINARY;
       end if;
    end Detect;
 

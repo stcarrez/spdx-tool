@@ -67,6 +67,8 @@ package SPDX_Tool.Infos is
    end record;
    type License_Text_Access is access all License_Text;
 
+   type File_Kind is (FILE_PROGRAMMING, FILE_DOC, FILE_IMAGE, FILE_BINARY);
+
    --  Information collected for a file.  An instance is created for each
    --  file that is scanned and put in a File_Maps.  The file is analyzed
    --  by a separate thread which populates the `Language`, `Mime` and
@@ -79,6 +81,7 @@ package SPDX_Tool.Infos is
       Path      : String (1 .. Len);
       Filtered  : Boolean := False;
       Text      : License_Text_Access;
+      Kind      : File_Kind := FILE_PROGRAMMING;
    end record;
    type File_Info_Access is access all File_Info;
 

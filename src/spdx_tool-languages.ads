@@ -165,6 +165,7 @@ private
    type Detector_Result is record
       Languages : Detected_Language_Vectors.Vector;
       Generated : UString;
+      Kind      : Infos.File_Kind := Infos.FILE_PROGRAMMING;
    end record;
 
    --  Update the language detection result with the language and the given confidence.
