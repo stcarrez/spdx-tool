@@ -77,7 +77,8 @@ package body SPDX_Tool.Languages.Rules is
                   end if;
 
                when RULE_CONTAINS | RULE_CONTAINS_AND =>
-                  if Util.Strings.Index (Line, Rules.Strings (Rule.Pattern).all, Line'First) > 0 then
+                  if Util.Strings.Index (Line, Rules.Strings (Rule.Pattern).all, Line'First) > 0
+                  then
                      return FOUND;
                   end if;
 
