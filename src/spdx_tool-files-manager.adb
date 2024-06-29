@@ -119,16 +119,15 @@ package body SPDX_Tool.Files.Manager is
 
       Output.Create (Ada.Streams.Stream_IO.Out_File, Name => Tmp_Path);
 
-      if File.Lines (First).Comment = LINE_COMMENT then
-         Line := First;
-
-         --  Keep some license lines before the inserted SPDX license tag.
-         if Before.First_Line = 1 then
-            Line := Line + Before.Last_Line;
-            if Line > File.Lines'Last then
-               Line := File.Lines'Last;
-            end if;
+      --  Keep some license lines before the inserted SPDX license tag.
+      if Before.First_Line = 1 then
+         Line := Line + Before.Last_Line;
+         if Line > File.Lines'Last then
+            Line := File.Lines'Last;
          end if;
+      end if;
+
+      if File.Lines (Line).Comment = LINE_COMMENT then
          if Before.First_Line <= 1 then
             First_Pos := File.Lines (Line).Style.Text_Start;
          else
@@ -168,16 +167,22 @@ package body SPDX_Tool.Files.Manager is
             Next_Pos := File.Lines (Line).Style.Last + 1;
             Last_Pos := File.Lines (Last).Style.Last + 1;
          end if;
+         Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
 
-      elsif File.Lines (First).Comment = LINE_BLOCK_COMMENT then
-         First_Pos := File.Lines (First).Style.Text_Start;
+      elsif File.Lines (Line).Comment = LINE_BLOCK_COMMENT then
+         First_Pos := File.Lines (Line).Style.Text_Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
          Next_Pos := File.Lines (Last).Style.Text_Last - 1;
          Last_Pos := Next_Pos;
+         if Line > 1 then
+            Spaces := File.Lines (Line - 1).Style.Text_Start - File.Lines (Line - 1).Line_Start + 1;
+         else
+            Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
+         end if;
       else
-         First_Pos := File.Lines (First).Style.Text_Start;
+         First_Pos := File.Lines (Line).Style.Text_Start;
          if First_Pos > Pos then
             Output.Write (Buf.Data (Buf.Data'First .. First_Pos - 1));
          end if;
@@ -188,9 +193,19 @@ package body SPDX_Tool.Files.Manager is
          else
             Spaces_After := 0;
          end if;
+         if Line > 1 then
+            Spaces := File.Lines (Line - 1).Style.Text_Start - File.Lines (Line - 1).Line_Start + 1;
+            Length := File.Lines (Line).Style.Text_Start - File.Lines (Line).Line_Start + 1;
+            if Length >= Spaces then
+               Spaces := 0;
+            else
+               Spaces := Spaces - Length;
+            end if;
+         else
+            Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
+         end if;
       end if;
 
-      Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
       for I in 1 .. Spaces loop
          Output.Write (" ");
       end loop;
