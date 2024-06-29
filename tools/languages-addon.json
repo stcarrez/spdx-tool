@@ -150,6 +150,9 @@
    "Forth": {
       "comment_style": "Forth-style",
    },
+   "M4Sugar": {
+      "comment_style": "M4-style",
+   },
    "Snowball": {
       "type": "programming",
       "extensions": [
