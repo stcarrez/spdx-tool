@@ -302,6 +302,8 @@ package body SPDX_Tool.Languages.Manager is
       Add_Builtin ("PowerShell-style", "", "", "PowerShell-block,Shell");
       Add_Builtin ("CoffeeScript-style", "", "", "Shell,CoffeeScript-block");
       Add_Builtin ("C-style", "", "", "C-line,C-block");
+      Add_Builtin ("M4-dnl", "dnl");
+      Add_Builtin ("M4-style", "", "", "M4-dnl,Shell");
       Configs.Configure (Config,
                          Set_Comments'Access);
       Configs.Configure (Config,
