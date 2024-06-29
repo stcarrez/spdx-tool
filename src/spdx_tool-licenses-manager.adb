@@ -764,38 +764,28 @@ package body SPDX_Tool.Licenses.Manager is
          else
             Log.Info ("{0}: {1}", File.Path, Empty_File);
          end if;
+      elsif Data.Cmt_Style = NO_COMMENT then
+         File.License.Name := To_UString (No_License);
+         File.Filtered := Manager.Is_License_Filtered (File);
+         if File.Filtered then
+            Log.Info ("{0}: {1} (ignored)", File.Path, No_License);
+         else
+            Log.Info ("{0} is {1}: {2} lines no comment", File.Path,
+                      To_String (File.Language),
+                      Image (Data.Count));
+         end if;
       else
-         declare
-            Cmt_Count : Natural := 0;
-         begin
-            for I in Data.Lines'Range loop
-               if Data.Lines (I).Comment /= NO_COMMENT then
-                  Cmt_Count := Cmt_Count + 1;
-               end if;
-            end loop;
-            if Cmt_Count = 0 then
-               File.License.Name := To_UString (No_License);
-               File.Filtered := Manager.Is_License_Filtered (File);
-               if File.Filtered then
-                  Log.Info ("{0}: {1} (ignored)", File.Path, No_License);
-               else
-                  Log.Info ("{0} is {1}: {2} lines no comment", File.Path,
-                            To_String (File.Language),
-                            Image (Data.Count));
-               end if;
-            else
-               File.License.Name := To_UString (Unknown_License);
-               File.Filtered := Manager.Is_License_Filtered (File);
-               if File.Filtered then
-                  Log.Info ("{0}: {1} (ignored)", File.Path, Unknown_License);
-               else
-                  Log.Info ("{0} is {1}: {2} lines {3} cmt", File.Path,
-                            To_String (File.Language),
-                            Image (Data.Count),
-                            Util.Strings.Image (Cmt_Count));
-               end if;
-            end if;
-         end;
+         File.License.Name := To_UString (Unknown_License);
+         File.License.Match := Infos.UNKNOWN_LICENSE;
+         File.Filtered := Manager.Is_License_Filtered (File);
+         if File.Filtered then
+            Log.Info ("{0}: {1} (ignored)", File.Path, Unknown_License);
+         else
+            Log.Info ("{0} is {1}: {2} lines {3} cmt", File.Path,
+                      To_String (File.Language),
+                      Image (Data.Count),
+                      Image (Data.Cmt_Count));
+         end if;
       end if;
    end Analyze;
 

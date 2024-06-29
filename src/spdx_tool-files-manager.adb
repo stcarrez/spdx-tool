@@ -177,7 +177,8 @@ package body SPDX_Tool.Files.Manager is
          Next_Pos := File.Lines (Last).Style.Text_Last - 1;
          Last_Pos := Next_Pos;
          if Line > 1 then
-            Spaces := File.Lines (Line - 1).Style.Text_Start - File.Lines (Line - 1).Line_Start + 1;
+            Spaces := File.Lines (Line - 1).Style.Text_Start
+                         - File.Lines (Line - 1).Line_Start + 1;
          else
             Spaces := Languages.Common_Start_Length (File.Lines, Buf.Data, First, Last);
          end if;
@@ -194,8 +195,10 @@ package body SPDX_Tool.Files.Manager is
             Spaces_After := 0;
          end if;
          if Line > 1 then
-            Spaces := File.Lines (Line - 1).Style.Text_Start - File.Lines (Line - 1).Line_Start + 1;
-            Length := File.Lines (Line).Style.Text_Start - File.Lines (Line).Line_Start + 1;
+            Spaces := File.Lines (Line - 1).Style.Text_Start
+                         - File.Lines (Line - 1).Line_Start + 1;
+            Length := File.Lines (Line).Style.Text_Start
+                         - File.Lines (Line).Line_Start + 1;
             if Length >= Spaces then
                Spaces := 0;
             else

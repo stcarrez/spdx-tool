@@ -116,9 +116,11 @@ package body SPDX_Tool.Languages.Manager is
             Analyzer.all.Find_Comments (Manager.Tokens, Buf.Data (Buf.Data'First .. Len),
                                         Content.Lines, Content.Count);
             for Line of Content.Lines (1 .. Content.Count) loop
-               if Line.Style.Mode /= NO_COMMENT then
+               if Line.Style.Mode /= NO_COMMENT
+                  and then Line.Style.Category not in Files.INTERPRETER | Files.MODELINE
+               then
                   Content.Cmt_Style := Line.Style.Mode;
-                  exit;
+                  Content.Cmt_Count := Content.Cmt_Count + 1;
                end if;
             end loop;
          else
