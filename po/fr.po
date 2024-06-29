@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: spdx-tool 0.1.0\n"
 "Report-Msgid-Bugs-To: Stephane.Carrez@gmail.com\n"
-"POT-Creation-Date: 2024-06-23\n"
+"POT-Creation-Date: 2024-06-29\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Scarrez\n"
 "Language-Team: \n"
@@ -65,18 +65,17 @@ msgstr "Désactiver le répository des licenses internes"
 msgid "Enable debug execution"
 msgstr "Activer l'execution debug"
 
+#: spdx_tool-licenses-manager.adb spdx_tool-languages-manager.adb
+#: spdx_tool-files-manager.adb spdx_tool-main.adb spdx_tool-magic_manager.adb
+#: spdx_tool-configs.adb spdx_tool-licenses-reader.adb
+msgid "Error"
+msgstr "erreur"
+
 #: spdx_tool.adb
 msgid "error"
 msgstr "erreur"
 
-#: spdx_tool-licenses-reader.adb spdx_tool-configs.adb
-#: spdx_tool-languages-manager.adb spdx_tool-magic_manager.adb
-#: spdx_tool-files-manager.adb spdx_tool-main.adb
-#: spdx_tool-licenses-manager.adb
-msgid "Error"
-msgstr "erreur"
-
-#: spdx_tool-licenses-reader.adb spdx_tool-licenses-manager.adb
+#: spdx_tool-licenses-manager.adb spdx_tool-licenses-reader.adb
 msgid "exception"
 msgstr ""
 
@@ -128,14 +127,14 @@ msgstr "Ignorer les fichiers avec une des licenses de la liste"
 msgid "Include pattern {0}"
 msgstr "Inclusion avec le modèle {0}"
 
-#: spdx_tool.adb
-msgid "info"
+#: spdx_tool-licenses-manager.adb spdx_tool-licenses.adb spdx_tool-configs.adb
+#: spdx_tool-files-manager.adb spdx_tool-languages.adb
+#: spdx_tool-languages-manager.adb
+msgid "Info"
 msgstr ""
 
-#: spdx_tool-licenses-manager.adb spdx_tool-files-manager.adb
-#: spdx_tool-languages.adb spdx_tool-languages-manager.adb
-#: spdx_tool-licenses.adb spdx_tool-configs.adb
-msgid "Info"
+#: spdx_tool.adb
+msgid "info"
 msgstr ""
 
 #: spdx_tool-licenses-manager.adb
@@ -244,7 +243,7 @@ msgstr "Pas de correspondance pour {0} licenses"
 
 #: spdx_tool-reports.adb
 msgid "None"
-msgstr "Aucun"
+msgstr "Aucune"
 
 #: spdx_tool-licenses-reader.adb
 msgid "not with a <<beginOptional>> element"
@@ -328,7 +327,7 @@ msgstr "essayez 'spdx-tool --help' pour plus d'information"
 
 #: spdx_tool-reports.adb
 msgid "Unknown"
-msgstr "Inconnu"
+msgstr "Inconnue"
 
 #: spdx_tool-main.adb
 msgid "unrecognized option '{}'"
@@ -386,7 +385,7 @@ msgstr "{0}: pas de language identifié"
 msgid "{0}: no license found"
 msgstr "{0}: pas de license identifié"
 
-#: spdx_tool-licenses-manager.adb spdx_tool-configs.adb
+#: spdx_tool-configs.adb spdx_tool-licenses-manager.adb
 msgid "{0}: {1}"
 msgstr ""
 
@@ -397,6 +396,10 @@ msgstr "{0}: {1} (ignoré)"
 #: spdx_tool-licenses-manager.adb
 msgid "{0}: {1} (ignored at lines {2})"
 msgstr "{0}: {1} (ignoré à la ligne {2})"
+
+#: spdx_tool-languages-manager.adb
+msgid "{0}: {1} (skipped)"
+msgstr "{0}: {1} (ignoré)"
 
 #: spdx_tool-licenses-manager.adb
 msgid "{0}: {1} at lines {2}"
