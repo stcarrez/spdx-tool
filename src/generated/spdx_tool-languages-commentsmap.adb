@@ -945,7 +945,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_413           : aliased constant String := "DenizenScript";
    M_413           : aliased constant String := "";
    K_414           : aliased constant String := "M4Sugar";
-   M_414           : aliased constant String := "";
+   M_414           : aliased constant String := "M4-style";
    K_415           : aliased constant String := "STL";
    M_415           : aliased constant String := "";
    K_416           : aliased constant String := "Roff Manpage";
