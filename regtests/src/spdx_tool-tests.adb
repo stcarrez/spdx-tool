@@ -59,6 +59,8 @@ package body SPDX_Tool.Tests is
                        Test_Print_License_None'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --line-number --print-license (Antlr)",
                        Test_Print_License_Antlr'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --update (Ada)",
+                       Test_Update_License_Ada'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --update (XHTML)",
                        Test_Update_License_XHTML'Access);
    end Add_Tests;
@@ -247,6 +249,7 @@ package body SPDX_Tool.Tests is
          Message => "Invalid license extraction");
    end Test_Print_License_Antlr;
 
+   --  Test spdx-tool --update option on various languages
    procedure Test_Update_License (T       : in out Test;
                                   Name    : in String;
                                   File    : in String;
@@ -280,7 +283,11 @@ package body SPDX_Tool.Tests is
          Line    => Line);
    end Test_Update_License;
 
-   --  Test spdx-tool --update option on various languages
+   procedure Test_Update_License_Ada (T : in out Test) is
+   begin
+      Test_Update_License (T, "update-apache-2.0-1.txt", "apache-2.0-1.ads", "1..2,spdx");
+   end Test_Update_License_Ada;
+
    procedure Test_Update_License_XHTML (T : in out Test) is
    begin
       Test_Update_License (T, "update-apache-2.0-5.txt", "apache-2.0-5.xhtml", "1..2,spdx");

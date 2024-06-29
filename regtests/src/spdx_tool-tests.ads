@@ -31,6 +31,7 @@ package SPDX_Tool.Tests is
    procedure Test_Print_License_Antlr (T : in out Test);
 
    --  Test spdx-tool --update option on various languages
+   procedure Test_Update_License_Ada (T : in out Test);
    procedure Test_Update_License_XHTML (T : in out Test);
 
 end SPDX_Tool.Tests;
