@@ -401,6 +401,7 @@ begin
       end if;
       Manager.Configure (Tool_Config, Mode);
       Filter.Exclude (".git");
+      Filter.Exclude (".svn");
       loop
          declare
             Arg : constant String := GC.Get_Argument;
