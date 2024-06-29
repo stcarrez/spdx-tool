@@ -50,6 +50,8 @@ package body SPDX_Tool.Tests is
                        Test_Print_License_Ocaml'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (None)",
                        Test_Print_License_None'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --line-number --print-license (Antlr)",
+                       Test_Print_License_Antlr'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -220,5 +222,20 @@ package body SPDX_Tool.Tests is
    begin
       Test_Print_License (T, "print-none.txt", "none.keywords");
    end Test_Print_License_None;
+
+   procedure Test_Print_License_Antlr (T : in out Test) is
+      Path : constant String := Util.Tests.Get_Test_Path ("print-antlr.txt");
+      Result : UString;
+   begin
+      --  Print license for two files with line numbers.
+      T.Execute (Tool & " --print-license --line-number regtests/files/identify/antlr-pd-1.c "
+                 & " regtests/files/identify/antlr-pd-2.c", "",
+                 Path, Result, 0);
+      Util.Tests.Assert_Equal_Files
+        (T       => T,
+         Expect  => Util.Tests.Get_Path ("regtests/expect/print-antlr.txt"),
+         Test    => Path,
+         Message => "Invalid license extraction");
+   end Test_Print_License_Antlr;
 
 end SPDX_Tool.Tests;

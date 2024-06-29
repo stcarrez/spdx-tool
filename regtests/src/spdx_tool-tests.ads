@@ -28,5 +28,6 @@ package SPDX_Tool.Tests is
    procedure Test_Print_License_Bsd (T : in out Test);
    procedure Test_Print_License_Ocaml (T : in out Test);
    procedure Test_Print_License_None (T : in out Test);
+   procedure Test_Print_License_Antlr (T : in out Test);
 
 end SPDX_Tool.Tests;
