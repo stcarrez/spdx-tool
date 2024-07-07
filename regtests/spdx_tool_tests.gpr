@@ -1,6 +1,5 @@
 with "../spdx_tool_config.gpr";
 with "spdx_tool.gpr";
-with "tools.gpr";
 with "utilada_base.gpr";
 with "utilada_conf.gpr";
 with "utilada_core.gpr";

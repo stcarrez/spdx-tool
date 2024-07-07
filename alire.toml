@@ -15,14 +15,14 @@ executables = ["spdx_tool"]
 project-files = ["spdx_tool.gpr"]
 
 [[depends-on]]
-utilada = "^2.6.0"
-utilada_xml = "^2.6.0"
-sciada = "~0.2.0"
+utilada = "^2.7.0"
+utilada_xml = "^2.7.0"
+sciada = "~0.3.0"
 spdx = "~0.2.0"
 ansiada = "^1.0.0"
 intl = "^1.0.1"
 printer_toolkitada = "~0.2.0"
-ada_toml = "~0.3.0"
+ada_toml = "~0.4.0"
 
 # [configuration]
 # disabled = true
@@ -41,5 +41,4 @@ windows = { USE_MAGICADA = "no" }
 
 [[pins]]
 printer_toolkitada = { url="https://gitlab.com/stcarrez/printer-toolkit.git" }
-sciada = { url="https://gitlab.com/stcarrez/ada-sci.git" }
-utilada = { url="https://github.com/stcarrez/ada-util.git" }
+

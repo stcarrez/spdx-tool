@@ -13,13 +13,11 @@ executables = ["spdx_tool_harness"]
 
 [[depends-on]]
 spdx_tool = "*"
-tools = "*"
-utilada_unit = "^2.6.0"
+utilada_unit = "^2.7.0"
 
 [configuration]
 disabled = true
 
 [[pins]]
 spdx_tool = { path='..' }
-tools = { path='../tools' }
 
