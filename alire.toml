@@ -1,7 +1,7 @@
 # This is a crate
 name = "spdx_tool"
 description = "SPDX Tool"
-version = "0.1.0-dev"
+version = "0.4.0"
 
 authors = ["ciceron"]
 maintainers = ["ciceron <Stephane.Carrez@gmail.com>"]
@@ -21,7 +21,7 @@ sciada = "~0.3.0"
 spdx = "~0.2.0"
 ansiada = "^1.0.0"
 intl = "^1.0.1"
-printer_toolkitada = "~0.2.0"
+printer_toolkit = "~0.2.0"
 ada_toml = "~0.4.0"
 
 # [configuration]
@@ -40,5 +40,5 @@ macos = { USE_MAGICADA = "no" }
 windows = { USE_MAGICADA = "no" }
 
 [[pins]]
-printer_toolkitada = { url="https://gitlab.com/stcarrez/printer-toolkit.git" }
+printer_toolkit = { url="https://gitlab.com/stcarrez/printer-toolkit.git" }
 

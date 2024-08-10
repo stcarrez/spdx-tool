@@ -6,7 +6,7 @@ with "utilada_sys.gpr";
 with "utilada_xml.gpr";
 with "sciada.gpr";
 with "spdx_tool_config.gpr";
-with "printer_toolkitada";
+with "printer_toolkit";
 with "intl.gpr";
 with "magicada.gpr";
 with "ada_toml.gpr";
