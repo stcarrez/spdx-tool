@@ -150,7 +150,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Assert_Equals (T, 16, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("C", Data.Language, "Invalid language");
-         Assert_Equals (T, START_COMMENT, Info.Cmt_Style,
+         Assert_Equals (T, END_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
                         "Invalid identification at 1");
@@ -190,7 +190,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Assert_Equals (T, 16, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("C", Data.Language, "Invalid language");
-         Assert_Equals (T, START_COMMENT, Info.Cmt_Style,
+         Assert_Equals (T, END_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Comment,
                         "Invalid identification at 1");
@@ -275,7 +275,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Manager.Open (Info, Data, Languages);
          Assert_Equals (T, 18, Info.Count,
                         "Invalid number of lines");
-         Assert_Equals (T, START_COMMENT, Info.Cmt_Style,
+         Assert_Equals (T, END_COMMENT, Info.Cmt_Style,
                         "Invalid comment style");
          Assert_Equals (T, START_COMMENT, Info.Lines (1).Style.Mode,
                         "Invalid identification at 1");
