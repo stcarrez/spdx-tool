@@ -230,7 +230,7 @@ procedure SPDX_Tool.Main is
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is
       Styles : SPDX_Tool.Reports.Style_Configuration;
       Screen : constant PT.Dimension_Type := PT.Drivers.Texts.Screen_Dimension;
-      Driver : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Screen);
+      Driver : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Screen, 1000);
       Writer : PT.Texts.Printer_Type := PT.Texts.Create (Driver);
    begin
       if not Opt_No_Color then
