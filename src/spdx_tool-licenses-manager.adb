@@ -174,6 +174,7 @@ package body SPDX_Tool.Licenses.Manager is
             F : constant Freq_Transformers.Frequency_Array
                := Freq_Transformers.IDF (Manager.Token_Counters);
          begin
+            Manager.Token_Frequency.Cells.Clear;
             Freq_Transformers.TIDF (From     => Manager.Token_Counters,
                                     Doc_Freq => F,
                                     Into     => Manager.Token_Frequency);
@@ -582,15 +583,6 @@ package body SPDX_Tool.Licenses.Manager is
          end loop;
          Log.Info ("No exact match on {0} licenses",
                    Util.Strings.Image (Get_Count (Checked)));
-         for Line in First_Line .. Last_Line loop
-            Match := Manager.Guess_License (File.Lines, Line, Last_Line);
-            if Match.Info.Match = Infos.GUESSED_LICENSE then
-               --  Match.Info.First_Line := First_Line;
-               --  Match.Info.Last_Line := Last_Line;
-               SPDX_Tool.Licenses.Report (Stamp, "Find license guessed");
-               return Match;
-            end if;
-         end loop;
       end if;
       for Line in First_Line .. Last_Line loop
          if File.Lines (Line).Comment /= NO_COMMENT then
@@ -612,6 +604,13 @@ package body SPDX_Tool.Licenses.Manager is
                   Result.Depth := Match.Depth;
                end if;
             end if;
+         end if;
+      end loop;
+      for Line in First_Line .. Last_Line loop
+         Match := Manager.Guess_License (File.Lines, Line, Last_Line);
+         if Match.Info.Match = Infos.GUESSED_LICENSE then
+            SPDX_Tool.Licenses.Report (Stamp, "Find license guessed");
+            return Match;
          end if;
       end loop;
       Result.Info.First_Line := First_Line;
