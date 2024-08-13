@@ -348,6 +348,40 @@ package body SPDX_Tool.Licenses.Manager is
       end if;
    end Scan_Subdir;
 
+   --  ------------------------------
+   --  Returns true if the path corresponds to a root path for a project:
+   --  * it contains a `.git` directory
+   --  ------------------------------
+   function Is_Root (Walker : in License_Manager;
+                     Path   : in String) return Boolean is
+   begin
+      return Is_Git_Submodule (Path);
+   end Is_Root;
+
+   --  ------------------------------
+   --  Find the root directory of a project knowing a path of a file or
+   --  directory of that project.  Move up to parent directories until
+   --  a path returns true when `Is_Root` is called.
+   --  ------------------------------
+   function Find_Root (Walker : in License_Manager;
+                       Path   : in String) return String is
+      Real_Path : constant String := Util.Files.Realpath (Path);
+      Pos       : Natural := Real_Path'Last;
+   begin
+      while not Walker.Is_Root (Real_Path (Real_Path'First .. Pos)) loop
+         declare
+            Parent : constant String :=
+              Ada.Directories.Containing_Directory (Real_Path (Real_Path'First .. Pos));
+         begin
+            if Parent'Length = 0 then
+               return Real_Path;
+            end if;
+            Pos := Real_Path'First + Parent'Length - 1;
+         end;
+      end loop;
+      return Real_Path (Real_Path'First .. Pos);
+   end Find_Root;
+
    procedure Wait (Manager : in out License_Manager) is
    begin
       Manager.Executor.Stop;
