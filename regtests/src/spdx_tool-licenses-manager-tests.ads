@@ -29,4 +29,6 @@ package SPDX_Tool.Licenses.Manager.Tests is
    procedure Test_Find_License_Optional (T : in out Test);
    procedure Test_Find_License_SPDX (T : in out Test);
 
+   procedure Test_Find_Root (T : in out Test);
+
 end SPDX_Tool.Licenses.Manager.Tests;

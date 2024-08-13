@@ -45,6 +45,8 @@ package body SPDX_Tool.Licenses.Manager.Tests is
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite) is
    begin
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_Root",
+                       Test_Find_Root'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Set_Pattern",
                        Test_Set_Update_Pattern'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (token)",
@@ -314,5 +316,21 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Check_License (T, "gpl-2.0-or-bsd.c", "standard/LGPL-2.1+.txt",
                      "GPL-2.0+ OR BSD-3-Clause", SPDX_LICENSE, 1, 1);
    end Test_Find_License_SPDX;
+
+   procedure Test_Find_Root (T : in out Test) is
+      Config  : SPDX_Tool.Configs.Config_Type;
+      Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
+   begin
+      Manager.Languages.Initialize (Config);
+      Manager.File_Mgr (1).Initialize ("");
+      declare
+         Path : constant String
+           := Manager.Find_Root ("regtests/files/identify");
+      begin
+         T.Assert (Ada.Directories.Exists (Path), "Find_Root does not exist");
+         Util.Tests.Assert_Equals (T, 0, Util.Strings.Index (Path, "regtests/", Path'First),
+                                   "invalid Find_Root");
+      end;
+   end Test_Find_Root;
 
 end SPDX_Tool.Licenses.Manager.Tests;
