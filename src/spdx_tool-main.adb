@@ -337,6 +337,9 @@ begin
    Configure_Logs (False, False, False);
    GC.Initialize_Option_Scan (Stop_At_First_Non_Switch => True);
    GC.Getopt (Config => Command_Config, Quiet => True);
+   if Opt_Debug then
+      Opt_Verbose2 := True;
+   end if;
    if Opt_Verbose2 then
       Opt_Verbose := True;
    end if;
