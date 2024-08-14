@@ -371,6 +371,7 @@ begin
       Manager : License_Manager (Opt_Tasks);
       Filter  : Util.Files.Walk.Filter_Type;
       Mode    : Licenses.Manager.Job_Type := Licenses.Manager.FIND_LANGUAGES;
+      Count   : Natural := 0;
    begin
       if not Is_Empty (Licenses.Only_Licenses) then
          Mode := Licenses.Manager.FIND_LICENSES;
@@ -406,24 +407,24 @@ begin
       Manager.Configure (Tool_Config, Mode);
       Filter.Exclude (".git");
       Filter.Exclude (".svn");
-      if GC.Get_Argument = "" then
+      loop
+         declare
+            Arg : constant String := GC.Get_Argument;
+         begin
+            exit when Arg'Length = 0;
+            Count := Count + 1;
+            if not AD.Exists (Arg) then
+               Log.Error ("path '{0}' does not exist", Arg);
+               Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+            elsif AD.Kind (Arg) = AD.Directory then
+               Manager.Scan (Arg, Filter);
+            else
+               Manager.Analyze (Arg);
+            end if;
+         end;
+      end loop;
+      if Count = 0 then
          Manager.Scan (".", Filter);
-      else
-         loop
-            declare
-               Arg : constant String := GC.Get_Argument;
-            begin
-               exit when Arg'Length = 0;
-               if not AD.Exists (Arg) then
-                  Log.Error ("path '{0}' does not exist", Arg);
-                  Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-               elsif AD.Kind (Arg) = AD.Directory then
-                  Manager.Scan (Arg, Filter);
-               else
-                  Manager.Analyze (Arg);
-               end if;
-            end;
-         end loop;
       end if;
       Manager.Wait;
       if not Is_Empty (SPDX_Tool.Reports.Json_Path)
