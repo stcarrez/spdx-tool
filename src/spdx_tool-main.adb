@@ -406,21 +406,25 @@ begin
       Manager.Configure (Tool_Config, Mode);
       Filter.Exclude (".git");
       Filter.Exclude (".svn");
-      loop
-         declare
-            Arg : constant String := GC.Get_Argument;
-         begin
-            exit when Arg'Length = 0;
-            if not AD.Exists (Arg) then
-               Log.Error ("path '{0}' does not exist", Arg);
-               Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-            elsif AD.Kind (Arg) = AD.Directory then
-               Manager.Scan (Arg, Filter);
-            else
-               Manager.Analyze (Arg);
-            end if;
-         end;
-      end loop;
+      if GC.Get_Argument = "" then
+         Manager.Scan (".", Filter);
+      else
+         loop
+            declare
+               Arg : constant String := GC.Get_Argument;
+            begin
+               exit when Arg'Length = 0;
+               if not AD.Exists (Arg) then
+                  Log.Error ("path '{0}' does not exist", Arg);
+                  Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+               elsif AD.Kind (Arg) = AD.Directory then
+                  Manager.Scan (Arg, Filter);
+               else
+                  Manager.Analyze (Arg);
+               end if;
+            end;
+         end loop;
+      end if;
       Manager.Wait;
       if not Is_Empty (SPDX_Tool.Reports.Json_Path)
         or else not Is_Empty (SPDX_Tool.Reports.Xml_Path)
