@@ -1,5 +1,5 @@
 .\"
-.TH SPDX-TOOL 1 "June 2, 2024" "SPDX License Tool"
+.TH SPDX-TOOL 1 "Aug 15, 2024" "SPDX License Tool"
 .SH NAME
 spdx-tool \- SPDX license management tool
 .SH SYNOPSIS
@@ -272,6 +272,46 @@ during the analysis.
 Produce a XML report in the given file with a summary of licenses, languages and files found
 during the analysis.
 .\"
+.SH CONFIGURATION
+.\"
+A TOML configuration file can be specified either by creating a
+.B .spdxtool
+file in the root directory of a project or by using the
+.B --config
+option.
+.\"
+.TP 5
+.BI color= {"yes"|"no"}
+Controls whether the terminal colors are used.
+.TP 5
+.BI ignore= [patterns]
+Define a list of patterns representing files that must be ignored for the license identification.
+.TP
+.BI ignore-files= [paths]
+Define a list of paths representing files with patterns representing files that must be ignored for the license identification.
+When the path starts with the prefix
+.I spdx-tool:
+the file is considered being provided and embedded by the
+.BR spdx-tool .
+.\"
+.P
+Example of configuration file:
+.RS 4
+.nf
+[default]
+color="no"
+ignore-files=[
+"spdx-tool:ignore.txt",
+"spdx-tool:ignore-docs.txt"
+]
+ignore=[
+"*.md",
+"*.html",
+"*.xml",
+".readthedocs.yaml",
+"docs/pagebreak.tex"
+]
+.RE
 .SH SEE ALSO
 .IR file (1)
 .\"
