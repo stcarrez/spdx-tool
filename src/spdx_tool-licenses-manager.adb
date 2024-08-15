@@ -288,6 +288,20 @@ package body SPDX_Tool.Licenses.Manager is
       return Util.Files.Compose (Path, ".gitignore");
    end Get_Ignore_Path;
 
+   --  ------------------------------
+   --  Load the file that contains a list of files to ignore.  The default
+   --  implementation reads patterns as defined in `.gitignore` files.
+   --  ------------------------------
+   overriding
+   procedure Load_Ignore (Walker : in out License_Manager;
+                          Path   : in String;
+                          Filter : in out Util.Files.Walk.Filter_Type'Class) is
+   begin
+      Log.Info ("Reading ignore file {0}", Path);
+
+      Util.Files.Walk.Walker_Type (Walker).Load_Ignore (Path, Filter);
+   end Load_Ignore;
+
    --  Called when a file is found during the directory tree walk.
    overriding
    procedure Scan_File (Manager : in out License_Manager;
@@ -352,35 +366,12 @@ package body SPDX_Tool.Licenses.Manager is
    --  Returns true if the path corresponds to a root path for a project:
    --  * it contains a `.git` directory
    --  ------------------------------
+   overriding
    function Is_Root (Walker : in License_Manager;
                      Path   : in String) return Boolean is
    begin
       return Is_Git_Submodule (Path);
    end Is_Root;
-
-   --  ------------------------------
-   --  Find the root directory of a project knowing a path of a file or
-   --  directory of that project.  Move up to parent directories until
-   --  a path returns true when `Is_Root` is called.
-   --  ------------------------------
-   function Find_Root (Walker : in License_Manager;
-                       Path   : in String) return String is
-      Real_Path : constant String := Util.Files.Realpath (Path);
-      Pos       : Natural := Real_Path'Last;
-   begin
-      while not Walker.Is_Root (Real_Path (Real_Path'First .. Pos)) loop
-         declare
-            Parent : constant String :=
-              Ada.Directories.Containing_Directory (Real_Path (Real_Path'First .. Pos));
-         begin
-            if Parent'Length = 0 then
-               return Real_Path;
-            end if;
-            Pos := Real_Path'First + Parent'Length - 1;
-         end;
-      end loop;
-      return Real_Path (Real_Path'First .. Pos);
-   end Find_Root;
 
    procedure Wait (Manager : in out License_Manager) is
    begin

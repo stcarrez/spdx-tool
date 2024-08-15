@@ -54,6 +54,13 @@ package SPDX_Tool.Licenses.Manager is
    function Get_Ignore_Path (Walker : in License_Manager;
                              Path   : in String) return String;
 
+   --  Load the file that contains a list of files to ignore.  The default
+   --  implementation reads patterns as defined in `.gitignore` files.
+   overriding
+   procedure Load_Ignore (Walker : in out License_Manager;
+                          Path   : in String;
+                          Filter : in out Util.Files.Walk.Filter_Type'Class);
+
    --  Called when a file is found during the directory tree walk.
    overriding
    procedure Scan_File (Manager : in out License_Manager;
@@ -72,14 +79,9 @@ package SPDX_Tool.Licenses.Manager is
 
    --  Returns true if the path corresponds to a root path for a project:
    --  * it contains a `.git` directory
+   overriding
    function Is_Root (Walker : in License_Manager;
                      Path   : in String) return Boolean;
-
-   --  Find the root directory of a project knowing a path of a file or
-   --  directory of that project.  Move up to parent directories until
-   --  a path returns true when `Is_Root` is called.
-   function Find_Root (Walker : in License_Manager;
-                       Path   : in String) return String;
 
    procedure Wait (Manager : in out License_Manager);
 
