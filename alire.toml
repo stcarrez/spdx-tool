@@ -41,4 +41,5 @@ windows = { USE_MAGICADA = "no" }
 
 [[pins]]
 printer_toolkit = { url="https://gitlab.com/stcarrez/printer-toolkit.git" }
+utilada = { url="https://gitlab.com/stcarrez/ada-util.git" }
 
