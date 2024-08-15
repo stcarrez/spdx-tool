@@ -81,6 +81,87 @@ package body SPDX_Tool.Licenses.Manager is
    --  Configure the license manager.
    --  ------------------------------
    procedure Configure (Manager : in out License_Manager;
+                        Config  : in SPDX_Tool.Configs.Config_Type) is
+      procedure Set_Ignore (Pattern : in String);
+      procedure Load_Ignore_File (Path : in String);
+      procedure Load_Ignore_Content (Label   : in String;
+                                     Content : in String);
+
+      procedure Set_Ignore (Pattern : in String) is
+      begin
+         if Pattern'Length > 0 then
+            if Pattern (Pattern'First) = '!' then
+               if Opt_Verbose2 then
+                  Log.Info ("Include pattern {0}",
+                  Pattern (Pattern'First + 1 .. Pattern'Last));
+               end if;
+               Manager.Ignore_Files_Filter.Include
+                 (Pattern (Pattern'First + 1 .. Pattern'Last));
+            else
+               if Opt_Verbose2 then
+                  Log.Info ("Exclude pattern {0}", Pattern);
+               end if;
+               Manager.Ignore_Files_Filter.Exclude (Pattern);
+            end if;
+         end if;
+      end Set_Ignore;
+
+      procedure Load_Ignore_Content (Label   : in String;
+                                     Content : in String) is
+         procedure String_Reader (Process : not null access procedure (Line : in String));
+
+         procedure String_Reader (Process : not null access procedure (Line : in String)) is
+            Pos   : Natural := Content'First;
+            First : Natural;
+         begin
+            while Pos <= Content'Last loop
+               First := Pos;
+               while Pos <= Content'Last and then not (Content (Pos) in ASCII.CR | ASCII.LF) loop
+                  Pos := Pos + 1;
+               end loop;
+               if Pos < Content'Last then
+                  Process (Content (First .. Pos - 1));
+               elsif not (Content (Content'Last) in ASCII.CR | ASCII.LF) then
+                  Process (Content (First .. Content'Last));
+               end if;
+               Pos := Pos + 1;
+            end loop;
+         end String_Reader;
+      begin
+         Manager.Ignore_Files_Filter.Load_Ignore (Label, String_Reader'Access);
+      end Load_Ignore_Content;
+
+      procedure Load_Ignore_File (Path : in String) is
+      begin
+         if Path = "spdx-tool:ignore.txt" then
+            Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore);
+         elsif Path = "spdx-tool:ignore-docs.txt" then
+            Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore_docs);
+         elsif Util.Strings.Starts_With (Path, "spdx-tool:") then
+            Log.Error ("invalid builtin ignore file {0}", Path);
+         elsif Ada.Directories.Exists (Path) then
+            Util.Files.Walk.Load_Ignore (Manager.Ignore_Files_Filter, Path);
+         else
+            Log.Error ("ignore file {} not found", Path);
+         end if;
+      end Load_Ignore_File;
+
+   begin
+      Configs.Configure (Config,
+                         Configs.Names.IGNORE,
+                         Set_Ignore'Access);
+      Configs.Configure (Config,
+                         Configs.Names.IGNORE_FILES,
+                         Load_Ignore_File'Access);
+      --  Manager.Languages.Initialize (Config, (if Job = FIND_LANGUAGES
+      --                                         then Languages.Manager.IDENTIFY_LANGUAGE
+      --                                         else Languages.Manager.IDENTIFY_COMMENTS));
+   end Configure;
+
+   --  ------------------------------
+   --  Configure the license manager.
+   --  ------------------------------
+   procedure Configure (Manager : in out License_Manager;
                         Config  : in SPDX_Tool.Configs.Config_Type;
                         Job     : in Job_Type) is
       procedure Set_Ignore (Pattern : in String);
@@ -149,12 +230,7 @@ package body SPDX_Tool.Licenses.Manager is
 
       Stamp   : Util.Measures.Stamp;
    begin
-      Configs.Configure (Config,
-                         Configs.Names.IGNORE,
-                         Set_Ignore'Access);
-      Configs.Configure (Config,
-                         Configs.Names.IGNORE_FILES,
-                         Load_Ignore_File'Access);
+      Manager.Configure (Config);
       Manager.Languages.Initialize (Config, (if Job = FIND_LANGUAGES
                                                then Languages.Manager.IDENTIFY_LANGUAGE
                                                else Languages.Manager.IDENTIFY_COMMENTS));
@@ -203,6 +279,25 @@ package body SPDX_Tool.Licenses.Manager is
       Util.Measures.Set_Current (Perf'Access);
       SPDX_Tool.Licenses.Report (Stamp, "configure license manager");
    end Configure;
+
+   --  ------------------------------
+   --  Load a .spdxtool configuration file at the root of a project with
+   --  the given path.
+   --  ------------------------------
+   procedure Load_Project_Configuration (Manager : in out License_Manager;
+                                         Path    : in String) is
+      Config_Path : constant String := Util.Files.Compose (Path, ".spdxtool");
+   begin
+      if not Ada.Directories.Exists (Config_Path) then
+         return;
+      end if;
+      declare
+         Config : SPDX_Tool.Configs.Config_Type;
+      begin
+         Config.Read (Config_Path);
+         Manager.Configure (Config);
+      end;
+   end Load_Project_Configuration;
 
    --  ------------------------------
    --  Load the license templates defined in the directory for the license
@@ -345,6 +440,21 @@ package body SPDX_Tool.Licenses.Manager is
    begin
       return Ada.Directories.Exists (Git);
    end Is_Git_Submodule;
+
+   overriding
+   procedure Scan_Subdir_For_Ignore (Walker    : in out License_Manager;
+                                     Path      : in String;
+                                     Scan_Path : in String;
+                                     Rel_Path  : in String;
+                                     Level     : in Natural;
+                                     Filter    : in Util.Files.Walk.Filter_Context_Type) is
+   begin
+      if Level = 0 then
+         Walker.Load_Project_Configuration (Path);
+      end if;
+      Util.Files.Walk.Walker_Type (Walker).Scan_Subdir_For_Ignore
+        (Path, Scan_Path, Rel_Path, Level, Filter);
+   end Scan_Subdir_For_Ignore;
 
    --  ------------------------------
    --  Called when a directory is found during a directory tree walk.

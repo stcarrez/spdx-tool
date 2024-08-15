@@ -40,6 +40,8 @@ package SPDX_Tool.Licenses.Manager is
 
    --  Configure the license manager.
    procedure Configure (Manager : in out License_Manager;
+                        Config  : in SPDX_Tool.Configs.Config_Type);
+   procedure Configure (Manager : in out License_Manager;
                         Config  : in SPDX_Tool.Configs.Config_Type;
                         Job     : in Job_Type);
 
@@ -47,6 +49,11 @@ package SPDX_Tool.Licenses.Manager is
    --  identification and analysis.
    procedure Load_Licenses (Manager : in out License_Manager;
                             Path    : in String);
+
+   --  Load a .spdxtool configuration file at the root of a project with
+   --  the given path.
+   procedure Load_Project_Configuration (Manager : in out License_Manager;
+                                         Path    : in String);
 
    --  Get the path of a file that can be read to get a list of files to ignore
    --  in the given directory (ie, .gitignore).
@@ -60,6 +67,14 @@ package SPDX_Tool.Licenses.Manager is
    procedure Load_Ignore (Walker : in out License_Manager;
                           Path   : in String;
                           Filter : in out Util.Files.Walk.Filter_Type'Class);
+
+   overriding
+   procedure Scan_Subdir_For_Ignore (Walker    : in out License_Manager;
+                                     Path      : in String;
+                                     Scan_Path : in String;
+                                     Rel_Path  : in String;
+                                     Level     : in Natural;
+                                     Filter    : in Util.Files.Walk.Filter_Context_Type);
 
    --  Called when a file is found during the directory tree walk.
    overriding
