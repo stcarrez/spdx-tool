@@ -8,11 +8,11 @@ INSTALL=install
 -include .env.local
 
 ifeq ($(BUILD),coverage)
-MAKE_ARGS=-- -XBUILD=coverage
+MAKE_ARGS=-- -XSPDX_TOOL_BUILD=coverage
 endif
 
 ifeq ($(BUILD),debug)
-MAKE_ARGS=-- -XBUILD=debug
+MAKE_ARGS=-- -XSPDX_TOOL_BUILD=debug
 endif
 
 PREFIX?=/usr/local
@@ -43,7 +43,7 @@ import-licenses:
 	bin/spdx_tool-genlicenses jsonld licenses/standard
 
 test: build-tests
-	bin/spdx_tool-harness -v
+	bin/spdx_tool-harness -v -xml spdx_tool-aunit.xml
 
 clean:
 	alr clean

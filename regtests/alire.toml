@@ -20,4 +20,5 @@ disabled = true
 
 [[pins]]
 spdx_tool = { path='..' }
+utilada_unit = { path='../alire/cache/pins/utilada/unit' }
 
