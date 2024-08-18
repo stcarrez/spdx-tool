@@ -316,17 +316,6 @@ package body SPDX_Tool.Licenses.Manager is
       Manager.Job := FIND_LICENSES;
    end Load_Licenses;
 
-   procedure Load_Jsonld_License (Manager : in out License_Manager;
-                                  Path    : in String) is
-      License : Reader.License_Type;
-   begin
-      Reader.Load (License, Path);
-      if Length (License.Name) = 0 then
-         Log.Error ("{0}: no license found", Path);
-         return;
-      end if;
-   end Load_Jsonld_License;
-
    --  ------------------------------
    --  Load the license template from the given path.
    --  ------------------------------
@@ -334,21 +323,10 @@ package body SPDX_Tool.Licenses.Manager is
                            Path    : in String) is
       Name : constant String := Ada.Directories.Base_Name (Path);
       Ext  : constant String := Ada.Directories.Extension (Path);
+      License : License_Index;
    begin
       Log.Info ("load license template {0}", Path);
-      if Ext = "jsonld" then
-         Manager.Load_Jsonld_License (Path);
-      else
-         declare
-            File   : Util.Streams.Files.File_Stream;
-            Buffer : Buffer_Type (1 .. 4096);
-            Last   : Ada.Streams.Stream_Element_Offset;
-         begin
-            File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
-            File.Read (Into => Buffer, Last => Last);
-            Reader.Load_License (Name, Buffer (1 .. Last), Manager.Licenses);
-         end;
-      end if;
+      Manager.Repository.Read_License (Path, License);
    end Load_License;
 
    --  ------------------------------

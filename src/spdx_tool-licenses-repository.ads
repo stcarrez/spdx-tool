@@ -8,16 +8,20 @@ with Ada.Directories;
 private with Ada.Finalization;
 package SPDX_Tool.Licenses.Repository is
 
+   MAX_LICENSE_SIZE : constant := 64 * 1024;
+
    type Repository_Type is tagged limited private;
 
    --  Get the license template for the given license index.
    function Get_License (Repository : in Repository_Type;
                          License    : in License_Index) return Token_Access;
 
-   --  Load the license templates defined in the directory for the license
-   --  identification and analysis.
-   procedure Load_Licenses (Repository : in out Repository_Type;
-                            Path    : in String);
+   --  Read the license template with the given path and allocate
+   --  a license index for that license template.
+   procedure Read_License (Repository : in out Repository_Type;
+                           Path       : in String;
+                           License    : out License_Index) with
+     Pre => Ada.Directories.Exists (Path);
 
 private
 
@@ -28,8 +32,12 @@ private
       procedure Load_License (License : in License_Index;
                               Token   : out Token_Access);
 
+      procedure Allocate_License (Template : in License_Template;
+                                  License  : out License_Index);
+
    private
-      Licenses : License_Template_Array (0 .. License_Index'Last);
+      Next_Index : License_Index := 0;
+      Licenses   : License_Template_Array (0 .. License_Index'Last);
    end License_Tree;
 
    type Repository_Type is limited new Ada.Finalization.Limited_Controlled with record

@@ -105,9 +105,6 @@ package SPDX_Tool.Licenses.Manager is
    procedure Load_License (Manager : in out License_Manager;
                            Path    : in String);
 
-   procedure Load_Jsonld_License (Manager : in out License_Manager;
-                                  Path    : in String);
-
    --  Define the list of SPDX license names or list of language filters
    --  to ignore.
    procedure Set_Filter (Manager  : in out License_Manager;
