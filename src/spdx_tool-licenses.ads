@@ -22,7 +22,6 @@ package SPDX_Tool.Licenses is
    Empty_File       : constant String := "Empty file";
 
    License_Dir      : aliased GNAT.Strings.String_Access;
-   Export_Dir       : aliased GNAT.Strings.String_Access;
    Ignore_Licenses  : aliased GNAT.Strings.String_Access;
    Only_Licenses    : aliased GNAT.Strings.String_Access;
    Ignore_Languages : aliased GNAT.Strings.String_Access;

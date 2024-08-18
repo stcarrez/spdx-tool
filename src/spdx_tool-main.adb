@@ -218,13 +218,6 @@ procedure SPDX_Tool.Main is
                         Long_Switch => "--templates=",
                         Argument => "PATH",
                         Help   => -("Path of a license template or a directory with templates"));
-      if Configs.Defaults.DEBUG then
-         GC.Define_Switch (Config => Command_Config,
-                           Output => SPDX_Tool.Licenses.Export_Dir'Access,
-                           Long_Switch => "--export=",
-                           Argument => "PATH",
-                           Help   => "Export the licenses in the directory");
-      end if;
    end Setup;
 
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map) is

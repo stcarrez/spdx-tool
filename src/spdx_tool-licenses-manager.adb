@@ -325,27 +325,6 @@ package body SPDX_Tool.Licenses.Manager is
          Log.Error ("{0}: no license found", Path);
          return;
       end if;
-      declare
-         Name : constant String := To_String (License.Name);
-      begin
-         Log.Info ("{0}: {1}", Path, Name);
-         if Length (License.Template) > 0
-           and then Export_Dir /= null
-           and then Export_Dir.all /= ""
-         then
-            Reader.Save_License (License,
-                                 Util.Files.Compose (Export_Dir.all, Name & ".txt"));
-         else
-            declare
-               Content : String := To_String (License.Template);
-               Buffer  : Buffer_Type (1 .. Content'Length);
-               for Buffer'Address use Content'Address;
-               L : License_Template;
-            begin
-               Reader.Load_License (Name, Buffer, L);
-            end;
-         end if;
-      end;
    end Load_Jsonld_License;
 
    --  ------------------------------
