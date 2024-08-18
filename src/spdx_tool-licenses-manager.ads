@@ -14,6 +14,7 @@ with SPDX_Tool.Configs;
 with SCI.Vectorizers.Transformers;
 with SCI.Numbers;
 private with SPDX_Tool.Languages.Manager;
+private with SPDX_Tool.Licenses.Repository;
 private with Util.Executors;
 private with Util.Concurrent.Counters;
 package SPDX_Tool.Licenses.Manager is
@@ -203,6 +204,7 @@ private
       Include_Languages    : Util.Strings.Sets.Set;
       Exclude_Languages    : Util.Strings.Sets.Set;
       Licenses             : License_Template;
+      Repository           : SPDX_Tool.Licenses.Repository.Repository_Type;
 
       --  A map of tokens used in license templates.
       Token_Counters       : SPDX_Tool.Counter_Arrays.Array_Type;

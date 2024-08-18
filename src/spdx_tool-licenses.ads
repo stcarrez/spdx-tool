@@ -239,13 +239,14 @@ private
 
    --  Find in the header comment an SPDX license tag.
    function Look_SPDX_License (Content : in Buffer_Type;
-                                Lines   : in SPDX_Tool.Languages.Line_Array;
-                                From    : in Line_Number;
-                                To      : in Line_Number)
+                               Lines   : in SPDX_Tool.Languages.Line_Array;
+                               From    : in Line_Number;
+                               To      : in Line_Number)
                                return License_Match
       with Pre => From <= To;
 
    function Look_License (License : in License_Index;
+                          Token   : in Token_Access;
                           File    : in SPDX_Tool.Files.File_Type;
                           From    : in Line_Number;
                           To      : in Line_Number)

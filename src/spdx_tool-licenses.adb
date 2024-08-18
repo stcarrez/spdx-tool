@@ -9,7 +9,6 @@ with Util.Strings;
 with Util.Log.Loggers;
 
 with SPDX_Tool.Licenses.Files;
-with SPDX_Tool.Licenses.Reader;
 package body SPDX_Tool.Licenses is
 
    use all type SPDX_Tool.Files.Comment_Mode;
@@ -51,42 +50,6 @@ package body SPDX_Tool.Licenses is
       end loop;
       return To_String (Result);
    end To_String;
-
-   --  Protect concurrent loading of license templates.
-   protected License_Tree is
-      function Get_License (License : in License_Index) return Token_Access;
-
-      procedure Load_License (License : in License_Index;
-                              Token   : out Token_Access);
-
-   private
-      Licenses : License_Template_Array (0 .. SPDX_Tool.Licenses.Files.Names_Count - 1);
-   end License_Tree;
-
-   protected body License_Tree is
-      function Get_License (License : in License_Index) return Token_Access is
-      begin
-         return Licenses (License).Root;
-      end Get_License;
-
-      procedure Load_License (License : in License_Index;
-                              Token    : out Token_Access) is
-         Stamp : Util.Measures.Stamp;
-      begin
-         Token := Licenses (License).Root;
-         if Token = null then
-            Reader.Load_License (License, Licenses (License), Token);
-            if Token /= null then
-               Licenses (License).Root := Token;
-            else
-               Log.Debug ("No license loaded for {0}",
-                          SPDX_Tool.Licenses.Files.Names (License).all);
-            end if;
-         end if;
-         Report (Stamp, "Load template license");
-      end Load_License;
-
-   end License_Tree;
 
    function Depth (Token : in Token_Type'Class) return Natural is
       Result : Natural := 0;
@@ -528,53 +491,47 @@ package body SPDX_Tool.Licenses is
    end Look_SPDX_License;
 
    function Look_License (License : in License_Index;
+                          Token   : in Token_Access;
                           File    : in SPDX_Tool.Files.File_Type;
                           From    : in Line_Number;
                           To      : in Line_Number)
                           return License_Match is
-      Token : Token_Access;
-      Stamp : Util.Measures.Stamp;
+      Buf     : constant Buffer_Accessor := File.Buffer.Value;
+      Result  : License_Match := (Last => null, Depth => 0, others => <>);
+      Match   : License_Match;
+      Line    : Infos.Line_Number := From;
+      Stamp   : Util.Measures.Stamp;
    begin
       Log.Debug ("Checking with license template '{0}'", Licenses.Files.Names (License).all);
-      Token := License_Tree.Get_License (License);
-      if Token = null then
-         License_Tree.Load_License (License, Token);
-      end if;
-      declare
-         Buf     : constant Buffer_Accessor := File.Buffer.Value;
-         Result  : License_Match := (Last => null, Depth => 0, others => <>);
-         Match   : License_Match;
-         Line    : Infos.Line_Number := From;
-      begin
-         while Line <= To loop
-            if File.Lines (Line).Comment /= NO_COMMENT then
-               Match := Look_License_Tree (Token, Buf.Data,
+
+      while Line <= To loop
+         if File.Lines (Line).Comment /= NO_COMMENT then
+            Match := Look_License_Tree (Token, Buf.Data,
                                            File.Lines, Line, To);
-               if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-                  return Match;
-               end if;
-               if Match.Last /= null and then Match.Info.First_Line + 1 < Match.Info.Last_Line then
-                  Log.Info ("license '{0}' missmatch at line{1} after {2} lines ({3} matched)",
-                            Licenses.Files.Names (License).all,
-                            Match.Info.Last_Line'Image,
-                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line),
-                            Infos.Percent_Image (Match.Confidence));
-               end if;
-               exit when Match.Info.First_Line + 1 < Match.Info.Last_Line;
-               if Match.Last /= null then
-                  Match.Depth := Match.Last.Depth;
-                  if Result.Last = null or else Match.Depth > Result.Depth then
-                     Result.Last := Match.Last;
-                     Result.Depth := Match.Depth;
-                  end if;
+            if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+               return Match;
+            end if;
+            if Match.Last /= null and then Match.Info.First_Line + 1 < Match.Info.Last_Line then
+               Log.Info ("license '{0}' missmatch at line{1} after {2} lines ({3} matched)",
+                         Licenses.Files.Names (License).all,
+                         Match.Info.Last_Line'Image,
+                         Infos.Image (Match.Info.Last_Line - Match.Info.First_Line),
+                         Infos.Percent_Image (Match.Confidence));
+            end if;
+            exit when Match.Info.First_Line + 1 < Match.Info.Last_Line;
+            if Match.Last /= null then
+               Match.Depth := Match.Last.Depth;
+               if Result.Last = null or else Match.Depth > Result.Depth then
+                  Result.Last := Match.Last;
+                  Result.Depth := Match.Depth;
                end if;
             end if;
-            exit when Line = To;
-            Line := Line + 1;
-         end loop;
-         Report (Stamp, "Find license (no match)");
-         return Result;
-      end;
+         end if;
+         exit when Line = To;
+         Line := Line + 1;
+      end loop;
+      Report (Stamp, "Find license (no match)");
+      return Result;
    end Look_License;
 
    procedure Performance_Report is
