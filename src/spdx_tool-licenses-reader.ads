@@ -12,10 +12,11 @@ package SPDX_Tool.Licenses.Reader is
       License      : UString;
       OSI_Approved : Boolean := False;
       FSF_Libre    : Boolean := False;
+      Is_Exception : Boolean := False;
    end record;
 
-   procedure Load (License : in out License_Type;
-                   Path    : in String);
+   procedure Load_JSON (License : in out License_Type;
+                        Path    : in String);
 
    procedure Save_License (License : in License_Type;
                            Path    : in String);

@@ -63,23 +63,35 @@ package body SPDX_Tool.Licenses.Reader is
       end if;
    end Find_Value;
 
-   procedure Load (License : in out License_Type;
-                   Path    : in String) is
-      Root, Graph, Info : Util.Beans.Objects.Object;
+   procedure Load_JSON (License : in out License_Type;
+                        Path    : in String) is
+      Root, Graph, Info, License_Id, Exception_Id : Util.Beans.Objects.Object;
    begin
       Root := Util.Serialize.IO.JSON.Read (Path);
       Graph := Util.Beans.Objects.Get_Value (Root, "@graph");
-      Info := Find_Header (Graph);
+      if UBO.Is_Null (Graph) then
+         Info := Root;
+      else
+         Info := Find_Header (Graph);
+      end if;
+      License_Id := UBO.Get_Value (Info, "spdx:licenseId");
+      License.Is_Exception := UBO.Is_Null (License_Id);
+      if UBO.Is_Null (License_Id) then
+         License.Name := Find_Value (Info, "spdx:licenseExceptionId");
+         License.Template := Find_Value (Info, "spdx:licenseExceptionTemplate");
+         License.License := Find_Value (Info, "spdx:licenseExceptionText");
+      else
+         License.Name := UBO.To_Unbounded_String (License_Id);
+         License.Template := Find_Value (Info,
+                                         "spdx:standardLicenseHeaderTemplate");
+         License.License := Find_Value (Info, "spdx:licenseText");
+         if Length (License.Template) = 0 then
+            License.Template := Find_Value (Info, "spdx:standardLicenseTemplate");
+         end if;
+      end if;
       License.OSI_Approved := Find_Value (Info, "spdx:isOsiApproved");
       License.FSF_Libre := Find_Value (Info, "spdx:isFsfLibre");
-      License.Name := Find_Value (Info, "spdx:licenseId");
-      License.Template := Find_Value (Info,
-                                      "spdx:standardLicenseHeaderTemplate");
-      License.License := Find_Value (Info, "spdx:licenseText");
-      if Length (License.Template) = 0 then
-         License.Template := Find_Value (Info, "spdx:standardLicenseTemplate");
-      end if;
-   end Load;
+   end Load_JSON;
 
    function Get_Name (License : License_Type) return String is
    begin
