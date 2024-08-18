@@ -26,7 +26,7 @@ procedure SPDX_Tool.Genlicenses is
                      Path       : in String) is
       License   : SPDX_Tool.Licenses.Reader.License_Type;
    begin
-      SPDX_Tool.Licenses.Reader.Load (License, Path);
+      SPDX_Tool.Licenses.Reader.Load_JSON (License, Path);
       declare
          Name   : constant String := To_String (License.Name);
          Target : constant String := Util.Files.Compose (Export_Dir, Name & ".txt");
