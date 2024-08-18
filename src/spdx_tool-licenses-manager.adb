@@ -3,24 +3,20 @@
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
-with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Unchecked_Deallocation;
 
 with Util.Strings;
 with Util.Strings.Tokenizers;
 with Util.Log.Loggers;
-with Util.Streams.Files;
 
 with SCI.Similarities.COO_Arrays;
 with SPDX_Tool.Configs.Default;
 with SPDX_Tool.Licenses.Templates;
-with SPDX_Tool.Licenses.Reader;
 package body SPDX_Tool.Licenses.Manager is
 
    use all type SPDX_Tool.Files.Comment_Mode;
    use type SPDX_Tool.Infos.License_Kind;
-   use type GNAT.Strings.String_Access;
 
    Log : constant Util.Log.Loggers.Logger :=
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses");
@@ -164,6 +160,7 @@ package body SPDX_Tool.Licenses.Manager is
    procedure Configure (Manager : in out License_Manager;
                         Config  : in SPDX_Tool.Configs.Config_Type;
                         Job     : in Job_Type) is
+      procedure Initialize_Tokens;
       procedure Set_Ignore (Pattern : in String);
       procedure Load_Ignore_File (Path : in String);
       procedure Load_Ignore_Content (Label   : in String;
@@ -228,6 +225,19 @@ package body SPDX_Tool.Licenses.Manager is
          end if;
       end Load_Ignore_File;
 
+      procedure Initialize_Tokens is
+         use type Licenses.Position;
+         First : Buffer_Index := 1;
+         Last  : Buffer_Index;
+      begin
+         for I in Licenses.Templates.Token_Pos'Range loop
+            Last := First + Buffer_Size (Licenses.Templates.Token_Pos (I) - 1);
+            Manager.Token_Counters.Tokens.Insert (Licenses.Templates.Tokens (First .. Last),
+                                                  SPDX_Tool.Token_Index (I));
+            First := Last + 1;
+         end loop;
+      end Initialize_Tokens;
+
       Stamp   : Util.Measures.Stamp;
    begin
       Manager.Configure (Config);
@@ -235,23 +245,27 @@ package body SPDX_Tool.Licenses.Manager is
                                                then Languages.Manager.IDENTIFY_LANGUAGE
                                                else Languages.Manager.IDENTIFY_COMMENTS));
 
+      if Manager.Token_Counters.Tokens.Is_Empty and then Job /= FIND_LANGUAGES then
+         Initialize_Tokens;
+      end if;
+
       --  Setup the list of license tokens
       if not Opt_No_Builtin and then Job /= FIND_LANGUAGES then
-         Manager.Token_Counters.Default := 0;
+         Manager.Token_Counters.Counters.Default := 0;
          Manager.Token_Frequency.Default := 0.0;
          for I in Licenses.Templates.List'Range loop
             declare
                Tokens : constant Token_Array_Access := Licenses.Templates.List (I);
             begin
-               Counter_Arrays.Fill (Manager.Token_Counters, I, Tokens.all);
+               Counter_Arrays.Fill (Manager.Token_Counters.Counters, I, Tokens.all);
             end;
          end loop;
          declare
             F : constant Freq_Transformers.Frequency_Array
-               := Freq_Transformers.IDF (Manager.Token_Counters);
+               := Freq_Transformers.IDF (Manager.Token_Counters.Counters);
          begin
             Manager.Token_Frequency.Cells.Clear;
-            Freq_Transformers.TIDF (From     => Manager.Token_Counters,
+            Freq_Transformers.TIDF (From     => Manager.Token_Counters.Counters,
                                     Doc_Freq => F,
                                     Into     => Manager.Token_Frequency);
             Manager.License_Frequency := new Freq_Transformers.Frequency_Array '(F);
@@ -321,8 +335,6 @@ package body SPDX_Tool.Licenses.Manager is
    --  ------------------------------
    procedure Load_License (Manager : in out License_Manager;
                            Path    : in String) is
-      Name : constant String := Ada.Directories.Base_Name (Path);
-      Ext  : constant String := Ada.Directories.Extension (Path);
       License : License_Index;
    begin
       Log.Info ("load license template {0}", Path);
@@ -780,7 +792,7 @@ package body SPDX_Tool.Licenses.Manager is
          return;
       end if;
 
-      File_Mgr.Open (Data, File, Manager.Languages);
+      File_Mgr.Open (Manager.Token_Counters.Tokens, Data, File, Manager.Languages);
       if File.Filtered then
          return;
       end if;

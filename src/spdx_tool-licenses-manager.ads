@@ -13,6 +13,7 @@ with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
 with SCI.Vectorizers.Transformers;
 with SCI.Numbers;
+with SPDX_Tool.Token_Counters;
 private with SPDX_Tool.Languages.Manager;
 private with SPDX_Tool.Licenses.Repository;
 private with Util.Executors;
@@ -204,7 +205,7 @@ private
       Repository           : SPDX_Tool.Licenses.Repository.Repository_Type;
 
       --  A map of tokens used in license templates.
-      Token_Counters       : SPDX_Tool.Counter_Arrays.Array_Type;
+      Token_Counters       : SPDX_Tool.Token_Counters.Vectorizer_Type;
       Token_Frequency      : Frequency_Arrays.Array_Type;
       License_Squares      : Float_Array_Access;
       License_Frequency    : Frequency_Array_Access;

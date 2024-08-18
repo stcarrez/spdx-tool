@@ -8,7 +8,6 @@ with Util.Log.Loggers;
 with Util.Strings.Vectors;
 with Util.Strings.Split;
 with SPDX_Tool.Languages.CommentsMap;
-with SPDX_Tool.Licenses.Templates;
 with SPDX_Tool.Languages.Rules.Generated;
 with SPDX_Tool.Languages.Rules.Disambiguations;
 package body SPDX_Tool.Languages.Manager is
@@ -46,6 +45,7 @@ package body SPDX_Tool.Languages.Manager is
    --  Identify the language used by the given file.
    --  ------------------------------
    procedure Find_Language (Manager  : in Language_Manager;
+                            Tokens   : in SPDX_Tool.Token_Counters.Token_Maps.Map;
                             File     : in out SPDX_Tool.Infos.File_Info;
                             Content  : in out File_Type;
                             Analyzer : out Analyzer_Access) is
@@ -113,7 +113,7 @@ package body SPDX_Tool.Languages.Manager is
             return;
          end if;
          if Analyzer /= null and then Manager.Level = IDENTIFY_COMMENTS then
-            Analyzer.all.Find_Comments (Manager.Tokens, Buf.Data (Buf.Data'First .. Len),
+            Analyzer.all.Find_Comments (Tokens, Buf.Data (Buf.Data'First .. Len),
                                         Content.Lines, Content.Count);
             for Line of Content.Lines (1 .. Content.Count) loop
                if Line.Style.Mode /= NO_COMMENT
@@ -172,7 +172,6 @@ package body SPDX_Tool.Languages.Manager is
    procedure Initialize (Manager : in out Language_Manager;
                          Config  : in SPDX_Tool.Configs.Config_Type;
                          Level   : in Level_Type := IDENTIFY_COMMENTS) is
-      procedure Initialize_Tokens;
       procedure Set_Comments (Conf : in Comment_Configuration);
       procedure Set_Language (Conf : in Language_Configuration);
       procedure Add_Builtin (Language     : in String;
@@ -264,27 +263,11 @@ package body SPDX_Tool.Languages.Manager is
          Lang.Analyzer := Result.all'Access;
       end Setup_Language;
 
-      procedure Initialize_Tokens is
-         use type Licenses.Position;
-         First : Buffer_Index := 1;
-         Last  : Buffer_Index;
-      begin
-         for I in Licenses.Templates.Token_Pos'Range loop
-            Last := First + Buffer_Size (Licenses.Templates.Token_Pos (I) - 1);
-            Manager.Tokens.Insert (Licenses.Templates.Tokens (First .. Last),
-                                   SPDX_Tool.Token_Index (I));
-            First := Last + 1;
-         end loop;
-      end Initialize_Tokens;
-
       Basic_Analyzer_Count : Natural := 0;
    begin
       Manager.Level := Level;
       SPDX_Tool.Languages.Rules.Initialize (Rules.Generated.Definition);
       SPDX_Tool.Languages.Rules.Initialize (Rules.Disambiguations.Definition);
-      if Manager.Tokens.Is_Empty and then Level /= IDENTIFY_LANGUAGE then
-         Initialize_Tokens;
-      end if;
       Add_Builtin ("dash-style", "--");
       Add_Builtin ("C-line", "//");
       Add_Builtin ("Shell", "#");

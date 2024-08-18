@@ -6,6 +6,7 @@
 
 with SPDX_Tool.Infos;
 with SPDX_Tool.Magic_Manager;
+with SPDX_Tool.Token_Counters;
 with SPDX_Tool.Languages.Manager;
 package SPDX_Tool.Files.Manager is
 
@@ -19,6 +20,7 @@ package SPDX_Tool.Files.Manager is
    --  Open the file and read the first data block (4K) to identify the
    --  language and comment headers.
    procedure Open (Manager   : in File_Manager;
+                   Tokens    : in SPDX_Tool.Token_Counters.Token_Maps.Map;
                    Data      : in out File_Type;
                    File      : in out SPDX_Tool.Infos.File_Info;
                    Languages : in SPDX_Tool.Languages.Manager.Language_Manager);

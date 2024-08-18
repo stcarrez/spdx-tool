@@ -45,6 +45,7 @@ package body SPDX_Tool.Files.Manager is
    --  language and comment headers.
    --  ------------------------------
    procedure Open (Manager   : in File_Manager;
+                   Tokens    : in SPDX_Tool.Token_Counters.Token_Maps.Map;
                    Data      : in out File_Type;
                    File      : in out SPDX_Tool.Infos.File_Info;
                    Languages : in SPDX_Tool.Languages.Manager.Language_Manager) is
@@ -76,7 +77,7 @@ package body SPDX_Tool.Files.Manager is
          Data.Last_Offset := Len;
          SPDX_Tool.Languages.Find_Lines (Buf.Data (Buf.Data'First .. Len), Data.Lines, Data.Count);
          Manager.Find_Mime_Type (File, Buf.Data (Buf.Data'First .. Len));
-         Languages.Find_Language (File, Data, Analyzer);
+         Languages.Find_Language (Tokens, File, Data, Analyzer);
          SPDX_Tool.Languages.Boxed_License (Data.Lines (Data.Lines'First .. Data.Count),
                                             Buf.Data, Data.Boxed);
       end;

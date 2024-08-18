@@ -31,6 +31,7 @@ package SPDX_Tool.Languages.Manager is
    --  made by looking at the file extension, the mime type or by looking at
    --  the first 4K block of the file.
    procedure Find_Language (Manager  : in Language_Manager;
+                            Tokens   : in SPDX_Tool.Token_Counters.Token_Maps.Map;
                             File     : in out SPDX_Tool.Infos.File_Info;
                             Content  : in out File_Type;
                             Analyzer : out Analyzer_Access);
@@ -52,7 +53,7 @@ private
 
    type Language_Manager is limited new Ada.Finalization.Limited_Controlled with record
       Languages        : Language_Maps.Map;
-      Tokens           : SPDX_Tool.Token_Counters.Token_Maps.Map;
+      --  Tokens           : SPDX_Tool.Token_Counters.Token_Maps.Map;
       Default          : Combined_Analyzer_Access;
       Mime_Detect      : Mimes.Mime_Detector_Type;
       Extension_Detect : Extensions.Extension_Detector_Type;
