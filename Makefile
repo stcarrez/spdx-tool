@@ -1,32 +1,27 @@
-BUILD=#coverage
 MAKE_ARGS=
 JSON_PP=json_pp
 VERSION=0.4.0
 DEBUG_MODE=False
 INSTALL=install
 
--include .env.local
+-include Makefile.conf
 
-ifeq ($(BUILD),coverage)
-MAKE_ARGS=-- -XSPDX_TOOL_BUILD=coverage
-endif
-
-ifeq ($(BUILD),debug)
-MAKE_ARGS=-- -XSPDX_TOOL_BUILD=debug
-endif
-
+MAKE_ARGS=-XSPDX_TOOL_BUILD=$(BUILD)
+BUILD?=distrib
 PREFIX?=/usr/local
+ALR?=alr --non-interactive
+BUILD_COMMAND?=$(ALR) build --
 
 build: src/spdx_tool-configs-defaults.ads
-	alr build $(MAKE_ARGS)
+	$(BUILD_COMMAND) $(MAKE_ARGS)
 
 build-tests:
-	cd regtests && alr build $(MAKE_ARGS)
+	cd regtests && $(BUILD_COMMAND) $(MAKE_ARGS)
 
 JSON_SRC=tools/languages.json tools/languages-addon.json
 
 generate:
-	cd tools && alr build $(MAKE_ARGS)
+	cd tools && $(BUILD_COMMAND) $(MAKE_ARGS)
 	bin/spdx_tool-genmap --extensions $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/extensions.json
 	bin/spdx_tool-genmap --filenames $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/filenames.json
 	bin/spdx_tool-genmap --interpreters $(JSON_SRC) | $(JSON_PP) > share/spdx-tool/interpreters.json
@@ -39,7 +34,7 @@ generate:
 	cd tools && alr exec are -- --rule=../are-package.xml -o ../src/generated ..
 
 import-licenses:
-	cd tools && alr build $(MAKE_ARGS)
+	cd tools && $(BUILD_COMMAND) $(MAKE_ARGS)
 	bin/spdx_tool-genlicenses jsonld licenses/standard
 
 test: build-tests
@@ -66,3 +61,7 @@ pot:
 src/spdx_tool-configs-defaults.ads:   Makefile src/spdx_tool-configs-defaults.gpb
 	gnatprep -DPREFIX='"${PREFIX}"' -DVERSION='"$(VERSION)"' -DDEBUG='$(DEBUG_MODE)'\
 		  src/spdx_tool-configs-defaults.gpb src/spdx_tool-configs-defaults.ads
+
+setup::
+	echo "BUILD=$(BUILD)" > Makefile.conf
+	echo "PREFIX=$(PREFIX)" >> Makefile.conf
