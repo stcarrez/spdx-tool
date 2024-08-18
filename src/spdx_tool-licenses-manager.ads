@@ -243,12 +243,6 @@ private
                           File    : in out SPDX_Tool.Files.File_Type)
                           return License_Match;
 
-   function Find_License (Manager : in License_Manager;
-                          Content : in Buffer_Type;
-                          Lines   : in SPDX_Tool.Languages.Line_Array;
-                          From    : in Line_Number;
-                          To      : in Line_Number) return License_Match;
-
    overriding
    procedure Initialize (Manager : in out License_Manager);
 
