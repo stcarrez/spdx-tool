@@ -11,9 +11,6 @@ with Util.Strings.Sets;
 with SPDX_Tool.Files.Manager;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
-with SCI.Vectorizers.Transformers;
-with SCI.Numbers;
-with SPDX_Tool.Token_Counters;
 private with SPDX_Tool.Languages.Manager;
 private with SPDX_Tool.Licenses.Repository;
 private with Util.Executors;
@@ -135,29 +132,6 @@ package SPDX_Tool.Licenses.Manager is
 
 private
 
-   subtype Confidence_Type is Infos.Confidence_Type;
-   use type Infos.Confidence_Type;
-   function To_Float (Value : in Count_Type) return Float is (Float (Value));
-
-   --  ??? Mul and Div seem necessary as "*" and "/" fail to instantiate
-   function Mul (Left, Right : Confidence_Type) return Confidence_Type is (Left * Right);
-   function Div (Left, Right : Confidence_Type) return Confidence_Type is (Left / Right);
-   function From_Integer (Value : in Integer) return Confidence_Type is (Confidence_Type (Value));
-   function From_Float (Value : in Float) return Confidence_Type is (Confidence_Type (Value));
-   package Confidence_Numbers is new SCI.Numbers.Number (Confidence_Type, "*" => Mul, "/" => Div);
-   package Confidence_Conversions is new SCI.Numbers.Conversion (Confidence_Numbers);
-
-   package Freq_Transformers is
-      new SCI.Vectorizers.Transformers (Frequency_Type => Float,
-                                        Arrays         => SPDX_Tool.Counter_Arrays,
-                                        Convert        => To_Float);
-   package Frequency_Arrays renames Freq_Transformers.Frequency_Arrays;
-
-   type Frequency_Array_Access is access all Freq_Transformers.Frequency_Array;
-
-   type Float_Array is array (License_Index range <>) of Float;
-   type Float_Array_Access is access all Float_Array;
-
    type License_Manager_Access is access all License_Manager;
 
    type License_Job_Type is record
@@ -204,12 +178,6 @@ private
       Licenses             : License_Template;
       Repository           : SPDX_Tool.Licenses.Repository.Repository_Type;
 
-      --  A map of tokens used in license templates.
-      Token_Counters       : SPDX_Tool.Token_Counters.Vectorizer_Type;
-      Token_Frequency      : Frequency_Arrays.Array_Type;
-      License_Squares      : Float_Array_Access;
-      License_Frequency    : Frequency_Array_Access;
-
       --  Replacement information
       Before   : SPDX_Tool.Infos.Line_Range_Type;
       After    : SPDX_Tool.Infos.Line_Range_Type;
@@ -220,11 +188,6 @@ private
       File_Mgr : File_Manager_Array (1 .. Count);
       Executor : Executor_Manager_Access;
    end record;
-
-   function Compute_Frequency (Manager : in License_Manager;
-                               Lines   : in SPDX_Tool.Languages.Line_Array;
-                               From    : in Line_Number;
-                               To      : in Line_Number) return Frequency_Arrays.Array_Type;
 
    function Find_License_Templates (Manager : in License_Manager;
                                     Line    : in SPDX_Tool.Languages.Line_Type)
@@ -251,10 +214,5 @@ private
 
    function Get_File_Manager (Manager : in out License_Manager)
                               return SPDX_Tool.Files.Manager.File_Manager_Access;
-
-   function Guess_License (Manager : in License_Manager;
-                           Lines   : in SPDX_Tool.Languages.Line_Array;
-                           From    : in Line_Number;
-                           To      : in Line_Number) return License_Match;
 
 end SPDX_Tool.Licenses.Manager;

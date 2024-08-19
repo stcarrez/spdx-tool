@@ -10,7 +10,6 @@ with Util.Strings;
 with Util.Strings.Tokenizers;
 with Util.Log.Loggers;
 
-with SCI.Similarities.COO_Arrays;
 with SPDX_Tool.Configs.Default;
 with SPDX_Tool.Licenses.Templates;
 package body SPDX_Tool.Licenses.Manager is
@@ -24,13 +23,7 @@ package body SPDX_Tool.Licenses.Manager is
    function Is_Info_Log return Boolean
       is (Util.Log.Loggers.Get_Level (Log) <= Util.Log.INFO_LEVEL);
 
-   function To_Float (Value : Float) return Float is (Value);
    function Is_Git_Submodule (Path : in String) return Boolean;
-
-   package Similarities is
-      new SCI.Similarities.COO_Arrays (Arrays      => Freq_Transformers.Frequency_Arrays,
-                                       Conversions => Confidence_Conversions,
-                                       To_Float    => To_Float);
 
    File_Mgr : SPDX_Tool.Files.Manager.File_Manager_Access := null with Thread_Local_Storage;
 
@@ -160,84 +153,6 @@ package body SPDX_Tool.Licenses.Manager is
    procedure Configure (Manager : in out License_Manager;
                         Config  : in SPDX_Tool.Configs.Config_Type;
                         Job     : in Job_Type) is
-      procedure Initialize_Tokens;
-      procedure Set_Ignore (Pattern : in String);
-      procedure Load_Ignore_File (Path : in String);
-      procedure Load_Ignore_Content (Label   : in String;
-                                     Content : in String);
-
-      procedure Set_Ignore (Pattern : in String) is
-      begin
-         if Pattern'Length > 0 then
-            if Pattern (Pattern'First) = '!' then
-               if Opt_Verbose2 then
-                  Log.Info ("Include pattern {0}",
-                  Pattern (Pattern'First + 1 .. Pattern'Last));
-               end if;
-               Manager.Ignore_Files_Filter.Include
-                 (Pattern (Pattern'First + 1 .. Pattern'Last));
-            else
-               if Opt_Verbose2 then
-                  Log.Info ("Exclude pattern {0}", Pattern);
-               end if;
-               Manager.Ignore_Files_Filter.Exclude (Pattern);
-            end if;
-         end if;
-      end Set_Ignore;
-
-      procedure Load_Ignore_Content (Label   : in String;
-                                     Content : in String) is
-         procedure String_Reader (Process : not null access procedure (Line : in String));
-
-         procedure String_Reader (Process : not null access procedure (Line : in String)) is
-            Pos   : Natural := Content'First;
-            First : Natural;
-         begin
-            while Pos <= Content'Last loop
-               First := Pos;
-               while Pos <= Content'Last and then not (Content (Pos) in ASCII.CR | ASCII.LF) loop
-                  Pos := Pos + 1;
-               end loop;
-               if Pos < Content'Last then
-                  Process (Content (First .. Pos - 1));
-               elsif not (Content (Content'Last) in ASCII.CR | ASCII.LF) then
-                  Process (Content (First .. Content'Last));
-               end if;
-               Pos := Pos + 1;
-            end loop;
-         end String_Reader;
-      begin
-         Manager.Ignore_Files_Filter.Load_Ignore (Label, String_Reader'Access);
-      end Load_Ignore_Content;
-
-      procedure Load_Ignore_File (Path : in String) is
-      begin
-         if Path = "spdx-tool:ignore.txt" then
-            Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore);
-         elsif Path = "spdx-tool:ignore-docs.txt" then
-            Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore_docs);
-         elsif Util.Strings.Starts_With (Path, "spdx-tool:") then
-            Log.Error ("invalid builtin ignore file {0}", Path);
-         elsif Ada.Directories.Exists (Path) then
-            Util.Files.Walk.Load_Ignore (Manager.Ignore_Files_Filter, Path);
-         else
-            Log.Error ("ignore file {} not found", Path);
-         end if;
-      end Load_Ignore_File;
-
-      procedure Initialize_Tokens is
-         use type Licenses.Position;
-         First : Buffer_Index := 1;
-         Last  : Buffer_Index;
-      begin
-         for I in Licenses.Templates.Token_Pos'Range loop
-            Last := First + Buffer_Size (Licenses.Templates.Token_Pos (I) - 1);
-            Manager.Token_Counters.Tokens.Insert (Licenses.Templates.Tokens (First .. Last),
-                                                  SPDX_Tool.Token_Index (I));
-            First := Last + 1;
-         end loop;
-      end Initialize_Tokens;
-
       Stamp   : Util.Measures.Stamp;
    begin
       Manager.Configure (Config);
@@ -245,39 +160,11 @@ package body SPDX_Tool.Licenses.Manager is
                                                then Languages.Manager.IDENTIFY_LANGUAGE
                                                else Languages.Manager.IDENTIFY_COMMENTS));
 
-      if Manager.Token_Counters.Tokens.Is_Empty and then Job /= FIND_LANGUAGES then
-         Initialize_Tokens;
+      Manager.Repository.Initialize_Tokens;
+      if Job in FIND_LICENSES | UPDATE_LICENSES then
+         Manager.Repository.Configure_Frequencies;
       end if;
 
-      --  Setup the list of license tokens
-      if not Opt_No_Builtin and then Job /= FIND_LANGUAGES then
-         Manager.Token_Counters.Counters.Default := 0;
-         Manager.Token_Frequency.Default := 0.0;
-         for I in Licenses.Templates.List'Range loop
-            declare
-               Tokens : constant Token_Array_Access := Licenses.Templates.List (I);
-            begin
-               Counter_Arrays.Fill (Manager.Token_Counters.Counters, I, Tokens.all);
-            end;
-         end loop;
-         declare
-            F : constant Freq_Transformers.Frequency_Array
-               := Freq_Transformers.IDF (Manager.Token_Counters.Counters);
-         begin
-            Manager.Token_Frequency.Cells.Clear;
-            Freq_Transformers.TIDF (From     => Manager.Token_Counters.Counters,
-                                    Doc_Freq => F,
-                                    Into     => Manager.Token_Frequency);
-            Manager.License_Frequency := new Freq_Transformers.Frequency_Array '(F);
-            Manager.License_Squares := new Float_Array (Licenses.Templates.List'Range);
-
-            --  Pre-compute for each license, the Sqrt of sum of square of token frequencies.
-            for I in Manager.License_Squares'Range loop
-               Manager.License_Squares (I)
-                  := Similarities.Sqrt_Square (Manager.Token_Frequency, I);
-            end loop;
-         end;
-      end if;
       if not Manager.Started then
          declare
             Path : constant String := (if Opt_Mimes then "/usr/share/misc/magic" else "");
@@ -532,87 +419,6 @@ package body SPDX_Tool.Licenses.Manager is
       return To_License_Index_Array (Licenses);
    end Find_License_Templates;
 
-   MIN_CONFIDENCE : constant := 500 * Confidence_Type'Small;
-
-   function Compute_Frequency (Manager : in License_Manager;
-                               Lines   : in SPDX_Tool.Languages.Line_Array;
-                               From    : in Line_Number;
-                               To      : in Line_Number) return Frequency_Arrays.Array_Type is
-      function Update (First, Second : Count_Type) return Count_Type is (First + Second);
-      Stamp    : Util.Measures.Stamp;
-      Counters : SPDX_Tool.Counter_Arrays.Array_Type;
-      Freqs    : Frequency_Arrays.Array_Type;
-   begin
-      Counters.Default := 0;
-      Freqs.Default := 0.0;
-      for Line in From .. To loop
-         SPDX_Tool.Counter_Arrays.Merge (Counters, Lines (Line).Tokens, Update'Access);
-      end loop;
-      if not Counters.Cells.Is_Empty and then Manager.License_Frequency /= null then
-         Freq_Transformers.TIDF (From     => Counters,
-                                 Doc_Freq => Manager.License_Frequency.all,
-                                 Into => Freqs);
-      end if;
-      SPDX_Tool.Licenses.Report (Stamp, "Compute TIDF");
-      return Freqs;
-   end Compute_Frequency;
-
-   function Guess_License (Manager : in License_Manager;
-                           Lines   : in SPDX_Tool.Languages.Line_Array;
-                           From    : in Line_Number;
-                           To      : in Line_Number) return License_Match is
-
-      Guess : License_Index := 0;
-      Confidence : Confidence_Type := 0.0;
-      C : Confidence_Type;
-      Result  : License_Match := (Last => null, Depth => 0, others => <>);
-      Stamp   : Util.Measures.Stamp;
-      Freqs   : Frequency_Arrays.Array_Type := Manager.Compute_Frequency (Lines, From, To);
-   begin
-      if not Freqs.Cells.Is_Empty then
-         declare
-            Licenses : constant License_Index_Array
-               := Find_License_Templates (Lines, From, To);
-         begin
-            for License of Licenses loop
-               declare
-                  Cosine_Stamp   : Util.Measures.Stamp;
-               begin
-                  C := Similarities.Cosine (Freqs, 1, Manager.Token_Frequency, License,
-                                            Manager.License_Squares (License));
-                  SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
-               end;
-               if Opt_Verbose2 then
-                  Log.Info ("Confidence with {0} -> {1}",
-                            Get_License_Name (License), C'Image);
-               end if;
-               if Confidence < C then
-                  Confidence := C;
-                  Guess := License;
-               end if;
-            end loop;
-         end;
-      end if;
-      if Confidence >= MIN_CONFIDENCE then
-         Result.Info.First_Line := From;
-         Result.Info.Last_Line := To;
-         for Line in From + 1 .. To - 1 loop
-            Freqs := Manager.Compute_Frequency (Lines, Line, To);
-            exit when Freqs.Cells.Is_Empty;
-            C := Similarities.Cosine (Freqs, 1, Manager.Token_Frequency, Guess,
-                                      Manager.License_Squares (Guess));
-            exit when Confidence > C;
-            Result.Info.First_Line := Line;
-            Confidence := C;
-         end loop;
-         Result.Info.Match := Infos.GUESSED_LICENSE;
-         Result.Info.Confidence := Confidence;
-         Result.Info.Name := To_UString (Get_License_Name (Guess));
-         SPDX_Tool.Licenses.Report (Stamp, "Guess license");
-      end if;
-      return Result;
-   end Guess_License;
-
    function Find_License (Manager : in License_Manager;
                           File    : in out SPDX_Tool.Files.File_Type)
                           return License_Match is
@@ -679,7 +485,7 @@ package body SPDX_Tool.Licenses.Manager is
          end if;
       end loop;
       for Line in First_Line .. Last_Line loop
-         Match := Manager.Guess_License (File.Lines, Line, Last_Line);
+         Match := Manager.Repository.Guess_License (File.Lines, Line, Last_Line);
          if Match.Info.Match = Infos.GUESSED_LICENSE then
             SPDX_Tool.Licenses.Report (Stamp, "Find license guessed");
             return Match;
@@ -792,7 +598,7 @@ package body SPDX_Tool.Licenses.Manager is
          return;
       end if;
 
-      File_Mgr.Open (Manager.Token_Counters.Tokens, Data, File, Manager.Languages);
+      File_Mgr.Open (Manager.Repository.Token_Counters.Tokens, Data, File, Manager.Languages);
       if File.Filtered then
          return;
       end if;
@@ -894,14 +700,10 @@ package body SPDX_Tool.Licenses.Manager is
       procedure Free is
          new Ada.Unchecked_Deallocation (Object => Executor_Manager'Class,
                                          Name   => Executor_Manager_Access);
-      procedure Free is
-         new Ada.Unchecked_Deallocation (Object => Freq_Transformers.Frequency_Array,
-                                         Name   => Frequency_Array_Access);
    begin
       Log.Debug ("License manager stopping, max fill {0}",
                  Util.Strings.Image (Manager.Max_Fill));
       Free (Manager.Executor);
-      Free (Manager.License_Frequency);
 
    exception
       when E : others =>
