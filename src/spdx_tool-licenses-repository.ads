@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with Ada.Finalization;
+with Ada.Containers.Hashed_Maps;
 
 with SCI.Numbers;
 with SCI.Vectorizers.Transformers;
@@ -14,6 +15,15 @@ with SPDX_Tool.Token_Counters;
 private package SPDX_Tool.Licenses.Repository is
 
    MAX_LICENSE_SIZE : constant := 64 * 1024;
+
+   function Hash (Value : Token_Index) return Ada.Containers.Hash_Type is
+      (Ada.Containers.Hash_Type (Value));
+
+   package Token_License_Maps is
+     new Ada.Containers.Hashed_Maps (Key_Type => Token_Index,
+                                     Element_Type => License_Index_Map,
+                                     Hash => Hash,
+                                     Equivalent_Keys => "=");
 
    subtype Confidence_Type is Infos.Confidence_Type;
    use type Infos.Confidence_Type;
@@ -42,13 +52,19 @@ private package SPDX_Tool.Licenses.Repository is
 
    --  Protect concurrent loading of license templates.
    protected type License_Tree is
+      function Get_Count return License_Index;
+
       function Get_License (License : in License_Index) return Token_Access;
+
+      function Get_Name (License : in License_Index) return UString;
 
       procedure Load_License (License : in License_Index;
                               Token   : out Token_Access);
 
       procedure Allocate_License (License  : out License_Index);
 
+      procedure Set_License (License  : in License_Index;
+                             Template : in License_Template);
    private
       Next_Index : License_Index := 0;
       Licenses   : License_Template_Array (0 .. License_Index'Last);
@@ -58,6 +74,7 @@ private package SPDX_Tool.Licenses.Repository is
       Repository     : aliased License_Tree;
       Instance       : access Repository_Type := Repository_Type'Unchecked_Access;
       Token_Counters : SPDX_Tool.Token_Counters.Vectorizer_Type;
+      Dyn_Index      : Token_License_Maps.Map;
 
       --  A map of tokens used in license templates.
       Token_Frequency      : Frequency_Arrays.Array_Type;
@@ -92,6 +109,14 @@ private package SPDX_Tool.Licenses.Repository is
                            Lines      : in SPDX_Tool.Languages.Line_Array;
                            From       : in Line_Number;
                            To         : in Line_Number) return License_Match;
+
+   function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
+                                    From    : in Line_Number;
+                                    To      : in Line_Number) return License_Index_Array;
+
+   function Find_License_Templates (Repository : in Repository_Type;
+                                    Line       : in SPDX_Tool.Languages.Line_Type)
+                                     return License_Index_Map;
 
    overriding
    procedure Finalize (Repository : in out Repository_Type);

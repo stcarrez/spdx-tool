@@ -5,7 +5,9 @@
 -----------------------------------------------------------------------
 with Ada.Streams.Stream_IO;
 with Ada.Unchecked_Deallocation;
+with Ada.Containers.Hashed_Sets;
 
+with Util.Strings;
 with Util.Log.Loggers;
 with Util.Streams.Files;
 with SCI.Similarities.COO_Arrays;
@@ -18,6 +20,11 @@ package body SPDX_Tool.Licenses.Repository is
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses.Repository");
 
    function To_Float (Value : Float) return Float is (Value);
+
+   package Token_Sets is
+     new Ada.Containers.Hashed_Sets (Element_Type => Token_Index,
+                                     Hash => Hash,
+                                     Equivalent_Elements => "=");
 
    package Similarities is
       new SCI.Similarities.COO_Arrays (Arrays      => Freq_Transformers.Frequency_Arrays,
@@ -76,6 +83,8 @@ package body SPDX_Tool.Licenses.Repository is
                            From : in Buffer_Index;
                            To   : in Buffer_Index);
 
+      Tokens : Token_Sets.Set;
+
       type Parser_Type is new Reader.Parser_Type with null record;
 
       overriding
@@ -88,11 +97,14 @@ package body SPDX_Tool.Licenses.Repository is
                            To   : in Buffer_Index) is
          Len   : constant Buffer_Size := Punctuation_Length (Buf, From, To);
          First : constant Buffer_Index := (if Len > 0 then From + Len else From);
+         Value : Token_Index;
       begin
          if First <= To and then not Licenses.Repository.Is_Ignored (Buf (First .. To)) then
             SPDX_Tool.Token_Counters.Add_Token (Repository.Token_Counters, License,
                                                 Buf (First .. To),
-                                                Increment'Access);
+                                                Increment'Access,
+                                                Value);
+            Tokens.Include (Value);
          end if;
       end Add_Token;
 
@@ -131,6 +143,7 @@ package body SPDX_Tool.Licenses.Repository is
          elsif Token = TOK_WORD and then Parser.Token_Pos < Parser.Current_Pos - 1 then
             Add_Token (Content, Parser.Token_Pos, Parser.Current_Pos - 1);
          end if;
+         SPDX_Tool.Licenses.Reader.Parser_Type (Parser).Token (Content, Token);
       end Token;
 
       Ext  : constant String := Ada.Directories.Extension (Path);
@@ -138,6 +151,7 @@ package body SPDX_Tool.Licenses.Repository is
       Info : Reader.License_Type;
       Template : License_Template;
       Parser : Parser_Type;
+      License_Map : License_Index_Map := EMPTY_MAP;
    begin
       Repository.Repository.Allocate_License (License);
       if Size = 0 or else Size > MAX_LICENSE_SIZE then
@@ -167,6 +181,20 @@ package body SPDX_Tool.Licenses.Repository is
             Parser.Parse (Buffer (1 .. Last), Template);
          end;
       end if;
+      Repository.Repository.Set_License (License, Template);
+
+      Set_License (License_Map, License);
+      for Token of Tokens loop
+         declare
+            Pos : constant Token_License_Maps.Cursor := Repository.Dyn_Index.Find (Token);
+         begin
+            if not Token_License_Maps.Has_Element (Pos) then
+               Repository.Dyn_Index.Insert (Token, License_Map);
+            else
+               Set_License (Repository.Dyn_Index.Reference (Pos), License);
+            end if;
+         end;
+      end loop;
    end Read_License;
 
    procedure Initialize_Tokens (Repository : in out Repository_Type) is
@@ -175,12 +203,24 @@ package body SPDX_Tool.Licenses.Repository is
    begin
       Repository.Token_Counters.Counters.Default := 0;
       if Repository.Token_Counters.Tokens.Is_Empty then
+         --  Populate the builtin tokens in the token map.
          for I in Licenses.Templates.Token_Pos'Range loop
             Last := First + Buffer_Size (Licenses.Templates.Token_Pos (I) - 1);
             Repository.Token_Counters.Tokens.Insert (Licenses.Templates.Tokens (First .. Last),
                                                      SPDX_Tool.Token_Index (I));
             First := Last + 1;
          end loop;
+
+         --  When builtin licenses are enabled, setup the token counters for each license index.
+         if not Opt_No_Builtin then
+            for I in Licenses.Templates.List'Range loop
+               declare
+                  Tokens : constant Token_Array_Access := Licenses.Templates.List (I);
+               begin
+                  Counter_Arrays.Fill (Repository.Token_Counters.Counters, I, Tokens.all);
+               end;
+            end loop;
+         end if;
       end if;
    end Initialize_Tokens;
 
@@ -192,23 +232,18 @@ package body SPDX_Tool.Licenses.Repository is
    begin
       --  Setup the list of license tokens
       Repository.Token_Frequency.Default := 0.0;
-      for I in Licenses.Templates.List'Range loop
-         declare
-            Tokens : constant Token_Array_Access := Licenses.Templates.List (I);
-         begin
-            Counter_Arrays.Fill (Repository.Token_Counters.Counters, I, Tokens.all);
-         end;
-      end loop;
       declare
-         F : constant Freq_Transformers.Frequency_Array
-           := Freq_Transformers.IDF (Repository.Token_Counters.Counters);
+         Cnt : constant License_Index := Repository.Repository.Get_Count;
+         F   : constant Freq_Transformers.Frequency_Array
+           := Freq_Transformers.IDF (Repository.Token_Counters.Counters,
+                                     Natural (Repository.Repository.Get_Count));
       begin
          Repository.Token_Frequency.Cells.Clear;
          Freq_Transformers.TIDF (From     => Repository.Token_Counters.Counters,
                                  Doc_Freq => F,
                                  Into     => Repository.Token_Frequency);
          Repository.License_Frequency := new Freq_Transformers.Frequency_Array '(F);
-         Repository.License_Squares := new Float_Array (Licenses.Templates.List'Range);
+         Repository.License_Squares := new Float_Array (0 .. Cnt);
 
          --  Pre-compute for each license, the Sqrt of sum of square of token frequencies.
          for I in Repository.License_Squares'Range loop
@@ -244,6 +279,57 @@ package body SPDX_Tool.Licenses.Repository is
       SPDX_Tool.Licenses.Report (Stamp, "Compute TIDF");
       return Freqs;
    end Compute_Frequency;
+
+   function Find_License_Templates (Repository : in Repository_Type;
+                                    Line       : in SPDX_Tool.Languages.Line_Type)
+                                     return License_Index_Map is
+      Result : License_Index_Map := SPDX_Tool.EMPTY_MAP;
+      First  : Boolean := True;
+      Item   : Index_Type;
+   begin
+      for Token in Line.Tokens.Cells.Iterate loop
+         Item.Token := Counter_Arrays.Maps.Key (Token).Column;
+         if not Opt_No_Builtin then
+            declare
+               R    : Algorithms.Result_Type;
+            begin
+               R := Algorithms.Find (Licenses.Templates.Index, Item);
+               if R.Found then
+                  declare
+                     List : constant License_Index_Array_Access
+                       := Templates.Index (R.Position).List;
+                  begin
+                     Log.Debug ("Token {0} used by {1} licenses list",
+                                Util.Strings.Image (Natural (Item.Token)),
+                                Util.Strings.Image (Natural (List'Length)));
+                     if First then
+                        Set_Licenses (Result, List.all);
+                        First := False;
+                     else
+                        And_Licenses (Result, List.all);
+                     end if;
+                  end;
+               else
+                  Log.Debug ("Token {0} not found in index",
+                             Util.Strings.Image (Natural (Item.Token)));
+               end if;
+            end;
+         end if;
+         declare
+            Pos : constant Token_License_Maps.Cursor := Repository.Dyn_Index.Find (Item.Token);
+         begin
+            if Token_License_Maps.Has_Element (Pos) then
+               if First then
+                  Result := Token_License_Maps.Element (Pos);
+                  First := False;
+               else
+                  And_Licenses (Result, Token_License_Maps.Element (Pos));
+               end if;
+            end if;
+         end;
+      end loop;
+      return Result;
+   end Find_License_Templates;
 
    function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
                                     From    : in Line_Number;
@@ -287,20 +373,22 @@ package body SPDX_Tool.Licenses.Repository is
                := Find_License_Templates (Lines, From, To);
          begin
             for License of Licenses loop
-               declare
-                  Cosine_Stamp   : Util.Measures.Stamp;
-               begin
-                  C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, License,
-                                            Repository.License_Squares (License));
-                  SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
-               end;
-               if Opt_Verbose2 then
-                  Log.Info ("Confidence with {0} -> {1}",
-                            Get_License_Name (License), C'Image);
-               end if;
-               if Confidence < C then
-                  Confidence := C;
-                  Guess := License;
+               if Repository.License_Squares (License) > 0.0 then
+                  declare
+                     Cosine_Stamp   : Util.Measures.Stamp;
+                  begin
+                     C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, License,
+                                               Repository.License_Squares (License));
+                     SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
+                  end;
+                  if Opt_Verbose2 then
+                     Log.Info ("Confidence with {0} -> {1}",
+                               Repository.Repository.Get_Name (License), C'Image);
+                  end if;
+                  if Confidence < C then
+                     Confidence := C;
+                     Guess := License;
+                  end if;
                end if;
             end loop;
          end;
@@ -319,7 +407,7 @@ package body SPDX_Tool.Licenses.Repository is
          end loop;
          Result.Info.Match := Infos.GUESSED_LICENSE;
          Result.Info.Confidence := Confidence;
-         Result.Info.Name := To_UString (Get_License_Name (Guess));
+         Result.Info.Name := Repository.Repository.Get_Name (Guess);
          SPDX_Tool.Licenses.Report (Stamp, "Guess license");
       end if;
       return Result;
@@ -336,10 +424,28 @@ package body SPDX_Tool.Licenses.Repository is
 
    protected body License_Tree is
 
+      function Get_Count return License_Index is
+      begin
+         if Next_Index = 0 then
+            return SPDX_Tool.Licenses.Files.Names'Last + 1;
+         else
+            return Next_Index + 1;
+         end if;
+      end Get_Count;
+
       function Get_License (License : in License_Index) return Token_Access is
       begin
          return Licenses (License).Root;
       end Get_License;
+
+      function Get_Name (License : in License_Index) return UString is
+      begin
+         if License < SPDX_Tool.Licenses.Files.Names'Last then
+            return To_Ustring (SPDX_Tool.Licenses.Files.Names (License).all);
+         else
+            return Licenses (License).Name;
+         end if;
+      end Get_Name;
 
       procedure Load_License (License : in License_Index;
                               Token    : out Token_Access) is
@@ -364,9 +470,14 @@ package body SPDX_Tool.Licenses.Repository is
             Next_Index := SPDX_Tool.Licenses.Files.Names'Last + 1;
          end if;
          License := Next_Index;
-         --  Licenses (License) := Template;
          Next_Index := Next_Index + 1;
       end Allocate_License;
+
+      procedure Set_License (License  : in License_Index;
+                             Template : in License_Template) is
+      begin
+         Licenses (License) := Template;
+      end Set_License;
 
    end License_Tree;
 

@@ -502,7 +502,7 @@ package body SPDX_Tool.Licenses is
       Line    : Infos.Line_Number := From;
       Stamp   : Util.Measures.Stamp;
    begin
-      Log.Debug ("Checking with license template '{0}'", Licenses.Files.Names (License).all);
+      --  Log.Debug ("Checking with license template '{0}'", Licenses.Files.Names (License).all);
 
       while Line <= To loop
          if File.Lines (Line).Comment /= NO_COMMENT then

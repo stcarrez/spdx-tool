@@ -11,7 +11,6 @@ with Util.Strings.Tokenizers;
 with Util.Log.Loggers;
 
 with SPDX_Tool.Configs.Default;
-with SPDX_Tool.Licenses.Templates;
 package body SPDX_Tool.Licenses.Manager is
 
    use all type SPDX_Tool.Files.Comment_Mode;
@@ -345,51 +344,13 @@ package body SPDX_Tool.Licenses.Manager is
       Manager.Executor.Wait;
    end Wait;
 
-   function Find_License_Templates (Manager : in License_Manager;
-                                    Line    : in SPDX_Tool.Languages.Line_Type)
-                                     return License_Index_Map is
-      pragma Unreferenced (Manager);
-
-      Result : License_Index_Map := SPDX_Tool.EMPTY_MAP;
-      First  : Boolean := True;
-   begin
-      for Token in Line.Tokens.Cells.Iterate loop
-         declare
-            Item : Index_Type;
-            R    : Algorithms.Result_Type;
-         begin
-            Item.Token := Counter_Arrays.Maps.Key (Token).Column;
-            R := Algorithms.Find (Licenses.Templates.Index, Item);
-            if R.Found then
-               declare
-                  List : constant License_Index_Array_Access := Templates.Index (R.Position).List;
-               begin
-                  Log.Debug ("Token {0} used by {1} licenses list",
-                             Util.Strings.Image (Natural (Item.Token)),
-                             Util.Strings.Image (Natural (List'Length)));
-                  if First then
-                     Set_Licenses (Result, List.all);
-                     First := False;
-                  else
-                     And_Licenses (Result, List.all);
-                  end if;
-               end;
-            else
-               Log.Debug ("Token {0} not found in index",
-                          Util.Strings.Image (Natural (Item.Token)));
-            end if;
-         end;
-      end loop;
-      return Result;
-   end Find_License_Templates;
-
    procedure Find_License_Templates (Manager : in License_Manager;
                                      Lines   : in out SPDX_Tool.Languages.Line_Array;
                                      From    : in Line_Number;
                                      To      : in Line_Number) is
    begin
       for Line in From .. To loop
-         Lines (Line).Licenses := Manager.Find_License_Templates (Lines (Line));
+         Lines (Line).Licenses := Manager.Repository.Find_License_Templates (Lines (Line));
       end loop;
       if Util.Log.Loggers.Get_Level (Log) >= Util.Log.DEBUG_LEVEL then
          for Line in From .. To loop
@@ -439,7 +400,7 @@ package body SPDX_Tool.Licenses.Manager is
       if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
          return Match;
       end if;
-      if not Opt_No_Builtin then
+      --  if not Opt_No_Builtin then
          Manager.Find_License_Templates (File.Lines, First_Line, Last_Line);
          for Line in First_Line .. Last_Line loop
             declare
@@ -461,7 +422,7 @@ package body SPDX_Tool.Licenses.Manager is
          end loop;
          Log.Info ("No exact match on {0} licenses",
                    Util.Strings.Image (Get_Count (Checked)));
-      end if;
+      --  end if;
       for Line in First_Line .. Last_Line loop
          if File.Lines (Line).Comment /= NO_COMMENT then
             Match := Look_License_Tree (Manager.Licenses.Root, Buf.Data,
