@@ -53,6 +53,10 @@ package SPDX_Tool.Licenses.Reader is
                     Content : in Buffer_Type;
                     Token   : in SPDX_Tool.Licenses.Token_Kind);
 
+   procedure Parse (Parser  : in out Parser_Type;
+                    Content : in Buffer_Type;
+                    License : in out License_Template);
+
    procedure Load_License (Name    : in String;
                            Content : in Buffer_Type;
                            License : in out License_Template);

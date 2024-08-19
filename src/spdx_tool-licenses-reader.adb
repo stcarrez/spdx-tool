@@ -65,7 +65,7 @@ package body SPDX_Tool.Licenses.Reader is
 
    procedure Load_JSON (License : in out License_Type;
                         Path    : in String) is
-      Root, Graph, Info, License_Id, Exception_Id : Util.Beans.Objects.Object;
+      Root, Graph, Info, License_Id : Util.Beans.Objects.Object;
    begin
       Root := Util.Serialize.IO.JSON.Read (Path);
       Graph := Util.Beans.Objects.Get_Value (Root, "@graph");
@@ -471,5 +471,15 @@ package body SPDX_Tool.Licenses.Reader is
 
       end case;
    end Token;
+
+   procedure Parse (Parser  : in out Parser_Type;
+                    Content : in Buffer_Type;
+                    License : in out License_Template) is
+   begin
+      Parser.Root := null;
+      Parser.License := License.Name;
+      Parser.Parse (Content);
+      License.Root := Parser.Root;
+   end Parse;
 
 end SPDX_Tool.Licenses.Reader;
