@@ -69,6 +69,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Config    : SPDX_Tool.Configs.Config_Type;
       Manager   : File_Manager;
       Languages : Language_Manager;
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
@@ -77,7 +78,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Data : File_Info := Get_Path ("files/identify/apache-2.0-1.ads");
          Info : File_Type (100);
       begin
-         Manager.Open (Info, Data, Languages);
+         Manager.Open (Tokens, Info, Data, Languages);
          Assert_Equals (T, 17, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("Ada", Data.Language,
@@ -88,7 +89,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Data : File_Info := Get_Path ("files/identify/gnat-3.0.ads");
          Info : File_Type (100);
       begin
-         Manager.Open (Info, Data, Languages);
+         Manager.Open (Tokens, Info, Data, Languages);
          Assert_Equals (T, 24, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("Ada", Data.Language, "Invalid language");
@@ -105,7 +106,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Data : File_Info := Get_Path ("files/identify/gpl-2.0-1.C");
          Info : File_Type (100);
       begin
-         Manager.Open (Info, Data, Languages);
+         Manager.Open (Tokens, Info, Data, Languages);
          Assert_Equals (T, 35, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("C++", Data.Language, "Invalid language");
@@ -122,7 +123,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Data : File_Info := Get_Path ("files/identify/gpl-3.0-1.sub");
          Info : File_Type (100);
       begin
-         Manager.Open (Info, Data, Languages);
+         Manager.Open (Tokens, Info, Data, Languages);
          Assert_Equals (T, 29, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("Shell", Data.Language, "Invalid language");
@@ -138,6 +139,7 @@ package body SPDX_Tool.Files.Manager.Tests is
       Config    : SPDX_Tool.Configs.Config_Type;
       Languages : Language_Manager;
       Manager   : File_Manager;
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
@@ -146,7 +148,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Data : File_Info := Get_Path ("files/identify/gpl-3.0.c");
          Info : File_Type (100);
       begin
-         Manager.Open (Info, Data, Languages);
+         Manager.Open (Tokens, Info, Data, Languages);
          Assert_Equals (T, 16, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("C", Data.Language, "Invalid language");
@@ -186,7 +188,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Data : File_Info := Get_Path ("files/identify/apache-2.0-3.c");
          Info : File_Type (100);
       begin
-         Manager.Open (Info, Data, Languages);
+         Manager.Open (Tokens, Info, Data, Languages);
          Assert_Equals (T, 16, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("C", Data.Language, "Invalid language");
@@ -233,7 +235,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Data : File_Info := Get_Path ("files/identify/lgpl-2.1.ml");
          Info : File_Type (100);
       begin
-         Manager.Open (Info, Data, Languages);
+         Manager.Open (Tokens, Info, Data, Languages);
          Assert_Equals (T, 16, Info.Count,
                         "Invalid number of lines");
          T.Assert_Equals ("OCaml", Data.Language,
@@ -272,7 +274,7 @@ package body SPDX_Tool.Files.Manager.Tests is
          Data : File_Info := Get_Path ("files/identify/lgpl-2.1.java");
          Info : File_Type (100);
       begin
-         Manager.Open (Info, Data, Languages);
+         Manager.Open (Tokens, Info, Data, Languages);
          Assert_Equals (T, 18, Info.Count,
                         "Invalid number of lines");
          Assert_Equals (T, END_COMMENT, Info.Cmt_Style,
@@ -324,11 +326,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       declare
          Result : constant String
             := Util.Tests.Get_Test_Path ("replace-apache-2.0.1.ads");
@@ -411,11 +414,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       Manager.Save (Info, Result, 11, 19, (0, 0), (0, 0), "GPL-3.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
@@ -433,11 +437,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       Manager.Save (Info, Result, 5, 15, (0, 0), (0, 0), "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
@@ -455,11 +460,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       Manager.Save (Info, Result, 12, 27, (0, 0), (0, 0), "GPL-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
@@ -477,11 +483,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       Manager.Save (Info, Result, 9, 27, (0, 0), (0, 0), "GPL-3.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
@@ -499,11 +506,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       Manager.Save (Info, Result, 3, 22, (0, 0), (0, 0), "MIT");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
@@ -521,11 +529,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       Manager.Save (Info, Result, 11, 13, (0, 0), (0, 0), "LGPL-2.1");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
@@ -541,11 +550,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Languages : Language_Manager;
       Manager : File_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       declare
          Result : constant String
             := Util.Tests.Get_Test_Path ("replace-apache-2.0-4.erl");
@@ -581,11 +591,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager : File_Manager;
       Languages : Language_Manager;
       Info : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       Manager.Save (Info, Result, 5, 17, (0, 0), (0, 0), "LGPL-2.1");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files
@@ -603,11 +614,12 @@ package body SPDX_Tool.Files.Manager.Tests is
       Manager   : File_Manager;
       Data      : File_Info := Get_Path ("files/identify/apache-2.0-5.xhtml");
       Info      : File_Type (100);
+      Tokens    : SPDX_Tool.Token_Counters.Token_Maps.Map;
    begin
       SPDX_Tool.Configs.Load_Default (Config);
       Languages.Initialize (Config);
       Manager.Initialize ("");
-      Manager.Open (Info, Data, Languages);
+      Manager.Open (Tokens, Info, Data, Languages);
       Manager.Save (Info, Result, 5, 15, (0, 0), (0, 0), "Apache-2.0");
       T.Assert (Ada.Directories.Exists (Result), "File not created");
       Util.Tests.Assert_Equal_Files

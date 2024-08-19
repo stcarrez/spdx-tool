@@ -124,7 +124,8 @@ package body SPDX_Tool.Licenses.Manager.Tests is
 
       --  Load only one license to simplify the debugging in case of problem.
       Manager.Load_License ("licenses/" & License);
-      Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
+      Manager.File_Mgr (1).Open (Manager.Repository.Token_Counters.Tokens,
+                                 File, Data, Manager.Languages);
       Result := Manager.Find_License (File);
       Util.Tests.Assert_Equals (T, Expect, Result.Info.Name,
                                 "Invalid license found", Source, Line);
@@ -187,12 +188,9 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Manager.Languages.Initialize (Config);
       Manager.File_Mgr (1).Initialize ("");
       Manager.Load_License ("regtests/files/templates/text.txt");
-      Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-      declare
-         Buf : constant Buffer_Accessor := File.Buffer.Value;
-      begin
-         Result := Manager.Find_License (Buf.Data, File.Lines, 1, 2);
-      end;
+      Manager.File_Mgr (1).Open (Manager.Repository.Token_Counters.Tokens,
+                                 File, Data, Manager.Languages);
+      Result := Manager.Find_License (File);
       Util.Tests.Assert_Equals (T, "text", Result.Info.Name,
                                 "Invalid license found");
    end Test_Template_Fixed;
@@ -210,12 +208,9 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Manager.Languages.Initialize (Config);
       Manager.File_Mgr (1).Initialize ("");
       Manager.Load_License ("regtests/files/templates/variable.txt");
-      Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-      declare
-         Buf : constant Buffer_Accessor := File.Buffer.Value;
-      begin
-         Result := Manager.Find_License (Buf.Data, File.Lines, 1, 2);
-      end;
+      Manager.File_Mgr (1).Open (Manager.Repository.Token_Counters.Tokens,
+                                 File, Data, Manager.Languages);
+      Result := Manager.Find_License (File);
       Util.Tests.Assert_Equals (T, "variable", Result.Info.Name,
                                 "Invalid license found");
       Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
@@ -231,12 +226,9 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Manager.Languages.Initialize (Config);
       Manager.File_Mgr (1).Initialize ("");
       Manager.Load_License ("regtests/files/templates/variable-2.txt");
-      Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-      declare
-         Buf : constant Buffer_Accessor := File.Buffer.Value;
-      begin
-         Result := Manager.Find_License (Buf.Data, File.Lines, 1, 2);
-      end;
+      Manager.File_Mgr (1).Open (Manager.Repository.Token_Counters.Tokens,
+                                 File, Data, Manager.Languages);
+      Result := Manager.Find_License (File);
       Util.Tests.Assert_Equals (T, "variable-2", Result.Info.Name,
                                 "Invalid license found");
       Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
@@ -254,12 +246,9 @@ package body SPDX_Tool.Licenses.Manager.Tests is
          File    : SPDX_Tool.Files.File_Type (100);
          Result  : License_Match;
       begin
-         Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-         declare
-            Buf : constant Buffer_Accessor := File.Buffer.Value;
-         begin
-            Result := Manager.Find_License (Buf.Data, File.Lines, 1, 2);
-         end;
+         Manager.File_Mgr (1).Open (Manager.Repository.Token_Counters.Tokens,
+                                    File, Data, Manager.Languages);
+         Result := Manager.Find_License (File);
          Util.Tests.Assert_Equals (T, "optional-1", Result.Info.Name,
                                    "Invalid license found");
          Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
@@ -269,12 +258,9 @@ package body SPDX_Tool.Licenses.Manager.Tests is
          File    : SPDX_Tool.Files.File_Type (100);
          Result  : License_Match;
       begin
-         Manager.File_Mgr (1).Open (File, Data, Manager.Languages);
-         declare
-            Buf : constant Buffer_Accessor := File.Buffer.Value;
-         begin
-            Result := Manager.Find_License (Buf.Data, File.Lines, 1, 4);
-         end;
+         Manager.File_Mgr (1).Open (Manager.Repository.Token_Counters.Tokens,
+                                    File, Data, Manager.Languages);
+         Result := Manager.Find_License (File);
          Util.Tests.Assert_Equals (T, "optional-1", Result.Info.Name,
                                    "Invalid license found");
          Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
