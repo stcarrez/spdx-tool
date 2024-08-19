@@ -15,6 +15,7 @@ with SPDX_Tool.Licenses;
 with SPDX_Tool.Token_Counters;
 with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Licenses.Reader;
+with SPDX_Tool.Licenses.Repository;
 procedure SPDX_Tool.Gentmpl is
 
    use Ada.Streams;
@@ -31,7 +32,6 @@ procedure SPDX_Tool.Gentmpl is
    function Increment (Value : in Count_Type) return Count_Type;
    procedure Build_Index_For_License (I : in License_Index);
    procedure Print_Index;
-   function Is_Ignored (Token : in Buffer_Type) return Boolean;
    procedure Load_License (Name : in String);
 
    package Token_Maps is
@@ -66,25 +66,6 @@ procedure SPDX_Tool.Gentmpl is
       return Value + 1;
    end Increment;
 
-   function Is_Ignored (Token : in Buffer_Type) return Boolean is
-      Word : String (Natural (Token'First) .. Natural (Token'Last));
-      for Word'Address use Token'Address;
-   begin
-      if Word'Length = 1 then
-         return True;
-      end if;
-      if Word in "of" | "is" | "to" | "in" | "do" | "be" then
-         return True;
-      end if;
-      if Word in "all" | "any" | "and" | "the" then
-         return True;
-      end if;
-      if Word in "2008" | "2009" | "2011" then
-         return True;
-      end if;
-      return False;
-   end Is_Ignored;
-
    procedure Add_Token (Into : in out SPDX_Tool.Token_Counters.Vectorizer_Type;
                         Idx  : in License_Index;
                         Buf  : in Buffer_Type;
@@ -93,7 +74,7 @@ procedure SPDX_Tool.Gentmpl is
       Len   : constant Buffer_Size := Punctuation_Length (Buf, From, To);
       First : constant Buffer_Index := (if Len > 0 then From + Len else From);
    begin
-      if First <= To and then not Is_Ignored (Buf (First .. To)) then
+      if First <= To and then not Licenses.Repository.Is_Ignored (Buf (First .. To)) then
          SPDX_Tool.Token_Counters.Add_Token (Into, Idx,
                                              Buf (First .. To),
                                              Increment'Access);
