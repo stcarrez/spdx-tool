@@ -54,7 +54,6 @@ package SPDX_Tool.Licenses is
    type License_Template is record
       Root   : Token_Access;
       Name   : UString;
-      --  Tokens : SPDX_Tool.Buffer_Sets.Set;
    end record;
 
    type Name_Array is array (License_Index range <>) of Name_Access;
