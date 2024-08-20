@@ -163,6 +163,14 @@ package body SPDX_Tool is
       end loop;
    end And_Licenses;
 
+   procedure Or_Licenses (Into : in out License_Index_Map;
+                          Map  : in License_Index_Map) is
+   begin
+      for I in Into'Range loop
+         Into (I) := Into (I) or Map (I);
+      end loop;
+   end Or_Licenses;
+
    function Get_Count (V : in Interfaces.Unsigned_8) return Natural is
       Count : Natural := 0;
       Mask  : Unsigned_8 := 1;

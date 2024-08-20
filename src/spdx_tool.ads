@@ -74,6 +74,8 @@ package SPDX_Tool is
                            List : in License_Index_Array);
    procedure And_Licenses (Into : in out License_Index_Map;
                            Map  : in License_Index_Map);
+   procedure Or_Licenses (Into : in out License_Index_Map;
+                          Map  : in License_Index_Map);
    function Is_Set (From    : in License_Index_Map;
                     License : in License_Index) return Boolean;
    function Is_Empty (Map : in License_Index_Map) return Boolean
