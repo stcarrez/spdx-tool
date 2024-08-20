@@ -471,6 +471,7 @@ package body SPDX_Tool.Reports is
       Buffer.Initialize (Output => File'Unchecked_Access, Size => 10000);
       Print.Initialize (Buffer'Unchecked_Access);
       Output.Initialize (Print'Unchecked_Access);
+      Output.Set_Indentation (2);
       Write_Report (Output, Files);
    end Write_Json;
 
