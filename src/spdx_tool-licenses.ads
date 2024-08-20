@@ -109,16 +109,11 @@ package SPDX_Tool.Licenses is
                        TOK_END_OPTIONAL,
                        TOK_END);
 
-   --  Get a printable representation of a list of licenses.
-   function To_String (List : in License_Index_Array) return String;
-
    procedure Report (Stamp : in out Util.Measures.Stamp;
                      Title : in String;
                      Count : in Positive := 1);
 
 private
-
-   function Get_License_Name (License : in License_Index) return String;
 
    function Skip_Spaces (Content : in Buffer_Type;
                          Lines   : in Line_Array;

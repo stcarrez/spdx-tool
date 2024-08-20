@@ -22,35 +22,6 @@ package body SPDX_Tool.Licenses is
                           Line    : in Infos.Line_Number;
                           From    : in Buffer_Index) return Infos.License_Info;
 
-   function Get_License_Name (License : in License_Index) return String is
-      Name    : constant Name_Access := Files.Names (License);
-      Pos     : constant Natural := Util.Strings.Index (Name.all, '/');
-   begin
-      if Pos > 0 then
-         return Name (Pos + 1 .. Name'Last);
-      else
-         return Name.all;
-      end if;
-   end Get_License_Name;
-
-   --  ------------------------------
-   --  Get a printable representation of a list of licenses.
-   --  ------------------------------
-   function To_String (List : in License_Index_Array) return String is
-      Result : UString;
-      Empty  : Boolean := True;
-   begin
-      for License of List loop
-         if not Empty then
-            Ada.Strings.Unbounded.Append (Result, ", ");
-         else
-            Empty := False;
-         end if;
-         Ada.Strings.Unbounded.Append (Result, Get_License_Name (License));
-      end loop;
-      return To_String (Result);
-   end To_String;
-
    function Depth (Token : in Token_Type'Class) return Natural is
       Result : Natural := 0;
       Parent : Token_Access := Token.Previous;
