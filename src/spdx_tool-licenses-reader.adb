@@ -296,15 +296,16 @@ package body SPDX_Tool.Licenses.Reader is
    end Load_License;
 
    procedure Load_License (License : in License_Index;
+                           Name    : in UString;
                            Into    : in out License_Template;
                            Tokens  : out Token_Access) is
-      Name    : constant Name_Access := Files.Names (License);
+      Path    : constant Name_Access := Files.Names (License);
       Content : constant access constant Buffer_Type
-        := Files.Get_Content (Name.all);
+        := Files.Get_Content (Path.all);
       Parser : Parser_Type;
    begin
-      Log.Debug ("Loading license template {0}", Name.all);
-      Into.Name := To_UString (Get_License_Name (License));
+      Log.Debug ("Loading license template {0}", Path.all);
+      Into.Name := Name;
       Tokens := null;
       Parser.Root := null;
       Parser.License := Into.Name;

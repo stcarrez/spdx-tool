@@ -62,6 +62,7 @@ package SPDX_Tool.Licenses.Reader is
                            License : in out License_Template);
 
    procedure Load_License (License : in License_Index;
+                           Name    : in UString;
                            Into    : in out License_Template;
                            Tokens  : out Token_Access);
 
