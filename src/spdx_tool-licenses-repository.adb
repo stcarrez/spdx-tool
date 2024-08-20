@@ -53,6 +53,20 @@ package body SPDX_Tool.Licenses.Repository is
    end Is_Ignored;
 
    --  ------------------------------
+   --  Get the token from the token index.
+   --  ------------------------------
+   function Get_Token (Index : in Token_Index) return Buffer_Type is
+      First : Buffer_Size := 1;
+      Last  : Buffer_Size := 0;
+   begin
+      for I in 1 .. Index loop
+         First := Last + 1;
+         Last := First + Buffer_Size (Licenses.Templates.Token_Pos (I) - 1);
+      end loop;
+      return Licenses.Templates.Tokens (First .. Last);
+   end Get_Token;
+
+   --  ------------------------------
    --  Get the license template for the given license index.
    --  ------------------------------
    function Get_License (Repository : in Repository_Type;
@@ -318,14 +332,22 @@ package body SPDX_Tool.Licenses.Repository is
                      List : constant License_Index_Array_Access
                        := Templates.Index (R.Position).List;
                   begin
-                     Log.Debug ("Token {0} used by {1} licenses list",
-                                Util.Strings.Image (Natural (Item.Token)),
-                                Util.Strings.Image (Natural (List'Length)));
+                     if Util.Log.Loggers.Is_Debug_Enabled (Log) then
+                        Log.Debug ("Token {0} '{1}' used by {2} licenses list",
+                                   Util.Strings.Image (Natural (Item.Token)),
+                                   To_String (Get_Token (Item.Token)),
+                                   Util.Strings.Image (Natural (List'Length)));
+                     end if;
                      if First then
                         Set_Licenses (Result, List.all);
                         First := False;
                      else
-                        And_Licenses (Result, List.all);
+                        declare
+                           New_List : License_Index_Map := EMPTY_MAP;
+                        begin
+                           Set_Licenses (New_List, List.all);
+                           And_Licenses (Result, New_List);
+                        end;
                      end if;
                   end;
                else
@@ -362,7 +384,7 @@ package body SPDX_Tool.Licenses.Repository is
       for Line in From .. To loop
          Lines (Line).Licenses := Repository.Find_License_Templates (Lines (Line));
       end loop;
-      if Util.Log.Loggers.Get_Level (Log) >= Util.Log.DEBUG_LEVEL then
+      if Util.Log.Loggers.Is_Debug_Enabled (Log) then
          for Line in From .. To loop
             Log.Debug ("Line {0}: {1}", Util.Strings.Image (Natural (Line)),
                        Repository.To_String (To_License_Index_Array (Lines (Line).Licenses)));
@@ -392,6 +414,19 @@ package body SPDX_Tool.Licenses.Repository is
 
    MIN_CONFIDENCE : constant := 500 * Confidence_Type'Small;
 
+   procedure Dump_Frequencies (Frequencies : in Frequency_Arrays.Array_Type) is
+   begin
+      for Iter in Frequencies.Cells.Iterate loop
+         declare
+            Key : constant Frequency_Arrays.Index_Type := Frequency_Arrays.Maps.Key (Iter);
+         begin
+            Log.Debug ("Token {0} -> {1}",
+                       To_String (Get_Token (Key.Column)),
+                       Frequency_Arrays.Maps.Element (Iter)'Image);
+         end;
+      end loop;
+   end Dump_Frequencies;
+
    --  ------------------------------
    --  Guess a best license based on the token inverse document frequencies (TIDF).
    --  ------------------------------
@@ -408,11 +443,18 @@ package body SPDX_Tool.Licenses.Repository is
    begin
       for Line in From .. To loop
          declare
-            Freqs : Frequency_Arrays.Array_Type := Repository.Compute_Frequency (Lines, Line, To);
+            Freqs : constant Frequency_Arrays.Array_Type
+              := Repository.Compute_Frequency (Lines, Line, To);
             Licenses : constant License_Index_Array
                := Find_License_Templates (Lines, Line, To);
          begin
             if not Freqs.Cells.Is_Empty then
+               if Opt_Verbose2 then
+                  Log.Info ("Checking {0} licenses at lines {1}",
+                            Licenses'Length'Image,
+                            Line'Image & ".." & To'Image);
+                  Dump_Frequencies (Freqs);
+               end if;
                for License of Licenses loop
                   if Repository.License_Squares (License) > 0.0 then
                      declare
@@ -442,7 +484,7 @@ package body SPDX_Tool.Licenses.Repository is
          Result.Info.Last_Line := To;
          for Line in From + 1 .. To - 1 loop
             declare
-               Freqs : Frequency_Arrays.Array_Type
+               Freqs : constant Frequency_Arrays.Array_Type
                  := Repository.Compute_Frequency (Lines, Guess_Start, To);
             begin
                exit when Freqs.Cells.Is_Empty;

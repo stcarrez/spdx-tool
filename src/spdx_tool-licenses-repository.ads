@@ -48,6 +48,9 @@ private package SPDX_Tool.Licenses.Repository is
    type Float_Array is array (License_Index range <>) of Float;
    type Float_Array_Access is access all Float_Array;
 
+   --  Get the token from the token index.
+   function Get_Token (Index : in Token_Index) return Buffer_Type;
+
    function Is_Ignored (Token : in Buffer_Type) return Boolean;
 
    --  Protect concurrent loading of license templates.
