@@ -82,6 +82,10 @@ private package SPDX_Tool.Licenses.Repository is
       License_Frequency    : Frequency_Array_Access;
    end record;
 
+   --  Get a printable representation of a list of licenses.
+   function To_String (Repository : in Repository_Type;
+                       List       : in License_Index_Array) return String;
+
    --  Get the license template for the given license index.
    function Get_License (Repository : in Repository_Type;
                          License    : in License_Index) return Token_Access;
@@ -109,6 +113,13 @@ private package SPDX_Tool.Licenses.Repository is
                            Lines      : in SPDX_Tool.Languages.Line_Array;
                            From       : in Line_Number;
                            To         : in Line_Number) return License_Match;
+
+   --  For each line, find the possible licenses and populate the Licenses field
+   --  in each line.
+   procedure Find_Possible_Licenses (Repository : in Repository_Type;
+                                     Lines      : in out SPDX_Tool.Languages.Line_Array;
+                                     From       : in Line_Number;
+                                     To         : in Line_Number);
 
    function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
                                     From    : in Line_Number;

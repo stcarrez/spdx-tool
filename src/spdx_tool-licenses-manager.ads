@@ -189,15 +189,6 @@ private
       Executor : Executor_Manager_Access;
    end record;
 
-   procedure Find_License_Templates (Manager : in License_Manager;
-                                     Lines   : in out SPDX_Tool.Languages.Line_Array;
-                                     From    : in Line_Number;
-                                     To      : in Line_Number);
-
-   function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
-                                    From    : in Line_Number;
-                                    To      : in Line_Number) return License_Index_Array;
-
    function Find_License (Manager : in License_Manager;
                           File    : in out SPDX_Tool.Files.File_Type)
                           return License_Match;

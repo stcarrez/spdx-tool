@@ -66,6 +66,25 @@ package body SPDX_Tool.Licenses.Repository is
       return Token;
    end Get_License;
 
+   --  ------------------------------
+   --  Get a printable representation of a list of licenses.
+   --  ------------------------------
+   function To_String (Repository : in Repository_Type;
+                       List       : in License_Index_Array) return String is
+      Result : UString;
+      Empty  : Boolean := True;
+   begin
+      for License of List loop
+         if not Empty then
+            Ada.Strings.Unbounded.Append (Result, ", ");
+         else
+            Empty := False;
+         end if;
+         Ada.Strings.Unbounded.Append (Result, Repository.Repository.Get_Name (License));
+      end loop;
+      return To_String (Result);
+   end To_String;
+
    function Increment (Value : in Count_Type) return Count_Type is
    begin
       return Value + 1;
@@ -323,13 +342,33 @@ package body SPDX_Tool.Licenses.Repository is
                   Result := Token_License_Maps.Element (Pos);
                   First := False;
                else
-                  And_Licenses (Result, Token_License_Maps.Element (Pos));
+                  Or_Licenses (Result, Token_License_Maps.Element (Pos));
                end if;
             end if;
          end;
       end loop;
       return Result;
    end Find_License_Templates;
+
+   --  ------------------------------
+   --  For each line, find the possible licenses and populate the Licenses field
+   --  in each line.
+   --  ------------------------------
+   procedure Find_Possible_Licenses (Repository : in Repository_Type;
+                                     Lines      : in out SPDX_Tool.Languages.Line_Array;
+                                     From       : in Line_Number;
+                                     To         : in Line_Number) is
+   begin
+      for Line in From .. To loop
+         Lines (Line).Licenses := Repository.Find_License_Templates (Lines (Line));
+      end loop;
+      if Util.Log.Loggers.Get_Level (Log) >= Util.Log.DEBUG_LEVEL then
+         for Line in From .. To loop
+            Log.Debug ("Line {0}: {1}", Util.Strings.Image (Natural (Line)),
+                       Repository.To_String (To_License_Index_Array (Lines (Line).Licenses)));
+         end loop;
+      end if;
+   end Find_Possible_Licenses;
 
    function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
                                     From    : in Line_Number;
@@ -360,50 +399,59 @@ package body SPDX_Tool.Licenses.Repository is
                            Lines      : in SPDX_Tool.Languages.Line_Array;
                            From       : in Line_Number;
                            To         : in Line_Number) return License_Match is
-      Guess : License_Index := 0;
-      Confidence : Confidence_Type := 0.0;
-      C : Confidence_Type;
-      Result  : License_Match := (Last => null, Depth => 0, others => <>);
-      Stamp   : Util.Measures.Stamp;
-      Freqs   : Frequency_Arrays.Array_Type := Repository.Compute_Frequency (Lines, From, To);
+      Guess       : License_Index := 0;
+      Guess_Start : Line_Number := From;
+      Confidence  : Confidence_Type := 0.0;
+      C           : Confidence_Type;
+      Result      : License_Match := (Last => null, Depth => 0, others => <>);
+      Stamp       : Util.Measures.Stamp;
    begin
-      if not Freqs.Cells.Is_Empty then
+      for Line in From .. To loop
          declare
+            Freqs : Frequency_Arrays.Array_Type := Repository.Compute_Frequency (Lines, Line, To);
             Licenses : constant License_Index_Array
-               := Find_License_Templates (Lines, From, To);
+               := Find_License_Templates (Lines, Line, To);
          begin
-            for License of Licenses loop
-               if Repository.License_Squares (License) > 0.0 then
-                  declare
-                     Cosine_Stamp   : Util.Measures.Stamp;
-                  begin
-                     C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, License,
-                                               Repository.License_Squares (License));
-                     SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
-                  end;
-                  if Opt_Verbose2 then
-                     Log.Info ("Confidence with {0} -> {1}",
-                               Repository.Repository.Get_Name (License), C'Image);
+            if not Freqs.Cells.Is_Empty then
+               for License of Licenses loop
+                  if Repository.License_Squares (License) > 0.0 then
+                     declare
+                        Cosine_Stamp   : Util.Measures.Stamp;
+                     begin
+                        C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, License,
+                                                  Repository.License_Squares (License));
+                        SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
+                     end;
+                     if Opt_Verbose2 then
+                        Log.Info ("Confidence at lines {2} with {0} -> {1}",
+                                  Repository.Repository.Get_Name (License), C'Image,
+                                  Line'Image & ".." & To'Image);
+                     end if;
+                     if Confidence < C then
+                        Confidence := C;
+                        Guess := License;
+                        Guess_Start := Line;
+                     end if;
                   end if;
-                  if Confidence < C then
-                     Confidence := C;
-                     Guess := License;
-                  end if;
-               end if;
-            end loop;
+               end loop;
+            end if;
          end;
-      end if;
+      end loop;
       if Confidence >= MIN_CONFIDENCE then
-         Result.Info.First_Line := From;
+         Result.Info.First_Line := Guess_Start;
          Result.Info.Last_Line := To;
          for Line in From + 1 .. To - 1 loop
-            Freqs := Repository.Compute_Frequency (Lines, Line, To);
-            exit when Freqs.Cells.Is_Empty;
-            C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, Guess,
-                                      Repository.License_Squares (Guess));
-            exit when Confidence > C;
-            Result.Info.First_Line := Line;
-            Confidence := C;
+            declare
+               Freqs : Frequency_Arrays.Array_Type
+                 := Repository.Compute_Frequency (Lines, Guess_Start, To);
+            begin
+               exit when Freqs.Cells.Is_Empty;
+               C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, Guess,
+                                         Repository.License_Squares (Guess));
+               exit when Confidence > C;
+               Result.Info.First_Line := Line;
+               Confidence := C;
+            end;
          end loop;
          Result.Info.Match := Infos.GUESSED_LICENSE;
          Result.Info.Confidence := Confidence;
@@ -441,7 +489,16 @@ package body SPDX_Tool.Licenses.Repository is
       function Get_Name (License : in License_Index) return UString is
       begin
          if License < SPDX_Tool.Licenses.Files.Names'Last then
-            return To_Ustring (SPDX_Tool.Licenses.Files.Names (License).all);
+            declare
+               Name : constant Name_Access := SPDX_Tool.Licenses.Files.Names (License);
+               Pos  : constant Natural := Util.Strings.Index (Name.all, '/');
+            begin
+               if Pos > 0 then
+                  return To_UString (Name (Pos + 1 .. Name'Last));
+               else
+                  return To_UString (Name.all);
+               end if;
+            end;
          else
             return Licenses (License).Name;
          end if;
@@ -453,7 +510,7 @@ package body SPDX_Tool.Licenses.Repository is
       begin
          Token := Licenses (License).Root;
          if Token = null then
-            Reader.Load_License (License, Licenses (License), Token);
+            Reader.Load_License (License, Get_Name (License), Licenses (License), Token);
             if Token /= null then
                Licenses (License).Root := Token;
             else
