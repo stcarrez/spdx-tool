@@ -387,28 +387,7 @@ package body SPDX_Tool.Licenses.Manager is
       end loop;
       Log.Info ("No exact match on {0} licenses",
                 Util.Strings.Image (Get_Count (Checked)));
-      for Line in First_Line .. Last_Line loop
-         if File.Lines (Line).Comment /= NO_COMMENT then
-            Match := Look_License_Tree (Manager.Licenses.Root, Buf.Data,
-                                        File.Lines, Line, Last_Line);
-            if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-               return Match;
-            end if;
-            if Match.Last /= null then
-               if Match.Info.First_Line + 1 < Match.Info.Last_Line then
-                  Log.Info ("license missmatch at line{0} after {1} lines ({2} matched)",
-                            Match.Info.Last_Line'Image,
-                            Infos.Image (Match.Info.Last_Line - Match.Info.First_Line),
-                            Infos.Percent_Image (Match.Confidence));
-               end if;
-               Match.Depth := Match.Last.Depth;
-               if Result.Last = null or else Match.Depth > Result.Depth then
-                  Result.Last := Match.Last;
-                  Result.Depth := Match.Depth;
-               end if;
-            end if;
-         end if;
-      end loop;
+
       for Line in reverse First_Line .. Last_Line loop
          Match := Manager.Repository.Guess_License (File.Lines, First_Line, Line);
          if Match.Info.Match = Infos.GUESSED_LICENSE

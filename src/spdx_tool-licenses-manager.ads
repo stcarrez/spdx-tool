@@ -175,7 +175,6 @@ private
       Exclude_Filters      : Util.Strings.Sets.Set;
       Include_Languages    : Util.Strings.Sets.Set;
       Exclude_Languages    : Util.Strings.Sets.Set;
-      Licenses             : License_Template;
       Repository           : SPDX_Tool.Licenses.Repository.Repository_Type;
 
       --  Replacement information
