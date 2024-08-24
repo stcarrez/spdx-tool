@@ -1,6 +1,7 @@
 #!/bin/sh
 NAME=spdxtool.cov
 alr exec -- lcov --quiet --base-directory . --directory . \
+   --ignore-errors source,count,negative \
    --no-external \
    --exclude '*/b__*.adb' \
    --exclude '*/regtests*' \

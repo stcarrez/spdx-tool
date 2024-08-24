@@ -28,7 +28,7 @@ abstract project Spdx_Tool_Config is
          when "coverage" =>
             for Default_Switches ("Ada") use defaults & warnings
                & ("-g", "-O0", "-gnata", "-gnatVaMI", "-gnaty3abcefhiklmnprstxM99O",
-                  "-fprofile-arcs", "-ftest-coverage");
+                  "-fprofile-arcs", "-ftest-coverage", "-fprofile-update=atomic");
 
          when "optimize" =>
             for Default_Switches ("Ada") use defaults & warnings
