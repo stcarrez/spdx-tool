@@ -84,6 +84,9 @@ private package SPDX_Tool.Licenses.Repository is
       Token_Frequency      : Frequency_Arrays.Array_Type;
       License_Squares      : Float_Array_Access;
       License_Frequency    : Frequency_Array_Access;
+
+      --  A bitmap of license index that are forced to be checked
+      Force_Check_List     : License_Index_Map := EMPTY_MAP;
    end record;
 
    --  Get a printable representation of a list of licenses.
@@ -125,7 +128,8 @@ private package SPDX_Tool.Licenses.Repository is
                                      From       : in Line_Number;
                                      To         : in Line_Number);
 
-   function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
+   function Find_License_Templates (Repository : in Repository_Type;
+                                    Lines   : in SPDX_Tool.Languages.Line_Array;
                                     From    : in Line_Number;
                                     To      : in Line_Number) return License_Index_Array;
 

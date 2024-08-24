@@ -370,11 +370,11 @@ package body SPDX_Tool.Licenses.Manager is
       for Line in First_Line .. Last_Line loop
          declare
             List  : constant License_Index_Array
-              := Repository.Find_License_Templates (File.Lines, Line, Last_Line);
+              := Manager.Repository.Find_License_Templates (File.Lines, Line, Last_Line);
          begin
             for License of List loop
                if not Is_Set (Checked, License) then
-                  Match := Look_License (License, Manager.Repository.Get_License (License),
+                  Match := Look_License (Manager.Repository.Get_License (License),
                                          File, First_Line, Last_Line);
                   if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                      SPDX_Tool.Licenses.Report (Stamp, "Find license from template");

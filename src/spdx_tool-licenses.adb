@@ -5,10 +5,8 @@
 -----------------------------------------------------------------------
 with Ada.Text_IO;
 
-with Util.Strings;
 with Util.Log.Loggers;
 
-with SPDX_Tool.Licenses.Files;
 package body SPDX_Tool.Licenses is
 
    use all type SPDX_Tool.Files.Comment_Mode;
@@ -461,8 +459,7 @@ package body SPDX_Tool.Licenses is
       return Result;
    end Look_SPDX_License;
 
-   function Look_License (License  : in License_Index;
-                          Template : in License_Template;
+   function Look_License (Template : in License_Template;
                           File     : in SPDX_Tool.Files.File_Type;
                           From     : in Line_Number;
                           To       : in Line_Number)

@@ -20,6 +20,7 @@ package body SPDX_Tool.Licenses.Repository is
      Util.Log.Loggers.Create ("SPDX_Tool.Licenses.Repository");
 
    function To_Float (Value : Float) return Float is (Value);
+   procedure Dump_Frequencies (Frequencies : in Frequency_Arrays.Array_Type);
 
    package Token_Sets is
      new Ada.Containers.Hashed_Sets (Element_Type => Token_Index,
@@ -134,11 +135,10 @@ package body SPDX_Tool.Licenses.Repository is
                Len   : Buffer_Size;
                First : Buffer_Index;
             begin
+               Var_Token :
                while Pos < Last loop
                   loop
-                     if Pos > Last then
-                        return;
-                     end if;
+                     exit Var_Token when Pos > Last;
                      Len := SPDX_Tool.Punctuation_Length (Content, Pos, Last);
                      if Len = 0 then
                         Len := Space_Length (Content, Pos, Last);
@@ -152,7 +152,7 @@ package body SPDX_Tool.Licenses.Repository is
                      Add_Token (Content, First, Pos);
                   end if;
                   Pos := Pos + 1;
-               end loop;
+               end loop Var_Token;
             end;
          elsif Token = TOK_WORD and then Parser.Token_Pos < Parser.Current_Pos - 1 then
             Add_Token (Content, Parser.Token_Pos, Parser.Current_Pos - 1);
@@ -196,6 +196,7 @@ package body SPDX_Tool.Licenses.Repository is
          end;
       end if;
       Repository.Repository.Set_License (License, Template);
+      Set_License (Repository.Force_Check_List, License);
 
       Set_License (License_Map, License);
       for Token of Tokens loop
@@ -381,9 +382,10 @@ package body SPDX_Tool.Licenses.Repository is
       end if;
    end Find_Possible_Licenses;
 
-   function Find_License_Templates (Lines   : in SPDX_Tool.Languages.Line_Array;
-                                    From    : in Line_Number;
-                                    To      : in Line_Number) return License_Index_Array is
+   function Find_License_Templates (Repository : in Repository_Type;
+                                    Lines      : in SPDX_Tool.Languages.Line_Array;
+                                    From       : in Line_Number;
+                                    To         : in Line_Number) return License_Index_Array is
       First    : Boolean := True;
       Licenses : License_Index_Map := EMPTY_MAP;
    begin
@@ -398,6 +400,7 @@ package body SPDX_Tool.Licenses.Repository is
             exit when Get_Count (Licenses) < 10;
          end if;
       end loop;
+      Or_Licenses (Licenses, Repository.Force_Check_List);
       return To_License_Index_Array (Licenses);
    end Find_License_Templates;
 
@@ -438,7 +441,7 @@ package body SPDX_Tool.Licenses.Repository is
                Freqs : constant Frequency_Arrays.Array_Type
                  := Repository.Compute_Frequency (Lines, Line, To);
                Licenses : constant License_Index_Array
-                 := Find_License_Templates (Lines, Line, To);
+                 := Repository.Find_License_Templates (Lines, Line, To);
             begin
                if not Freqs.Cells.Is_Empty then
                   if Opt_Verbose2 then
@@ -584,9 +587,11 @@ package body SPDX_Tool.Licenses.Repository is
       end Set_License;
 
       procedure Clear is
+         procedure Release (Token : in out Token_Access);
          procedure Free is
            new Ada.Unchecked_Deallocation (Object => Token_Type'Class,
                                            Name   => Token_Access);
+
          procedure Release (Token : in out Token_Access) is
             T : Token_Access;
          begin
