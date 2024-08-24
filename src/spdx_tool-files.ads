@@ -54,7 +54,6 @@ package SPDX_Tool.Files is
       Cmt_Style    : Comment_Mode := NO_COMMENT;
       Cmt_Count    : Line_Count := 0;
       Lines        : Line_Array (1 .. Max_Lines);
-      Boxed        : Boolean;
    end record;
 
 end SPDX_Tool.Files;

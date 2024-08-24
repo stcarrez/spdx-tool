@@ -279,9 +279,14 @@ package body SPDX_Tool.Languages is
          if Style.Mode /= NO_COMMENT then
             Lines (Line_No).Comment := Style.Mode;
             Lines (Line_No).Style.Last := Pos;
-            Extract_Line_Tokens (Tokens, Buffer, Lines (Line_No));
          else
             Lines (Line_No).Comment := NO_COMMENT;
+         end if;
+      end loop;
+      Boxed_License (Lines, Buffer);
+      for Line_No in 1 .. Count loop
+         if Lines (Line_No).Comment /= NO_COMMENT then
+            Extract_Line_Tokens (Tokens, Buffer, Lines (Line_No));
          end if;
       end loop;
    end Find_Comments;
@@ -310,6 +315,9 @@ package body SPDX_Tool.Languages is
                if Len > 0 then
                   Pos := Pos + Len;
                   Punctuation_Count := Punctuation_Count + 1;
+               elsif Buffer (Pos) = Character'Pos ('_') then
+                  Punctuation_Count := Punctuation_Count + 1;
+                  Pos := Pos + 1;
                else
                   Other_Count := Other_Count + 1;
                   Pos := Pos + 1;
@@ -514,8 +522,7 @@ package body SPDX_Tool.Languages is
    --  to ignore the boxed presentation.
    --  ------------------------------
    procedure Boxed_License (Lines  : in out Line_Array;
-                            Buffer : in Buffer_Type;
-                            Boxed  : out Boolean) is
+                            Buffer : in Buffer_Type) is
       Limit  : constant Infos.Line_Count := (Lines'Length / 2);
       Common : Buffer_Size;
       Common_Start : Buffer_Size;
@@ -526,7 +533,6 @@ package body SPDX_Tool.Languages is
                if Lines (J).Comment /= NO_COMMENT
                  and then Is_Same_Length (Lines, I, J)
                then
-                  Boxed := True;
                   Common := Common_End_Length (Lines, Buffer, I, J);
                   Common_Start := Common_Start_Length (Lines, Buffer, I, J);
                   for K in I .. J loop
@@ -551,22 +557,35 @@ package body SPDX_Tool.Languages is
       Last  : constant Buffer_Index := Line.Style.Text_Last;
       Pos   : Buffer_Index := Line.Style.Text_Start;
       First : Buffer_Index;
+      Len   : Buffer_Size;
    begin
+      if Line.Style.Category /= TEXT then
+         return;
+      end if;
       while Pos <= Last loop
          First := Skip_Spaces (Buffer, Pos, Last);
          exit when First > Last;
          Pos := Next_Space (Buffer, First, Last);
          if First <= Pos then
-            declare
-               use SPDX_Tool.Token_Counters.Token_Maps;
-               Token_Pos : constant Token_Cursor := Tokens.Find (Buffer (First .. Pos));
-            begin
-               if SPDX_Tool.Token_Counters.Token_Maps.Has_Element (Token_Pos) then
-                  Counter_Arrays.Update (Line.Tokens, 1, Element (Token_Pos), Increment'Access);
-               end if;
-            end;
+            Len := Punctuation_Length (Buffer, First, Last);
+            if Len > 0 then
+               Pos := First + Len;
+            else
+               declare
+                  use SPDX_Tool.Token_Counters.Token_Maps;
+                  Token_Pos : constant Token_Cursor := Tokens.Find (Buffer (First .. Pos));
+               begin
+                  if SPDX_Tool.Token_Counters.Token_Maps.Has_Element (Token_Pos) then
+                     Counter_Arrays.Update (Line.Tokens, 1, Element (Token_Pos), Increment'Access);
+                  elsif not Is_Ignored (Buffer (First .. Pos)) then
+                     Log.Debug ("Token '{0}' not found", To_String (Buffer (First .. Pos)));
+                  end if;
+                  Pos := Pos + 1;
+               end;
+            end if;
+         else
+            Pos := Pos + 1;
          end if;
-         Pos := Pos + 1;
       end loop;
    end Extract_Line_Tokens;
 

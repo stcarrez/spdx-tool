@@ -78,8 +78,6 @@ package body SPDX_Tool.Files.Manager is
          SPDX_Tool.Languages.Find_Lines (Buf.Data (Buf.Data'First .. Len), Data.Lines, Data.Count);
          Manager.Find_Mime_Type (File, Buf.Data (Buf.Data'First .. Len));
          Languages.Find_Language (Tokens, File, Data, Analyzer);
-         SPDX_Tool.Languages.Boxed_License (Data.Lines (Data.Lines'First .. Data.Count),
-                                            Buf.Data, Data.Boxed);
       end;
    end Open;
 

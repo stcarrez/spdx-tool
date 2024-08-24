@@ -104,8 +104,7 @@ package SPDX_Tool.Languages is
    --  position to indicate the last position of the text for each line
    --  to ignore the boxed presentation.
    procedure Boxed_License (Lines  : in out Line_Array;
-                            Buffer : in Buffer_Type;
-                            Boxed  : out Boolean);
+                            Buffer : in Buffer_Type);
 
    --  Extract from the given line in the comment the list of tokens used.
    --  Such list can be used by the license decision tree to find a matching license.
