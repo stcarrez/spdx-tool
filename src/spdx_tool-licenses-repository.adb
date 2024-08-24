@@ -51,14 +51,14 @@ package body SPDX_Tool.Licenses.Repository is
    --  Get the license template for the given license index.
    --  ------------------------------
    function Get_License (Repository : in Repository_Type;
-                         License    : in License_Index) return Token_Access is
-      Token : Token_Access;
+                         License    : in License_Index) return License_Template is
+      Template : License_Template;
    begin
-      Token := Repository.Instance.Repository.Get_License (License);
-      if Token = null then
-         Repository.Instance.Repository.Load_License (License, Token);
+      Template := Repository.Instance.Repository.Get_License (License);
+      if Template.Root = null then
+         Repository.Instance.Repository.Load_License (License, Template);
       end if;
-      return Token;
+      return Template;
    end Get_License;
 
    --  ------------------------------
@@ -517,9 +517,9 @@ package body SPDX_Tool.Licenses.Repository is
          end if;
       end Get_Count;
 
-      function Get_License (License : in License_Index) return Token_Access is
+      function Get_License (License : in License_Index) return License_Template is
       begin
-         return Licenses (License).Root;
+         return Licenses (License);
       end Get_License;
 
       function Get_Name (License : in License_Index) return UString is
@@ -540,15 +540,18 @@ package body SPDX_Tool.Licenses.Repository is
          end if;
       end Get_Name;
 
-      procedure Load_License (License : in License_Index;
-                              Token    : out Token_Access) is
+      procedure Load_License (License  : in License_Index;
+                              Template : out License_Template) is
          Stamp : Util.Measures.Stamp;
+         Token : Token_Access;
       begin
-         Token := Licenses (License).Root;
-         if Token = null then
-            Reader.Load_License (License, Get_Name (License), Licenses (License), Token);
+         Template := Licenses (License);
+         if Template.Root = null then
+            Template.Name := Get_Name (License);
+            Reader.Load_License (License, Template.Name, Licenses (License), Token);
             if Token /= null then
-               Licenses (License).Root := Token;
+               Template.Root := Token;
+               Licenses (License) := Template;
             else
                Log.Debug ("No license loaded for {0}",
                           SPDX_Tool.Licenses.Files.Names (License).all);

@@ -461,11 +461,11 @@ package body SPDX_Tool.Licenses is
       return Result;
    end Look_SPDX_License;
 
-   function Look_License (License : in License_Index;
-                          Token   : in Token_Access;
-                          File    : in SPDX_Tool.Files.File_Type;
-                          From    : in Line_Number;
-                          To      : in Line_Number)
+   function Look_License (License  : in License_Index;
+                          Template : in License_Template;
+                          File     : in SPDX_Tool.Files.File_Type;
+                          From     : in Line_Number;
+                          To       : in Line_Number)
                           return License_Match is
       Buf     : constant Buffer_Accessor := File.Buffer.Value;
       Result  : License_Match := (Last => null, Depth => 0, others => <>);
@@ -473,18 +473,21 @@ package body SPDX_Tool.Licenses is
       Line    : Infos.Line_Number := From;
       Stamp   : Util.Measures.Stamp;
    begin
-      Log.Debug ("Checking with license template '{0}'", Licenses.Files.Names (License).all);
+      Log.Debug ("Checking with license template '{0}'", Template.Name);
 
       while Line <= To loop
          if File.Lines (Line).Comment /= NO_COMMENT then
-            Match := Look_License_Tree (Token, Buf.Data,
+            Match := Look_License_Tree (Template.Root, Buf.Data,
                                            File.Lines, Line, To);
             if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
                return Match;
             end if;
-            if Match.Last /= null and then Match.Info.First_Line + 1 < Match.Info.Last_Line then
+            if Log.Is_Info_Enabled
+              and then Match.Last /= null
+              and then Match.Info.First_Line + 1 < Match.Info.Last_Line
+            then
                Log.Info ("license '{0}' missmatch at line{1} after {2} lines ({3} matched)",
-                         Licenses.Files.Names (License).all,
+                         To_String (Template.Name),
                          Match.Info.Last_Line'Image,
                          Infos.Image (Match.Info.Last_Line - Match.Info.First_Line),
                          Infos.Percent_Image (Match.Confidence));
@@ -502,6 +505,11 @@ package body SPDX_Tool.Licenses is
          Line := Line + 1;
       end loop;
       Report (Stamp, "Find license (no match)");
+      if Log.Is_Info_Enabled then
+         Log.Info ("license '{0}' missmatch at lines {1}..{2}",
+                   To_String (Template.Name),
+                   Infos.Image (From), Infos.Image (To));
+      end if;
       return Result;
    end Look_License;
 

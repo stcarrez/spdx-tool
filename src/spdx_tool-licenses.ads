@@ -239,11 +239,11 @@ private
                                return License_Match
       with Pre => From <= To;
 
-   function Look_License (License : in License_Index;
-                          Token   : in Token_Access;
-                          File    : in SPDX_Tool.Files.File_Type;
-                          From    : in Line_Number;
-                          To      : in Line_Number)
+   function Look_License (License  : in License_Index;
+                          Template : in License_Template;
+                          File     : in SPDX_Tool.Files.File_Type;
+                          From     : in Line_Number;
+                          To       : in Line_Number)
                           return License_Match;
 
    function Look_License_Tree (Root    : in Token_Access;

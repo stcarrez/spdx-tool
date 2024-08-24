@@ -55,12 +55,12 @@ private package SPDX_Tool.Licenses.Repository is
    protected type License_Tree is
       function Get_Count return License_Index;
 
-      function Get_License (License : in License_Index) return Token_Access;
+      function Get_License (License : in License_Index) return License_Template;
 
       function Get_Name (License : in License_Index) return UString;
 
-      procedure Load_License (License : in License_Index;
-                              Token   : out Token_Access);
+      procedure Load_License (License  : in License_Index;
+                              Template : out License_Template);
 
       procedure Allocate_License (License  : out License_Index);
 
@@ -89,7 +89,7 @@ private package SPDX_Tool.Licenses.Repository is
 
    --  Get the license template for the given license index.
    function Get_License (Repository : in Repository_Type;
-                         License    : in License_Index) return Token_Access;
+                         License    : in License_Index) return License_Template;
 
    --  Read the license template with the given path and allocate
    --  a license index for that license template.
