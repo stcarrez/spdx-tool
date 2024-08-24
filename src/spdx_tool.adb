@@ -532,6 +532,30 @@ package body SPDX_Tool is
       return Count;
    end Printable_Length;
 
+   --  ------------------------------
+   --  Returns true if the token in ignored by the token index
+   --  Common words such as 'to', 'or', 'and', 'if', ... are not inserted in the
+   --  token index.
+   --  ------------------------------
+   function Is_Ignored (Token : in Buffer_Type) return Boolean is
+      Word : String (Natural (Token'First) .. Natural (Token'Last));
+      for Word'Address use Token'Address;
+   begin
+      if Word'Length = 1 then
+         return True;
+      end if;
+      if Word in "of" | "is" | "to" | "in" | "do" | "be" then
+         return True;
+      end if;
+      if Word in "all" | "any" | "and" | "the" then
+         return True;
+      end if;
+      if Word in "2008" | "2009" | "2011" then
+         return True;
+      end if;
+      return False;
+   end Is_Ignored;
+
    function To_String (Buffer : in Buffer_Type) return String is
       Content : String (1 .. Buffer'Length);
       for Content'Address use Buffer'Address;

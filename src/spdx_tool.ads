@@ -136,6 +136,11 @@ private
    function Is_Comment_Presentation (C : Byte) return Boolean is
       (C in Character'Pos ('*') | Character'Pos ('-') | Character'Pos ('+'));
 
+   --  Returns true if the token in ignored by the token index
+   --  Common words such as 'to', 'or', 'and', 'if', ... are not inserted in the
+   --  token index.
+   function Is_Ignored (Token : in Buffer_Type) return Boolean;
+
    --  Check if there is a space in the buffer starting at `First` position
    --  and return its length.  Returns 0 when there is no space.
    function Space_Length
