@@ -256,11 +256,7 @@ package body SPDX_Tool.Languages is
             if Style.Text_Last < Style.Text_Start then
                Style.Text_Last := Style.Text_Start - 1;
             end if;
-            if Lines (Line_No).Style.Category = UNKNOWN then
-               Style.Category := Find_Category (Buffer, Style.Text_Start, Style.Text_Last);
-            else
-               Style.Category := Lines (Line_No).Style.Category;
-            end if;
+            Style.Category := Lines (Line_No).Style.Category;
          else
             Style.Length := 0;
             Style.Start := First;
@@ -286,6 +282,11 @@ package body SPDX_Tool.Languages is
       Boxed_License (Lines, Buffer);
       for Line_No in 1 .. Count loop
          if Lines (Line_No).Comment /= NO_COMMENT then
+            if Lines (Line_No).Style.Category = UNKNOWN then
+               Lines (Line_No).Style.Category
+                 := Find_Category (Buffer, Lines (Line_No).Style.Text_Start,
+                                   Lines (Line_No).Style.Text_Last);
+            end if;
             Extract_Line_Tokens (Tokens, Buffer, Lines (Line_No));
          end if;
       end loop;
