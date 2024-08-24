@@ -502,8 +502,16 @@ package body SPDX_Tool.Licenses.Repository is
       procedure Free is
          new Ada.Unchecked_Deallocation (Object => Freq_Transformers.Frequency_Array,
                                          Name   => Frequency_Array_Access);
+      procedure Free is
+         new Ada.Unchecked_Deallocation (Object => Float_Array,
+                                         Name   => Float_Array_Access);
    begin
       Free (Repository.License_Frequency);
+      Free (Repository.License_Squares);
+      Repository.Repository.Clear;
+   exception
+      when E : others =>
+         Log.Error ("Exception", E);
    end Finalize;
 
    protected body License_Tree is
@@ -574,6 +582,35 @@ package body SPDX_Tool.Licenses.Repository is
       begin
          Licenses (License) := Template;
       end Set_License;
+
+      procedure Clear is
+         procedure Free is
+           new Ada.Unchecked_Deallocation (Object => Token_Type'Class,
+                                           Name   => Token_Access);
+         procedure Release (Token : in out Token_Access) is
+            T : Token_Access;
+         begin
+            loop
+               T := Token.Alternate;
+               exit when T = null;
+               Token.Alternate := T.Alternate;
+               Free (T);
+            end loop;
+            loop
+               T := Token.Next;
+               exit when T = null;
+               Token.Next := T.Next;
+               Free (T);
+            end loop;
+            Free (Token);
+         end Release;
+      begin
+         for License of Licenses loop
+            if License.Root /= null then
+               Release (License.Root);
+            end if;
+         end loop;
+      end Clear;
 
    end License_Tree;
 

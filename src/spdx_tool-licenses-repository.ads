@@ -66,6 +66,9 @@ private package SPDX_Tool.Licenses.Repository is
 
       procedure Set_License (License  : in License_Index;
                              Template : in License_Template);
+
+      procedure Clear;
+
    private
       Next_Index : License_Index := 0;
       Licenses   : License_Template_Array (0 .. License_Index'Last);
