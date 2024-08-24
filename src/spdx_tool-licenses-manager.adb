@@ -388,15 +388,36 @@ package body SPDX_Tool.Licenses.Manager is
       Log.Info ("No exact match on {0} licenses",
                 Util.Strings.Image (Get_Count (Checked)));
 
-      for Line in reverse First_Line .. Last_Line loop
-         Match := Manager.Repository.Guess_License (File.Lines, First_Line, Line);
-         if Match.Info.Match = Infos.GUESSED_LICENSE
-           and then (Result.Info.Match /= Infos.GUESSED_LICENSE
-                     or else Match.Info.Confidence > Result.Info.Confidence)
-         then
-            Result := Match;
-         end if;
-      end loop;
+      declare
+         use type Files.Comment_Category;
+         Line      : Line_Number := First_Line;
+         Next_Line : Line_Number;
+      begin
+         while Line <= Last_Line loop
+            if File.Lines (Line).Style.Category = Files.TEXT then
+               Next_Line := Line;
+               while Next_Line < Last_Line
+                 and then File.Lines (Next_Line).Style.Category in Files.TEXT | Files.EMPTY
+               loop
+                  Next_Line := Next_Line + 1;
+               end loop;
+               Match := Manager.Repository.Guess_License (File.Lines, First_Line, Next_Line);
+               if Match.Info.Match = Infos.GUESSED_LICENSE
+                 and then (Result.Info.Match /= Infos.GUESSED_LICENSE
+                           or else Match.Info.Confidence > Result.Info.Confidence)
+                 and then Match.Info.First_Line < Match.Info.Last_Line
+               then
+                  Result := Match;
+               end if;
+               exit when Next_Line = Last_Line;
+               First_Line := Next_Line + 1;
+               Line := Next_Line + 1;
+            else
+               exit when Line = Last_Line;
+               Line := Line + 1;
+            end if;
+         end loop;
+      end;
       if Result.Info.Match /= Infos.GUESSED_LICENSE then
          Result.Info.First_Line := First_Line;
          Result.Info.Last_Line := Last_Line;

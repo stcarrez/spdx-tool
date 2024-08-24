@@ -423,6 +423,8 @@ package body SPDX_Tool.Licenses.Repository is
                            Lines      : in SPDX_Tool.Languages.Line_Array;
                            From       : in Line_Number;
                            To         : in Line_Number) return License_Match is
+      use type SPDX_Tool.Files.Comment_Category;
+
       Guess       : License_Index := 0;
       Guess_Start : Line_Number := From;
       Confidence  : Confidence_Type := 0.0;
@@ -431,56 +433,59 @@ package body SPDX_Tool.Licenses.Repository is
       Stamp       : Util.Measures.Stamp;
    begin
       for Line in From .. To loop
-         declare
-            Freqs : constant Frequency_Arrays.Array_Type
-              := Repository.Compute_Frequency (Lines, Line, To);
-            Licenses : constant License_Index_Array
-               := Find_License_Templates (Lines, Line, To);
-         begin
-            if not Freqs.Cells.Is_Empty then
-               if Opt_Verbose2 then
-                  Log.Info ("Checking {0} licenses at lines {1}",
-                            Licenses'Length'Image,
-                            Line'Image & ".." & To'Image);
-                  Dump_Frequencies (Freqs);
-               end if;
-               for License of Licenses loop
-                  if Repository.License_Squares (License) > 0.0 then
-                     declare
-                        Cosine_Stamp   : Util.Measures.Stamp;
-                     begin
-                        C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, License,
-                                                  Repository.License_Squares (License));
-                        SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
-                     end;
-                     if Opt_Verbose2 then
-                        Log.Info ("Confidence at lines {2} with {0} -> {1}",
-                                  Repository.Repository.Get_Name (License), C'Image,
-                                  Line'Image & ".." & To'Image);
-                     end if;
-                     if Confidence < C then
-                        Confidence := C;
-                        Guess := License;
-                        Guess_Start := Line;
-                     end if;
+         if Lines (Line).Style.Category = SPDX_Tool.Files.TEXT then
+            declare
+               Freqs : constant Frequency_Arrays.Array_Type
+                 := Repository.Compute_Frequency (Lines, Line, To);
+               Licenses : constant License_Index_Array
+                 := Find_License_Templates (Lines, Line, To);
+            begin
+               if not Freqs.Cells.Is_Empty then
+                  if Opt_Verbose2 then
+                     Log.Info ("Checking {0} licenses at lines {1}",
+                               Licenses'Length'Image,
+                               Line'Image & ".." & To'Image);
+                     Dump_Frequencies (Freqs);
                   end if;
-               end loop;
-            end if;
-         end;
+                  for License of Licenses loop
+                     if Repository.License_Squares (License) > 0.0 then
+                        declare
+                           Cosine_Stamp   : Util.Measures.Stamp;
+                        begin
+                           C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, License,
+                                                     Repository.License_Squares (License));
+                           SPDX_Tool.Licenses.Report (Cosine_Stamp, "Cosine");
+                        end;
+                        if Opt_Verbose2 then
+                           Log.Info ("Confidence at lines {2} with {0} -> {1}",
+                                     Repository.Repository.Get_Name (License), C'Image,
+                                     Line'Image & ".." & To'Image);
+                        end if;
+                        if Confidence < C then
+                           Confidence := C;
+                           Guess := License;
+                           Guess_Start := Line;
+                        end if;
+                     end if;
+                  end loop;
+               end if;
+            end;
+         end if;
+         exit when Line + 10 > To;
       end loop;
       if Confidence >= MIN_CONFIDENCE then
          Result.Info.First_Line := Guess_Start;
          Result.Info.Last_Line := To;
-         for Line in From + 1 .. To - 1 loop
+         for Line in reverse From + 8 .. To - 1 loop
             declare
                Freqs : constant Frequency_Arrays.Array_Type
-                 := Repository.Compute_Frequency (Lines, Guess_Start, To);
+                 := Repository.Compute_Frequency (Lines, Guess_Start, Line);
             begin
                exit when Freqs.Cells.Is_Empty;
                C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, Guess,
                                          Repository.License_Squares (Guess));
                exit when Confidence > C;
-               Result.Info.First_Line := Line;
+               Result.Info.Last_Line := Line;
                Confidence := C;
             end;
          end loop;
