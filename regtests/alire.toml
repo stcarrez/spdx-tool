@@ -21,5 +21,5 @@ disabled = true
 [[pins]]
 spdx_tool = { path='..' }
 utilada_unit = { path='../alire/cache/pins/utilada/unit' }
-sciada = { url="https://gitlab.com/stcarrez/ada-sci.git" }
+# sciada = { path='../alire/cache/pins/sciada' }
 

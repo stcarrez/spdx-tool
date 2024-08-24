@@ -67,6 +67,8 @@ package body SPDX_Tool.Licenses.Manager.Tests is
                        Test_Find_License_Optional'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Find_License (SPDX)",
                        Test_Find_License_SPDX'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool.Licenses.Load_License (JSONLD)",
+                       Test_JSONLD_Template'Access);
    end Add_Tests;
 
    --  Test parsing various update patterns.
@@ -266,6 +268,26 @@ package body SPDX_Tool.Licenses.Manager.Tests is
          Assert_Equals (T, Infos.TEMPLATE_LICENSE, Result.Info.Match, "Invalid match kind");
       end;
    end Test_Template_Optional;
+
+   --  ------------------------------
+   --  Test reading a JSONLD template a match a fix content.
+   --  ------------------------------
+   procedure Test_JSONLD_Template (T : in out Test) is
+      Data    : File_Info := Get_Path ("files/identify/beerware.java");
+      Config  : SPDX_Tool.Configs.Config_Type;
+      Manager : SPDX_Tool.Licenses.Manager.License_Manager (1);
+      File    : SPDX_Tool.Files.File_Type (100);
+      Result  : License_Match;
+   begin
+      Manager.Languages.Initialize (Config);
+      Manager.File_Mgr (1).Initialize ("");
+      Manager.Load_License ("regtests/files/templates/Beerware.jsonld");
+      Manager.File_Mgr (1).Open (Manager.Repository.Token_Counters.Tokens,
+                                 File, Data, Manager.Languages);
+      Result := Manager.Find_License (File);
+      Util.Tests.Assert_Equals (T, "Beerware", Result.Info.Name,
+                                "Invalid license found");
+   end Test_JSONLD_Template;
 
    --  ------------------------------
    --  Test Find_License with simple license files
