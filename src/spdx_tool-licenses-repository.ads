@@ -51,8 +51,6 @@ private package SPDX_Tool.Licenses.Repository is
    --  Get the token from the token index.
    function Get_Token (Index : in Token_Index) return Buffer_Type;
 
-   function Is_Ignored (Token : in Buffer_Type) return Boolean;
-
    --  Protect concurrent loading of license templates.
    protected type License_Tree is
       function Get_Count return License_Index;
@@ -128,9 +126,9 @@ private package SPDX_Tool.Licenses.Repository is
                                     From    : in Line_Number;
                                     To      : in Line_Number) return License_Index_Array;
 
-   function Find_License_Templates (Repository : in Repository_Type;
-                                    Line       : in SPDX_Tool.Languages.Line_Type)
-                                     return License_Index_Map;
+   procedure Find_License_Templates (Repository : in Repository_Type;
+                                     Line       : in out SPDX_Tool.Languages.Line_Type;
+                                     Global     : in out License_Index_Map);
 
    overriding
    procedure Finalize (Repository : in out Repository_Type);

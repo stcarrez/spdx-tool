@@ -33,25 +33,6 @@ package body SPDX_Tool.Licenses.Repository is
 
    function Increment (Value : in Count_Type) return Count_Type;
 
-   function Is_Ignored (Token : in Buffer_Type) return Boolean is
-      Word : String (Natural (Token'First) .. Natural (Token'Last));
-      for Word'Address use Token'Address;
-   begin
-      if Word'Length = 1 then
-         return True;
-      end if;
-      if Word in "of" | "is" | "to" | "in" | "do" | "be" then
-         return True;
-      end if;
-      if Word in "all" | "any" | "and" | "the" then
-         return True;
-      end if;
-      if Word in "2008" | "2009" | "2011" then
-         return True;
-      end if;
-      return False;
-   end Is_Ignored;
-
    --  ------------------------------
    --  Get the token from the token index.
    --  ------------------------------
@@ -132,7 +113,7 @@ package body SPDX_Tool.Licenses.Repository is
          First : constant Buffer_Index := (if Len > 0 then From + Len else From);
          Value : Token_Index;
       begin
-         if First <= To and then not Licenses.Repository.Is_Ignored (Buf (First .. To)) then
+         if First <= To and then not Is_Ignored (Buf (First .. To)) then
             SPDX_Tool.Token_Counters.Add_Token (Repository.Token_Counters, License,
                                                 Buf (First .. To),
                                                 Increment'Access,
@@ -313,12 +294,13 @@ package body SPDX_Tool.Licenses.Repository is
       return Freqs;
    end Compute_Frequency;
 
-   function Find_License_Templates (Repository : in Repository_Type;
-                                    Line       : in SPDX_Tool.Languages.Line_Type)
-                                     return License_Index_Map is
-      Result : License_Index_Map := SPDX_Tool.EMPTY_MAP;
-      First  : Boolean := True;
-      Item   : Index_Type;
+   procedure Find_License_Templates (Repository : in Repository_Type;
+                                     Line       : in out SPDX_Tool.Languages.Line_Type;
+                                     Global     : in out License_Index_Map) is
+      Or_List  : License_Index_Map := SPDX_Tool.EMPTY_MAP;
+      And_List : License_Index_Map := SPDX_Tool.EMPTY_MAP;
+      First    : Boolean := True;
+      Item     : Index_Type;
    begin
       for Token in Line.Tokens.Cells.Iterate loop
          Item.Token := Counter_Arrays.Maps.Key (Token).Column;
@@ -338,17 +320,18 @@ package body SPDX_Tool.Licenses.Repository is
                                    To_String (Get_Token (Item.Token)),
                                    Util.Strings.Image (Natural (List'Length)));
                      end if;
-                     if First then
-                        Set_Licenses (Result, List.all);
-                        First := False;
-                     else
-                        declare
-                           New_List : License_Index_Map := EMPTY_MAP;
-                        begin
-                           Set_Licenses (New_List, List.all);
-                           And_Licenses (Result, New_List);
-                        end;
-                     end if;
+                     declare
+                        New_List : License_Index_Map := EMPTY_MAP;
+                     begin
+                        Set_Licenses (New_List, List.all);
+                        Or_Licenses (Or_List, New_List);
+                        if First then
+                           And_List := New_List;
+                           First := False;
+                        else
+                           And_Licenses (And_List, New_List);
+                        end if;
+                     end;
                   end;
                else
                   Log.Debug ("Token {0} not found in index",
@@ -360,16 +343,18 @@ package body SPDX_Tool.Licenses.Repository is
             Pos : constant Token_License_Maps.Cursor := Repository.Dyn_Index.Find (Item.Token);
          begin
             if Token_License_Maps.Has_Element (Pos) then
+               Or_Licenses (Or_List, Token_License_Maps.Element (Pos));
                if First then
-                  Result := Token_License_Maps.Element (Pos);
+                  And_List := Token_License_Maps.Element (Pos);
                   First := False;
                else
-                  Or_Licenses (Result, Token_License_Maps.Element (Pos));
+                  And_Licenses (And_List, Token_License_Maps.Element (Pos));
                end if;
             end if;
          end;
       end loop;
-      return Result;
+      Line.Licenses := Or_List;
+      Or_Licenses (Global, And_List);
    end Find_License_Templates;
 
    --  ------------------------------
@@ -380,9 +365,13 @@ package body SPDX_Tool.Licenses.Repository is
                                      Lines      : in out SPDX_Tool.Languages.Line_Array;
                                      From       : in Line_Number;
                                      To         : in Line_Number) is
+      Global : License_Index_Map := SPDX_Tool.EMPTY_MAP;
    begin
       for Line in From .. To loop
-         Lines (Line).Licenses := Repository.Find_License_Templates (Lines (Line));
+         Repository.Find_License_Templates (Lines (Line), Global);
+      end loop;
+      for Line in From .. To loop
+         And_Licenses (Lines (Line).Licenses, Global);
       end loop;
       if Util.Log.Loggers.Is_Debug_Enabled (Log) then
          for Line in From .. To loop
