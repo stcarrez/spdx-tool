@@ -3,20 +3,21 @@
 color="yes"
 ignore-files=[
 "spdx-tool:ignore.txt",
-"spdx-tool:ignore-docs.txt"
+"spdx-tool:ignore-docs.txt",
+"spdx-tool:ignore-images.txt",
+"spdx-tool:ignore-bin.txt"
 ]
 ignore=[
-"*.o",
-"*.a",
-"*.so",
-"*.lib",
 "*.md",
 "*.log",
 "*.pem",
 "*.txt",
 "*.json",
 "*.rst",
-"*~"
+"*~",
+"*.ali",
+"*.stdout",
+"*.stderr"
 ]
 
 [license-files]

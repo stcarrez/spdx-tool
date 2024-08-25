@@ -1,0 +1,10 @@
+# Ignore various binary files
+*.pdf
+*.zip
+*.gz
+*.tgz
+*.o
+*.a
+*.so
+*.lib
+
