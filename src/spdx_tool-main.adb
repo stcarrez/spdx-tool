@@ -400,6 +400,7 @@ begin
       Manager.Configure (Tool_Config, Mode);
       Filter.Exclude (".git");
       Filter.Exclude (".svn");
+      Filter.Exclude (".hg");
       loop
          declare
             Arg : constant String := GC.Get_Argument;
