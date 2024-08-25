@@ -8,6 +8,9 @@ regtests/files/identify/apache-2.0-5.xhtml: Apache-2.0
 regtests/files/identify/apache-2.0-6.jsp: Apache-2.0
 regtests/files/identify/apache-2.0-7.cs: Apache-2.0
 regtests/files/identify/apache-2.0-8.ts: Apache-2.0
+regtests/files/identify/beerware.java: Beerware
+regtests/files/identify/blessing-1.c: blessing
+regtests/files/identify/blessing-2.ads: blessing
 regtests/files/identify/bsd-3-clause.c: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.ps1: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.tex: BSD-3-Clause

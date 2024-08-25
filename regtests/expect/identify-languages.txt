@@ -9,6 +9,8 @@ regtests/files/identify/apache-2.0-6.jsp: Java Server Pages
 regtests/files/identify/apache-2.0-7.cs: C#
 regtests/files/identify/apache-2.0-8.ts: TypeScript
 regtests/files/identify/beerware.java: Java
+regtests/files/identify/blessing-1.c: C
+regtests/files/identify/blessing-2.ads: Ada
 regtests/files/identify/bsd-3-clause.c: C
 regtests/files/identify/bsd-3-clause.ps1: PowerShell
 regtests/files/identify/bsd-3-clause.tex: TeX
