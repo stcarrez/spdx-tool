@@ -4,33 +4,37 @@ package SPDX_Tool.Configs.Default is
 
    default : aliased constant String;
    ignore : aliased constant String;
+   ignore_bin : aliased constant String;
    ignore_docs : aliased constant String;
+   ignore_images : aliased constant String;
 
 private
 
    default : aliased constant String := "# Default configuration" & ASCII.LF & "["
        & "default]" & ASCII.LF & "color=""yes""" & ASCII.LF & "ignore-files="
        & "[" & ASCII.LF & """spdx-tool:ignore.txt""," & ASCII.LF & """spdx-t"
-       & "ool:ignore-docs.txt""" & ASCII.LF & "]" & ASCII.LF & "ignore=["
-       & ASCII.LF & """*.o""," & ASCII.LF & """*.a""," & ASCII.LF & """*.so"
-       & """," & ASCII.LF & """*.lib""," & ASCII.LF & """*.md""," & ASCII.LF
-       & """*.log""," & ASCII.LF & """*.pem""," & ASCII.LF & """*.txt"","
+       & "ool:ignore-docs.txt""," & ASCII.LF & """spdx-tool:ignore-images.txt"
+       & """," & ASCII.LF & """spdx-tool:ignore-bin.txt""" & ASCII.LF & "]"
+       & ASCII.LF & "ignore=[" & ASCII.LF & """*.md""," & ASCII.LF & """*.l"
+       & "og""," & ASCII.LF & """*.pem""," & ASCII.LF & """*.txt"","
        & ASCII.LF & """*.json""," & ASCII.LF & """*.rst""," & ASCII.LF & """"
-       & "*~""" & ASCII.LF & "]" & ASCII.LF & ASCII.LF & "[license-files]"
-       & ASCII.LF & "MIT=[ ""MIT.txt"", ""MIT-LICENSE.txt"", ""LICENSE.txt"" ]"
-       & ASCII.LF & "GPL-3=[ ""COPYING3"", ""COPYING3.LIB"" ]" & ASCII.LF & "G"
-       & "PL-2=[ ""COPYING"", ""COPYING.LIB"", ""GPL-LICENSE.txt"" ]" & ASCII.LF
-       & "Apache-2= [ ""LICENSE"", ""LICENSE.txt"" ]" & ASCII.LF & ASCII.LF & "["
-       & "comments]" & ASCII.LF & "Shell={ start=""#"" }" & ASCII.LF & "Ada="
-       & "{ start=""--"" }" & ASCII.LF & ASCII.LF & ASCII.LF & "[languages]"
-       & ASCII.LF & "Markdown=[ ""*.md"" ]" & ASCII.LF & "Makefile=[ ""Makefi"
-       & "le"", ""Imakefile"", { comment=""Shell"" } ]" & ASCII.LF & "Ada=[ """
-       & "*.ads"", ""*.adb"", ""*gpb"", { comment=""Ada"" } ]" & ASCII.LF & "C"
-       & "=[ ""*.c"", ""*.h"", { comment=""C-style"" }]" & ASCII.LF & """C++"""
-       & "=[ ""*.cc"", ""*.CC"", ""*.C"", ""*.h"", { comment=""C-style"" }]"
-       & ASCII.LF & "Java=[ ""*.java"", { comment=""C-style"" }]" & ASCII.LF & "C"
-       & "onfigure=[ ""config.sub"", ""*.in"", ""config.guess"", { comment=""She"
-       & "ll"" }]" & ASCII.LF & ASCII.LF & ASCII.LF;
+       & "*~""," & ASCII.LF & """*.ali""," & ASCII.LF & """*.stdout"","
+       & ASCII.LF & """*.stderr""" & ASCII.LF & "]" & ASCII.LF & ASCII.LF & "["
+       & "license-files]" & ASCII.LF & "MIT=[ ""MIT.txt"", ""MIT-LICENSE.txt"""
+       & ", ""LICENSE.txt"" ]" & ASCII.LF & "GPL-3=[ ""COPYING3"", ""COPYING3."
+       & "LIB"" ]" & ASCII.LF & "GPL-2=[ ""COPYING"", ""COPYING.LIB"", ""GPL-L"
+       & "ICENSE.txt"" ]" & ASCII.LF & "Apache-2= [ ""LICENSE"", ""LICENSE.txt"
+       & """ ]" & ASCII.LF & ASCII.LF & "[comments]" & ASCII.LF & "Shell={ "
+       & "start=""#"" }" & ASCII.LF & "Ada={ start=""--"" }" & ASCII.LF
+       & ASCII.LF & ASCII.LF & "[languages]" & ASCII.LF & "Markdown=[ ""*.md"
+       & """ ]" & ASCII.LF & "Makefile=[ ""Makefile"", ""Imakefile"", { commen"
+       & "t=""Shell"" } ]" & ASCII.LF & "Ada=[ ""*.ads"", ""*.adb"", ""*gpb"","
+       & " { comment=""Ada"" } ]" & ASCII.LF & "C=[ ""*.c"", ""*.h"", { commen"
+       & "t=""C-style"" }]" & ASCII.LF & """C++""=[ ""*.cc"", ""*.CC"", ""*.C"
+       & """, ""*.h"", { comment=""C-style"" }]" & ASCII.LF & "Java=[ ""*.java"
+       & """, { comment=""C-style"" }]" & ASCII.LF & "Configure=[ ""config.sub"
+       & """, ""*.in"", ""config.guess"", { comment=""Shell"" }]" & ASCII.LF
+       & ASCII.LF & ASCII.LF;
 
    ignore : aliased constant String := "# Vendored files and directories are excl"
        & "uded from license analysis." & ASCII.LF & "# File created from the v"
@@ -195,6 +199,11 @@ private
        & "ian/" & ASCII.LF & ASCII.LF & "# teamcity CI configuration"
        & ASCII.LF & ".teamcity/" & ASCII.LF;
 
+   ignore_bin : aliased constant String := "# Ignore various binary files" & ASCII.LF
+       & "*.pdf" & ASCII.LF & "*.zip" & ASCII.LF & "*.gz" & ASCII.LF & "*."
+       & "tgz" & ASCII.LF & "*.o" & ASCII.LF & "*.a" & ASCII.LF & "*.so"
+       & ASCII.LF & "*.lib" & ASCII.LF & ASCII.LF;
+
    ignore_docs : aliased constant String := "# Documentation files and directories are"
        & " excluded from license analysis." & ASCII.LF & "#" & ASCII.LF & "#"
        & " File created from the documentation.yml file of https://github.com/gi"
@@ -211,5 +220,9 @@ private
        & "ICEN[CS]E(\.|$)" & ASCII.LF & "[Ll]icen[cs]e(\.|$)" & ASCII.LF & "R"
        & "EADME(\.|$)" & ASCII.LF & "[Rr]eadme(\.|$)" & ASCII.LF & ASCII.LF & "#"
        & " Samples folders" & ASCII.LF & "[Ss]amples?/" & ASCII.LF;
+
+   ignore_images : aliased constant String := "# Ignore images" & ASCII.LF & "*.png"
+       & ASCII.LF & "*.gif" & ASCII.LF & "*.jpg" & ASCII.LF & "*.tiff"
+       & ASCII.LF & "*.bmp" & ASCII.LF;
 
 end SPDX_Tool.Configs.Default;
