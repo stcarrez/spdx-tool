@@ -9,8 +9,6 @@
 \#*
 /*.s
 /*.ali
-/*.ads
-/*.adb
 /src/spdx_tool-configs-defaults.ads
 debian/.debhelper/
 /debian/*.substvars
