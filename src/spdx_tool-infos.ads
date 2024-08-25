@@ -28,6 +28,9 @@ package SPDX_Tool.Infos is
    function Image (Line : in Line_Count)
                    return String is (Util.Strings.Image (Natural (Line)));
 
+   function Image (Lines : in Line_Range_Type)
+     return String is (Image (Lines.First_Line) & ".." & Image (Lines.Last_Line));
+
    --  Identifies the license implementation found:
    --  - LICENSE_FILE means the file corresponds to a license file,
    --  - SPDX_LICENSE indicates we found a license tag (strongest identification),
