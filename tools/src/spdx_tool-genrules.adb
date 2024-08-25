@@ -305,6 +305,7 @@ procedure SPDX_Tool.Genrules is
             R.Pattern := Get_Pattern_Index (Patterns, UBO.To_String (File));
             R.Result := (if Def.Language > 0 then Def.Language else Def.Generator);
             Def.Rules.Append (R);
+            Is_And := True;
          end;
       end if;
 
@@ -650,6 +651,9 @@ procedure SPDX_Tool.Genrules is
                elsif Rule.Mode in RULE_CONTAINS | RULE_CONTAINS_AND then
                   Writer.Write ("RULE_CONTAINS, ");
                   Value := Get_Mapping (Str_Cvt, Rule.Pattern);
+               elsif Rule.Mode in RULE_FILENAME_MATCH | RULE_FILENAME_MATCH_AND then
+                  Writer.Write ("RULE_FILENAME_MATCH, ");
+                  Value := Get_Mapping (Pat_Cvt, Rule.Pattern);
                else
                   Writer.Write ("RULE_SUCCESS, ");
                   Value := 0;
@@ -667,6 +671,12 @@ procedure SPDX_Tool.Genrules is
                elsif Rule.Mode = RULE_CONTAINS_AND then
                   Writer.Write ("RULE_CONTAINS_AND, ");
                   Value := Get_Mapping (Str_Cvt, Rule.Pattern);
+               elsif Rule.Mode = RULE_FILENAME_MATCH then
+                  Writer.Write ("RULE_FILENAME_MATCH, ");
+                  Value := Get_Mapping (Pat_Cvt, Rule.Pattern);
+               elsif Rule.Mode = Rule_Filename_Match_AND then
+                  Writer.Write ("RULE_FILENAME_MATCH_AND, ");
+                  Value := Get_Mapping (Pat_Cvt, Rule.Pattern);
                else
                   Writer.Write ("RULE_SUCCESS, ");
                   Value := 0;

@@ -74,7 +74,7 @@ procedure SPDX_Tool.Gentmpl is
       Len   : constant Buffer_Size := Punctuation_Length (Buf, From, To);
       First : constant Buffer_Index := (if Len > 0 then From + Len else From);
    begin
-      if First <= To and then not Licenses.Repository.Is_Ignored (Buf (First .. To)) then
+      if First <= To and then not Is_Ignored (Buf (First .. To)) then
          SPDX_Tool.Token_Counters.Add_Token (Into, Idx,
                                              Buf (First .. To),
                                              Increment'Access);
