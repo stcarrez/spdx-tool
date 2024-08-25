@@ -398,10 +398,11 @@ package body SPDX_Tool.Licenses.Manager is
                Next_Line := Line;
                while Next_Line < Last_Line
                  and then File.Lines (Next_Line).Style.Category in Files.TEXT | Files.EMPTY
+                 and then File.Lines (Next_Line + 1).Style.Category in Files.TEXT | Files.EMPTY
                loop
                   Next_Line := Next_Line + 1;
                end loop;
-               Match := Manager.Repository.Guess_License (File.Lines, First_Line, Next_Line);
+               Match := Manager.Repository.Guess_License (File.Lines, Line, Next_Line);
                if Match.Info.Match = Infos.GUESSED_LICENSE
                  and then (Result.Info.Match /= Infos.GUESSED_LICENSE
                            or else Match.Info.Confidence > Result.Info.Confidence)
