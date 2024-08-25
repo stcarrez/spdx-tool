@@ -13,6 +13,8 @@
         <include name="default.toml"/>
         <include name="ignore.txt"/>
         <include name="ignore-docs.txt"/>
+        <include name="ignore-images.txt"/>
+        <include name="ignore-bin.txt"/>
       </fileset>
     </install>
   </resource>
