@@ -137,7 +137,7 @@ private
       27 => (RULE_CONTAINS, 2, (2, 2), 9, 33),
       28 => (RULE_CONTAINS, 2, (1, 1), 15, 49),
       29 => (RULE_CONTAINS, 1, (1, 4), 28, 31),
-      30 => (RULE_SUCCESS, 11, (0, 0), 0, 40),
+      30 => (RULE_FILENAME_MATCH, 11, (0, 0), 1, 40),
       31 => (RULE_CONTAINS, 11, (9, 9), 21, 40),
       32 => (RULE_CONTAINS, 2, (1, 1), 15, 49),
       33 => (RULE_CONTAINS, 2, (1, 4), 29, 41),
