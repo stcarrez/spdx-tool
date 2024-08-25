@@ -125,6 +125,10 @@ package body SPDX_Tool.Licenses.Manager is
             Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore);
          elsif Path = "spdx-tool:ignore-docs.txt" then
             Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore_docs);
+         elsif Path = "spdx-tool:ignore-images.txt" then
+            Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore_images);
+         elsif Path = "spdx-tool:ignore-bin.txt" then
+            Load_Ignore_Content (Path, SPDX_Tool.Configs.Default.ignore_bin);
          elsif Util.Strings.Starts_With (Path, "spdx-tool:") then
             Log.Error ("invalid builtin ignore file {0}", Path);
          elsif Ada.Directories.Exists (Path) then
