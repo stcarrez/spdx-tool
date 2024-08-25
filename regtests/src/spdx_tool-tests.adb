@@ -59,6 +59,8 @@ package body SPDX_Tool.Tests is
                        Test_Print_License_None'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --line-number --print-license (Antlr)",
                        Test_Print_License_Antlr'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (Blessing)",
+                       Test_Print_License_Blessing'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --update (Ada)",
                        Test_Update_License_Ada'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --update (C)",
@@ -252,6 +254,11 @@ package body SPDX_Tool.Tests is
          Test    => Path,
          Message => "Invalid license extraction");
    end Test_Print_License_Antlr;
+
+   procedure Test_Print_License_Blessing (T : in out Test) is
+   begin
+      Test_Print_License (T, "print-blessing-2.txt", "blessing-2.ads");
+   end Test_Print_License_Blessing;
 
    --  Test spdx-tool --update option on various languages
    procedure Test_Update_License (T       : in out Test;
