@@ -12,7 +12,7 @@ with SCI.Vectorizers.Transformers;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Counter_Arrays;
 with SPDX_Tool.Token_Counters;
-private package SPDX_Tool.Licenses.Repository is
+package SPDX_Tool.Licenses.Repository is
 
    MAX_LICENSE_SIZE : constant := 64 * 1024;
 
