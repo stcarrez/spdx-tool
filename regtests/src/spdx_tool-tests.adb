@@ -57,10 +57,12 @@ package body SPDX_Tool.Tests is
                        Test_Print_License_Ocaml'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (None)",
                        Test_Print_License_None'Access);
-      Caller.Add_Test (Suite, "Test SPDX_Tool --line-number --print-license (Antlr)",
-                       Test_Print_License_Antlr'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (Blessing)",
                        Test_Print_License_Blessing'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (Chinese)",
+                       Test_Print_License_Chinese'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --line-number --print-license (Antlr)",
+                       Test_Print_License_Antlr'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --update (Ada)",
                        Test_Update_License_Ada'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --update (C)",
@@ -259,6 +261,11 @@ package body SPDX_Tool.Tests is
    begin
       Test_Print_License (T, "print-blessing-2.txt", "blessing-2.ads");
    end Test_Print_License_Blessing;
+
+   procedure Test_Print_License_Chinese (T : in out Test) is
+   begin
+      Test_Print_License (T, "print-chinese-mit.txt", "../custom/chinese-mit.c");
+   end Test_Print_License_Chinese;
 
    --  Test spdx-tool --update option on various languages
    procedure Test_Update_License (T       : in out Test;
