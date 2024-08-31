@@ -10,6 +10,7 @@ with Util.Strings;
 package SPDX_Tool.Infos is
 
    MAX_LINES : constant := 100;
+   MAX_LICENSES_PER_FILE : constant := 4;
 
    type Line_Count is new Natural range 0 .. MAX_LINES;
 
@@ -53,16 +54,21 @@ package SPDX_Tool.Infos is
    function Percent_Image (Confidence : in Confidence_Type) return String;
 
    --  Information about the license that was identified in the file.
+   type License_Info;
+   type License_Info_Access is access License_Info;
    type License_Info is record
-      First_Line : Line_Count := 0;
-      Last_Line  : Line_Count := 0;
+      Lines      : Line_Range_Type;
       Name       : UString;
       Match      : License_Kind := NONE;
       Confidence : Confidence_Type := 1.0;
+      Next       : License_Info_Access;
    end record;
 
    function Lines_Image (Info : in License_Info) return String
-      is (Image (Info.First_Line) & ".." & Image (Info.Last_Line));
+      is (Image (Info.Lines)); --  Image (Info.First_Line) & ".." & Image (Info.Last_Line));
+
+   type License_Count is new Natural range 0 .. MAX_LINES;
+   type License_Array_Info is array (License_Count range <>) of License_Info;
 
    --  Holds the license text found in the header of the file
    type License_Text (Len : Buffer_Size) is record

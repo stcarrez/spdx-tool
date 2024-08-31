@@ -291,8 +291,8 @@ package body SPDX_Tool.Licenses is
          Pos := Pos + 1;
          Last := Last - 1;
       end if;
-      Result.First_Line := Line;
-      Result.Last_Line := Line;
+      Result.Lines.First_Line := Line;
+      Result.Lines.Last_Line := Line;
       Result.Name := To_UString (Content (Pos .. Last));
       Result.Match := Infos.SPDX_LICENSE;
       return Result;
@@ -356,7 +356,7 @@ package body SPDX_Tool.Licenses is
       Len        : Buffer_Size;
       Match_Count : Natural := 0;
    begin
-      Result.Info.First_Line := From;
+      Result.Info.Lines.First_Line := From;
       Pos.Line := From;
       Pos.Pos := Content'First;
       Last.Line := To;
@@ -390,7 +390,7 @@ package body SPDX_Tool.Licenses is
                          (To, Pos.Pos), Pos, Next_Token);
                end if;
                if Next_Token = null then
-                  Result.Info.Last_Line := Pos.Line;
+                  Result.Info.Lines.Last_Line := Pos.Line;
                   Result.Last := Current;
                   Result.Confidence := Confidence (Match_Count, Count_Remaining (Current));
                   return Result;
@@ -404,7 +404,7 @@ package body SPDX_Tool.Licenses is
                end if;
                if Current.Kind = TOK_LICENSE then
                   Result.Info.Name := Final_Token_Type (Current.all).License;
-                  Result.Info.Last_Line := Pos.Line;
+                  Result.Info.Lines.Last_Line := Pos.Line;
                   Result.Info.Match := Infos.TEMPLATE_LICENSE;
                   Result.Last := Current;
                   Result.Confidence := 1.0;
@@ -417,7 +417,7 @@ package body SPDX_Tool.Licenses is
             Pos.Line := Pos.Line + 1;
          end if;
       end loop;
-      Result.Info.Last_Line := Pos.Line;
+      Result.Info.Lines.Last_Line := Pos.Line;
       Result.Info.Match := Infos.UNKNOWN_LICENSE;
       Result.Last := null;
       Result.Confidence := Confidence (Match_Count, Count_Remaining (Current));
@@ -437,8 +437,8 @@ package body SPDX_Tool.Licenses is
       Last   : Buffer_Index;
       First  : Buffer_Index;
    begin
-      Result.Info.First_Line := From;
-      Result.Info.Last_Line := To;
+      Result.Info.Lines.First_Line := From;
+      Result.Info.Lines.Last_Line := To;
       for Line in From .. To loop
          Pos := Lines (Line).Style.Text_Start;
          Last := Lines (Line).Style.Text_Last;
@@ -481,15 +481,15 @@ package body SPDX_Tool.Licenses is
             end if;
             if Log.Is_Info_Enabled
               and then Match.Last /= null
-              and then Match.Info.First_Line + 1 < Match.Info.Last_Line
+              and then Match.Info.Lines.First_Line + 1 < Match.Info.Lines.Last_Line
             then
                Log.Info ("license '{0}' missmatch at line{1} after {2} lines ({3} matched)",
                          To_String (Template.Name),
-                         Match.Info.Last_Line'Image,
-                         Infos.Image (Match.Info.Last_Line - Match.Info.First_Line),
+                         Match.Info.Lines.Last_Line'Image,
+                         Infos.Image (Match.Info.Lines.Last_Line - Match.Info.Lines.First_Line),
                          Infos.Percent_Image (Match.Confidence));
             end if;
-            exit when Match.Info.First_Line + 1 < Match.Info.Last_Line;
+            exit when Match.Info.Lines.First_Line + 1 < Match.Info.Lines.Last_Line;
             if Match.Last /= null then
                Match.Depth := Match.Last.Depth;
                if Result.Last = null or else Match.Depth > Result.Depth then

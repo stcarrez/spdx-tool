@@ -360,6 +360,30 @@ package body SPDX_Tool.Licenses.Manager is
       First_Line : Line_Number;
       Last_Line  : Line_Number;
       Checked    : License_Index_Map := EMPTY_MAP;
+
+      function Find_License_Template (Para : in Infos.Line_Range_Type) return License_Match is
+
+      begin
+         for Line in Para.First_Line .. Para.Last_Line loop
+            declare
+               List  : constant License_Index_Array
+                 := Manager.Repository.Find_License_Templates (File.Lines, Line, Para.Last_Line);
+            begin
+               for License of List loop
+                  if not Is_Set (Checked, License) then
+                     Match := Look_License (Manager.Repository.Get_License (License),
+                                            File, First_Line, Last_Line);
+                     if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                        return Match;
+                     end if;
+                     Set_License (Checked, License);
+                  end if;
+               end loop;
+            end;
+         end loop;
+         return (Last => null, Depth => 0, others => <>);
+      end Find_License_Template;
+
    begin
       if File.Cmt_Style = NO_COMMENT or else File.Count = 0 then
          Result.Info.Match := Infos.NONE;
@@ -372,22 +396,11 @@ package body SPDX_Tool.Licenses.Manager is
       end if;
       Manager.Repository.Find_Possible_Licenses (File.Lines, First_Line, Last_Line);
       for Line in First_Line .. Last_Line loop
-         declare
-            List  : constant License_Index_Array
-              := Manager.Repository.Find_License_Templates (File.Lines, Line, Last_Line);
-         begin
-            for License of List loop
-               if not Is_Set (Checked, License) then
-                  Match := Look_License (Manager.Repository.Get_License (License),
-                                         File, First_Line, Last_Line);
-                  if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-                     SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
-                     return Match;
-                  end if;
-                  Set_License (Checked, License);
-               end if;
-            end loop;
-         end;
+         Match := Find_License_Template ((Line, Last_Line));
+         if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+            SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
+            return Match;
+         end if;
       end loop;
       Log.Info ("No exact match on {0} licenses",
                 Util.Strings.Image (Get_Count (Checked)));
@@ -406,11 +419,17 @@ package body SPDX_Tool.Licenses.Manager is
                loop
                   Next_Line := Next_Line + 1;
                end loop;
+               Match := Find_License_Template ((Line, Next_Line));
+               if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                  SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
+                  return Match;
+               end if;
+
                Match := Manager.Repository.Guess_License (File.Lines, Line, Next_Line);
                if Match.Info.Match = Infos.GUESSED_LICENSE
                  and then (Result.Info.Match /= Infos.GUESSED_LICENSE
                            or else Match.Info.Confidence > Result.Info.Confidence)
-                 and then Match.Info.First_Line < Match.Info.Last_Line
+                 and then Match.Info.Lines.First_Line < Match.Info.Lines.Last_Line
                then
                   Result := Match;
                end if;
@@ -424,8 +443,8 @@ package body SPDX_Tool.Licenses.Manager is
          end loop;
       end;
       if Result.Info.Match /= Infos.GUESSED_LICENSE then
-         Result.Info.First_Line := First_Line;
-         Result.Info.Last_Line := Last_Line;
+         Result.Info.Lines.First_Line := First_Line;
+         Result.Info.Lines.Last_Line := Last_Line;
       else
          SPDX_Tool.Licenses.Report (Stamp, "Find license guessed");
       end if;
@@ -579,8 +598,8 @@ package body SPDX_Tool.Licenses.Manager is
                File_Mgr.Save
                   (File    => Data,
                    Path    => File.Path,
-                   First   => File.License.First_Line,
-                   Last    => File.License.Last_Line,
+                   First   => File.License.Lines.First_Line,
+                   Last    => File.License.Lines.Last_Line,
                    Before  => Manager.Before,
                    After   => Manager.After,
                    License => To_String (File.License.Name));

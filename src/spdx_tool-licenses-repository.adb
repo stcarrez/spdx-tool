@@ -477,8 +477,8 @@ package body SPDX_Tool.Licenses.Repository is
          exit when Line + 10 > To;
       end loop;
       if Confidence >= MIN_CONFIDENCE then
-         Result.Info.First_Line := Guess_Start;
-         Result.Info.Last_Line := To;
+         Result.Info.Lines.First_Line := Guess_Start;
+         Result.Info.Lines.Last_Line := To;
          for Line in reverse From + 8 .. To - 1 loop
             declare
                Freqs : constant Frequency_Arrays.Array_Type
@@ -488,7 +488,7 @@ package body SPDX_Tool.Licenses.Repository is
                C := Similarities.Cosine (Freqs, 1, Repository.Token_Frequency, Guess,
                                          Repository.License_Squares (Guess));
                exit when Confidence > C;
-               Result.Info.Last_Line := Line;
+               Result.Info.Lines.Last_Line := Line;
                Confidence := C;
             end;
          end loop;

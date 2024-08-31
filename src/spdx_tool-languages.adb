@@ -604,8 +604,8 @@ package body SPDX_Tool.Languages is
       Size, Len, Skip : Buffer_Size;
    begin
       if License.Match /= Infos.NONE then
-         First_Line := License.First_Line;
-         Last_Line := License.Last_Line;
+         First_Line := License.Lines.First_Line;
+         Last_Line := License.Lines.Last_Line;
       else
          Find_Headers (Buffer, Lines, Lines'Last, First_Line, Last_Line);
       end if;
