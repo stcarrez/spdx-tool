@@ -31,7 +31,7 @@ procedure SPDX_Tool.Genlicenses is
          Name   : constant String := To_String (License.Name);
          Target : constant String := Util.Files.Compose (Export_Dir, Name & ".txt");
       begin
-         if Length (License.License) > 0 and then Name'Length > 0 then
+         if Length (License.Template) > 0 and then Name'Length > 0 then
             SPDX_Tool.Licenses.Reader.Save_License (License, Target);
             Idx := Idx + 1;
          end if;

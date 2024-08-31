@@ -12,7 +12,8 @@ project Tools is
    for Exec_Dir use "../bin";
    for Main use ("spdx_tool-gentmpl.adb",
                  "spdx_tool-genmap.adb",
-                 "spdx_tool-genrules.adb");
+                 "spdx_tool-genrules.adb",
+		 "spdx_tool-genlicenses.adb");
 
    package Builder  renames Spdx_Tool.Builder;
    package Compiler renames Spdx_Tool.Compiler;
