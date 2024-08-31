@@ -541,7 +541,7 @@ package body SPDX_Tool is
       Word : String (Natural (Token'First) .. Natural (Token'Last));
       for Word'Address use Token'Address;
    begin
-      if Word'Length = 1 then
+      if Word'Length <= 1 then
          return True;
       end if;
       if Word in "of" | "is" | "to" | "in" | "do" | "be" then
@@ -551,6 +551,9 @@ package body SPDX_Tool is
          return True;
       end if;
       if Word in "2008" | "2009" | "2011" then
+         return True;
+      end if;
+      if Word (Word'First) = '_' then
          return True;
       end if;
       return False;
