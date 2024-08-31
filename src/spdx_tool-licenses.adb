@@ -220,7 +220,10 @@ package body SPDX_Tool.Licenses is
          return;
       end if;
       Token.Optional.Matches (Content, Lines, From, To, Result, Next);
-      if Next = null and then (Result = From or else Token.Optional.Next /= null) then
+      if Next = null
+        and then Token.Next /= null
+        and then (Result = From or else Token.Optional.Next /= null)
+      then
          Token.Next.Matches (Content, Lines, From, To, Result, Next);
          return;
       end if;
