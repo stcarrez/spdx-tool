@@ -17,7 +17,7 @@ project-files = ["spdx_tool.gpr"]
 [[depends-on]]
 utilada = "^2.7.0"
 utilada_xml = "^2.7.0"
-sciada = "~0.3.0"
+sciada = "~0.4.0"
 spdx = "~0.2.0"
 ansiada = "^1.0.0"
 intl = "^1.0.1"
@@ -40,6 +40,6 @@ macos = { USE_MAGICADA = "no" }
 windows = { USE_MAGICADA = "no" }
 
 [[pins]]
-printer_toolkit = { url="https://gitlab.com/stcarrez/printer-toolkit.git" }
+# printer_toolkit = { url="https://gitlab.com/stcarrez/printer-toolkit.git" }
 utilada = { url="https://gitlab.com/stcarrez/ada-util.git" }
-sciada = { url="https://gitlab.com/stcarrez/ada-sci.git" }
+# sciada = { url="https://gitlab.com/stcarrez/ada-sci.git" }
