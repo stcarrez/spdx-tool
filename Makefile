@@ -1,7 +1,7 @@
 MAKE_ARGS=
 JSON_PP=json_pp
 VERSION=0.4.0
-DEBUG_MODE=False
+DEBUG_MODE=True
 INSTALL=install
 
 -include Makefile.conf
@@ -59,7 +59,7 @@ pot:
 	msgfmt -o po/locale/fr/LC_MESSAGES/spdx-tool.mo po/fr.po
 
 src/spdx_tool-configs-defaults.ads:   Makefile src/spdx_tool-configs-defaults.gpb
-	gnatprep -DPREFIX='"${PREFIX}"' -DVERSION='"$(VERSION)"' -DDEBUG='$(DEBUG_MODE)'\
+	$(ALR) exec -- gnatprep -DPREFIX='"${PREFIX}"' -DVERSION='"$(VERSION)"' -DDEBUG='$(DEBUG_MODE)'\
 		  src/spdx_tool-configs-defaults.gpb src/spdx_tool-configs-defaults.ads
 
 setup::
