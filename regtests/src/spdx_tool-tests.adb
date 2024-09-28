@@ -49,6 +49,8 @@ package body SPDX_Tool.Tests is
                        Test_Xml_Report'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (Apache)",
                        Test_Print_License_Apache'Access);
+      Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (Apache)",
+                       Test_Print_License_Apache_Bug'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (GNAT, boxed)",
                        Test_Print_License_Gnat'Access);
       Caller.Add_Test (Suite, "Test SPDX_Tool --print-license (BSD, C)",
@@ -221,6 +223,11 @@ package body SPDX_Tool.Tests is
    begin
       Test_Print_License (T, "print-apache.txt", "apache-2.0-1.ads");
    end Test_Print_License_Apache;
+
+   procedure Test_Print_License_Apache_Bug (T : in out Test) is
+   begin
+      Test_Print_License (T, "print-apache-9.txt", "apache-2.0-9.ads");
+   end Test_Print_License_Apache_Bug;
 
    procedure Test_Print_License_Gnat (T : in out Test) is
    begin
