@@ -41,7 +41,7 @@ spdx-tool --only-licenses=Apache-2.0 --print-license --line-number src
 spdx-tool --only-licenses=Apache-2.0 --update=spdx src
 ```
 
-Likewise but keep the first line two lines of the existing license header:
+Likewise but keep the first two lines of the existing license header:
 
 ```
 spdx-tool --only-licenses=Apache-2.0 --update=1..2.spdx src
