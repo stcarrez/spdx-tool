@@ -51,6 +51,7 @@ procedure SPDX_Tool.Gentmpl is
    Info     : SPDX_Tool.Token_Counters.Vectorizer_Type;
    Tokens   : Token_Maps.Map;
    Indexes  : Index_Maps.Map;
+   Can_Add  : Boolean := True;
    Output   : aliased Util.Streams.Files.File_Stream;
    Writer   : aliased Util.Streams.Texts.Print_Stream;
 
@@ -66,6 +67,22 @@ procedure SPDX_Tool.Gentmpl is
       return Value + 1;
    end Increment;
 
+   function Can_Add_Token (Into  : in out SPDX_Tool.Token_Counters.Vectorizer_Type;
+                           Token : in Buffer_Type) return Boolean is
+   begin
+      if Is_Ignored (Token) then
+         return False;
+      end if;
+      if Can_Add then
+         return True;
+      end if;
+      declare
+         Pos : constant Token_Counters.Token_Maps.Cursor := Into.Tokens.Find (Token);
+      begin
+         return Token_Counters.Token_Maps.Has_Element (Pos);
+      end;
+   end Can_Add_Token;
+
    procedure Add_Token (Into : in out SPDX_Tool.Token_Counters.Vectorizer_Type;
                         Idx  : in License_Index;
                         Buf  : in Buffer_Type;
@@ -74,7 +91,7 @@ procedure SPDX_Tool.Gentmpl is
       Len   : constant Buffer_Size := Punctuation_Length (Buf, From, To);
       First : constant Buffer_Index := (if Len > 0 then From + Len else From);
    begin
-      if First <= To and then not Is_Ignored (Buf (First .. To)) then
+      if First <= To and then Can_Add_Token (Into, Buf (First .. To)) then
          SPDX_Tool.Token_Counters.Add_Token (Into, Idx,
                                              Buf (First .. To),
                                              Increment'Access);
@@ -150,40 +167,81 @@ procedure SPDX_Tool.Gentmpl is
 
    procedure Print_Token_Array (I : in License_Index) is
       use SPDX_Tool.Counter_Arrays;
-      Row : Maps.Cursor := Info.Counters.Cells.Ceiling ((I, 1));
-      Col : Natural := 0;
+
+      function Count (From : Maps.Cursor) return Natural;
+
+      function Count (From : Maps.Cursor) return Natural is
+         Result : Natural := 0;
+         Iter   : Maps.Cursor := From;
+      begin
+         while Maps.Has_Element (Iter) loop
+            declare
+               K : constant Index_Type := Maps.Key (Iter);
+            begin
+               exit when K.Row /= I;
+               Result := Result + 1;
+            end;
+            Maps.Next (Iter);
+         end loop;
+         return Result;
+      end Count;
+
+      Row   : Maps.Cursor := Info.Counters.Cells.Ceiling ((I, 1));
+      Col   : Natural := 0;
+      Empty : Boolean := True;
+      Cnt   : constant Natural := Count (Row);
    begin
-      Writer.Write ("(");
-      while Maps.Has_Element (Row) loop
-         declare
-            K : constant Index_Type := Maps.Key (Row);
-         begin
-            exit when K.Row /= I;
-            if Col > 80 then
-               Writer.Write ("," & ASCII.LF);
-               Writer.Write ("      ");
-               Col := 0;
-            elsif Col > 0 then
-               Writer.Write (", ");
-            end if;
-            Col := Col + 10;
-            if K.Column > 1000 then
-               Col := Col + 2;
-            end if;
-            Writer.Write ("(");
-            Writer.Write (Util.Strings.Image (Natural (K.Column)));
-            Writer.Write (",");
-            Writer.Write (Maps.Element (Row)'Image);
-            Writer.Write (")");
-         end;
-         Maps.Next (Row);
-      end loop;
+      if Cnt = 0 then
+         Writer.Write ("Token_Array := (1 => (1, 1)");
+      else
+         Writer.Write ("Token_Array :=");
+         if Cnt = 1 then
+            Writer.Write (" (1 => ");
+         else
+            Writer.Write (ASCII.LF & "      (");
+         end if;
+         while Maps.Has_Element (Row) loop
+            declare
+               K : constant Index_Type := Maps.Key (Row);
+            begin
+               exit when K.Row /= I;
+               if Col > 80 then
+                  Writer.Write ("," & ASCII.LF);
+                  Writer.Write ("      ");
+                  Col := 0;
+               elsif Col > 0 then
+                  Writer.Write (", ");
+               end if;
+               Col := Col + 10;
+               if K.Column > 1000 then
+                  Col := Col + 2;
+               end if;
+               Writer.Write ("(");
+               Writer.Write (Util.Strings.Image (Natural (K.Column)));
+               Writer.Write (",");
+               Writer.Write (Maps.Element (Row)'Image);
+               Writer.Write (")");
+            end;
+            Maps.Next (Row);
+         end loop;
+      end if;
       Writer.Write (");" & ASCII.LF);
    end Print_Token_Array;
+
+   function Get_Count (Token : Token_Index) return Natural is
+      Pos : constant Index_Maps.Cursor := Indexes.Find (Token);
+   begin
+      if Index_Maps.Has_Element (Pos) then
+         return Index_Maps.Element (Pos)'Length;
+      else
+         return 0;
+      end if;
+   end Get_Count;
 
    procedure Print_Token_Data is
       Len : Buffer_Size := 0;
       Col : Natural := 0;
+      Token_Id : Token_Index := 1;
    begin
       for Token of Tokens loop
          Len := Len + Token'Length;
@@ -198,7 +256,9 @@ procedure SPDX_Tool.Gentmpl is
             Writer.Write ("" & ASCII.LF);
          end if;
          Writer.Write ("      --  ");
-         Writer.Write (To_String (To_UString (Token)) & ASCII.LF);
+         Writer.Write (To_String (To_UString (Token)) & " (");
+         Writer.Write (Util.Strings.Image (Get_Count (Token_Id)) & ")" & ASCII.LF);
+         Token_Id := Token_Id + 1;
          Col := 10;
          begin
             Writer.Write ("     ");
@@ -317,6 +377,13 @@ begin
       Idx := Idx + 1;
    end loop;
 
+   --  Build the index map by looking at the token counters and build
+   --  the index.
+   for I in 0 .. Idx - 1 loop
+      Build_Index_For_License (I);
+   end loop;
+   Can_Add := False;
+
    --  After first scan, we know the full list of tokens but they have been
    --  assigned a number which depends on the read-order somehow.  Get the
    --  sorted list of token, and insert them in the token array so that
@@ -324,12 +391,17 @@ begin
    declare
       Tokens   : constant Token_Counters.Token_Maps.Map := Info.Tokens;
       Token_Id : Token_Index := 1;
+      Read_Idx : Token_Index;
    begin
       Info.Tokens.Clear;
       for Iter in Tokens.Iterate loop
-         Info.Tokens.Insert (Token_Counters.Token_Maps.Key (Iter), Token_Id);
-         Token_Id := Token_Id + 1;
+         Read_Idx := Token_Counters.Token_Maps.Element (Iter);
+         if Get_Count (Read_Idx) < 20 then
+            Info.Tokens.Insert (Token_Counters.Token_Maps.Key (Iter), Token_Id);
+            Token_Id := Token_Id + 1;
+         end if;
       end loop;
+      Indexes.Clear;
    end;
 
    --  Scan again to now use the new token ids.
@@ -373,8 +445,6 @@ begin
    Print_Token_Data;
    for I in 0 .. Idx - 1 loop
       Writer.Write ("   T" & Util.Strings.Image (Natural (I)) & " : aliased constant ");
-      Writer.Write ("Token_Array :=" & ASCII.LF);
-      Writer.Write ("      ");
       Print_Token_Array (I);
    end loop;
    Writer.Write ("" & ASCII.LF);

@@ -15,21 +15,25 @@ procedure SPDX_Tool.Genlicenses is
    use type AD.File_Kind;
 
    procedure Import (Export_Dir : in String;
+                     Except_Dir : in String;
                      Path       : in String);
 
    procedure Scan (Path       : in String;
-                   Export_Dir : in String);
+                   Export_Dir : in String;
+                   Except_Dir : in String);
 
    Idx      : License_Index := 0;
 
    procedure Import (Export_Dir : in String;
+                     Except_Dir : in String;
                      Path       : in String) is
       License   : SPDX_Tool.Licenses.Reader.License_Type;
    begin
       SPDX_Tool.Licenses.Reader.Load_JSON (License, Path);
       declare
          Name   : constant String := To_String (License.Name);
-         Target : constant String := Util.Files.Compose (Export_Dir, Name & ".txt");
+         Target : constant String := Util.Files.Compose
+           ((if License.Is_Exception then Except_Dir else Export_Dir), Name & ".txt");
       begin
          if Length (License.Template) > 0 and then Name'Length > 0 then
             SPDX_Tool.Licenses.Reader.Save_License (License, Target);
@@ -39,7 +43,8 @@ procedure SPDX_Tool.Genlicenses is
    end Import;
 
    procedure Scan (Path       : in String;
-                   Export_Dir : in String) is
+                   Export_Dir : in String;
+                   Except_Dir : in String) is
       Dir_Filter  : constant AD.Filter_Type := (AD.Ordinary_File => True,
                                                 AD.Directory     => True,
                                                 others           => False);
@@ -54,7 +59,7 @@ procedure SPDX_Tool.Genlicenses is
             Full_Name : constant String := AD.Full_Name (Ent);
          begin
             if AD.Kind (Ent) /= AD.Directory then
-               Import (Export_Dir, Full_Name);
+               Import (Export_Dir, Except_Dir, Full_Name);
             end if;
          end;
       end loop;
@@ -62,10 +67,12 @@ procedure SPDX_Tool.Genlicenses is
 
    Arg_Count : constant Natural := Ada.Command_Line.Argument_Count;
 begin
-   if Arg_Count /= 2 then
-      Ada.Text_IO.Put_Line ("Usage: spdx_tool-genlicenses <jsonld directory> <target directory>");
+   if Arg_Count /= 3 then
+      Ada.Text_IO.Put_Line ("Usage: spdx_tool-genlicenses <jsonld directory> <target dir> <exception dir>");
       Ada.Command_Line.Set_Exit_Status (1);
       return;
    end if;
-   Scan (Ada.Command_Line.Argument (1), Ada.Command_Line.Argument (2));
+   Scan (Ada.Command_Line.Argument (1),
+         Ada.Command_Line.Argument (2),
+         Ada.Command_Line.Argument (3));
 end SPDX_Tool.Genlicenses;
