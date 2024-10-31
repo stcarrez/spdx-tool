@@ -35,7 +35,7 @@ generate:
 
 import-licenses:
 	cd tools && $(BUILD_COMMAND) $(MAKE_ARGS)
-	bin/spdx_tool-genlicenses jsonld licenses/standard
+	bin/spdx_tool-genlicenses jsonld licenses/standard licenses/exceptions
 
 test: build-tests
 	bin/spdx_tool-harness -v -xml spdx_tool-aunit.xml
