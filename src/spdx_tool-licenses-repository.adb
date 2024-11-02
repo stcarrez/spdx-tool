@@ -49,6 +49,20 @@ package body SPDX_Tool.Licenses.Repository is
    end Get_Token;
 
    --  ------------------------------
+   --  Get the license index of the license in the builtin repository.
+   --  ------------------------------
+   function Get_License_Index (Name : in String) return License_Index is
+   begin
+      for I in Licenses.Files.Names'Range loop
+         if Licenses.Files.Names (I).all = Name then
+            return I;
+         end if;
+      end loop;
+      Log.Warn ("License '{0}' not found in repository", Name);
+      raise Not_Found;
+   end Get_License_Index;
+
+   --  ------------------------------
    --  Get the license template for the given license index.
    --  ------------------------------
    function Get_License (Repository : in Repository_Type;
@@ -355,7 +369,7 @@ package body SPDX_Tool.Licenses.Repository is
          end;
       end loop;
       Line.Licenses := Or_List;
-      Or_Licenses (Global, And_List);
+      Or_Licenses (Global, Or_List);
    end Find_License_Templates;
 
    --  ------------------------------
@@ -395,7 +409,7 @@ package body SPDX_Tool.Licenses.Repository is
                Licenses := Lines (Line).Licenses;
                First := False;
             else
-               And_Licenses (Licenses, Lines (Line).Licenses);
+               Or_Licenses (Licenses, Lines (Line).Licenses);
             end if;
             exit when Get_Count (Licenses) < 10;
          end if;

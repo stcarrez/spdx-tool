@@ -16,6 +16,8 @@ package SPDX_Tool.Licenses.Repository is
 
    MAX_LICENSE_SIZE : constant := 64 * 1024;
 
+   Not_Found : exception;
+
    function Hash (Value : Token_Index) return Ada.Containers.Hash_Type is
       (Ada.Containers.Hash_Type (Value));
 
@@ -50,6 +52,9 @@ package SPDX_Tool.Licenses.Repository is
 
    --  Get the token from the token index.
    function Get_Token (Index : in Token_Index) return Buffer_Type;
+
+   --  Get the license index of the license in the builtin repository.
+   function Get_License_Index (Name : in String) return License_Index;
 
    --  Protect concurrent loading of license templates.
    protected type License_Tree is
