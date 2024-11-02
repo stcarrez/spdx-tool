@@ -6,6 +6,7 @@
 with GNAT.Strings;
 with SPDX_Tool.Infos;
 with PT.Drivers;
+with SPDX_Tool.Licenses;
 package SPDX_Tool.Reports is
 
    Json_Path      : aliased GNAT.Strings.String_Access;
@@ -58,6 +59,11 @@ package SPDX_Tool.Reports is
                                  Styles    : in Style_Configuration;
                                  Text      : in Infos.License_Text;
                                  Show_Line : in Boolean);
+
+   --  Print the tokens defined by the token array (used for debugging).
+   procedure Print_Tokens (Printer : in out PT.Printer_Type'Class;
+                           Styles  : in Style_Configuration;
+                           Tokens  : in SPDX_Tool.Licenses.Token_Array);
 
    --  Write a JSON report with the license and files that were identified.
    procedure Write_Json (Path  : in String;

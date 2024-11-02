@@ -14,6 +14,7 @@ with Util.Serialize.IO.XML;
 with PT.Texts;
 with PT.Charts;
 with SCI.Occurrences.Finites;
+with SPDX_Tool.Licenses.Repository;
 package body SPDX_Tool.Reports is
 
    use type SPDX_Tool.Infos.License_Kind;
@@ -387,6 +388,31 @@ package body SPDX_Tool.Reports is
          end if;
       end loop;
    end Print_Texts;
+
+   --  ------------------------------
+   --  Print the tokens defined by the token array (used for debugging).
+   --  ------------------------------
+   procedure Print_Tokens (Printer : in out PT.Printer_Type'Class;
+                           Styles  : in Style_Configuration;
+                           Tokens  : in SPDX_Tool.Licenses.Token_Array) is
+      Count : Natural := 0;
+   begin
+      for Token of Tokens loop
+         declare
+            Tok : constant Buffer_Type
+              := SPDX_Tool.Licenses.Repository.Get_Token (Token.Column);
+         begin
+            Printer.Put (To_String (Tok));
+            if (Count mod 10) = 9 then
+               Printer.New_Line;
+            else
+               Printer.Put (" ");
+            end if;
+            Count := Count + 1;
+         end;
+      end loop;
+      Printer.New_Line;
+   end Print_Tokens;
 
    --  ------------------------------
    --  Write a JSON/XML report with the license and files that were identified.
