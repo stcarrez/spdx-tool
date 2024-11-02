@@ -550,7 +550,7 @@ package body SPDX_Tool is
       if Word in "all" | "any" | "and" | "the" then
          return True;
       end if;
-      if Word in "2008" | "2009" | "2011" then
+      if Word in "2008" | "2009" | "2011" | "yyyy" then
          return True;
       end if;
       if Word (Word'First) = '_' then
