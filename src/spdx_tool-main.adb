@@ -26,6 +26,8 @@ with PT.Colors;
 
 with SPDX_Tool.Infos;
 with SPDX_Tool.Licenses.Manager;
+with SPDX_Tool.Licenses.Templates;
+with SPDX_Tool.Licenses.Repository;
 with SPDX_Tool.Reports;
 with SPDX_Tool.Configs.Defaults;
 procedure SPDX_Tool.Main is
@@ -41,6 +43,7 @@ procedure SPDX_Tool.Main is
    procedure Load_Configuration;
    procedure Setup;
    procedure Print_Report (Files : in SPDX_Tool.Infos.File_Map);
+   procedure Print_Tokens (Name : in String);
    procedure Save_Report (Files : in SPDX_Tool.Infos.File_Map);
    procedure Read_Licenses (Manager : in out License_Manager;
                             Path    : in String);
@@ -103,6 +106,11 @@ procedure SPDX_Tool.Main is
                            Output => SPDX_Tool.Licenses.Opt_Perf_Report'Access,
                            Long_Switch => "--print-perf-report",
                            Help   => "Print performance report (debugging)");
+         GC.Define_Switch (Config => Command_Config,
+                           Output => SPDX_Tool.Licenses.License_Name'Access,
+                           Long_Switch => "--print-tokens=",
+                           Argument => "NAME",
+                           Help   => -("Print tokens of the license"));
       end if;
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Tasks'Access,
@@ -324,6 +332,24 @@ procedure SPDX_Tool.Main is
       end if;
    end Load_Configuration;
 
+   procedure Print_Tokens (Name : in String) is
+      Styles : SPDX_Tool.Reports.Style_Configuration;
+      Screen : constant PT.Dimension_Type := PT.Drivers.Texts.Screen_Dimension;
+      Driver : PT.Drivers.Texts.Printer_Type := PT.Drivers.Texts.Create (Screen, 1000);
+      Writer : PT.Texts.Printer_Type := PT.Texts.Create (Driver);
+      Idx    : License_Index;
+   begin
+      Driver.Set_Flush (PT.Drivers.Texts.GNAT_IO.Flush'Access);
+      Idx := SPDX_Tool.Licenses.Repository.Get_License_Index (Name);
+      SPDX_Tool.Reports.Print_Tokens (Writer, Styles, Licenses.Templates.List (Idx).all);
+
+   exception
+      when SPDX_Tool.Licenses.Repository.Not_Found =>
+         Log.Error ("License '{0}' not found in builtin repository", Name);
+         Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+
+   end Print_Tokens;
+
 begin
    Opt_Tasks := Integer (System.Multiprocessors.Number_Of_CPUs);
    Setup;
@@ -398,6 +424,10 @@ begin
          Mode := Licenses.Manager.FIND_LICENSES;
       end if;
       Manager.Configure (Tool_Config, Mode);
+      if Configs.Defaults.DEBUG and then not Is_Empty (SPDX_Tool.Licenses.License_Name) then
+         Print_Tokens (SPDX_Tool.Licenses.License_Name.all);
+         return;
+      end if;
       Filter.Exclude (".git");
       Filter.Exclude (".svn");
       Filter.Exclude (".hg");
