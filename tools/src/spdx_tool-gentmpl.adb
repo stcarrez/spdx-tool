@@ -396,7 +396,7 @@ begin
       Info.Tokens.Clear;
       for Iter in Tokens.Iterate loop
          Read_Idx := Token_Counters.Token_Maps.Element (Iter);
-         if Get_Count (Read_Idx) < 20 then
+         if Get_Count (Read_Idx) < 2000 then
             Info.Tokens.Insert (Token_Counters.Token_Maps.Key (Iter), Token_Id);
             Token_Id := Token_Id + 1;
          end if;
