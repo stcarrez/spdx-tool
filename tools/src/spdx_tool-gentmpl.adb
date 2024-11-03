@@ -15,7 +15,6 @@ with SPDX_Tool.Licenses;
 with SPDX_Tool.Token_Counters;
 with SPDX_Tool.Licenses.Files;
 with SPDX_Tool.Licenses.Reader;
-with SPDX_Tool.Licenses.Repository;
 procedure SPDX_Tool.Gentmpl is
 
    use Ada.Streams;
@@ -33,6 +32,9 @@ procedure SPDX_Tool.Gentmpl is
    procedure Build_Index_For_License (I : in License_Index);
    procedure Print_Index;
    procedure Load_License (Name : in String);
+   function Get_Count (Token : Token_Index) return Natural;
+   function Can_Add_Token (Into  : in out SPDX_Tool.Token_Counters.Vectorizer_Type;
+                           Token : in Buffer_Type) return Boolean;
 
    package Token_Maps is
      new Ada.Containers.Indefinite_Ordered_Maps (Key_Type => Token_Index,
@@ -54,6 +56,7 @@ procedure SPDX_Tool.Gentmpl is
    Can_Add  : Boolean := True;
    Output   : aliased Util.Streams.Files.File_Stream;
    Writer   : aliased Util.Streams.Texts.Print_Stream;
+   Exception_Map : License_Index_Map := EMPTY_MAP;
 
    type Parser_Type is new SPDX_Tool.Licenses.Reader.Abstract_Parser_Type with null record;
 
@@ -188,7 +191,6 @@ procedure SPDX_Tool.Gentmpl is
 
       Row   : Maps.Cursor := Info.Counters.Cells.Ceiling ((I, 1));
       Col   : Natural := 0;
-      Empty : Boolean := True;
       Cnt   : constant Natural := Count (Row);
    begin
       if Cnt = 0 then
@@ -374,6 +376,9 @@ begin
    Info.Counters.Default := 0;
    for Name of SPDX_Tool.Licenses.Files.Names loop
       Load_License (Name.all);
+      if Util.Strings.Starts_With (Name.all, "exceptions/") then
+         Set_License (Exception_Map, Idx);
+      end if;
       Idx := Idx + 1;
    end loop;
 
@@ -441,7 +446,26 @@ begin
    Writer.Write ("   Tokens    : constant Buffer_Type;" & ASCII.LF);
    Writer.Write ("   Token_Pos : constant Position_Array;" & ASCII.LF);
    Writer.Write ("   Max_License_Index_Size : constant Positive;" & ASCII.LF);
+   Writer.Write ("   Exception_Map : constant License_Index_Map;" & ASCII.LF);
    Writer.Write ("private" & ASCII.LF & ASCII.LF);
+   Writer.Write ("   Exception_Map : constant License_Index_Map := (");
+   declare
+      Cnt : Natural := 0;
+   begin
+      for V of Exception_Map loop
+         if Cnt > 0 then
+            Writer.Write (",");
+         end if;
+         if (Cnt mod 10) = 9 then
+            Writer.Write (ASCII.LF & "      ");
+         elsif Cnt > 0 then
+            Writer.Write (" ");
+         end if;
+         Writer.Write (Util.Strings.Image (Long_Long_Integer (V)));
+         Cnt := Cnt + 1;
+      end loop;
+   end;
+   Writer.Write (");" & ASCII.LF & ASCII.LF);
    Print_Token_Data;
    for I in 0 .. Idx - 1 loop
       Writer.Write ("   T" & Util.Strings.Image (Natural (I)) & " : aliased constant ");
