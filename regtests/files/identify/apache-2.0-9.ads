@@ -1,0 +1,52 @@
+-----------------------------------------------------------------------
+--  wiki -- Ada Wiki Engine
+--  Copyright (C) 2015, 2016, 2020, 2021, 2022 Stephane Carrez
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+-----------------------------------------------------------------------
+
+--  = Wiki =
+--  The Wiki engine parses a Wiki text in several Wiki syntax such as `MediaWiki`,
+--  `Creole`, `Markdown`, `Dotclear` and renders the result either in HTML, text or into
+--  another Wiki format.  The Wiki engine is used in two steps:
+--
+--  * The Wiki text is parsed according to its syntax to produce a Wiki Document instance.
+--  * The Wiki document is then rendered by a renderer to produce the final HTML, text.
+--
+--  Through this process, it is possible to insert filters and plugins to customize the
+--  parsing and the rendering.
+--
+--  [images/ada-wiki.png]
+--
+--  The Ada Wiki engine is organized in several packages:
+--
+--  * The [Wiki Streams](#wiki-streams) packages define the interface, types and operations
+--  for the Wiki engine to read the Wiki or HTML content and for the Wiki renderer to generate
+--  the HTML or text outputs.
+--  * The [Wiki parser](#wiki-parsers) is responsible for parsing HTML or Wiki content
+--  according to a selected Wiki syntax.  It builds the final Wiki document through filters
+--  and plugins.
+--  * The [Wiki Filters](#wiki-filters) provides a simple filter framework that allows to plug
+--  specific filters when a Wiki document is parsed and processed.  Filters are used for the
+--  table of content generation, for the HTML filtering, to collect words or links
+--  and so on.
+--  * The [Wiki Plugins](#wiki-plugins) defines the plugin interface that is used
+--  by the Wiki engine to provide pluggable extensions in the Wiki.  Plugins are used
+--  for the Wiki template support, to hide some Wiki text content when it is rendered
+--  or to interact with other systems.
+--  * The Wiki documents and attributes are used for the representation of the Wiki
+--  document after the Wiki content is parsed.
+--  * The [Wiki renderers](@wiki-render) are the last packages which are used for the rendering
+--  of the Wiki document to produce the final HTML or text.
+--
