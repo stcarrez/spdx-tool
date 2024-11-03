@@ -35,6 +35,7 @@ procedure SPDX_Tool.Gentmpl is
    function Get_Count (Token : Token_Index) return Natural;
    function Can_Add_Token (Into  : in out SPDX_Tool.Token_Counters.Vectorizer_Type;
                            Token : in Buffer_Type) return Boolean;
+   procedure Print_License_Map (Name : in String; Map : License_Index_Map);
 
    package Token_Maps is
      new Ada.Containers.Indefinite_Ordered_Maps (Key_Type => Token_Index,
@@ -57,6 +58,7 @@ procedure SPDX_Tool.Gentmpl is
    Output   : aliased Util.Streams.Files.File_Stream;
    Writer   : aliased Util.Streams.Texts.Print_Stream;
    Exception_Map : License_Index_Map := EMPTY_MAP;
+   License_Map   : License_Index_Map := EMPTY_MAP;
 
    type Parser_Type is new SPDX_Tool.Licenses.Reader.Abstract_Parser_Type with null record;
 
@@ -363,6 +365,25 @@ procedure SPDX_Tool.Gentmpl is
       Writer.Write (");" & ASCII.LF & ASCII.LF);
    end Print_Index;
 
+   procedure Print_License_Map (Name : in String; Map : License_Index_Map) is
+      Cnt : Natural := 0;
+   begin
+      Writer.Write ("   " & Name & " : constant License_Index_Map := (");
+      for V of Map loop
+         if Cnt > 0 then
+            Writer.Write (",");
+         end if;
+         if (Cnt mod 5) = 4 then
+            Writer.Write (ASCII.LF & "      ");
+         elsif Cnt > 0 then
+            Writer.Write (" ");
+         end if;
+         Writer.Write (Util.Strings.Image (Long_Long_Integer (V)));
+         Cnt := Cnt + 1;
+      end loop;
+      Writer.Write (");" & ASCII.LF & ASCII.LF);
+   end Print_License_Map;
+
    Arg_Count : constant Natural := Ada.Command_Line.Argument_Count;
 begin
    if Arg_Count /= 1 then
@@ -378,6 +399,8 @@ begin
       Load_License (Name.all);
       if Util.Strings.Starts_With (Name.all, "exceptions/") then
          Set_License (Exception_Map, Idx);
+      else
+         Set_License (License_Map, Idx);
       end if;
       Idx := Idx + 1;
    end loop;
@@ -446,26 +469,11 @@ begin
    Writer.Write ("   Tokens    : constant Buffer_Type;" & ASCII.LF);
    Writer.Write ("   Token_Pos : constant Position_Array;" & ASCII.LF);
    Writer.Write ("   Max_License_Index_Size : constant Positive;" & ASCII.LF);
+   Writer.Write ("   License_Map   : constant License_Index_Map;" & ASCII.LF);
    Writer.Write ("   Exception_Map : constant License_Index_Map;" & ASCII.LF);
    Writer.Write ("private" & ASCII.LF & ASCII.LF);
-   Writer.Write ("   Exception_Map : constant License_Index_Map := (");
-   declare
-      Cnt : Natural := 0;
-   begin
-      for V of Exception_Map loop
-         if Cnt > 0 then
-            Writer.Write (",");
-         end if;
-         if (Cnt mod 10) = 9 then
-            Writer.Write (ASCII.LF & "      ");
-         elsif Cnt > 0 then
-            Writer.Write (" ");
-         end if;
-         Writer.Write (Util.Strings.Image (Long_Long_Integer (V)));
-         Cnt := Cnt + 1;
-      end loop;
-   end;
-   Writer.Write (");" & ASCII.LF & ASCII.LF);
+   Print_License_Map ("License_Map", License_Map);
+   Print_License_Map ("Exception_Map", Exception_Map);
    Print_Token_Data;
    for I in 0 .. Idx - 1 loop
       Writer.Write ("   T" & Util.Strings.Image (Natural (I)) & " : aliased constant ");
