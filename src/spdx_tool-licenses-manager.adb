@@ -361,8 +361,31 @@ package body SPDX_Tool.Licenses.Manager is
       Last_Line  : Line_Number;
       Checked    : License_Index_Map := EMPTY_MAP;
 
-      function Find_License_Template (Para : in Infos.Line_Range_Type) return License_Match is
+      procedure Find_Exception_Template (Para : in Infos.Line_Range_Type) is
+         Except_Match   : License_Match;
+      begin
+         for Line in Para.First_Line .. Para.Last_Line loop
+            declare
+               List  : constant License_Index_Array
+                 := Manager.Repository.Find_License_Templates (File.Lines, Line, Para.Last_Line);
+            begin
+               for License of List loop
+                  if not Is_Set (Checked, License) then
+                     Except_Match := Look_License (Manager.Repository.Get_License (License),
+                                                   File, First_Line, Last_Line);
+                     if Except_Match.Info.Match in Infos.TEMPLATE_LICENSE then
+                        Log.Error ("Found exception match {0}", To_String (Except_Match.Info.Name));
+                        return;
+                     end if;
+                     Set_License (Checked, License);
+                  end if;
+               end loop;
+            end;
+         end loop;
+         null;
+      end Find_Exception_Template;
 
+      function Find_License_Template (Para : in Infos.Line_Range_Type) return License_Match is
       begin
          for Line in Para.First_Line .. Para.Last_Line loop
             declare
@@ -374,6 +397,10 @@ package body SPDX_Tool.Licenses.Manager is
                      Match := Look_License (Manager.Repository.Get_License (License),
                                             File, First_Line, Last_Line);
                      if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                        if Match.Count > 1 then
+                           Find_Exception_Template ((Match.Sections (2).Start.Line,
+                                                     Match.Sections (2).Last.Line));
+                        end if;
                         return Match;
                      end if;
                      Set_License (Checked, License);

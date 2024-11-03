@@ -358,10 +358,14 @@ package body SPDX_Tool.Licenses is
       Last : Line_Pos;
       Len        : Buffer_Size;
       Match_Count : Natural := 0;
+      Miss_Count  : Natural := 0;
+      Section_Count : Natural := 0;
+      Matched : Boolean := False;
    begin
       Result.Info.Lines.First_Line := From;
       Pos.Line := From;
       Pos.Pos := Content'First;
+      Result.Sections (1).Start := Pos;
       Last.Line := To;
       while Pos.Line <= To loop
          First.Line := Pos.Line;
@@ -393,25 +397,55 @@ package body SPDX_Tool.Licenses is
                          (To, Pos.Pos), Pos, Next_Token);
                end if;
                if Next_Token = null then
-                  Result.Info.Lines.Last_Line := Pos.Line;
-                  Result.Last := Current;
-                  Result.Confidence := Confidence (Match_Count, Count_Remaining (Current));
-                  return Result;
-               end if;
-               Match_Count := Match_Count + 1;
-               Current := Next_Token;
-               if Current.Next /= null
-                 and then Current.Next.Kind = TOK_LICENSE
-               then
-                  Current := Current.Next;
-               end if;
-               if Current.Kind = TOK_LICENSE then
-                  Result.Info.Name := Final_Token_Type (Current.all).License;
-                  Result.Info.Lines.Last_Line := Pos.Line;
-                  Result.Info.Match := Infos.TEMPLATE_LICENSE;
-                  Result.Last := Current;
-                  Result.Confidence := 1.0;
-                  return Result;
+                  if Matched then
+                     Result.Sections (Section_Count).Last := First;
+                     if Section_Count = Result.Sections'Last then
+                        Result.Info.Lines.Last_Line := Pos.Line;
+                        Result.Last := Current;
+                        Result.Count := Section_Count;
+                        Result.Confidence := Confidence (Match_Count,
+                                                         Count_Remaining (Current) + Miss_Count);
+                        return Result;
+                     end if;
+                     Section_Count := Section_Count + 1;
+                     Result.Sections (Section_Count).Start := First;
+                     Matched := False;
+                  elsif Section_Count = 0 then
+                     Result.Confidence := 0.0;
+                     return Result;
+                  end if;
+                  Pos.Pos := Next_Space (Content, First.Pos, Last.Pos) + 1;
+                  Miss_Count := Miss_Count + 1;
+               else
+                  if not Matched then
+                     Section_Count := Section_Count + 1;
+                     if Section_Count > Result.Sections'Last then
+                        Result.Info.Lines.Last_Line := Pos.Line;
+                        Result.Info.Match := Infos.UNKNOWN_LICENSE;
+                        Result.Last := null;
+                        Result.Count := Section_Count;
+                        Result.Confidence := Confidence (Match_Count, Count_Remaining (Current) + Miss_Count);
+                        return Result;
+                     end if;
+                     Result.Sections (Section_Count).Start := First;
+                     Matched := True;
+                  end if;
+                  Match_Count := Match_Count + 1;
+                  Current := Next_Token;
+                  if Current.Next /= null
+                    and then Current.Next.Kind = TOK_LICENSE
+                  then
+                     Current := Current.Next;
+                  end if;
+                  if Current.Kind = TOK_LICENSE then
+                     Result.Info.Name := Final_Token_Type (Current.all).License;
+                     Result.Info.Lines.Last_Line := Pos.Line;
+                     Result.Info.Match := Infos.TEMPLATE_LICENSE;
+                     Result.Last := Current;
+                     Result.Confidence := Confidence (Match_Count, Match_Count + Miss_Count);
+                     Result.Count := Section_Count;
+                     return Result;
+                  end if;
                end if;
             end loop;
          end if;
@@ -423,7 +457,8 @@ package body SPDX_Tool.Licenses is
       Result.Info.Lines.Last_Line := Pos.Line;
       Result.Info.Match := Infos.UNKNOWN_LICENSE;
       Result.Last := null;
-      Result.Confidence := Confidence (Match_Count, Count_Remaining (Current));
+      Result.Count := Section_Count;
+      Result.Confidence := Confidence (Match_Count, Count_Remaining (Current) + Miss_Count);
       return Result;
    end Look_License_Tree;
 

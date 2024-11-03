@@ -38,18 +38,27 @@ package SPDX_Tool.Licenses is
    function Image (Line : Line_Count) return String renames SPDX_Tool.Infos.Image;
 
    type Line_Pos is record
-      Line : Line_Number := 1;
-      Pos  : Buffer_Index;
+      Line : Line_Number  := 1;
+      Pos  : Buffer_Index := 1;
    end record;
 
    type Token_Type (Len : Buffer_Size) is tagged limited private;
    type Token_Access is access all Token_Type'Class;
+
+   type Section_Type is record
+      Start : Line_Pos;
+      Last  : Line_Pos;
+   end record;
+
+   type Section_Array is array (1 .. 4) of Section_Type;
 
    type License_Match is record
       Info       : Infos.License_Info;
       Last       : Token_Access;
       Depth      : Natural := 0;
       Confidence : Infos.Confidence_Type := 0.0;
+      Count      : Natural := 0;
+      Sections   : Section_Array;
    end record;
 
    type License_Template is record
