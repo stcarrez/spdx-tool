@@ -367,7 +367,7 @@ package body SPDX_Tool.Licenses.Manager is
          for Line in Para.First_Line .. Para.Last_Line loop
             declare
                List  : constant License_Index_Array
-                 := Manager.Repository.Find_License_Templates (File.Lines, Line, Para.Last_Line);
+                 := Manager.Repository.Find_License_Templates (File.Lines, Line, Para.Last_Line, True);
             begin
                for License of List loop
                   if not Is_Set (Checked, License) then
@@ -390,7 +390,7 @@ package body SPDX_Tool.Licenses.Manager is
          for Line in Para.First_Line .. Para.Last_Line loop
             declare
                List  : constant License_Index_Array
-                 := Manager.Repository.Find_License_Templates (File.Lines, Line, Para.Last_Line);
+                 := Manager.Repository.Find_License_Templates (File.Lines, Line, Para.Last_Line, False);
             begin
                for License of List loop
                   if not Is_Set (Checked, License) then

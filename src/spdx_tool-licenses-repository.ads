@@ -133,10 +133,11 @@ package SPDX_Tool.Licenses.Repository is
                                      From       : in Line_Number;
                                      To         : in Line_Number);
 
-   function Find_License_Templates (Repository : in Repository_Type;
-                                    Lines   : in SPDX_Tool.Languages.Line_Array;
-                                    From    : in Line_Number;
-                                    To      : in Line_Number) return License_Index_Array;
+   function Find_License_Templates (Repository   : in Repository_Type;
+                                    Lines        : in SPDX_Tool.Languages.Line_Array;
+                                    From         : in Line_Number;
+                                    To           : in Line_Number;
+                                    Is_Exception : in Boolean) return License_Index_Array;
 
    procedure Find_License_Templates (Repository : in Repository_Type;
                                      Line       : in out SPDX_Tool.Languages.Line_Type;

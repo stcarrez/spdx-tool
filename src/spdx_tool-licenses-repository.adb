@@ -376,10 +376,10 @@ package body SPDX_Tool.Licenses.Repository is
    --  For each line, find the possible licenses and populate the Licenses field
    --  in each line.
    --  ------------------------------
-   procedure Find_Possible_Licenses (Repository : in Repository_Type;
-                                     Lines      : in out SPDX_Tool.Languages.Line_Array;
-                                     From       : in Line_Number;
-                                     To         : in Line_Number) is
+   procedure Find_Possible_Licenses (Repository   : in Repository_Type;
+                                     Lines        : in out SPDX_Tool.Languages.Line_Array;
+                                     From         : in Line_Number;
+                                     To           : in Line_Number) is
       Global : License_Index_Map := SPDX_Tool.EMPTY_MAP;
    begin
       for Line in From .. To loop
@@ -396,10 +396,11 @@ package body SPDX_Tool.Licenses.Repository is
       end if;
    end Find_Possible_Licenses;
 
-   function Find_License_Templates (Repository : in Repository_Type;
-                                    Lines      : in SPDX_Tool.Languages.Line_Array;
-                                    From       : in Line_Number;
-                                    To         : in Line_Number) return License_Index_Array is
+   function Find_License_Templates (Repository   : in Repository_Type;
+                                    Lines        : in SPDX_Tool.Languages.Line_Array;
+                                    From         : in Line_Number;
+                                    To           : in Line_Number;
+                                    Is_Exception : in Boolean) return License_Index_Array is
       First    : Boolean := True;
       Licenses : License_Index_Map := EMPTY_MAP;
    begin
@@ -415,6 +416,11 @@ package body SPDX_Tool.Licenses.Repository is
          end if;
       end loop;
       Or_Licenses (Licenses, Repository.Force_Check_List);
+      if Is_Exception then
+         And_Licenses (Licenses, Templates.Exception_Map);
+      else
+         And_Licenses (Licenses, Templates.License_Map);
+      end if;
       return To_License_Index_Array (Licenses);
    end Find_License_Templates;
 
@@ -455,7 +461,7 @@ package body SPDX_Tool.Licenses.Repository is
                Freqs : constant Frequency_Arrays.Array_Type
                  := Repository.Compute_Frequency (Lines, Line, To);
                Licenses : constant License_Index_Array
-                 := Repository.Find_License_Templates (Lines, Line, To);
+                 := Repository.Find_License_Templates (Lines, Line, To, False);
             begin
                if not Freqs.Cells.Is_Empty then
                   if Opt_Verbose2 then
