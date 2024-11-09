@@ -61,6 +61,10 @@ package SPDX_Tool.Licenses is
       Sections   : Section_Array;
    end record;
 
+   --  Compare the two license match and return true if Left license has
+   --  a better match than the Right license.
+   function Is_Best (Left, Right : in License_Match) return Boolean;
+
    type License_Template is record
       Root   : Token_Access;
       Name   : UString;

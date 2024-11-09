@@ -321,6 +321,17 @@ package body SPDX_Tool.Licenses is
       Result := From;
    end Match;
 
+   --  ------------------------------
+   --  Compare the two license match and return true if Left license has
+   --  a better match than the Right license.
+   --  ------------------------------
+   function Is_Best (Left, Right : in License_Match) return Boolean is
+      C1 : constant Line_Count := Left.Info.Lines.Last_Line - Left.Info.Lines.First_Line;
+      C2 : constant Line_Count := Right.Info.Lines.Last_Line - Right.Info.Lines.First_Line;
+   begin
+      return C1 > C2;
+   end Is_Best;
+
    function Look_License_Tree (Root    : in Token_Access;
                                Content : in Buffer_Type;
                                Lines   : in Line_Array;
@@ -424,7 +435,8 @@ package body SPDX_Tool.Licenses is
                         Result.Info.Match := Infos.UNKNOWN_LICENSE;
                         Result.Last := null;
                         Result.Count := Section_Count;
-                        Result.Confidence := Confidence (Match_Count, Count_Remaining (Current) + Miss_Count);
+                        Result.Confidence := Confidence (Match_Count,
+                                                         Count_Remaining (Current) + Miss_Count);
                         return Result;
                      end if;
                      Result.Sections (Section_Count).Start := First;
