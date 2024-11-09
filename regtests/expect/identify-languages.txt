@@ -1,3 +1,4 @@
+regtests/files/identify/HPND-sell-MIT-disclaimer-xserver-1.c: C
 regtests/files/identify/antlr-pd-1.c: C
 regtests/files/identify/antlr-pd-2.c: C
 regtests/files/identify/apache-2.0-1.ads: Ada
@@ -12,9 +13,11 @@ regtests/files/identify/apache-2.0-9.ads: Ada
 regtests/files/identify/beerware.java: Java
 regtests/files/identify/blessing-1.c: C
 regtests/files/identify/blessing-2.ads: Ada
+regtests/files/identify/bsd-3-clause-or-gpl.c: C
 regtests/files/identify/bsd-3-clause.c: C
 regtests/files/identify/bsd-3-clause.ps1: PowerShell
 regtests/files/identify/bsd-3-clause.tex: TeX
+regtests/files/identify/bsd-source-beginning-file-1.c: C
 regtests/files/identify/gnat-3.0.ads: Ada
 regtests/files/identify/gpl-2.0-1.C: C++
 regtests/files/identify/gpl-2.0-2.st: Smalltalk

@@ -1,3 +1,4 @@
+regtests/files/identify/HPND-sell-MIT-disclaimer-xserver-1.c: HPND-sell-MIT-disclaimer-xserver
 regtests/files/identify/antlr-pd-1.c: ANTLR-PD
 regtests/files/identify/antlr-pd-2.c: ANTLR-PD
 regtests/files/identify/apache-2.0-1.ads: Apache-2.0
@@ -12,9 +13,11 @@ regtests/files/identify/apache-2.0-9.ads: Apache-2.0
 regtests/files/identify/beerware.java: Beerware
 regtests/files/identify/blessing-1.c: blessing
 regtests/files/identify/blessing-2.ads: blessing
+regtests/files/identify/bsd-3-clause-or-gpl.c: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.c: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.ps1: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.tex: BSD-3-Clause
+regtests/files/identify/bsd-source-beginning-file-1.c: BSD-Source-beginning-file
 regtests/files/identify/gnat-3.0.ads: gnat-gcc
 regtests/files/identify/gpl-2.0-1.C: GPL-1.0
 regtests/files/identify/gpl-2.0-2.st: GPL-2.0
