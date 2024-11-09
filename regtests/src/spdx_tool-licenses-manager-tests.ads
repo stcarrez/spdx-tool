@@ -22,6 +22,7 @@ package SPDX_Tool.Licenses.Manager.Tests is
    procedure Test_Template_Var (T : in out Test);
    procedure Test_Template_Var2 (T : in out Test);
    procedure Test_Template_Optional (T : in out Test);
+   procedure Test_Template_Optional2 (T : in out Test);
 
    --  Test reading a JSONLD template a match a fix content.
    procedure Test_JSONLD_Template (T : in out Test);
