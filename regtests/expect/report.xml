@@ -1,6 +1,6 @@
 
 <report>
-  <license name="Apache-2.0" spdx="false" confidence="1.000" count="8">
+  <license name="Apache-2.0" spdx="false" confidence="1.000" count="9">
     <file>regtests/files/identify/apache-2.0-1.ads</file>
     <file>regtests/files/identify/apache-2.0-2.ads</file>
     <file>regtests/files/identify/apache-2.0-3.c</file>
@@ -8,12 +8,12 @@
     <file>regtests/files/identify/apache-2.0-5.xhtml</file>
     <file>regtests/files/identify/apache-2.0-6.jsp</file>
     <file>regtests/files/identify/apache-2.0-8.ts</file>
+    <file>regtests/files/identify/apache-2.0-9.ads</file>
   </license>
-  <license name="None" spdx="false" confidence="0.000" count="5">
+  <license name="Unknown" spdx="false" confidence="0.000" count="4">
     <file>regtests/files/identify/gpl-3.0-1.sub</file>
     <file>regtests/files/identify/lgpl-2.1.ml</file>
     <file>regtests/files/identify/misc-1.ml</file>
-    <file>regtests/files/identify/none.keywords</file>
     <file>regtests/files/identify/uri.d</file>
   </license>
   <license name="BSD-3-Clause" spdx="false" confidence="1.000" count="3">
@@ -21,33 +21,38 @@
     <file>regtests/files/identify/bsd-3-clause.ps1</file>
     <file>regtests/files/identify/bsd-3-clause.tex</file>
   </license>
+  <license name="ISC" spdx="false" confidence="1.000" count="3">
+    <file>regtests/files/identify/isc-1.h</file>
+    <file>regtests/files/identify/isc-3.h</file>
+  </license>
   <license name="ANTLR-PD" spdx="false" confidence="1.000" count="2">
     <file>regtests/files/identify/antlr-pd-1.c</file>
     <file>regtests/files/identify/antlr-pd-2.c</file>
   </license>
-  <license name="eCos-2.0" spdx="false" confidence="0.506" count="2">
-    <file>regtests/files/identify/gpl-3.0-2.el</file>
+  <license name="GPL-1.0" spdx="false" confidence="0.829" count="2">
+    <file>regtests/files/identify/lgpl-2.1.java</file>
   </license>
-  <license name="GPL-1.0+" spdx="false" confidence="0.757" count="1">
-    <file>regtests/files/identify/gpl-2.0-1.C</file>
+  <license name="GPL-2.0" spdx="false" confidence="0.854" count="2">
+    <file>regtests/files/identify/gpl2-or-later.java</file>
+  </license>
+  <license name="GPL-3.0" spdx="false" confidence="0.946" count="2">
+    <file>regtests/files/identify/gpl-3.0.c</file>
+  </license>
+  <license name="blessing" spdx="false" confidence="1.000" count="2">
+    <file>regtests/files/identify/blessing-1.c</file>
+    <file>regtests/files/identify/blessing-2.ads</file>
+  </license>
+  <license name="Beerware" spdx="false" confidence="1.000" count="1">
+    <file>regtests/files/identify/beerware.java</file>
   </license>
   <license name="GPL-2.0" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-2.0-3.rs</file>
-  </license>
-  <license name="GPL-2.0+" spdx="false" confidence="0.834" count="1">
-    <file>regtests/files/identify/gpl2-or-later.java</file>
   </license>
   <license name="GPL-2.0+ OR BSD-3-Clause" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-2.0-or-bsd.c</file>
   </license>
   <license name="GPL-2.0-only" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-2.0-only-1.sh</file>
-  </license>
-  <license name="GPL-3.0+" spdx="false" confidence="0.884" count="1">
-    <file>regtests/files/identify/gpl-3.0.c</file>
-  </license>
-  <license name="LGPL-2.1" spdx="false" confidence="0.813" count="1">
-    <file>regtests/files/identify/lgpl-2.1.java</file>
   </license>
   <license name="LGPL-2.1+" spdx="false" confidence="1.000" count="1">
     <file>regtests/files/identify/lgpl-2.1.c</file>
@@ -58,25 +63,38 @@
   <license name="MIT" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/mit-2.c</file>
   </license>
-  <license name="gnat-gcc" spdx="false" confidence="0.976" count="1">
+  <license name="None" spdx="false" confidence="0.000" count="1">
+    <file>regtests/files/identify/none.keywords</file>
+  </license>
+  <license name="gnat-gcc" spdx="false" confidence="0.983" count="1">
     <file>regtests/files/identify/gnat-3.0.ads</file>
   </license>
-  <language name="C" count="8">
+  <language name="C" count="9">
     <file>regtests/files/identify/antlr-pd-1.c</file>
     <file>regtests/files/identify/antlr-pd-2.c</file>
     <file>regtests/files/identify/apache-2.0-3.c</file>
+    <file>regtests/files/identify/blessing-1.c</file>
     <file>regtests/files/identify/bsd-3-clause.c</file>
     <file>regtests/files/identify/gpl-2.0-or-bsd.c</file>
     <file>regtests/files/identify/gpl-3.0.c</file>
     <file>regtests/files/identify/lgpl-2.1.c</file>
     <file>regtests/files/identify/mit-2.c</file>
   </language>
-  <language name="Ada" count="3">
+  <language name="Ada" count="5">
     <file>regtests/files/identify/apache-2.0-1.ads</file>
     <file>regtests/files/identify/apache-2.0-2.ads</file>
+    <file>regtests/files/identify/apache-2.0-9.ads</file>
+    <file>regtests/files/identify/blessing-2.ads</file>
     <file>regtests/files/identify/gnat-3.0.ads</file>
   </language>
-  <language name="Java" count="2">
+  <language name="C++" count="4">
+    <file>regtests/files/identify/gpl-2.0-1.C</file>
+    <file>regtests/files/identify/isc-1.h</file>
+    <file>regtests/files/identify/isc-2.h</file>
+    <file>regtests/files/identify/isc-3.h</file>
+  </language>
+  <language name="Java" count="3">
+    <file>regtests/files/identify/beerware.java</file>
     <file>regtests/files/identify/gpl2-or-later.java</file>
     <file>regtests/files/identify/lgpl-2.1.java</file>
   </language>
@@ -94,9 +112,6 @@
   </language>
   <language name="C#" count="1">
     <file>regtests/files/identify/apache-2.0-7.cs</file>
-  </language>
-  <language name="C++" count="1">
-    <file>regtests/files/identify/gpl-2.0-1.C</file>
   </language>
   <language name="D" count="1">
     <file>regtests/files/identify/uri.d</file>

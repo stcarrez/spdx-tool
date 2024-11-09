@@ -8,6 +8,7 @@ regtests/files/identify/apache-2.0-5.xhtml: Apache-2.0
 regtests/files/identify/apache-2.0-6.jsp: Apache-2.0
 regtests/files/identify/apache-2.0-7.cs: Apache-2.0
 regtests/files/identify/apache-2.0-8.ts: Apache-2.0
+regtests/files/identify/apache-2.0-9.ads: Apache-2.0
 regtests/files/identify/beerware.java: Beerware
 regtests/files/identify/blessing-1.c: blessing
 regtests/files/identify/blessing-2.ads: blessing
@@ -15,17 +16,20 @@ regtests/files/identify/bsd-3-clause.c: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.ps1: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.tex: BSD-3-Clause
 regtests/files/identify/gnat-3.0.ads: gnat-gcc
-regtests/files/identify/gpl-2.0-1.C: GPL-1.0+
-regtests/files/identify/gpl-2.0-2.st: eCos-2.0
+regtests/files/identify/gpl-2.0-1.C: GPL-1.0
+regtests/files/identify/gpl-2.0-2.st: GPL-2.0
 regtests/files/identify/gpl-2.0-3.rs: GPL-2.0
 regtests/files/identify/gpl-2.0-only-1.sh: GPL-2.0-only
 regtests/files/identify/gpl-2.0-or-bsd.c: GPL-2.0+ OR BSD-3-Clause
 regtests/files/identify/gpl-3.0-1.sub: Unknown
-regtests/files/identify/gpl-3.0-2.el: eCos-2.0
-regtests/files/identify/gpl-3.0.c: GPL-3.0+
-regtests/files/identify/gpl2-or-later.java: GPL-2.0+
+regtests/files/identify/gpl-3.0-2.el: GPL-3.0
+regtests/files/identify/gpl-3.0.c: GPL-3.0
+regtests/files/identify/gpl2-or-later.java: GPL-2.0
+regtests/files/identify/isc-1.h: ISC
+regtests/files/identify/isc-2.h: ISC
+regtests/files/identify/isc-3.h: ISC
 regtests/files/identify/lgpl-2.1.c: LGPL-2.1+
-regtests/files/identify/lgpl-2.1.java: LGPL-2.1
+regtests/files/identify/lgpl-2.1.java: GPL-1.0
 regtests/files/identify/lgpl-2.1.ml: Unknown
 regtests/files/identify/misc-1.ml: Unknown
 regtests/files/identify/mit-1.tex: MIT

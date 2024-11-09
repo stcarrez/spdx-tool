@@ -8,6 +8,7 @@ regtests/files/identify/apache-2.0-5.xhtml: HTML
 regtests/files/identify/apache-2.0-6.jsp: Java Server Pages
 regtests/files/identify/apache-2.0-7.cs: C#
 regtests/files/identify/apache-2.0-8.ts: TypeScript
+regtests/files/identify/apache-2.0-9.ads: Ada
 regtests/files/identify/beerware.java: Java
 regtests/files/identify/blessing-1.c: C
 regtests/files/identify/blessing-2.ads: Ada
@@ -24,6 +25,9 @@ regtests/files/identify/gpl-3.0-1.sub: Shell
 regtests/files/identify/gpl-3.0-2.el: Emacs Lisp
 regtests/files/identify/gpl-3.0.c: C
 regtests/files/identify/gpl2-or-later.java: Java
+regtests/files/identify/isc-1.h: C++
+regtests/files/identify/isc-2.h: C++
+regtests/files/identify/isc-3.h: C++
 regtests/files/identify/lgpl-2.1.c: C
 regtests/files/identify/lgpl-2.1.java: Java
 regtests/files/identify/lgpl-2.1.ml: OCaml
