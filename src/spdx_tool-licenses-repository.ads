@@ -92,7 +92,12 @@ package SPDX_Tool.Licenses.Repository is
 
       --  A bitmap of license index that are forced to be checked
       Force_Check_List     : License_Index_Map := EMPTY_MAP;
+      Exception_Map        : License_Index_Map;
+      License_Map          : License_Index_Map;
    end record;
+
+   overriding
+   procedure Initialize (Repository : in out Repository_Type);
 
    --  Get a printable representation of a list of licenses.
    function To_String (Repository : in Repository_Type;

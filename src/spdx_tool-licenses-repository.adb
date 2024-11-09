@@ -62,6 +62,15 @@ package body SPDX_Tool.Licenses.Repository is
       raise Not_Found;
    end Get_License_Index;
 
+   overriding
+   procedure Initialize (Repository : in out Repository_Type) is
+   begin
+      --  We have to get a copy of the static license/exception maps
+      --  to take into account the forced licenses that are loaded dynamically.
+      Repository.License_Map := Templates.License_Map;
+      Repository.Exception_Map := Templates.Exception_Map;
+   end Initialize;
+
    --  ------------------------------
    --  Get the license template for the given license index.
    --  ------------------------------
@@ -211,6 +220,7 @@ package body SPDX_Tool.Licenses.Repository is
       end if;
       Repository.Repository.Set_License (License, Template);
       Set_License (Repository.Force_Check_List, License);
+      Set_License (Repository.License_Map, License);
 
       Set_License (License_Map, License);
       for Token of Tokens loop
@@ -417,9 +427,9 @@ package body SPDX_Tool.Licenses.Repository is
       end loop;
       Or_Licenses (Licenses, Repository.Force_Check_List);
       if Is_Exception then
-         And_Licenses (Licenses, Templates.Exception_Map);
+         And_Licenses (Licenses, Repository.Exception_Map);
       else
-         And_Licenses (Licenses, Templates.License_Map);
+         And_Licenses (Licenses, Repository.License_Map);
       end if;
       return To_License_Index_Array (Licenses);
    end Find_License_Templates;
