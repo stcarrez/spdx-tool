@@ -80,7 +80,7 @@ package body SPDX_Tool.Licenses is
                       Next    : out Token_Access) is
       Last  : constant Buffer_Index := Content'Last;
       Check : constant Token_Access := Token.Next;
-      Pos   : Line_Pos := (Line => From.Line, Pos => To.Pos);
+      Pos   : Line_Pos := (Line => From.Line, Pos => From.Pos);
    begin
       if Check = null then
          Result := From;
@@ -89,14 +89,12 @@ package body SPDX_Tool.Licenses is
       end if;
       while Pos.Pos < Last loop
          declare
-            End_Pos : constant Line_Pos := Pos;
-            First   : constant Line_Pos
-              := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos + 1), To);
+            First    : constant Line_Pos := Pos;
             End_Line : Buffer_Index;
             Len      : Buffer_Size;
          begin
             exit when First.Line > Lines'Last;
-            exit when End_Pos.Pos - From.Pos > Token.Max_Length;
+            exit when First.Pos - From.Pos > Token.Max_Length;
             exit when Lines (First.Line).Comment = NO_COMMENT;
             End_Line := Lines (First.Line).Style.Text_Last;
             exit when First.Pos > End_Line;
@@ -115,10 +113,11 @@ package body SPDX_Tool.Licenses is
                exit when First.Line = To.Line;
                Pos.Line := First.Line + 1;
                exit when Lines (Pos.Line).Comment = NO_COMMENT;
-               Pos.Pos := Lines (Pos.Line).Style.Text_Start - 1;
+               Pos.Pos := Lines (Pos.Line).Style.Text_Start;
             else
                Pos.Line := First.Line;
             end if;
+            Pos := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos), To);
          end;
       end loop;
       Result := From;
