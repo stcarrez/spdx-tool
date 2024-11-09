@@ -386,6 +386,7 @@ package body SPDX_Tool.Licenses.Manager is
       end Find_Exception_Template;
 
       function Find_License_Template (Para : in Infos.Line_Range_Type) return License_Match is
+         Best : License_Match := (Last => null, Depth => 0, others => <>);
       begin
          for Line in Para.First_Line .. Para.Last_Line loop
             declare
@@ -397,18 +398,23 @@ package body SPDX_Tool.Licenses.Manager is
                      Match := Look_License (Manager.Repository.Get_License (License),
                                             File, First_Line, Last_Line);
                      if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                        if Match.Count = 1 then
+                           return Match;
+                        end if;
                         if Match.Count > 1 then
                            Find_Exception_Template ((Match.Sections (2).Start.Line,
                                                      Match.Sections (2).Last.Line));
                         end if;
-                        return Match;
+                        if Is_Best (Match, Best) then
+                           Best := Match;
+                        end if;
                      end if;
                      Set_License (Checked, License);
                   end if;
                end loop;
             end;
          end loop;
-         return (Last => null, Depth => 0, others => <>);
+         return Best;
       end Find_License_Template;
 
    begin
