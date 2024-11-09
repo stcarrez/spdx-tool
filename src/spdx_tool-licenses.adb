@@ -326,9 +326,13 @@ package body SPDX_Tool.Licenses is
    --  a better match than the Right license.
    --  ------------------------------
    function Is_Best (Left, Right : in License_Match) return Boolean is
-      C1 : constant Line_Count := Left.Info.Lines.Last_Line - Left.Info.Lines.First_Line;
-      C2 : constant Line_Count := Right.Info.Lines.Last_Line - Right.Info.Lines.First_Line;
+      C1 : Line_Count := Left.Info.Lines.Last_Line - Left.Info.Lines.First_Line;
+      C2 : Line_Count := Right.Info.Lines.Last_Line - Right.Info.Lines.First_Line;
    begin
+      if C1 = C2 then
+         C1 := Left.Sections (1).Last.Line - Left.Sections (1).Start.Line;
+         C2 := Right.Sections (1).Last.Line - Right.Sections (1).Start.Line;
+      end if;
       return C1 > C2;
    end Is_Best;
 
