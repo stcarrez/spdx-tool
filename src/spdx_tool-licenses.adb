@@ -466,7 +466,11 @@ package body SPDX_Tool.Licenses is
             Pos.Line := Pos.Line + 1;
          end if;
       end loop;
-      Result.Info.Lines.Last_Line := Pos.Line;
+      if Matched or else Section_Count = 0 then
+         Result.Info.Lines.Last_Line := Pos.Line;
+      else
+         Result.Info.Lines.Last_Line := Result.Sections (Section_Count).Start.Line;
+      end if;
       Result.Info.Match := Infos.UNKNOWN_LICENSE;
       Result.Last := null;
       Result.Count := Section_Count;
@@ -530,7 +534,7 @@ package body SPDX_Tool.Licenses is
                return Match;
             end if;
             if Log.Is_Info_Enabled
-              and then Match.Last /= null
+              and then Match.Count > 0
               and then Match.Info.Lines.First_Line + 1 < Match.Info.Lines.Last_Line
             then
                Log.Info ("license '{0}' missmatch at line{1} after {2} lines ({3} matched)",
