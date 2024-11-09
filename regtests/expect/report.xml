@@ -24,6 +24,7 @@
   </license>
   <license name="ISC" spdx="false" confidence="1.000" count="3">
     <file>regtests/files/identify/isc-1.h</file>
+    <file>regtests/files/identify/isc-2.h</file>
     <file>regtests/files/identify/isc-3.h</file>
   </license>
   <license name="ANTLR-PD" spdx="false" confidence="1.000" count="2">

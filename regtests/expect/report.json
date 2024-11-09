@@ -48,6 +48,7 @@
       "count":  3,
       "files": [
         "regtests/files/identify/isc-1.h",
+        "regtests/files/identify/isc-2.h",
         "regtests/files/identify/isc-3.h"
       ]
     },

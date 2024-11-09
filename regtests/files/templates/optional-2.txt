@@ -1,6 +1,6 @@
-<<beginOptional>>MIT License
+<<beginOptional>><<var;name="title";original="ISC License";match="(The )?ISC License( \(ISC[L]?\))?:?">>
 
-<<endOptional>> <<var;name="copyright";original="Copyright (c) <year> <copyright holders>  ";match=".{0,5000}">>
+<<endOptional>> <<var;name="copyright";original="<copyright notice>  ";match=".{0,5000}">>
 
 Permission is hereby granted
 
