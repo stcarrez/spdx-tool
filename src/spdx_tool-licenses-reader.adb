@@ -237,6 +237,9 @@ package body SPDX_Tool.Licenses.Reader is
                exit when Space_Length (Content, Pos, Last) /= 0;
                Len := Punctuation_Length (Content, Pos, Last);
                if Len > 0 then
+                  if Is_Quote (Content (Pos)) then
+                     Token := TOK_QUOTE;
+                  end if;
                   Pos := Pos + Len;
                   exit;
                end if;
@@ -436,6 +439,19 @@ package body SPDX_Tool.Licenses.Reader is
                                      Alternate => null,
                                      Content => Content (Parser.Token_Pos
                                         .. Parser.Current_Pos - 1));
+               Parser.Append_Token (T);
+            end if;
+            Parser.Previous := T;
+
+         when TOK_QUOTE =>
+            T := Parser.Find_Token (Content (Parser.Token_Pos .. Parser.Current_Pos - 1));
+            if T = null then
+               T := new Quote_Token_Type '(Len => Parser.Current_Pos - Parser.Token_Pos,
+                                           Previous => null,
+                                           Next => null,
+                                           Alternate => null,
+                                           Content => Content (Parser.Token_Pos
+                                             .. Parser.Current_Pos - 1));
                Parser.Append_Token (T);
             end if;
             Parser.Previous := T;

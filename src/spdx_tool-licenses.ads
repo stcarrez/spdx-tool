@@ -120,6 +120,7 @@ package SPDX_Tool.Licenses is
                        TOK_OPTIONAL,
                        TOK_VAR,
                        TOK_LICENSE,
+                       TOK_QUOTE,
                        TOK_END_OPTIONAL,
                        TOK_END);
 
@@ -180,6 +181,23 @@ private
                   return Token_Kind is (TOK_WORD);
 
    function Depth (Token : in Token_Type'Class) return Natural;
+
+   --  Match equivalent quotes: single, double and curly are equivalent.
+   type Quote_Token_Type (Len : Buffer_Size)
+   is new Token_Type (Len) with null record;
+
+   overriding
+   function Kind (Token : in Quote_Token_Type)
+                  return Token_Kind is (TOK_QUOTE);
+
+   overriding
+   procedure Matches (Token   : in Quote_Token_Type;
+                      Content : in Buffer_Type;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
+                      To      : in Line_Pos;
+                      Result  : out Line_Pos;
+                      Next    : out Token_Access);
 
    type Any_Token_Type (Len : Buffer_Size)
    is new Token_Type (Len) with record

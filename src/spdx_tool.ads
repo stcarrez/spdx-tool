@@ -111,6 +111,9 @@ private
    TAB         : constant Byte := 16#09#;
    OPEN_PAREN  : constant Byte := Character'Pos ('(');
    CLOSE_PAREN : constant Byte := Character'Pos (')');
+   DOUBLE_QUOTE : constant Byte := Character'Pos ('"');
+   SINGLE_QUOTE : constant Byte := Character'Pos (''');
+   CURLY_QUOTE  : constant Byte := Character'Pos ('`');
 
    --  UTF-8 special 3-byte codes that represent space or punctuation:
    --  * General punctuation: 0x2000-0x206F            0xE2 0x80..0x81 0x80..0xBF
@@ -130,6 +133,9 @@ private
        | Character'Pos ('.') | Character'Pos (';') | Character'Pos ('!')
        | Character'Pos ('(') | Character'Pos (')') | Character'Pos ('-')
        | Character'Pos ('"') | Character'Pos ('''));
+
+   function Is_Quote (C : Byte) return Boolean is
+      (C in DOUBLE_QUOTE | SINGLE_QUOTE | CURLY_QUOTE);
 
    function Is_Eol (C : Byte) return Boolean is (C in CR | LF);
 

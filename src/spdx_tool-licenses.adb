@@ -48,6 +48,43 @@ package body SPDX_Tool.Licenses is
       end if;
    end Matches;
 
+   overriding
+   procedure Matches (Token   : in Quote_Token_Type;
+                      Content : in Buffer_Type;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
+                      To      : in Line_Pos;
+                      Result  : out Line_Pos;
+                      Next    : out Token_Access) is
+   begin
+      --  Consider "AS IS" equivalent to ``AS IS``.
+      case Content (From.Pos) is
+         when DOUBLE_QUOTE =>
+            Result := (Line => From.Line, Pos => From.Pos + 1);
+            Next := Token.Next;
+            return;
+
+         when SINGLE_QUOTE | CURLY_QUOTE =>
+            declare
+               End_Line : constant Buffer_Index := Lines (From.Line).Style.Text_Last;
+            begin
+               if From.Pos + 1 <= End_Line
+                 and then Content (From.Pos) = Content (From.Pos + 1)
+               then
+                  Result := (Line => From.Line, Pos => From.Pos + 2);
+               else
+                  Result := (Line => From.Line, Pos => From.Pos + 1);
+               end if;
+               Next := Token.Next;
+            end;
+
+         when others =>
+            Result := From;
+            Next := null;
+
+      end case;
+   end Matches;
+
    function Skip_Spaces (Content : in Buffer_Type;
                          Lines   : in Line_Array;
                          From    : in Line_Pos;
