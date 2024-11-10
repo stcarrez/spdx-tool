@@ -17,7 +17,7 @@ ADAFLAGS += -gnatafno -gnatVa -gnatwa
 	dh $@
 
 override_dh_auto_build:
-	make PREFIX=/usr MAKE_ARGS="-- -R -m -q -bargs -static"
+	make PREFIX=/usr MAKE_ARGS="-R -m -q -bargs -static"
 
 override_dh_auto_test::
 
