@@ -39,4 +39,5 @@ regtests/files/identify/misc-1.ml: Unknown
 regtests/files/identify/mit-1.tex: MIT
 regtests/files/identify/mit-2.c: MIT
 regtests/files/identify/none.keywords: None
+regtests/files/identify/none.l: None
 regtests/files/identify/uri.d: Unknown

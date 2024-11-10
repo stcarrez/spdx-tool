@@ -39,4 +39,5 @@ regtests/files/identify/misc-1.ml: OCaml
 regtests/files/identify/mit-1.tex: TeX
 regtests/files/identify/mit-2.c: C
 regtests/files/identify/none.keywords: 
+regtests/files/identify/none.l: Lex
 regtests/files/identify/uri.d: D

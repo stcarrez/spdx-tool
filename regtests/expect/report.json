@@ -91,6 +91,16 @@
       ]
     },
     {
+      "name": "None",
+      "spdx": false,
+      "confidence": "0.000",
+      "count":  2,
+      "files": [
+        "regtests/files/identify/none.keywords",
+        "regtests/files/identify/none.l"
+      ]
+    },
+    {
       "name": "blessing",
       "spdx": false,
       "confidence": "1.000",
@@ -179,15 +189,6 @@
       "count":  1,
       "files": [
         "regtests/files/identify/mit-2.c"
-      ]
-    },
-    {
-      "name": "None",
-      "spdx": false,
-      "confidence": "0.000",
-      "count":  1,
-      "files": [
-        "regtests/files/identify/none.keywords"
       ]
     },
     {
@@ -314,6 +315,13 @@
       "count":  1,
       "files": [
         "regtests/files/identify/apache-2.0-6.jsp"
+      ]
+    },
+    {
+      "name": "Lex",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/none.l"
       ]
     },
     {
