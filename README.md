@@ -91,10 +91,14 @@ in the project.  For each file, the spdx-tool tries to:
   * look for a template match from the [license templates](https://github.com/spdx/license-list-data)
     builtin repository or the templates configured for the tool.  When this succeeds, the match
     report indicates `TMPL`,
-  * guess the best matching license by computing the [Tversky](https://en.wikipedia.org/wiki/Tversky_index)
-    index (0..1) and reporting the repository license having the highest Tversky index.  The report will
-    indicate the highest Tversky index found.
+  * last, we guess the best matching license by using an inverted index of license tokens.
+    The tool then uses a classical \fIterm frequency inverse document frequency\fP
+    algorithm to find the best matching license.  The report will indicate the
+    highest [Cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity) found.
 
+# Documentation
+
+* Man page: [spdx-tool (1)](https://gitlab.com/stcarrez/spdx-tool/blob/master/docs/spdx-tool.md)
 
 # Improving the tool
 
