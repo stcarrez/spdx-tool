@@ -397,6 +397,8 @@ package body SPDX_Tool.Reports is
    procedure Print_Tokens (Printer : in out PT.Printer_Type'Class;
                            Styles  : in Style_Configuration;
                            Tokens  : in SPDX_Tool.Licenses.Token_Array) is
+      pragma Unreferenced (Styles);
+
       Count : Natural := 0;
    begin
       for Token of Tokens loop

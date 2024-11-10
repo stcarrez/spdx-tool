@@ -65,7 +65,7 @@ package body SPDX_Tool.Licenses.Reader is
 
    procedure Load_JSON (License : in out License_Type;
                         Path    : in String) is
-      Root, Graph, Info, License_Id, Value : Util.Beans.Objects.Object;
+      Root, Graph, Info, License_Id : Util.Beans.Objects.Object;
    begin
       Root := Util.Serialize.IO.JSON.Read (Path);
       Graph := Util.Beans.Objects.Get_Value (Root, "@graph");

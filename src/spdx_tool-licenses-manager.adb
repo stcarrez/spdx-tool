@@ -390,6 +390,8 @@ package body SPDX_Tool.Licenses.Manager is
                           File    : in out SPDX_Tool.Files.File_Type)
                           return License_Match is
       use type Infos.Confidence_Type;
+      procedure Find_Exception_Template (Para : in Infos.Line_Range_Type);
+      function Find_License_Template (Para : in Infos.Line_Range_Type) return License_Match;
 
       Buf     : constant Buffer_Accessor := File.Buffer.Value;
       Result  : License_Match := (Last => null, Depth => 0, others => <>);
@@ -405,14 +407,16 @@ package body SPDX_Tool.Licenses.Manager is
          for Line in Para.First_Line .. Para.Last_Line loop
             declare
                List  : constant License_Index_Array
-                 := Manager.Repository.Find_License_Templates (File.Lines, Line, Para.Last_Line, True);
+                 := Manager.Repository.Find_License_Templates (File.Lines, Line,
+                                                               Para.Last_Line, True);
             begin
                for License of List loop
                   if not Is_Set (Checked, License) then
                      Except_Match := Look_License (Manager.Repository.Get_License (License),
                                                    File, First_Line, Last_Line);
                      if Except_Match.Info.Match in Infos.TEMPLATE_LICENSE then
-                        Log.Error ("Found exception match {0}", To_String (Except_Match.Info.Name));
+                        Log.Error ("Found exception match {0}",
+                                   To_String (Except_Match.Info.Name));
                         return;
                      end if;
                      Set_License (Checked, License);
@@ -429,7 +433,8 @@ package body SPDX_Tool.Licenses.Manager is
          for Line in Para.First_Line .. Para.Last_Line loop
             declare
                List  : constant License_Index_Array
-                 := Manager.Repository.Find_License_Templates (File.Lines, Line, Para.Last_Line, False);
+                 := Manager.Repository.Find_License_Templates (File.Lines, Line,
+                                                               Para.Last_Line, False);
             begin
                for License of List loop
                   if not Is_Set (Checked, License) then
