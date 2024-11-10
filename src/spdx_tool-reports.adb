@@ -35,7 +35,9 @@ package body SPDX_Tool.Reports is
    function "<" (Left, Right : License_Tag)
                  return Boolean is
      (Left.Name < Right.Name
-      or else (Left.SPDX < Right.SPDX and then Left.Name = Right.Name));
+      or else (Left.Name = Right.Name and then Left.Rate < Right.Rate)
+      or else (Left.Name = Right.Name and then Left.Rate = Right.Rate
+        and then Left.SPDX < Right.SPDX));
 
    package Occurrences is
      new SCI.Occurrences.Finites (Element_Type => License_Tag,
