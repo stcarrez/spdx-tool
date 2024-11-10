@@ -1,37 +1,33 @@
 .\"
-.TH SPDX-TOOL 1 "Aug 15, 2024" "SPDX License Tool"
+.TH SPDX-TOOL 1 "Nov 10, 2024" "SPDX License Tool"
 .SH NAME
 spdx-tool \- SPDX license management tool
 .SH SYNOPSIS
 .B spdx-tool
 [\-c|\-\-config
-.I config] [\-\-help] [\-\-no-color]  [--no-builtin-licenses]
-[\-t
+.I config] [\-\-help] [\-\-no-color]
+ [--no-builtin-licenses] [\-t
 .I count
 ]
  [\-V|\-\-version] [\-v|\-\-verbose] [\-vv] [\-vvv|\-\-debug]
  [\-f|\-\-files] [\-i|\-\-identify] [\-L|\-\-languages]  [\-l|\-\-licenses]
- [-m|--mimes] [\-n|\-\-line-number] [\-p|\-\-print-license] [\-\-update
-.I pattern
-]
- [\-\-ignore-licenses
-.I spdx-name1,spdx-name2,...
-] [\-\-ignore-languages
-.I lang1,lang2,...
-]
+ [-m|--mimes] [\-n|\-\-line-number] [\-p|\-\-print-license]
+ [\-\-update
+.IR pattern ]
+[\-\-ignore-licenses
+.IR spdx-name1,spdx-name2,... ]
+ [\-\-ignore-languages
+.IR lang1,lang2,... ]
  [\-\-only-licenses
-.I spdx-name1,spdx-name2,...
-] [\-\-only-languages
-.I lang1,lang2,...
-]
+.IR spdx-name1,spdx-name2,... ]
+ [\-\-only-languages
+.IR lang1,lang2,... ]
  [\-\-output-json
-.I file
-] [\-\-output-xml
-.I file
-]
+.IR file ]
+[\-\-output-xml
+.IR file ]
  [--templates
-.I file|directory
-]
+.IR file|directory ]
 .I files|directories
 .br
 .SH DESCRIPTION
@@ -123,7 +119,8 @@ in order to double check before the replacement.  For this, you can use the
 option:
 .P
 .RS 4
-\fBspdx-tool --only-licenses=\fRApache-2.0,MIT \fB--print-license --line-number\fR .
+\fBspdx-tool --only-licenses=\fRApache-2.0,MIT \fB--print-license \\
+   --line-number\fR .
 .RE
 .\"
 .PP
