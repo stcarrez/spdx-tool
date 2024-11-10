@@ -1,6 +1,7 @@
-## Version 0.4.0  - Under development
+## Version 0.4.0  - Nov 2024
   - Fix reading the root .gitignore file when scanning a sub-directory
   - Add support for a .spdxtool at the root of a project
+  - Better license template identification
 
 ## Version 0.3.0  - June 2024
   - Cleanup list of options used by the tool,
