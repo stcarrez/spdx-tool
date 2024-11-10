@@ -98,7 +98,7 @@ in the project.  For each file, the spdx-tool tries to:
 
 # Documentation
 
-* Man page: [spdx-tool (1)](https://gitlab.com/stcarrez/spdx-tool/blob/master/docs/spdx-tool.md)
+* Man page: [spdx-tool (1)](https://gitlab.com/stcarrez/spdx-tool/-/blob/main/docs/spdx-tool.md?ref_type=heads)
 
 # Improving the tool
 
