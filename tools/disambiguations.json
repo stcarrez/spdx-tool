@@ -888,7 +888,7 @@
         },
         {
           "language": "Lex",
-          "pattern": "^(%[%{}]xs|<.*>)"
+          "pattern": "^(%[%{}uo]|<.*>)"
         },
         {
           "language": "Roff",
