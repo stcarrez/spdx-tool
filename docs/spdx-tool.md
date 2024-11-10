@@ -12,14 +12,14 @@ spdx-tool \- SPDX license management tool
  [\-f|\-\-files] [\-i|\-\-identify] [\-L|\-\-languages]  [\-l|\-\-licenses]
  [-m|--mimes] [\-n|\-\-line-number] [\-p|\-\-print-license]
  [\-\-update
-**pattern**] [\-\-ignore-licenses
-**spdx-name1,spdx-name2,...**]  [\-\-ignore-languages
-**lang1,lang2,...**]  [\-\-only-licenses
-**spdx-name1,spdx-name2,...**]  [\-\-only-languages
-**lang1,lang2,...**]  [\-\-output-json
-**file**] [\-\-output-xml
-**file**]  [--templates
-**file|directory**] *files|directories* 
+**pattern** ] [\-\-ignore-licenses
+**spdx-name1,spdx-name2,...** ]  [\-\-ignore-languages
+**lang1,lang2,...** ]  [\-\-only-licenses
+**spdx-name1,spdx-name2,...** ]  [\-\-only-languages
+**lang1,lang2,...** ]  [\-\-output-json
+**file** ] [\-\-output-xml
+**file** ]  [--templates
+**file|directory** ] *files|directories* 
 
 ## DESCRIPTION
 
@@ -56,11 +56,11 @@ comment.  The license identification is made in several steps:
 
 * first we look for a
 *SPDX-License-Identifier* tag.  When it was found, the match report indicates
-**SPDX**, 
+**SPDX** , 
 * then we look for an exact template match from the license templates
 builtin repository or from the templates configured for the tool.
 When this succeeds, the match report indicates
-**TMPL**, 
+**TMPL** , 
 * last, we guess the best matching license by using an inverted index of license tokens.
 The tool then uses a classical **term frequency inverse document frequency**
 algorithm to find the best matching license.  The report will indicate the
@@ -134,7 +134,7 @@ spdx-tool --only-licenses=Apache-2.0,MIT --update=spdx,1..2 file...
 The following options are recognized by **spdx-tool**:
 
 
-*\-c\*config Load the
+*\-c\* config Load the
 *spdx-tool* configuration file to configure default filters, languages and license templates.
 
 
@@ -144,7 +144,7 @@ The following options are recognized by **spdx-tool**:
 *\-\-no-builtin-licenses* Disable the builtin repository licenses used by the tool.
 
 
-*\-t\*count Defines the number of threads for the encryption and decryption process.
+*\-t\* count Defines the number of threads for the encryption and decryption process.
 By default, it uses the number of system CPU cores.
 
 
@@ -167,8 +167,8 @@ license SPDX name.
 
 *\-\-identify* After identifying the license, print a single line report with the path and license tag found.
 The output is intended to be easily parsed by tools such as
-**sed**(1) or
-**grep**(1). 
+**sed** (1) or
+**grep** (1). 
 
 *\-\-languages* Print the report about the languages identified in source files.
 The report contains the list of files grouped by the language identified.
@@ -193,32 +193,32 @@ for the definition of the
 *\-\-print-license* Print the license which was identified from the source file after the analysis.
 
 
-*\-\-update\*pattern Update the license header found by the equivalent SPDX license with the
+*\-\-update\* pattern Update the license header found by the equivalent SPDX license with the
 *SPDX-License-Identifier* tag.  The
 *pattern* string allows to control the replacement to allow keeping some lines from the existing license header.
 
 
-*\-\-ignore\-licenses\*spdx\-name1,spdx\-name2,... When printing report or updating files, ignore the licenses which correspond to one
+*\-\-ignore\-licenses\* spdx\-name1,spdx\-name2,... When printing report or updating files, ignore the licenses which correspond to one
 of the SPDX license tag defined in the parameter.
 
 
-*\-\-ignore\-languages\*lang1,lang2,... When printing report or updating files, ignore the languages which correspond to one
+*\-\-ignore\-languages\* lang1,lang2,... When printing report or updating files, ignore the languages which correspond to one
 of the name defined in the parameter.
 
 
-*\-\-only\-licenses\*spdx-name1,spdx-name2,... When printing report or updating files, only take into account the licenses which correspond to one
+*\-\-only\-licenses\* spdx-name1,spdx-name2,... When printing report or updating files, only take into account the licenses which correspond to one
 of the SPDX license tag defined in the parameter.
 
 
-*\-\-only\-languages\*lang1,lang2,... When printing report or updating files, only take into account the languages which correspond to one
+*\-\-only\-languages\* lang1,lang2,... When printing report or updating files, only take into account the languages which correspond to one
 of the name defined in the parameter.
 
 
-*\-\-output\-json\*file Produce a JSON report in the given file with a summary of licenses, languages and files found
+*\-\-output\-json\* file Produce a JSON report in the given file with a summary of licenses, languages and files found
 during the analysis.
 
 
-*\-\-output\-xml\*file Produce a XML report in the given file with a summary of licenses, languages and files found
+*\-\-output\-xml\* file Produce a XML report in the given file with a summary of licenses, languages and files found
 during the analysis.
 
 ## CONFIGURATION
@@ -228,16 +228,16 @@ A TOML configuration file can be specified either by creating a
 *--config* option.
 
 
-*color=*{"yes"|"no"} Controls whether the terminal colors are used.
+*color=* {"yes"|"no"} Controls whether the terminal colors are used.
 
 
-*ignore=*[patterns] Define a list of patterns representing files that must be ignored for the license identification.
+*ignore=* [patterns] Define a list of patterns representing files that must be ignored for the license identification.
 
 
-*ignore-files=*[paths] Define a list of paths representing files with patterns representing files that must be ignored for the license identification.
+*ignore-files=* [paths] Define a list of paths representing files with patterns representing files that must be ignored for the license identification.
 When the path starts with the prefix
 *spdx-tool:* the file is considered being provided and embedded by the
-*spdx-tool*. 
+*spdx-tool* . 
 Example of configuration file:
 ```
 [default]
@@ -257,7 +257,7 @@ ignore=[
 
 ## SEE ALSO
 
-**file**(1) 
+**file** (1) 
 ## AUTHOR
 
 Written by Stephane Carrez.
