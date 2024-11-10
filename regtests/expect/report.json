@@ -5,7 +5,7 @@
       "name": "Apache-2.0",
       "spdx": false,
       "confidence": "1.000",
-      "count":  9,
+      "count":  8,
       "files": [
         "regtests/files/identify/apache-2.0-1.ads",
         "regtests/files/identify/apache-2.0-2.ads",
@@ -64,33 +64,6 @@
       ]
     },
     {
-      "name": "GPL-1.0",
-      "spdx": false,
-      "confidence": "0.829",
-      "count":  2,
-      "files": [
-        "regtests/files/identify/lgpl-2.1.java"
-      ]
-    },
-    {
-      "name": "GPL-2.0",
-      "spdx": false,
-      "confidence": "0.854",
-      "count":  2,
-      "files": [
-        "regtests/files/identify/gpl2-or-later.java"
-      ]
-    },
-    {
-      "name": "GPL-3.0",
-      "spdx": false,
-      "confidence": "0.946",
-      "count":  2,
-      "files": [
-        "regtests/files/identify/gpl-3.0.c"
-      ]
-    },
-    {
       "name": "None",
       "spdx": false,
       "confidence": "0.000",
@@ -111,6 +84,15 @@
       ]
     },
     {
+      "name": "Apache-2.0",
+      "spdx": false,
+      "confidence": "0.980",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/apache-2.0-7.cs"
+      ]
+    },
+    {
       "name": "BSD-Source-beginning-file",
       "spdx": false,
       "confidence": "0.941",
@@ -126,6 +108,42 @@
       "count":  1,
       "files": [
         "regtests/files/identify/beerware.java"
+      ]
+    },
+    {
+      "name": "GPL-1.0",
+      "spdx": false,
+      "confidence": "0.829",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/lgpl-2.1.java"
+      ]
+    },
+    {
+      "name": "GPL-1.0",
+      "spdx": false,
+      "confidence": "0.915",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/gpl-2.0-1.C"
+      ]
+    },
+    {
+      "name": "GPL-2.0",
+      "spdx": false,
+      "confidence": "0.854",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/gpl2-or-later.java"
+      ]
+    },
+    {
+      "name": "GPL-2.0",
+      "spdx": false,
+      "confidence": "0.863",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/gpl-2.0-2.st"
       ]
     },
     {
@@ -153,6 +171,24 @@
       "count":  1,
       "files": [
         "regtests/files/identify/gpl-2.0-only-1.sh"
+      ]
+    },
+    {
+      "name": "GPL-3.0",
+      "spdx": false,
+      "confidence": "0.826",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/gpl-3.0-2.el"
+      ]
+    },
+    {
+      "name": "GPL-3.0",
+      "spdx": false,
+      "confidence": "0.946",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/gpl-3.0.c"
       ]
     },
     {

@@ -1,6 +1,6 @@
 
 <report>
-  <license name="Apache-2.0" spdx="false" confidence="1.000" count="9">
+  <license name="Apache-2.0" spdx="false" confidence="1.000" count="8">
     <file>regtests/files/identify/apache-2.0-1.ads</file>
     <file>regtests/files/identify/apache-2.0-2.ads</file>
     <file>regtests/files/identify/apache-2.0-3.c</file>
@@ -32,15 +32,6 @@
     <file>regtests/files/identify/antlr-pd-1.c</file>
     <file>regtests/files/identify/antlr-pd-2.c</file>
   </license>
-  <license name="GPL-1.0" spdx="false" confidence="0.829" count="2">
-    <file>regtests/files/identify/lgpl-2.1.java</file>
-  </license>
-  <license name="GPL-2.0" spdx="false" confidence="0.854" count="2">
-    <file>regtests/files/identify/gpl2-or-later.java</file>
-  </license>
-  <license name="GPL-3.0" spdx="false" confidence="0.946" count="2">
-    <file>regtests/files/identify/gpl-3.0.c</file>
-  </license>
   <license name="None" spdx="false" confidence="0.000" count="2">
     <file>regtests/files/identify/none.keywords</file>
     <file>regtests/files/identify/none.l</file>
@@ -49,11 +40,26 @@
     <file>regtests/files/identify/blessing-1.c</file>
     <file>regtests/files/identify/blessing-2.ads</file>
   </license>
+  <license name="Apache-2.0" spdx="false" confidence="0.980" count="1">
+    <file>regtests/files/identify/apache-2.0-7.cs</file>
+  </license>
   <license name="BSD-Source-beginning-file" spdx="false" confidence="0.941" count="1">
     <file>regtests/files/identify/bsd-source-beginning-file-1.c</file>
   </license>
   <license name="Beerware" spdx="false" confidence="1.000" count="1">
     <file>regtests/files/identify/beerware.java</file>
+  </license>
+  <license name="GPL-1.0" spdx="false" confidence="0.829" count="1">
+    <file>regtests/files/identify/lgpl-2.1.java</file>
+  </license>
+  <license name="GPL-1.0" spdx="false" confidence="0.915" count="1">
+    <file>regtests/files/identify/gpl-2.0-1.C</file>
+  </license>
+  <license name="GPL-2.0" spdx="false" confidence="0.854" count="1">
+    <file>regtests/files/identify/gpl2-or-later.java</file>
+  </license>
+  <license name="GPL-2.0" spdx="false" confidence="0.863" count="1">
+    <file>regtests/files/identify/gpl-2.0-2.st</file>
   </license>
   <license name="GPL-2.0" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-2.0-3.rs</file>
@@ -63,6 +69,12 @@
   </license>
   <license name="GPL-2.0-only" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-2.0-only-1.sh</file>
+  </license>
+  <license name="GPL-3.0" spdx="false" confidence="0.826" count="1">
+    <file>regtests/files/identify/gpl-3.0-2.el</file>
+  </license>
+  <license name="GPL-3.0" spdx="false" confidence="0.946" count="1">
+    <file>regtests/files/identify/gpl-3.0.c</file>
   </license>
   <license name="HPND-sell-MIT-disclaimer-xserver" spdx="false" confidence="0.927" count="1">
     <file>regtests/files/identify/HPND-sell-MIT-disclaimer-xserver-1.c</file>
