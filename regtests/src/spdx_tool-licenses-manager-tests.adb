@@ -134,8 +134,10 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Util.Tests.Assert_Equals (T, Expect, Result.Info.Name,
                                 "Invalid license found", Source, Line);
       Assert_Equals (T, Kind, Result.Info.Match, "Invalid match kind");
-      Util.Tests.Assert_Equals (T, Start, Natural (Result.Info.Lines.First_Line), "Invalid first line");
-      Util.Tests.Assert_Equals (T, Finish, Natural (Result.Info.Lines.Last_Line), "Invalid last line");
+      Util.Tests.Assert_Equals (T, Start, Natural (Result.Info.Lines.First_Line),
+                                "Invalid first line");
+      Util.Tests.Assert_Equals (T, Finish, Natural (Result.Info.Lines.Last_Line),
+                                "Invalid last line");
       T.Assert (Result.Info.Confidence = 1.0,
                 "Invalid confidence:" & Result.Info.Confidence'Image);
    end Check_License;
