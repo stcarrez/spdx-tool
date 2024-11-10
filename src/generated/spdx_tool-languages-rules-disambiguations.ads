@@ -161,7 +161,7 @@ private
    S97 : aliased constant String := "^#version\s+[0-9]+\b";
    S98 : aliased constant String := "^%(end|ctor|hook|group)\b";
    S99 : aliased constant String := "^(# |include|require|inherit)\b";
-   S100 : aliased constant String := "^(%[%{}]xs|<.*>)";
+   S100 : aliased constant String := "^(%[%{}uo]|<.*>)";
    S101 : aliased constant String := "^((\/{2,3})?\s*(namespace|operation)\b)";
    S102 : aliased constant String := "^(----[- ]BEGIN|ssh-(rsa|dss)) ";
    S103 : aliased constant String := "^(: |also |new-device|previous )";
