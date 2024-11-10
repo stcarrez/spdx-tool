@@ -13,6 +13,7 @@ regtests/files/identify/apache-2.0-9.ads: Ada
 regtests/files/identify/beerware.java: Java
 regtests/files/identify/blessing-1.c: C
 regtests/files/identify/blessing-2.ads: Ada
+regtests/files/identify/bsd-3-clause-2.c: C
 regtests/files/identify/bsd-3-clause-or-gpl.c: C
 regtests/files/identify/bsd-3-clause.c: C
 regtests/files/identify/bsd-3-clause.ps1: PowerShell
