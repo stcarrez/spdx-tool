@@ -5,9 +5,11 @@
 -----------------------------------------------------------------------
 with Ada.Exceptions;
 with Ada.Directories;
+with Ada.Containers.Hashed_Sets;
 
 with Util.Files.Walk;
 with Util.Strings.Sets;
+with Util.Systems.Types;
 with SPDX_Tool.Files.Manager;
 with SPDX_Tool.Infos;
 with SPDX_Tool.Configs;
@@ -132,6 +134,19 @@ package SPDX_Tool.Licenses.Manager is
 
 private
 
+   type File_Id_Type is record
+      St_Dev : Util.Systems.Types.dev_t;
+      St_Ino : Util.Systems.Types.ino_t;
+   end record;
+
+   function Hash (Item : in File_Id_Type) return Ada.Containers.Hash_Type;
+
+   function "<" (Left, Right : in File_Id_Type) return Boolean
+   is (Left.St_Ino < Right.St_Ino
+       or else (Left.St_Ino = Right.St_Ino and then Left.St_Dev < Right.St_Dev));
+
+   package File_Sets is new Ada.Containers.Hashed_Sets (File_Id_Type, Hash, "=");
+
    type License_Manager_Access is access all License_Manager;
 
    type License_Job_Type is record
@@ -161,6 +176,7 @@ private
       Max_Fill  : Natural := 0;
       Started   : Boolean := False;
       Job       : Job_Type := FIND_LICENSES;
+      Dir_Scanned : File_Sets.Set;
 
       --  Filters to identify license files (ex: COPYING, LICENSE.txt, ...)
       --  Filters to ignore files when looking at file headers.  The two filters

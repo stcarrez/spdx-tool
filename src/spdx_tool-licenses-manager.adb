@@ -5,7 +5,10 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Fixed;
 with Ada.Unchecked_Deallocation;
+with Ada.IO_Exceptions;
+with Interfaces.C.Strings;
 
+with Util.Systems.Os;
 with Util.Strings;
 with Util.Strings.Tokenizers;
 with Util.Log.Loggers;
@@ -25,6 +28,15 @@ package body SPDX_Tool.Licenses.Manager is
    function Is_Git_Submodule (Path : in String) return Boolean;
 
    File_Mgr : SPDX_Tool.Files.Manager.File_Manager_Access := null with Thread_Local_Storage;
+
+   function Hash (Item : in File_Id_Type) return Ada.Containers.Hash_Type is
+      use Interfaces;
+
+      V : Interfaces.Unsigned_64 := Interfaces.Unsigned_64 (Item.St_Ino);
+   begin
+      V := V xor Interfaces.Unsigned_64 (Item.St_Dev);
+      return Ada.Containers.Hash_Type (V and 16#ffffffff#);
+   end Hash;
 
    --  ------------------------------
    --  Setup the update pattern when the tool must replace the existing license
@@ -313,6 +325,10 @@ package body SPDX_Tool.Licenses.Manager is
       end if;
       Util.Files.Walk.Walker_Type (Walker).Scan_Subdir_For_Ignore
         (Path, Scan_Path, Rel_Path, Level, Filter);
+
+   exception
+      when Ada.IO_Exceptions.Use_Error =>
+         Log.Error ("error while scanning {0}", Path);
    end Scan_Subdir_For_Ignore;
 
    --  ------------------------------
@@ -326,9 +342,31 @@ package body SPDX_Tool.Licenses.Manager is
                           Filter : in Util.Files.Walk.Filter_Context_Type;
                           Match  : in Util.Files.Walk.Filter_Result) is
    begin
-      if Opt_Scan_Submodules or else not Is_Git_Submodule (Path) then
-         Util.Files.Walk.Walker_Type (Walker).Scan_Subdir (Path, Filter, Match);
+      if not Opt_Scan_Submodules and then Is_Git_Submodule (Path) then
+         return;
       end if;
+      declare
+         Id   : File_Id_Type;
+         St   : aliased Util.Systems.Types.Stat_Type;
+         Name : Util.Systems.Os.Ptr := Interfaces.C.Strings.New_String (Path);
+         Res  : Integer;
+      begin
+         Res := Util.Systems.Os.Sys_Stat (Name, St'Unchecked_Access);
+         Interfaces.C.Strings.Free (Name);
+
+         if Res /= 0 then
+            return;
+         end if;
+
+         Id.St_Dev := St.st_dev;
+         Id.St_Ino := St.st_ino;
+         if Id.St_Ino > 0 and then Walker.Dir_Scanned.Contains (Id) then
+            return;
+         end if;
+
+         Walker.Dir_Scanned.Include (Id);
+         Util.Files.Walk.Walker_Type (Walker).Scan_Subdir (Path, Filter, Match);
+      end;
    end Scan_Subdir;
 
    --  ------------------------------
