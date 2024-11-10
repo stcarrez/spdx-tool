@@ -134,7 +134,7 @@ spdx-tool --only-licenses=Apache-2.0,MIT --update=spdx,1..2 file...
 The following options are recognized by **spdx-tool**:
 
 
-*\-c\* config Load the
+*\-c* config Load the
 *spdx-tool* configuration file to configure default filters, languages and license templates.
 
 
@@ -144,7 +144,7 @@ The following options are recognized by **spdx-tool**:
 *\-\-no-builtin-licenses* Disable the builtin repository licenses used by the tool.
 
 
-*\-t\* count Defines the number of threads for the encryption and decryption process.
+*\-t* count Defines the number of threads for the encryption and decryption process.
 By default, it uses the number of system CPU cores.
 
 
@@ -193,32 +193,32 @@ for the definition of the
 *\-\-print-license* Print the license which was identified from the source file after the analysis.
 
 
-*\-\-update\* pattern Update the license header found by the equivalent SPDX license with the
+*\-\-update* pattern Update the license header found by the equivalent SPDX license with the
 *SPDX-License-Identifier* tag.  The
 *pattern* string allows to control the replacement to allow keeping some lines from the existing license header.
 
 
-*\-\-ignore\-licenses\* spdx\-name1,spdx\-name2,... When printing report or updating files, ignore the licenses which correspond to one
+*\-\-ignore\-licenses* spdx\-name1,spdx\-name2,... When printing report or updating files, ignore the licenses which correspond to one
 of the SPDX license tag defined in the parameter.
 
 
-*\-\-ignore\-languages\* lang1,lang2,... When printing report or updating files, ignore the languages which correspond to one
+*\-\-ignore\-languages* lang1,lang2,... When printing report or updating files, ignore the languages which correspond to one
 of the name defined in the parameter.
 
 
-*\-\-only\-licenses\* spdx-name1,spdx-name2,... When printing report or updating files, only take into account the licenses which correspond to one
+*\-\-only\-licenses* spdx-name1,spdx-name2,... When printing report or updating files, only take into account the licenses which correspond to one
 of the SPDX license tag defined in the parameter.
 
 
-*\-\-only\-languages\* lang1,lang2,... When printing report or updating files, only take into account the languages which correspond to one
+*\-\-only\-languages* lang1,lang2,... When printing report or updating files, only take into account the languages which correspond to one
 of the name defined in the parameter.
 
 
-*\-\-output\-json\* file Produce a JSON report in the given file with a summary of licenses, languages and files found
+*\-\-output\-json* file Produce a JSON report in the given file with a summary of licenses, languages and files found
 during the analysis.
 
 
-*\-\-output\-xml\* file Produce a XML report in the given file with a summary of licenses, languages and files found
+*\-\-output\-xml* file Produce a XML report in the given file with a summary of licenses, languages and files found
 during the analysis.
 
 ## CONFIGURATION
