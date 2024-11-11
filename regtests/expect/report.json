@@ -86,7 +86,7 @@
     {
       "name": "Apache-2.0",
       "spdx": false,
-      "confidence": "0.980",
+      "confidence": "0.979",
       "count":  1,
       "files": [
         "regtests/files/identify/apache-2.0-7.cs"
@@ -95,7 +95,7 @@
     {
       "name": "BSD-Source-beginning-file",
       "spdx": false,
-      "confidence": "0.941",
+      "confidence": "0.940",
       "count":  1,
       "files": [
         "regtests/files/identify/bsd-source-beginning-file-1.c"
@@ -131,7 +131,7 @@
     {
       "name": "GPL-2.0",
       "spdx": false,
-      "confidence": "0.854",
+      "confidence": "0.853",
       "count":  1,
       "files": [
         "regtests/files/identify/gpl2-or-later.java"
@@ -140,7 +140,7 @@
     {
       "name": "GPL-2.0",
       "spdx": false,
-      "confidence": "0.863",
+      "confidence": "0.862",
       "count":  1,
       "files": [
         "regtests/files/identify/gpl-2.0-2.st"
@@ -194,7 +194,7 @@
     {
       "name": "HPND-sell-MIT-disclaimer-xserver",
       "spdx": false,
-      "confidence": "0.927",
+      "confidence": "0.926",
       "count":  1,
       "files": [
         "regtests/files/identify/HPND-sell-MIT-disclaimer-xserver-1.c"
@@ -230,7 +230,7 @@
     {
       "name": "gnat-gcc",
       "spdx": false,
-      "confidence": "0.983",
+      "confidence": "0.982",
       "count":  1,
       "files": [
         "regtests/files/identify/gnat-3.0.ads"
