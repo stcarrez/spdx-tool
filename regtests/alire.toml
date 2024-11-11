@@ -13,7 +13,7 @@ executables = ["spdx_tool_harness"]
 
 [[depends-on]]
 spdx_tool = "*"
-utilada_unit = "^2.7.0"
+utilada_unit = "^2.6.0"
 
 [configuration]
 disabled = true
@@ -21,7 +21,7 @@ disabled = true
 [[pins]]
 spdx_tool = { path='..' }
 # utilada_unit = { url="https://gitlab.com/stcarrez/ada-util.git", subdir="./unit/" }
-utilada = { url="https://gitlab.com/stcarrez/ada-util.git" }
+# utilada = { url="https://gitlab.com/stcarrez/ada-util.git" }
 # utilada = { path='../alire/cache/pins/utilada' }
 # utilada_unit = { path='../alire/cache/pins/utilada/unit' }
 # sciada = { path='../alire/cache/pins/sciada' }
