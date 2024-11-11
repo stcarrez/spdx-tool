@@ -7,7 +7,6 @@ Build-Depends: debhelper (>= 10),
 # This line is parsed by debian/rules.
  gprbuild (>= 2015-2),
  pkg-config,
- libxmlada-dom10-dev,
  libxml2-utils,
  libmagic-dev
 Standards-Version: 4.6.2
