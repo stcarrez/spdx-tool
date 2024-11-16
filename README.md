@@ -87,13 +87,55 @@ in the project.  For each file, the spdx-tool tries to:
     builtin repository or the templates configured for the tool.  When this succeeds, the match
     report indicates `TMPL`,
   * last, we guess the best matching license by using an inverted index of license tokens.
-    The tool then uses a classical \fIterm frequency inverse document frequency\fP
+    The tool then uses a classical *term frequency inverse document frequency*
     algorithm to find the best matching license.  The report will indicate the
     highest [Cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity) found.
 
 # Documentation
 
 * Man page: [spdx-tool (1)](https://gitlab.com/stcarrez/spdx-tool/-/blob/main/docs/spdx-tool.md?ref_type=heads)
+
+# Debian Packages for x86_64
+
+You can install spdx-tool by using the Debian 12 and Ubuntu 24.04 packages.
+First, setup to accept the signed packages:
+
+```
+wget -O - https://apt.vacs.fr/apt.vacs.fr.gpg.asc | sudo tee /etc/apt/trusted.gpg.d/apt-vacs-fr.asc
+```
+
+and choose one of the `echo` command according to your Linux distribution:
+
+Ubuntu 24.04
+```
+echo "deb https://apt.vacs.fr/ubuntu-noble noble main" | sudo tee -a /etc/apt/sources.list.d/vacs.list
+```
+
+Debian 12
+```
+echo "deb https://apt.vacs.fr/debian-bullseye bullseye main" | sudo tee -a /etc/apt/sources.list.d/vacs.list
+```
+
+Then, launch the apt update command:
+
+```
+sudo apt-get update
+```
+
+and install the tool using:
+
+```
+sudo apt-get install -y spdx-tool
+```
+
+# Build
+
+To build the spdx-tool you will need the GNAT Ada compiler as well
+as the [Alire](https://alire.ada.dev/) package manager.
+
+```
+make
+```
 
 # Improving the tool
 
