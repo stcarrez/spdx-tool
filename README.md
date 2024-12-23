@@ -54,10 +54,8 @@ spdx-tool --output-xml=report.xml .
 spdx-tool --output-json=report.json .
 ```
 
-## Version 0.4.0  - Nov 2024
-  - Fix reading the root .gitignore file when scanning a sub-directory
-  - Add support for a .spdxtool at the root of a project
-  - Better license template identification
+## Version 0.4.1  - Dec 2024
+  - Fix compilation on FreeBSD and Windows
 
 [List all versions](https://gitlab.com/stcarrez/spdx-tool/blob/master/NEWS.md)
 
