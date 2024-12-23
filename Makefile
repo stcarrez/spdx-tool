@@ -59,8 +59,7 @@ pot:
 	msgfmt -o po/locale/fr/LC_MESSAGES/spdx-tool.mo po/fr.po
 
 src/spdx_tool-configs-defaults.ads:   Makefile src/spdx_tool-configs-defaults.gpb
-	$(ALR) exec -- gnatprep -DPREFIX='"${PREFIX}"' -DVERSION='"$(VERSION)"' -DDEBUG='$(DEBUG_MODE)'\
-		  src/spdx_tool-configs-defaults.gpb src/spdx_tool-configs-defaults.ads
+	$(ALR) exec -- sh ./alire-setup.sh PREFIX='"${PREFIX}"' VERSION='"$(VERSION)"' DEBUG='$(DEBUG_MODE)'
 
 setup::
 	echo "BUILD=$(BUILD)" > Makefile.conf
