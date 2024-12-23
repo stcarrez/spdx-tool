@@ -9,7 +9,7 @@
 ## Identify licenses used in a project
 
 ```
-spdx-tool .
+spdx-tool
 License               Match          Count          Ratio
 Apache-2.0             TMPL             62           60.1
 None                                    34           33.0
