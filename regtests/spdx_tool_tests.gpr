@@ -1,4 +1,4 @@
-with "../spdx_tool_config.gpr";
+with "../spdx_tool_conf.gpr";
 with "spdx_tool.gpr";
 with "utilada_base.gpr";
 with "utilada_conf.gpr";

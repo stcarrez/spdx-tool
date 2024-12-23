@@ -3,7 +3,7 @@ with "utilada_conf.gpr";
 with "utilada_core.gpr";
 with "utilada_sys.gpr";
 with "spdx_tool.gpr";
-with "../spdx_tool_config.gpr";
+with "../spdx_tool_conf.gpr";
 project Tools is
 
    for Source_Dirs use ("src");
