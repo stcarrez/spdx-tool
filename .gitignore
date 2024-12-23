@@ -17,3 +17,4 @@ debian/.debhelper/
 /debian/files
 /debian/spdx-tool/
 .clang-format
+spdx_tool.def
