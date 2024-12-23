@@ -10,7 +10,7 @@ licenses = "Apache-2.0"
 website = "https://github.com/stcarrez/spdx-tool"
 tags = ["tools", "spdx", "license"]
 
-executables = ["spdx_tool"]
+executables = ["spdx-tool"]
 
 project-files = ["spdx_tool.gpr"]
 
