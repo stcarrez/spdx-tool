@@ -134,6 +134,11 @@ package SPDX_Tool.Licenses.Manager is
 
 private
 
+   --  use type clause necessary on Windows.
+   pragma Warnings (Off, "*use clause for type*");
+   use type Util.Systems.Types.dev_t, Util.Systems.Types.ino_t;
+   pragma Warnings (On, "*use clause for type*");
+
    type File_Id_Type is record
       St_Dev : Util.Systems.Types.dev_t;
       St_Ino : Util.Systems.Types.ino_t;
