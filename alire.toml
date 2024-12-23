@@ -74,12 +74,9 @@ ada_toml = "~0.5.0"
 [depends-on."case(os)".linux]
 magicada = "^1"
 
-[depends-on."case(os)".freebsd]
-magicada = "^1"
-
 [gpr-set-externals."case(os)"]
 linux = { USE_MAGICADA = "yes" }
-freebsd = { USE_MAGICADA = "yes" }
+freebsd = { USE_MAGICADA = "no" }
 macos = { USE_MAGICADA = "no" }
 windows = { USE_MAGICADA = "no" }
 
