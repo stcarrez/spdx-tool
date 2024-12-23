@@ -7,7 +7,7 @@ authors = ["ciceron"]
 maintainers = ["ciceron <Stephane.Carrez@gmail.com>"]
 maintainers-logins = ["stcarrez"]
 licenses = "Apache-2.0"
-website = ""
+website = "https://github.com/stcarrez/spdx-tool"
 tags = ["tools", "spdx", "license"]
 
 executables = ["spdx_tool"]
