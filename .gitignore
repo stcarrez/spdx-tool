@@ -18,3 +18,4 @@ debian/.debhelper/
 /debian/spdx-tool/
 .clang-format
 spdx_tool.def
+Makefile.conf
