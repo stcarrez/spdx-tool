@@ -1,15 +1,6 @@
-with "spdx.gpr";
-with "utilada_base.gpr";
-with "utilada_conf.gpr";
-with "utilada_core.gpr";
-with "utilada_sys.gpr";
-with "utilada_xml.gpr";
-with "sciada.gpr";
-with "spdx_tool_config.gpr";
-with "printer_toolkit";
+with "config/spdx_tool_config.gpr";
+with "spdx_tool_conf.gpr";
 with "intl.gpr";
-with "magicada.gpr";
-with "ada_toml.gpr";
 project Spdx_Tool is
 
    type Yes_No is ("yes", "no");
@@ -25,19 +16,19 @@ project Spdx_Tool is
          for Source_Dirs use Project'Source_Dirs & ("src/nomagic");
    end case;
 
-   for Object_Dir use "obj/" & Spdx_Tool_Config.Build_Profile;
+   for Object_Dir use "obj/" & Spdx_Tool_Conf.Build_Profile;
    for Create_Missing_Dirs use "True";
    for Exec_Dir use "bin";
    for Main use ("spdx_tool-main.adb");
 
-   package Compiler renames Spdx_Tool_Config.Compiler;
+   package Compiler renames Spdx_Tool_Conf.Compiler;
 
    package Binder is
       for Switches ("Ada") use ("-Es"); --  Symbolic traceback
    end Binder;
 
    package Linker is
-      for Default_Switches ("Ada") use Spdx_Tool_Config.Linker'Default_Switches ("Ada")
+      for Default_Switches ("Ada") use Spdx_Tool_Conf.Linker'Default_Switches ("Ada")
       & Intl.Linker'Default_Switches ("Ada");
 
    end Linker;

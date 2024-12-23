@@ -1,4 +1,4 @@
-abstract project Spdx_Tool_Config is
+abstract project Spdx_Tool_Conf is
    for Source_Dirs use ();
 
    type Yes_No is ("yes", "no");
@@ -112,4 +112,4 @@ abstract project Spdx_Tool_Config is
    type Build_Profile_Kind is ("release", "validation", "development");
    Build_Profile : Build_Profile_Kind := "development";
 
-end Spdx_Tool_Config;
+end Spdx_Tool_Conf;
