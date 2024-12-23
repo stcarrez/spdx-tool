@@ -7,6 +7,8 @@
 with Ada.Streams;
 package SPDX_Tool.Magic_Manager is
 
+   HAS_MAGIC_SUPPORT : constant Boolean := False;
+
    type Magic_Manager is tagged record A : Natural := 0; end record;
 
    procedure Initialize (Manager : in out Magic_Manager;

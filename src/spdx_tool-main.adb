@@ -25,6 +25,7 @@ with PT.Texts;
 with PT.Colors;
 
 with SPDX_Tool.Infos;
+with SPDX_Tool.Magic_Manager;
 with SPDX_Tool.Licenses.Manager;
 with SPDX_Tool.Licenses.Templates;
 with SPDX_Tool.Licenses.Repository;
@@ -161,11 +162,14 @@ procedure SPDX_Tool.Main is
                         Switch => "-l",
                         Long_Switch => "--licenses",
                         Help   => -("Check and gather licenses used in source files"));
-      GC.Define_Switch (Config => Command_Config,
-                        Output => Opt_Mimes'Access,
-                        Switch => "-m",
-                        Long_Switch => "--mimes",
-                        Help   => -("Identify mime types of files"));
+
+      if SPDX_Tool.Magic_Manager.HAS_MAGIC_SUPPORT then
+         GC.Define_Switch (Config => Command_Config,
+                           Output => Opt_Mimes'Access,
+                           Switch => "-m",
+                           Long_Switch => "--mimes",
+                           Help   => -("Identify mime types of files"));
+      end if;
       GC.Define_Switch (Config => Command_Config,
                         Output => Opt_Print_Lineno'Access,
                         Switch => "-n",

@@ -7,6 +7,8 @@
 with Magic.Manager;
 package SPDX_Tool.Magic_Manager is
 
+   HAS_MAGIC_SUPPORT : constant Boolean := True;
+
    subtype Magic_Manager is Magic.Manager.Magic_Manager;
 
    --  Initialize the magic manager and prepare the libmagic library.
