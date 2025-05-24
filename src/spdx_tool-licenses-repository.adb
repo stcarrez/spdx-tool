@@ -210,12 +210,24 @@ package body SPDX_Tool.Licenses.Repository is
             File   : Util.Streams.Files.File_Stream;
             Buffer : Buffer_Type (1 .. Buffer_Size (Size));
             Last   : Ada.Streams.Stream_Element_Offset;
-            Name   : constant String := Ada.Directories.Base_Name (Path);
+            Pos    : Buffer_Index := Buffer'First;
+            Match  : Buffer_Index;
          begin
             File.Open (Mode => Ada.Streams.Stream_IO.In_File, Name => Path);
             File.Read (Into => Buffer, Last => Last);
-            Template.Name := To_UString (Name);
-            Parser.Parse (Buffer (1 .. Last), Template);
+
+            --  Look for the first line having an SPDX-License-Identifier: tag
+            --  and use it for the license name.  Such line, is not part of
+            --  the template.
+            Match := Next_With (Buffer, Pos, SPDX_License_Tag);
+            if Match > Pos then
+               Match := Skip_Spaces (Buffer, Match, Buffer'Last);
+               Pos := Find_Eol (Buffer, Match);
+               Template.Name := To_UString (Buffer (Match .. Pos - 1));
+            else
+               Template.Name := To_UString (Ada.Directories.Base_Name (Path));
+            end if;
+            Parser.Parse (Buffer (Pos .. Last), Template);
          end;
       end if;
       Repository.Repository.Set_License (License, Template);
@@ -565,7 +577,9 @@ package body SPDX_Tool.Licenses.Repository is
 
       function Get_Name (License : in License_Index) return UString is
       begin
-         if License < SPDX_Tool.Licenses.Files.Names'Last then
+         if License < SPDX_Tool.Licenses.Files.Names'Last
+           and then Licenses (License).Root = null
+         then
             declare
                Name : constant Name_Access := SPDX_Tool.Licenses.Files.Names (License);
                Pos  : constant Natural := Util.Strings.Index (Name.all, '/');
@@ -592,6 +606,7 @@ package body SPDX_Tool.Licenses.Repository is
             Reader.Load_License (License, Template.Name, Licenses (License), Token);
             if Token /= null then
                Template.Root := Token;
+               Template.Name := Licenses (License).Name;
                Licenses (License) := Template;
             else
                Log.Debug ("No license loaded for {0}",

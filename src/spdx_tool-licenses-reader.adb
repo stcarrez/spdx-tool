@@ -311,7 +311,7 @@ package body SPDX_Tool.Licenses.Reader is
       end if;
       Parser.Root := License.Root;
       Parser.License := License.Name;
-      Parser.Parse (Content);
+      Parser.Parse (Content (Pos .. Content'Last));
       License.Root := Parser.Root;
       Log.Debug ("License {0} => {1} tokens", To_String (License.Name),
                 Natural'Image (Parser.Token_Count));
@@ -328,14 +328,23 @@ package body SPDX_Tool.Licenses.Reader is
       Path    : constant Name_Access := Files.Names (License);
       Content : constant access constant Buffer_Type
         := Files.Get_Content (Path.all);
+      Pos    : Buffer_Index := Content'First;
+      Match  : Buffer_Index;
       Parser : Parser_Type;
    begin
       Log.Debug ("Loading license template {0}", Path.all);
-      Into.Name := Name;
+      Match := Next_With (Content.all, Pos, SPDX_License_Tag);
+      if Match > Pos then
+         Match := Skip_Spaces (Content.all, Match, Content'Last);
+         Pos := Find_Eol (Content.all, Match);
+         Into.Name := To_UString (Content (Match .. Pos - 1));
+      else
+         Into.Name := Name;
+      end if;
       Tokens := null;
       Parser.Root := null;
       Parser.License := Into.Name;
-      Parser.Parse (Content.all);
+      Parser.Parse (Content (Pos .. Content'Last));
       Tokens := Parser.Root;
    end Load_License;
 
