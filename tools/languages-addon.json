@@ -68,6 +68,9 @@
    "Groovy": {
       "comment_style": "C-style",
    },
+   "TSX": {
+      "comment_style": "C-style",
+   },
    "PHP": {
       "comment_style": "C-style",
    },
@@ -166,6 +169,9 @@
          "emacs-lisp"
       ],
    },
+   "SVG": {
+      "comment_style": "XML"
+   },   
    "XML": {
       "comment_style": "XML"
    }
