@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.5.0
+--  Advanced Resource Embedder 1.5.1
 --  SPDX-License-Identifier: Apache-2.0
 --  Interpreter mapping generated from interpreters.json
 package SPDX_Tool.Languages.InterpreterMap is

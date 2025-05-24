@@ -1,4 +1,4 @@
---  Advanced Resource Embedder 1.5.0
+--  Advanced Resource Embedder 1.5.1
 --  SPDX-License-Identifier: Apache-2.0
 --  Mime mapping generated from mimes.json
 package SPDX_Tool.Languages.MimeMap is
