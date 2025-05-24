@@ -170,11 +170,9 @@ package body SPDX_Tool.Licenses is
                       Result  : out Line_Pos;
                       Next    : out Token_Access) is
       Last  : constant Buffer_Index := Content'Last;
-      --  Start : constant Positive := Positive (From);
-      --  End_Pos : Positive;
-      --  First : Buffer_Index := From;
-      Pos   : Line_Pos := (Line => From.Line, Pos => To.Pos);
+      Pos   : Line_Pos := (Line => From.Line, Pos => From.Pos);
       Check : constant Token_Access := Token.Next;
+      Val   : UString;
    begin
       if Check = null then
          Result := From;
@@ -187,11 +185,19 @@ package body SPDX_Tool.Licenses is
       then
          return;
       end if;
+      declare
+         V : constant String := To_String (Content (From.Pos .. To.Pos));
+      begin
+         if GNAT.Regpat.Match (Token.Pattern, V) then
+            Result := (Line => From.Line, Pos => To.Pos + 1);
+            Next := Check;
+            return;
+         end if;
+         Ada.Strings.Unbounded.Append (Val, V);
+      end;
       while Pos.Pos < Last loop
          declare
-            --  End_Pos : constant Line_Pos := Pos;
-            First   : constant Line_Pos
-              := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos + 1), To);
+            First    : constant Line_Pos := Pos;
             End_Line : Buffer_Index;
             Len      : Buffer_Size;
          begin
@@ -206,19 +212,30 @@ package body SPDX_Tool.Licenses is
                Pos.Pos := Next_Space (Content, First.Pos, End_Line);
             end if;
             Match (Check, Content, Lines, First, (To.Line, Pos.Pos), Result, Next);
-            if Next /= null and then Result /= First then
+            if Next /= null and then Result /= First
+              and then GNAT.Regpat.Match (Token.Pattern, To_String (Val))
+            then
                return;
             end if;
+            Ada.Strings.Unbounded.Append (Val, " ");
+            Ada.Strings.Unbounded.Append (Val, To_String (Content (First.Pos .. Pos.Pos)));
             Pos.Pos := Pos.Pos + 1;
             if Pos.Pos >= End_Line then
                exit when First.Line = To.Line;
                Pos.Line := First.Line + 1;
+               exit when Lines (Pos.Line).Comment = NO_COMMENT;
                Pos.Pos := Lines (Pos.Line).Style.Text_Start;
             else
                Pos.Line := First.Line;
             end if;
+            Pos := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos), To);
          end;
       end loop;
+      if Check.Next = null and then GNAT.Regpat.Match (Token.Pattern, To_String (Val)) then
+         Result := (Line => Pos.Line, Pos => Pos.Pos);
+         Next := Check;
+         return;
+      end if;
       --  while Pos.Pos < Last loop
       --   End_Pos := Positive (Pos);
       --   First := Skip_Spaces (Content, Pos + 1, Last);
@@ -484,11 +501,11 @@ package body SPDX_Tool.Licenses is
                   end if;
                   Match_Count := Match_Count + 1;
                   Current := Next_Token;
-                  if Current.Next /= null
-                    and then Current.Next.Kind = TOK_LICENSE
-                  then
-                     Current := Current.Next;
-                  end if;
+                  --if Current.Next /= null
+                  --  and then Current.Next.Kind = TOK_LICENSE
+                  --then
+                  --   Current := Current.Next;
+                  --end if;
                   if Current.Kind = TOK_LICENSE then
                      Result.Info.Name := Final_Token_Type (Current.all).License;
                      Result.Info.Lines.Last_Line := Pos.Line;
