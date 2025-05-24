@@ -9,6 +9,7 @@ with Util.Beans.Objects;
 with Util.Beans.Objects.Iterators;
 with Util.Serialize.IO.JSON;
 with Util.Log.Loggers;
+with Util.Strings;
 
 with SPDX_Tool.Licenses.Files;
 package body SPDX_Tool.Licenses.Reader is
@@ -21,6 +22,7 @@ package body SPDX_Tool.Licenses.Reader is
    function Find_Header (List : UBO.Object) return UBO.Object;
    function Find_Value (Info : UBO.Object; Name : String) return Boolean;
    function Find_Value (Info : UBO.Object; Name : String) return UString;
+   function Get_License_Id (Value : in UBO.Object) return UString;
 
    function Find_Header (List : UBO.Object) return UBO.Object is
       Iter : UBO.Iterators.Iterator := UBO.Iterators.First (List);
@@ -28,9 +30,13 @@ package body SPDX_Tool.Licenses.Reader is
       while UBO.Iterators.Has_Element (Iter) loop
          declare
             Item : constant UBO.Object := UBO.Iterators.Element (Iter);
-            Hdr  : constant UBO.Object
+            Hdr  : UBO.Object
               := UBO.Get_Value (Item, "spdx:standardLicenseTemplate");
          begin
+            if not UBO.Is_Null (Hdr) then
+               return Item;
+            end if;
+            Hdr := UBO.Get_Value (Item, "spdx:standardLicenseHeaderTemplate");
             if not UBO.Is_Null (Hdr) then
                return Item;
             end if;
@@ -63,6 +69,17 @@ package body SPDX_Tool.Licenses.Reader is
       end if;
    end Find_Value;
 
+   function Get_License_Id (Value : in UBO.Object) return UString is
+      Prefix : constant String := "http://spdx.org/licenses/";
+      Id     : constant String := UBO.To_String (Value);
+   begin
+      if Util.Strings.Starts_With (Id, Prefix) then
+         return To_UString (Id (Id'First + Prefix'Length .. Id'Last));
+      else
+         return To_UString (Id);
+      end if;
+   end Get_License_Id;
+
    procedure Load_JSON (License : in out License_Type;
                         Path    : in String) is
       Root, Graph, Info, License_Id : Util.Beans.Objects.Object;
@@ -74,14 +91,14 @@ package body SPDX_Tool.Licenses.Reader is
       else
          Info := Find_Header (Graph);
       end if;
-      License_Id := UBO.Get_Value (Info, "spdx:licenseId");
+      License_Id := UBO.Get_Value (Info, "@id");
       License.Is_Exception := UBO.Is_Null (License_Id);
       if UBO.Is_Null (License_Id) then
          License.Name := Find_Value (Info, "spdx:licenseExceptionId");
          License.Template := Find_Value (Info, "spdx:licenseExceptionTemplate");
          License.License := Find_Value (Info, "spdx:licenseExceptionText");
       else
-         License.Name := UBO.To_Unbounded_String (License_Id);
+         License.Name := Get_License_Id (License_Id);
          License.Template := Find_Value (Info,
                                          "spdx:standardLicenseHeaderTemplate");
          License.License := Find_Value (Info, "spdx:licenseText");
