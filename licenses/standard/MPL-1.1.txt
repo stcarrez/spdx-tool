@@ -5,7 +5,6 @@ Software distributed under the License is distributed on an "AS IS" basis, WITHO
 The Original Code is <<var;name="code";original="______________________________________";match=".+">> .
 
 The Initial Developer of the Original Code is <<var;name="initialDeveloper";original="________________________";match=".+">> .
-
 Portions created by <<var;name="creator";original="______________________";match=".+">> are Copyright (C) <<var;name="copyright";original="______";match=".+">> . All Rights Reserved.
 
 Contributor(s): <<var;name="contributor";original="______________________________________";match=".+">> .
