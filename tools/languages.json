@@ -233,6 +233,15 @@
     "codemirror_mode": "clike",
     "codemirror_mime_type": "text/x-c++src"
   },
+  "Answer Set Programming": {
+    "type": "programming",
+    "extensions": [
+      ".lp"
+    ],
+    "interpreters": [
+      "clingo"
+    ]
+  },
   "Ant Build System": {
     "type": "data",
     "filenames": [
@@ -270,6 +279,7 @@
     "type": "programming",
     "extensions": [
       ".cls",
+      ".apex",
       ".trigger"
     ],
     "codemirror_mode": "clike",
@@ -328,7 +338,8 @@
       ".i",
       ".inc",
       ".nas",
-      ".nasm"
+      ".nasm",
+      ".s"
     ]
   },
   "Astro": {
@@ -399,10 +410,27 @@
       "nawk"
     ]
   },
+  "B4X": {
+    "type": "programming",
+    "extensions": [
+      ".bas"
+    ],
+    "aliases": [
+      "basic for android"
+    ],
+    "codemirror_mode": "vb",
+    "codemirror_mime_type": "text/x-vb"
+  },
   "BASIC": {
     "type": "programming",
     "extensions": [
       ".bas"
+    ]
+  },
+  "BQN": {
+    "type": "programming",
+    "extensions": [
+      ".bqn"
     ]
   },
   "Ballerina": {
@@ -457,6 +485,12 @@
     ],
     "codemirror_mode": "stex",
     "codemirror_mime_type": "text/x-stex"
+  },
+  "BibTeX Style": {
+    "type": "programming",
+    "extensions": [
+      ".bst"
+    ]
   },
   "Bicep": {
     "type": "programming",
@@ -586,12 +620,19 @@
       "browserslist"
     ]
   },
+  "BuildStream": {
+    "type": "data",
+    "extensions": [
+      ".bst"
+    ]
+  },
   "C": {
     "type": "programming",
     "extensions": [
       ".c",
       ".cats",
       ".h",
+      ".h.in",
       ".idc"
     ],
     "interpreters": [
@@ -773,6 +814,18 @@
     "codemirror_mode": "haskell",
     "codemirror_mime_type": "text/x-haskell"
   },
+  "Caddyfile": {
+    "type": "data",
+    "aliases": [
+      "Caddy"
+    ],
+    "extensions": [
+      ".caddyfile"
+    ],
+    "filenames": [
+      "Caddyfile"
+    ]
+  },
   "Cadence": {
     "type": "programming",
     "extensions": [
@@ -783,7 +836,15 @@
     "type": "programming",
     "extensions": [
       ".cairo"
-    ]
+    ],
+    "group": "Cairo"
+  },
+  "Cairo Zero": {
+    "type": "programming",
+    "extensions": [
+      ".cairo"
+    ],
+    "group": "Cairo"
   },
   "CameLIGO": {
     "type": "programming",
@@ -799,6 +860,14 @@
     "extensions": [
       ".capnp"
     ]
+  },
+  "Carbon": {
+    "type": "programming",
+    "extensions": [
+      ".carbon"
+    ],
+    "codemirror_mode": "go",
+    "codemirror_mime_type": "text/x-go"
   },
   "CartoCSS": {
     "type": "programming",
@@ -1079,13 +1148,6 @@
       ".cl"
     ]
   },
-  "Coq": {
-    "type": "programming",
-    "extensions": [
-      ".coq",
-      ".v"
-    ]
-  },
   "Cpp-ObjDump": {
     "type": "data",
     "extensions": [
@@ -1173,6 +1235,16 @@
     ],
     "codemirror_mode": "javascript",
     "codemirror_mime_type": "text/javascript"
+  },
+  "Cylc": {
+    "type": "data",
+    "extensions": [
+      ".cylc"
+    ],
+    "filenames": [
+      "suite.rc"
+    ],
+    "group": "INI"
   },
   "Cypher": {
     "type": "programming",
@@ -1342,7 +1414,8 @@
       "Containerfile"
     ],
     "extensions": [
-      ".dockerfile"
+      ".dockerfile",
+      ".containerfile"
     ],
     "filenames": [
       "Containerfile",
@@ -1376,6 +1449,12 @@
       ".env.staging",
       ".env.test",
       ".env.testing"
+    ]
+  },
+  "Dune": {
+    "type": "programming",
+    "filenames": [
+      "dune-project"
     ]
   },
   "Dylan": {
@@ -1686,6 +1765,12 @@
       ".flf"
     ]
   },
+  "FIRRTL": {
+    "type": "programming",
+    "extensions": [
+      ".fir"
+    ]
+  },
   "FLUX": {
     "type": "programming",
     "extensions": [
@@ -1801,7 +1886,7 @@
     "codemirror_mode": "fortran",
     "codemirror_mime_type": "text/x-fortran"
   },
-  "FreeBasic": {
+  "FreeBASIC": {
     "type": "programming",
     "extensions": [
       ".bi",
@@ -2328,6 +2413,14 @@
     "codemirror_mode": "ruby",
     "codemirror_mime_type": "text/x-ruby"
   },
+  "HIP": {
+    "type": "programming",
+    "extensions": [
+      ".hip"
+    ],
+    "codemirror_mode": "clike",
+    "codemirror_mime_type": "text/x-c++src"
+  },
   "HLSL": {
     "type": "programming",
     "extensions": [
@@ -2386,9 +2479,9 @@
       "leex"
     ],
     "extensions": [
-      ".eex",
-      ".html.heex",
-      ".html.leex"
+      ".html.eex",
+      ".heex",
+      ".leex"
     ],
     "codemirror_mode": "htmlmixed",
     "codemirror_mime_type": "text/html"
@@ -2482,6 +2575,12 @@
       ".hb"
     ]
   },
+  "Hare": {
+    "type": "programming",
+    "extensions": [
+      ".ha"
+    ]
+  },
   "Haskell": {
     "type": "programming",
     "extensions": [
@@ -2525,7 +2624,8 @@
     "type": "data",
     "filenames": [
       "HOSTS",
-      "hosts"
+      "hosts",
+      "hosts.txt"
     ],
     "aliases": [
       "hosts"
@@ -2582,6 +2682,7 @@
       ".url"
     ],
     "filenames": [
+      ".buckconfig",
       ".coveragerc",
       ".flake8",
       ".pylintrc",
@@ -2610,6 +2711,14 @@
     "codemirror_mode": "mirc",
     "codemirror_mime_type": "text/mirc"
   },
+  "ISPC": {
+    "type": "programming",
+    "extensions": [
+      ".ispc"
+    ],
+    "codemirror_mode": "clike",
+    "codemirror_mime_type": "text/x-csrc"
+  },
   "Idris": {
     "type": "programming",
     "extensions": [
@@ -2634,9 +2743,11 @@
       ".coffeelintignore",
       ".cvsignore",
       ".dockerignore",
+      ".easignore",
       ".eleventyignore",
       ".eslintignore",
       ".gitignore",
+      ".ignore",
       ".markdownlintignore",
       ".nodemonignore",
       ".npmignore",
@@ -2771,9 +2882,11 @@
       ".har",
       ".ice",
       ".JSON-tmLanguage",
+      ".json.example",
       ".jsonl",
       ".mcmeta",
       ".sarif",
+      ".tact",
       ".tfstate",
       ".tfstate.backup",
       ".topojson",
@@ -2793,7 +2906,10 @@
       ".tern-config",
       ".tern-project",
       ".watchmanconfig",
+      "MODULE.bazel.lock",
+      "Package.resolved",
       "Pipfile.lock",
+      "bun.lock",
       "composer.lock",
       "deno.lock",
       "flake.lock",
@@ -2813,6 +2929,7 @@
       ".code-snippets",
       ".code-workspace",
       ".sublime-build",
+      ".sublime-color-scheme",
       ".sublime-commands",
       ".sublime-completions",
       ".sublime-keymap",
@@ -2866,6 +2983,12 @@
       ".jq"
     ]
   },
+  "Jai": {
+    "type": "programming",
+    "extensions": [
+      ".jai"
+    ]
+  },
   "Janet": {
     "type": "programming",
     "extensions": [
@@ -2913,6 +3036,16 @@
     ],
     "codemirror_mode": "htmlembedded",
     "codemirror_mime_type": "application/x-jsp"
+  },
+  "Java Template Engine": {
+    "type": "programming",
+    "group": "Java",
+    "aliases": [
+      "jte"
+    ],
+    "extensions": [
+      ".jte"
+    ]
   },
   "JavaScript": {
     "type": "programming",
@@ -3053,6 +3186,10 @@
     "codemirror_mode": "julia",
     "codemirror_mime_type": "text/x-julia"
   },
+  "Julia REPL": {
+    "type": "programming",
+    "group": "Julia"
+  },
   "Jupyter Notebook": {
     "type": "markup",
     "codemirror_mode": "javascript",
@@ -3073,10 +3210,24 @@
       "Justfile"
     ],
     "filenames": [
+      ".JUSTFILE",
+      ".Justfile",
+      ".justfile",
       "JUSTFILE",
       "Justfile",
       "justfile"
+    ],
+    "extensions": [
+      ".just"
     ]
+  },
+  "KDL": {
+    "type": "data",
+    "extensions": [
+      ".kdl"
+    ],
+    "codemirror_mode": "yacas",
+    "codemirror_mime_type": "text/x-yacas"
   },
   "KRL": {
     "type": "programming",
@@ -3143,6 +3294,7 @@
     ],
     "extensions": [
       ".kicad_sch",
+      ".kicad_sym",
       ".sch"
     ]
   },
@@ -3158,6 +3310,15 @@
     "codemirror_mime_type": "text/html",
     "extensions": [
       ".kit"
+    ]
+  },
+  "Koka": {
+    "type": "programming",
+    "extensions": [
+      ".kk"
+    ],
+    "interpreters": [
+      "koka"
     ]
   },
   "Kotlin": {
@@ -3315,8 +3476,14 @@
       ".m"
     ]
   },
+  "Linear Programming": {
+    "type": "programming",
+    "extensions": [
+      ".lp"
+    ]
+  },
   "Linker Script": {
-    "type": "data",
+    "type": "programming",
     "extensions": [
       ".ld",
       ".lds",
@@ -3369,6 +3536,12 @@
     ],
     "codemirror_mode": "haskell-literate",
     "codemirror_mime_type": "text/x-literate-haskell"
+  },
+  "LiveCode Script": {
+    "type": "programming",
+    "extensions": [
+      ".livecodescript"
+    ]
   },
   "LiveScript": {
     "type": "programming",
@@ -3437,6 +3610,17 @@
       "lua"
     ]
   },
+  "Luau": {
+    "type": "programming",
+    "codemirror_mode": "lua",
+    "codemirror_mime_type": "text/x-lua",
+    "extensions": [
+      ".luau"
+    ],
+    "interpreters": [
+      "luau"
+    ]
+  },
   "M": {
     "type": "programming",
     "aliases": [
@@ -3448,6 +3632,17 @@
     ],
     "codemirror_mode": "mumps",
     "codemirror_mime_type": "text/x-mumps"
+  },
+  "M3U": {
+    "type": "data",
+    "aliases": [
+      "hls playlist",
+      "m3u playlist"
+    ],
+    "extensions": [
+      ".m3u",
+      ".m3u8"
+    ]
   },
   "M4": {
     "type": "programming",
@@ -3743,6 +3938,18 @@
     "codemirror_mode": "yaml",
     "codemirror_mime_type": "text/x-yaml"
   },
+  "MiniZinc": {
+    "type": "programming",
+    "extensions": [
+      ".mzn"
+    ]
+  },
+  "MiniZinc Data": {
+    "type": "data",
+    "extensions": [
+      ".dzn"
+    ]
+  },
   "Mint": {
     "type": "programming",
     "extensions": [
@@ -3820,6 +4027,12 @@
     "type": "programming",
     "extensions": [
       ".moo"
+    ]
+  },
+  "MoonBit": {
+    "type": "programming",
+    "extensions": [
+      ".mbt"
     ]
   },
   "MoonScript": {
@@ -3909,6 +4122,12 @@
     "type": "data",
     "extensions": [
       ".nl"
+    ]
+  },
+  "NMODL": {
+    "type": "programming",
+    "extensions": [
+      ".mod"
     ]
   },
   "NPM Config": {
@@ -4054,6 +4273,17 @@
       "nixos"
     ]
   },
+  "Noir": {
+    "type": "programming",
+    "aliases": [
+      "nargo"
+    ],
+    "codemirror_mode": "rust",
+    "codemirror_mime_type": "text/x-rustsrc",
+    "extensions": [
+      ".nr"
+    ]
+  },
   "Nu": {
     "type": "programming",
     "aliases": [
@@ -4161,6 +4391,24 @@
       "ocaml",
       "ocamlrun",
       "ocamlscript"
+    ]
+  },
+  "OMNeT++ MSG": {
+    "type": "programming",
+    "extensions": [
+      ".msg"
+    ],
+    "aliases": [
+      "omnetpp-msg"
+    ]
+  },
+  "OMNeT++ NED": {
+    "type": "programming",
+    "extensions": [
+      ".ned"
+    ],
+    "aliases": [
+      "omnetpp-ned"
     ]
   },
   "Oberon": {
@@ -4358,6 +4606,13 @@
       ".org"
     ]
   },
+  "OverpassQL": {
+    "type": "programming",
+    "wrap": true,
+    "extensions": [
+      ".overpassql"
+    ]
+  },
   "Ox": {
     "type": "programming",
     "extensions": [
@@ -4395,7 +4650,8 @@
   "PEG.js": {
     "type": "programming",
     "extensions": [
-      ".pegjs"
+      ".pegjs",
+      ".peggy"
     ],
     "codemirror_mode": "javascript",
     "codemirror_mime_type": "text/javascript"
@@ -4639,6 +4895,15 @@
     "filenames": [
       "requirements-dev.txt",
       "requirements.txt"
+    ]
+  },
+  "Pkl": {
+    "type": "programming",
+    "extensions": [
+      ".pkl"
+    ],
+    "interpreters": [
+      "pkl"
     ]
   },
   "PlantUML": {
@@ -4915,7 +5180,8 @@
       "python3",
       "py",
       "pypy",
-      "pypy3"
+      "pypy3",
+      "uv"
     ],
     "aliases": [
       "python3",
@@ -4980,6 +5246,21 @@
       "m3makefile",
       "m3overrides"
     ]
+  },
+  "QuickBASIC": {
+    "type": "programming",
+    "extensions": [
+      ".bas"
+    ],
+    "aliases": [
+      "qb",
+      "qbasic",
+      "qb64",
+      "classic qbasic",
+      "classic quickbasic"
+    ],
+    "codemirror_mode": "vb",
+    "codemirror_mime_type": "text/x-vb"
   },
   "R": {
     "type": "programming",
@@ -5060,6 +5341,12 @@
     "extensions": [
       ".qmd",
       ".rmd"
+    ]
+  },
+  "RON": {
+    "type": "data",
+    "extensions": [
+      ".ron"
     ]
   },
   "RPC": {
@@ -5307,13 +5594,25 @@
   "RobotFramework": {
     "type": "programming",
     "extensions": [
-      ".robot"
+      ".robot",
+      ".resource"
     ]
   },
   "Roc": {
     "type": "programming",
     "extensions": [
       ".roc"
+    ]
+  },
+  "Rocq Prover": {
+    "type": "programming",
+    "extensions": [
+      ".v",
+      ".coq"
+    ],
+    "aliases": [
+      "coq",
+      "rocq"
     ]
   },
   "Roff": {
@@ -5535,7 +5834,8 @@
     "type": "programming",
     "extensions": [
       ".smt2",
-      ".smt"
+      ".smt",
+      ".z3"
     ],
     "interpreters": [
       "boolector",
@@ -5602,6 +5902,12 @@
   "SSH Config": {
     "type": "data",
     "group": "INI",
+    "aliases": [
+      "sshconfig",
+      "sshdconfig",
+      "ssh_config",
+      "sshd_config"
+    ],
     "filenames": [
       "ssh-config",
       "ssh_config",
@@ -5658,6 +5964,12 @@
     ],
     "codemirror_mode": "python",
     "codemirror_mime_type": "text/x-python"
+  },
+  "Sail": {
+    "type": "programming",
+    "extensions": [
+      ".sail"
+    ]
   },
   "SaltStack": {
     "type": "programming",
@@ -5756,7 +6068,8 @@
       "sh",
       "shell-script",
       "bash",
-      "zsh"
+      "zsh",
+      "envrc"
     ],
     "extensions": [
       ".sh",
@@ -5781,6 +6094,7 @@
       ".bash_profile",
       ".bashrc",
       ".cshrc",
+      ".envrc",
       ".flaskenv",
       ".kshrc",
       ".login",
@@ -5877,6 +6191,12 @@
     "type": "programming",
     "filenames": [
       "Singularity"
+    ]
+  },
+  "Slang": {
+    "type": "programming",
+    "extensions": [
+      ".slang"
     ]
   },
   "Slash": {
@@ -6035,7 +6355,8 @@
       "MODULE.bazel",
       "Tiltfile",
       "WORKSPACE",
-      "WORKSPACE.bazel"
+      "WORKSPACE.bazel",
+      "WORKSPACE.bzlmod"
     ],
     "aliases": [
       "bazel",
@@ -6089,6 +6410,12 @@
     "interpreters": [
       "sclang",
       "scsynth"
+    ]
+  },
+  "Survex data": {
+    "type": "data",
+    "extensions": [
+      ".svx"
     ]
   },
   "Svelte": {
@@ -6157,13 +6484,25 @@
     ],
     "filenames": [
       "Cargo.lock",
+      "Cargo.toml.orig",
       "Gopkg.lock",
       "Pipfile",
       "pdm.lock",
-      "poetry.lock"
+      "poetry.lock",
+      "uv.lock"
     ],
     "codemirror_mode": "toml",
     "codemirror_mime_type": "text/x-toml"
+  },
+  "TSPLIB data": {
+    "aliases": [
+      "travelling salesman problem",
+      "traveling salesman problem"
+    ],
+    "type": "data",
+    "extensions": [
+      ".tsp"
+    ]
   },
   "TSQL": {
     "type": "programming",
@@ -6174,7 +6513,11 @@
   "TSV": {
     "type": "data",
     "extensions": [
-      ".tsv"
+      ".tsv",
+      ".vcf"
+    ],
+    "aliases": [
+      "tab-seperated values"
     ]
   },
   "TSX": {
@@ -6190,6 +6533,12 @@
     "type": "programming",
     "extensions": [
       ".txl"
+    ]
+  },
+  "Tact": {
+    "type": "programming",
+    "extensions": [
+      ".tact"
     ]
   },
   "Talon": {
@@ -6380,6 +6729,15 @@
       ".toit"
     ]
   },
+  "Tree-sitter Query": {
+    "type": "programming",
+    "aliases": [
+      "tsq"
+    ],
+    "extensions": [
+      ".scm"
+    ]
+  },
   "Turing": {
     "type": "programming",
     "extensions": [
@@ -6418,8 +6776,10 @@
       "ts"
     ],
     "interpreters": [
+      "bun",
       "deno",
-      "ts-node"
+      "ts-node",
+      "tsx"
     ],
     "extensions": [
       ".ts",
@@ -6428,6 +6788,15 @@
     ],
     "codemirror_mode": "javascript",
     "codemirror_mime_type": "application/typescript"
+  },
+  "TypeSpec": {
+    "type": "programming",
+    "aliases": [
+      "tsp"
+    ],
+    "extensions": [
+      ".tsp"
+    ]
   },
   "Typst": {
     "type": "programming",
@@ -6608,7 +6977,8 @@
     "aliases": [
       "vim",
       "viml",
-      "nvim"
+      "nvim",
+      "vimscript"
     ],
     "extensions": [
       ".vim",
@@ -6939,6 +7309,7 @@
       ".glade",
       ".gml",
       ".gmx",
+      ".gpx",
       ".grxml",
       ".gst",
       ".hzp",
@@ -7096,6 +7467,12 @@
     "codemirror_mode": "xml",
     "codemirror_mime_type": "text/xml"
   },
+  "Xmake": {
+    "type": "programming",
+    "filenames": [
+      "xmake.lua"
+    ]
+  },
   "Xojo": {
     "type": "programming",
     "extensions": [
@@ -7141,9 +7518,11 @@
     "filenames": [
       ".clang-format",
       ".clang-tidy",
+      ".clangd",
       ".gemrc",
       "CITATION.cff",
       "glide.lock",
+      "pixi.lock",
       "yarn.lock"
     ],
     "codemirror_mode": "yaml",
@@ -7225,7 +7604,8 @@
   "Zig": {
     "type": "programming",
     "extensions": [
-      ".zig"
+      ".zig",
+      ".zig.zon"
     ]
   },
   "Zimpl": {
@@ -7245,6 +7625,16 @@
     "filenames": [
       ".curlrc",
       "_curlrc"
+    ]
+  },
+  "crontab": {
+    "type": "data",
+    "aliases": [
+      "cron",
+      "cron table"
+    ],
+    "filenames": [
+      "crontab"
     ]
   },
   "desktop": {
@@ -7300,6 +7690,18 @@
       ".hoon"
     ]
   },
+  "iCalendar": {
+    "type": "data",
+    "extensions": [
+      ".ics",
+      ".ical"
+    ],
+    "aliases": [
+      "iCal"
+    ],
+    "codemirror_mode": "properties",
+    "codemirror_mime_type": "text/x-properties"
+  },
   "jq": {
     "type": "programming",
     "extensions": [
@@ -7330,6 +7732,15 @@
     "type": "programming",
     "extensions": [
       ".mcfunction"
+    ]
+  },
+  "mdsvex": {
+    "type": "markup",
+    "codemirror_mode": "gfm",
+    "codemirror_mime_type": "text/x-gfm",
+    "wrap": true,
+    "extensions": [
+      ".svx"
     ]
   },
   "mupad": {
@@ -7403,6 +7814,24 @@
       "sed",
       "ssed"
     ]
+  },
+  "templ": {
+    "type": "markup",
+    "extensions": [
+      ".templ"
+    ]
+  },
+  "vCard": {
+    "type": "data",
+    "extensions": [
+      ".vcf"
+    ],
+    "aliases": [
+      "virtual contact file",
+      "electronic business card"
+    ],
+    "codemirror_mode": "properties",
+    "codemirror_mime_type": "text/x-properties"
   },
   "wisp": {
     "type": "programming",
