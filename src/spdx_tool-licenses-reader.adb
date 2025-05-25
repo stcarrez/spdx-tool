@@ -401,11 +401,31 @@ package body SPDX_Tool.Licenses.Reader is
                     Content : in Buffer_Type;
                     Token   : in SPDX_Tool.Licenses.Token_Kind) is
       function Create_Regpat (Content : in Buffer_Type) return Token_Access;
+      function Is_Multi_Token (Regpat : in String) return Boolean;
+
+      --  Returns true if the regular expression applies on several tokens.
+      function Is_Multi_Token (Regpat : in String) return Boolean is
+      begin
+         --  Example: "SOFTWARE IS|MATERIALS ARE"
+         if Util.Strings.Index (Regpat, " ", Regpat'First) > 0 then
+            return True;
+         end if;
+         --  Example: "this\s+software\s+and..."
+         if Util.Strings.Index (Regpat, "\s", Regpat'First) > 0 then
+            return True;
+         end if;
+         --  Example: "assume\.?"
+         if Util.Strings.Index (Regpat, "\.", Regpat'First) > 0 then
+            return True;
+         end if;
+         return False;
+      end Is_Multi_Token;
 
       function Create_Regpat (Content : in Buffer_Type) return Token_Access is
          Regpat : String (1 .. Content'Length);
          for Regpat'Address use Content'Address;
       begin
+         Log.Debug ("Pattern: '{0}'", Regpat);
          if Regpat = ".+" then
             return new Any_Token_Type '(Len => Content'Length,
                                         Previous => null,
@@ -430,10 +450,18 @@ package body SPDX_Tool.Licenses.Reader is
                                         Content => Content,
                                         Max_Length => 20);
          end if;
-         Log.Debug ("Pattern: '{0}'", Regpat);
          declare
             Pat : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
          begin
+            if not Is_Multi_Token (Regpat) then
+               return new Regpat_Multi_Token_Type '(Len => Content'Length,
+                                                    Plen => Pat.Size,
+                                                    Previous => null,
+                                                    Next => null,
+                                                    Alternate => null,
+                                                    Content => Content,
+                                                    Pattern => Pat);
+            end if;
             return new Regpat_Token_Type '(Len => Content'Length,
                                            Plen => Pat.Size,
                                            Previous => null,

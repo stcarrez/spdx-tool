@@ -169,6 +169,40 @@ package body SPDX_Tool.Licenses is
                       To      : in Line_Pos;
                       Result  : out Line_Pos;
                       Next    : out Token_Access) is
+      Check : constant Token_Access := Token.Next;
+   begin
+      if Check = null then
+         Result := From;
+         Next := null;
+         return;
+      end if;
+      Match (Check, Content, Lines, From, To, Result, Next);
+      if Next /= null and then Result /= From
+        and then GNAT.Regpat.Match (Token.Pattern, "")
+      then
+         return;
+      end if;
+      declare
+         V : constant String := To_String (Content (From.Pos .. To.Pos));
+      begin
+         if GNAT.Regpat.Match (Token.Pattern, V) then
+            Result := (Line => From.Line, Pos => To.Pos + 1);
+            Next := Check;
+            return;
+         end if;
+      end;
+      Result := From;
+      Next := null;
+   end Matches;
+
+   overriding
+   procedure Matches (Token   : in Regpat_Multi_Token_Type;
+                      Content : in Buffer_Type;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
+                      To      : in Line_Pos;
+                      Result  : out Line_Pos;
+                      Next    : out Token_Access) is
       Last  : constant Buffer_Index := Content'Last;
       Pos   : Line_Pos := (Line => From.Line, Pos => From.Pos);
       Check : constant Token_Access := Token.Next;
@@ -236,24 +270,6 @@ package body SPDX_Tool.Licenses is
          Next := Check;
          return;
       end if;
-      --  while Pos.Pos < Last loop
-      --   End_Pos := Positive (Pos);
-      --   First := Skip_Spaces (Content, Pos + 1, Last);
-      --   exit when First > Last;
-      --   Pos := Next_Space (Content, First, Last);
-      --   Check.Matches (Content, First, Pos - 1, Result, Next);
-      --   if Next /= null and then Result /= First then
-      --      declare
-      --         Item : String (1 .. Content'Length);
-      --         for Item'Address use Content'Address;
-      --      begin
-      --         Log.Debug ("Check '{0}'", Item (Start .. End_Pos));
-      --          if GNAT.Regpat.Match (Token.Pattern, Item (Start .. End_Pos)) then
-      --            return;
-      --         end if;
-      --      end;
-      --   end if;
-      --  end loop;
       Result := From;
       Next := null;
    end Matches;
@@ -501,11 +517,6 @@ package body SPDX_Tool.Licenses is
                   end if;
                   Match_Count := Match_Count + 1;
                   Current := Next_Token;
-                  --if Current.Next /= null
-                  --  and then Current.Next.Kind = TOK_LICENSE
-                  --then
-                  --   Current := Current.Next;
-                  --end if;
                   if Current.Kind = TOK_LICENSE then
                      Result.Info.Name := Final_Token_Type (Current.all).License;
                      Result.Info.Lines.Last_Line := Pos.Line;

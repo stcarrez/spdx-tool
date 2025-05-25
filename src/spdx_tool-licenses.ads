@@ -217,6 +217,7 @@ private
                       Result  : out Line_Pos;
                       Next    : out Token_Access);
 
+   --  Match a single token against the regular expression.
    type Regpat_Token_Type (Len  : Buffer_Size;
                            Plen : GNAT.Regpat.Program_Size)
    is new Token_Type (Len) with record
@@ -229,6 +230,20 @@ private
 
    overriding
    procedure Matches (Token   : in Regpat_Token_Type;
+                      Content : in Buffer_Type;
+                      Lines   : in Line_Array;
+                      From    : in Line_Pos;
+                      To      : in Line_Pos;
+                      Result  : out Line_Pos;
+                      Next    : out Token_Access);
+
+   --  Similar to Regpat_Token_Type but try to match possibly several tokens.
+   type Regpat_Multi_Token_Type (Len  : Buffer_Size;
+                                 Plen : GNAT.Regpat.Program_Size)
+   is new Regpat_Token_Type (Len, Plen) with null record;
+
+   overriding
+   procedure Matches (Token   : in Regpat_Multi_Token_Type;
                       Content : in Buffer_Type;
                       Lines   : in Line_Array;
                       From    : in Line_Pos;
