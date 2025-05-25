@@ -406,6 +406,11 @@ package body SPDX_Tool.Licenses is
       C1 : Line_Count := Left.Info.Lines.Last_Line - Left.Info.Lines.First_Line;
       C2 : Line_Count := Right.Info.Lines.Last_Line - Right.Info.Lines.First_Line;
    begin
+      if Left.Count = 1 and then Right.Count > 1 then
+         return True;
+      elsif Right.Count = 1 and then Left.Count > 1 then
+         return False;
+      end if;
       if C1 = C2 then
          C1 := Left.Sections (1).Last.Line - Left.Sections (1).Start.Line;
          C2 := Right.Sections (1).Last.Line - Right.Sections (1).Start.Line;

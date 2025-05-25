@@ -453,7 +453,7 @@ package body SPDX_Tool.Licenses.Reader is
          declare
             Pat : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
          begin
-            if not Is_Multi_Token (Regpat) then
+            if Is_Multi_Token (Regpat) then
                return new Regpat_Multi_Token_Type '(Len => Content'Length,
                                                     Plen => Pat.Size,
                                                     Previous => null,
