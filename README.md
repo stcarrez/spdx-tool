@@ -54,6 +54,10 @@ spdx-tool --output-xml=report.xml .
 spdx-tool --output-json=report.json .
 ```
 
+## Version 0.5.0  - Under development
+  - Update licenses templates from https://github.com/spdx/license-list-data.git
+  - Update language detection rules from https://github.com/github-linguist/linguist.git
+
 ## Version 0.4.1  - Dec 2024
   - Fix compilation on FreeBSD and Windows
 
