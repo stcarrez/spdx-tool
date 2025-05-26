@@ -666,7 +666,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_271           : aliased constant String := "TeX";
    M_271           : aliased constant String := "";
    K_272           : aliased constant String := "Emacs Lisp";
-   M_272           : aliased constant String := "";
+   M_272           : aliased constant String := "Semicolon";
    K_273           : aliased constant String := "Java";
    M_273           : aliased constant String := "C-style";
    K_274           : aliased constant String := "Tea";
