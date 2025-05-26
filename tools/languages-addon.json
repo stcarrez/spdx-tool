@@ -166,8 +166,11 @@
    "Common Lisp": {
       "comment_style": "Semicolon",      
       "aliases": [
-         "emacs-lisp"
+         "Emacs Lisp"
       ],
+   },
+   "Emacs Lisp": {
+      "comment_style": "Semicolon",      
    },
    "SVG": {
       "comment_style": "XML"
