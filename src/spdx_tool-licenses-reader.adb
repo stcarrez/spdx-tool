@@ -250,6 +250,8 @@ package body SPDX_Tool.Licenses.Reader is
                   Parse_Var;
                   exit;
                end if;
+               Pos := Pos + 1;
+               exit;
             elsif Pos = First then
                exit when Space_Length (Content, Pos, Last) /= 0;
                Len := Punctuation_Length (Content, Pos, Last);
