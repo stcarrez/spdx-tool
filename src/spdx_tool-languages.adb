@@ -137,6 +137,10 @@ package body SPDX_Tool.Languages is
                     Category  => TEXT);
                return;
             end if;
+            --  If we enter a string, assume there is no interesting comment
+            --  on that line (this may be wrong but we look only at possible
+            --  license header comments...).
+            exit when Buffer (Pos) in DOUBLE_QUOTE | SINGLE_QUOTE;
             Pos := Pos + 1;
          end loop;
          Comment.Mode := NO_COMMENT;
