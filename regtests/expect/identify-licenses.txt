@@ -27,7 +27,7 @@ regtests/files/identify/gpl-2.0-only-1.sh: GPL-2.0-only
 regtests/files/identify/gpl-2.0-or-bsd.c: GPL-2.0+ OR BSD-3-Clause
 regtests/files/identify/gpl-3.0-1.sub: Unknown
 regtests/files/identify/gpl-3.0-2.el: GPL-3.0
-regtests/files/identify/gpl-3.0.c: GPL-3.0
+regtests/files/identify/gpl-3.0.c: GPL-3.0+
 regtests/files/identify/gpl2-or-later.java: GPL-2.0
 regtests/files/identify/isc-1.h: ISC
 regtests/files/identify/isc-2.h: ISC
