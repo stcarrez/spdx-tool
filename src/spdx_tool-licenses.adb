@@ -515,6 +515,9 @@ package body SPDX_Tool.Licenses is
                   Miss_Count := Miss_Count + 1;
                else
                   if not Matched then
+                     if Section_Count > 0 then
+                        Result.Sections (Section_Count).Last := First;
+                     end if;
                      Section_Count := Section_Count + 1;
                      if Section_Count > Result.Sections'Last then
                         Result.Info.Lines.Last_Line := Pos.Line;
@@ -531,6 +534,7 @@ package body SPDX_Tool.Licenses is
                   Match_Count := Match_Count + 1;
                   Current := Next_Token;
                   if Current.Kind = TOK_LICENSE then
+                     Result.Sections (Section_Count).Last := First;
                      Result.Info.Name := Final_Token_Type (Current.all).License;
                      Result.Info.Lines.Last_Line := Pos.Line;
                      Result.Info.Match := Infos.TEMPLATE_LICENSE;

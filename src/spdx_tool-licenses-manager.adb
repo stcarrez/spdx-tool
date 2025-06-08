@@ -467,13 +467,13 @@ package body SPDX_Tool.Licenses.Manager is
       end if;
       Languages.Find_Headers (Buf.Data, File.Lines, File.Count, First_Line, Last_Line);
       Match := Look_SPDX_License (Buf.Data, File.Lines, First_Line, Last_Line);
-      if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+      if Match.Info.Match = Infos.SPDX_LICENSE then
          return Match;
       end if;
       Manager.Repository.Find_Possible_Licenses (File.Lines, First_Line, Last_Line);
       for Line in First_Line .. Last_Line loop
          Match := Find_License_Template ((Line, Last_Line));
-         if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+         if Match.Info.Match = Infos.TEMPLATE_LICENSE and then Match.Confidence = 1.0 then
             SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
             return Match;
          end if;
