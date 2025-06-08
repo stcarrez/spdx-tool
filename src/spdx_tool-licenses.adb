@@ -6,6 +6,7 @@
 with Ada.Text_IO;
 
 with Util.Log.Loggers;
+with Util.Strings;
 
 package body SPDX_Tool.Licenses is
 
@@ -403,17 +404,28 @@ package body SPDX_Tool.Licenses is
    --  a better match than the Right license.
    --  ------------------------------
    function Is_Best (Left, Right : in License_Match) return Boolean is
-      C1 : Line_Count := Left.Info.Lines.Last_Line - Left.Info.Lines.First_Line;
-      C2 : Line_Count := Right.Info.Lines.Last_Line - Right.Info.Lines.First_Line;
+      function Count (L : in Infos.Line_Range_Type) return Line_Count
+        is ((if L.Last_Line >= L.First_Line then L.Last_Line - L.First_Line else 0));
+
+      function Count (From : in Line_Pos; To : in Line_Pos) return Line_Count
+        is ((if To.Line >= From.Line then To.Line - From.Line else 0));
+
+      C1 : Line_Count := Count (Left.Info.Lines);
+      C2 : Line_Count := Count (Right.Info.Lines);
    begin
       if Left.Count = 1 and then Right.Count > 1 then
          return True;
       elsif Right.Count = 1 and then Left.Count > 1 then
          return False;
       end if;
+      if Left.Depth > Right.Depth then
+         return True;
+      elsif Right.Depth > Left.Depth then
+         return False;
+      end if;
       if C1 = C2 then
-         C1 := Left.Sections (1).Last.Line - Left.Sections (1).Start.Line;
-         C2 := Right.Sections (1).Last.Line - Right.Sections (1).Start.Line;
+         C1 := Count (Left.Sections (1).Last, Left.Sections (1).Start);
+         C2 := Count (Right.Sections (1).Last, Right.Sections (1).Start);
       end if;
       return C1 > C2;
    end Is_Best;
@@ -496,6 +508,7 @@ package body SPDX_Tool.Licenses is
                if Next_Token = null then
                   if Matched then
                      Result.Sections (Section_Count).Last := First;
+                     Result.Sections (Section_Count).Token := Current;
                      if Section_Count = Result.Sections'Last then
                         Result.Info.Lines.Last_Line := Pos.Line;
                         Result.Last := Current;
@@ -613,10 +626,10 @@ package body SPDX_Tool.Licenses is
 
       while Line <= To loop
          if File.Lines (Line).Comment /= NO_COMMENT then
-            Match := Look_License_Tree (Template.Root, Buf.Data,
-                                           File.Lines, Line, To);
-            if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
-               return Match;
+            Match := Look_License_Tree (Template.Root, Buf.Data, File.Lines, Line, To);
+            if Match.Info.Match = Infos.TEMPLATE_LICENSE then
+               Result := Match;
+               exit;
             end if;
             if Log.Is_Info_Enabled
               and then Match.Count > 0
@@ -629,22 +642,24 @@ package body SPDX_Tool.Licenses is
                          Infos.Percent_Image (Match.Confidence));
             end if;
             exit when Match.Info.Lines.First_Line + 1 < Match.Info.Lines.Last_Line;
-            if Match.Last /= null then
-               Match.Depth := Match.Last.Depth;
-               if Result.Last = null or else Match.Depth > Result.Depth then
-                  Result.Last := Match.Last;
-                  Result.Depth := Match.Depth;
-               end if;
+            if Is_Best (Match, Result) then
+               Result := Match;
             end if;
          end if;
          exit when Line = To;
          Line := Line + 1;
       end loop;
       Report (Stamp, "Find license (no match)");
-      if Log.Is_Info_Enabled then
-         Log.Info ("license '{0}' missmatch at lines {1}..{2}",
+      if Result.Count > 0 and then Result.Sections (1).Token /= null then
+         Result.Depth := Result.Sections (1).Token.Depth;
+      end if;
+      if Log.Is_Info_Enabled
+        and then (Result.Depth > 0 or else Log.Is_Debug_Enabled)
+      then
+         Log.Info ("license '{0}' missmatch at lines {1}..{2} depth {3}",
                    To_String (Template.Name),
-                   Infos.Image (From), Infos.Image (To));
+                   Infos.Image (From), Infos.Image (To),
+                   Util.Strings.Image (Result.Depth));
       end if;
       return Result;
    end Look_License;

@@ -460,6 +460,7 @@ package body SPDX_Tool.Licenses.Manager is
          return Best;
       end Find_License_Template;
 
+      Best : License_Match := (Last => null, Depth => 0, others => <>);
    begin
       if File.Cmt_Style = NO_COMMENT or else File.Count = 0 then
          Result.Info.Match := Infos.NONE;
@@ -477,9 +478,21 @@ package body SPDX_Tool.Licenses.Manager is
             SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
             return Match;
          end if;
+         if Is_Best (Match, Best) then
+            Best := Match;
+         end if;
       end loop;
-      Log.Info ("No exact match on {0} licenses",
-                Util.Strings.Image (Get_Count (Checked)));
+      if Best.Depth > 0 then
+         Log.Info ("No exact match on {0} licenses, best match {1}"
+                   & " with {2} token match at lines {3}",
+                   Util.Strings.Image (Get_Count (Checked)),
+                   To_String (Best.Info.Name),
+                   Infos.Percent_Image (Best.Confidence),
+                   Infos.Image (Best.Info.Lines));
+      else
+         Log.Info ("No exact match and no best lisence on {0} licenses",
+                   Util.Strings.Image (Get_Count (Checked)));
+      end if;
 
       declare
          use type Files.Comment_Category;
@@ -496,7 +509,7 @@ package body SPDX_Tool.Licenses.Manager is
                   Next_Line := Next_Line + 1;
                end loop;
                Match := Find_License_Template ((Line, Next_Line));
-               if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+               if Match.Info.Match = Infos.TEMPLATE_LICENSE then
                   SPDX_Tool.Licenses.Report (Stamp, "Find license from template");
                   return Match;
                end if;

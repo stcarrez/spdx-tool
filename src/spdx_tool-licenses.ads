@@ -48,6 +48,7 @@ package SPDX_Tool.Licenses is
    type Section_Type is record
       Start : Line_Pos;
       Last  : Line_Pos;
+      Token : Token_Access;
    end record;
 
    type Section_Array is array (1 .. 4) of Section_Type;
