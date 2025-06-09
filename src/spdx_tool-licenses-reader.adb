@@ -403,32 +403,40 @@ package body SPDX_Tool.Licenses.Reader is
                     Content : in Buffer_Type;
                     Token   : in SPDX_Tool.Licenses.Token_Kind) is
       function Create_Regpat (Content : in Buffer_Type) return Token_Access;
-      function Is_Multi_Token (Regpat : in String) return Boolean;
+      function Multi_Token_Count (Regpat : in String) return Natural;
 
       --  Returns true if the regular expression applies on several tokens.
-      function Is_Multi_Token (Regpat : in String) return Boolean is
+      function Multi_Token_Count (Regpat : in String) return Natural is
+         Cnt : Natural := 1;
+         Pos : Positive := Regpat'First;
       begin
-         --  Example: "SOFTWARE IS|MATERIALS ARE"
-         if Util.Strings.Index (Regpat, " ", Regpat'First) > 0 then
-            return True;
-         end if;
-         --  Example: "this\s+software\s+and..."
-         if Util.Strings.Index (Regpat, "\s", Regpat'First) > 0 then
-            return True;
-         end if;
-         --  Example: "assume\.?"
-         if Util.Strings.Index (Regpat, "\.", Regpat'First) > 0 then
-            return True;
-         end if;
-         return False;
-      end Is_Multi_Token;
+         while Pos <= Regpat'Last loop
+            --  Example: "SOFTWARE IS|MATERIALS ARE"
+            if Regpat (Pos) in ' ' | ':' | ',' | '.' | ';' | '!' | '"' | '<' | '>'
+              | '@' | '/' | '&' | '=' | '#'
+            then
+               Cnt := Cnt + 1;
+
+               --  Example: "this\s+software\s+and..."
+               --  Example: "assume\.?"
+               --  Example: \(0BSD\)
+            elsif Regpat (Pos) = '\' and then Pos + 1 <= Regpat'Last
+              and then Regpat (Pos + 1) in '.' | 's' | '(' | ')' | '[' | ']' | '#'
+            then
+               Cnt := Cnt + 1;
+               Pos := Pos + 1;
+            end if;
+            Pos := Pos + 1;
+         end loop;
+         return Cnt;
+      end Multi_Token_Count;
 
       function Create_Regpat (Content : in Buffer_Type) return Token_Access is
          Regpat : String (1 .. Content'Length);
          for Regpat'Address use Content'Address;
       begin
-         Log.Debug ("Pattern: '{0}'", Regpat);
          if Regpat = ".+" then
+            Log.Debug ("Pattern: '{0}'", Regpat);
             return new Any_Token_Type '(Len => Content'Length,
                                         Previous => null,
                                         Next => null,
@@ -437,6 +445,7 @@ package body SPDX_Tool.Licenses.Reader is
                                         Max_Length => 1000);
          end if;
          if Regpat = ".*" or else Regpat = ".{0,5000}" then
+            Log.Debug ("Pattern: '{0}'", Regpat);
             return new Any_Token_Type '(Len => Content'Length,
                                         Previous => null,
                                         Next => null,
@@ -445,6 +454,7 @@ package body SPDX_Tool.Licenses.Reader is
                                         Max_Length => 1000);
          end if;
          if Regpat = ".{0,20}" then
+            Log.Debug ("Pattern: '{0}'", Regpat);
             return new Any_Token_Type '(Len => Content'Length,
                                         Previous => null,
                                         Next => null,
@@ -454,10 +464,13 @@ package body SPDX_Tool.Licenses.Reader is
          end if;
          declare
             Pat : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (Regpat);
+            Cnt : constant Natural := Multi_Token_Count (Regpat);
          begin
-            if Is_Multi_Token (Regpat) then
+            Log.Debug ("Pattern: '{0}' {1} tokens", Regpat, Util.Strings.Image (Cnt));
+            if Cnt > 1 then
                return new Regpat_Multi_Token_Type '(Len => Content'Length,
                                                     Plen => Pat.Size,
+                                                    Max_Token => Cnt,
                                                     Previous => null,
                                                     Next => null,
                                                     Alternate => null,

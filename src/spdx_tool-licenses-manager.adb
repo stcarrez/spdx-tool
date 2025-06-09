@@ -440,7 +440,7 @@ package body SPDX_Tool.Licenses.Manager is
                   if not Is_Set (Checked, License) then
                      Match := Look_License (Manager.Repository.Get_License (License),
                                             File, First_Line, Last_Line);
-                     if Match.Info.Match in Infos.SPDX_LICENSE | Infos.TEMPLATE_LICENSE then
+                     if Match.Info.Match = Infos.TEMPLATE_LICENSE then
                         if Match.Count = 1 then
                            return Match;
                         end if;
@@ -448,9 +448,9 @@ package body SPDX_Tool.Licenses.Manager is
                            Find_Exception_Template ((Match.Sections (2).Start.Line,
                                                      Match.Sections (2).Last.Line));
                         end if;
-                        if Is_Best (Match, Best) then
-                           Best := Match;
-                        end if;
+                     end if;
+                     if Is_Best (Match, Best) then
+                        Best := Match;
                      end if;
                      Set_License (Checked, License);
                   end if;

@@ -240,7 +240,8 @@ private
 
    --  Similar to Regpat_Token_Type but try to match possibly several tokens.
    type Regpat_Multi_Token_Type (Len  : Buffer_Size;
-                                 Plen : GNAT.Regpat.Program_Size)
+                                 Plen : GNAT.Regpat.Program_Size;
+                                 Max_Token : Positive)
    is new Regpat_Token_Type (Len, Plen) with null record;
 
    overriding

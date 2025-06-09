@@ -207,8 +207,8 @@ package body SPDX_Tool.Licenses is
       Last  : constant Buffer_Index := Content'Last;
       Pos   : Line_Pos := (Line => From.Line, Pos => From.Pos);
       Check : constant Token_Access := Token.Next;
-      Val   : UString;
       Need_Space : Boolean := False;
+      Val   : UString;
    begin
       if Check = null then
          Result := From;
@@ -231,54 +231,59 @@ package body SPDX_Tool.Licenses is
          end if;
          Ada.Strings.Unbounded.Append (Val, V);
       end;
-      while Pos.Pos < Last loop
-         declare
-            First    : constant Line_Pos := Pos;
-            End_Line : Buffer_Index;
-            Len      : Buffer_Size;
-            Next_Pos : Line_Pos;
-         begin
-            exit when First.Line > Lines'Last;
-            exit when Lines (First.Line).Comment = NO_COMMENT;
-            End_Line := Lines (First.Line).Style.Text_Last;
-            exit when First.Pos > End_Line;
-            Len := Punctuation_Length (Content, First.Pos, End_Line);
-            if Len > 0 then
-               Pos.Pos := First.Pos + Len - 1;
-            else
-               Pos.Pos := Next_Space (Content, First.Pos, End_Line);
-            end if;
-            Match (Check, Content, Lines, First, (To.Line, Pos.Pos), Result, Next);
-            if Next /= null and then Result /= First
-              and then GNAT.Regpat.Match (Token.Pattern, To_String (Val))
-            then
-               return;
-            end if;
-            if Need_Space then
-               Ada.Strings.Unbounded.Append (Val, " ");
-            end if;
-            Ada.Strings.Unbounded.Append (Val, To_String (Content (First.Pos .. Pos.Pos)));
-            Pos.Pos := Pos.Pos + 1;
-            if Pos.Pos >= End_Line then
-               exit when First.Line = To.Line;
-               Pos.Line := First.Line + 1;
-               exit when Lines (Pos.Line).Comment = NO_COMMENT;
-               Pos.Pos := Lines (Pos.Line).Style.Text_Start;
-               Next_Pos := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos), To);
-               Need_Space := True;
-            else
-               Pos.Line := First.Line;
-               Next_Pos := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos), To);
-               Need_Space := Pos /= Next_Pos;
-            end if;
-            Pos := Next_Pos;
-         end;
-      end loop;
-      if Check.Next = null and then GNAT.Regpat.Match (Token.Pattern, To_String (Val)) then
-         Result := (Line => Pos.Line, Pos => Pos.Pos);
-         Next := Check;
-         return;
-      end if;
+      declare
+         Token_Count : Positive := 1;
+      begin
+         while Pos.Pos < Last and then Token_Count <= Token.Max_Token loop
+            declare
+               First    : constant Line_Pos := Pos;
+               End_Line : Buffer_Index;
+               Len      : Buffer_Size;
+               Next_Pos : Line_Pos;
+            begin
+               exit when First.Line > Lines'Last;
+               exit when Lines (First.Line).Comment = NO_COMMENT;
+               End_Line := Lines (First.Line).Style.Text_Last;
+               exit when First.Pos > End_Line;
+               Len := Punctuation_Length (Content, First.Pos, End_Line);
+               if Len > 0 then
+                  Pos.Pos := First.Pos + Len - 1;
+               else
+                  Pos.Pos := Next_Space (Content, First.Pos, End_Line);
+               end if;
+               Match (Check, Content, Lines, First, (To.Line, Pos.Pos), Result, Next);
+               if Next /= null and then Result /= First
+                 and then GNAT.Regpat.Match (Token.Pattern, To_String (Val))
+               then
+                  return;
+               end if;
+               if Need_Space then
+                  Ada.Strings.Unbounded.Append (Val, " ");
+               end if;
+               Ada.Strings.Unbounded.Append (Val, To_String (Content (First.Pos .. Pos.Pos)));
+               Pos.Pos := Pos.Pos + 1;
+               if Pos.Pos >= End_Line then
+                  exit when First.Line = To.Line;
+                  Pos.Line := First.Line + 1;
+                  exit when Lines (Pos.Line).Comment = NO_COMMENT;
+                  Pos.Pos := Lines (Pos.Line).Style.Text_Start;
+                  Next_Pos := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos), To);
+                  Need_Space := True;
+               else
+                  Pos.Line := First.Line;
+                  Next_Pos := Skip_Spaces (Content, Lines, (Pos.Line, Pos.Pos), To);
+                  Need_Space := Pos /= Next_Pos;
+               end if;
+               Pos := Next_Pos;
+               Token_Count := Token_Count + 1;
+            end;
+         end loop;
+         if Check.Next = null and then GNAT.Regpat.Match (Token.Pattern, To_String (Val)) then
+            Result := (Line => Pos.Line, Pos => Pos.Pos);
+            Next := Check;
+            return;
+         end if;
+      end;
       Result := From;
       Next := null;
    end Matches;
@@ -641,15 +646,20 @@ package body SPDX_Tool.Licenses is
                          Infos.Image (Match.Info.Lines.Last_Line - Match.Info.Lines.First_Line),
                          Infos.Percent_Image (Match.Confidence));
             end if;
-            exit when Match.Info.Lines.First_Line + 1 < Match.Info.Lines.Last_Line;
             if Is_Best (Match, Result) then
                Result := Match;
             end if;
+            exit when Match.Info.Lines.First_Line + 1 < Match.Info.Lines.Last_Line;
          end if;
          exit when Line = To;
          Line := Line + 1;
       end loop;
-      Report (Stamp, "Find license (no match)");
+      if Result.Info.Match /= Infos.TEMPLATE_LICENSE then
+         Result.Info.Name := Template.Name;
+         Report (Stamp, "Find license (no match)");
+      else
+         Report (Stamp, "Find license (template match)");
+      end if;
       if Result.Count > 0 and then Result.Sections (1).Token /= null then
          Result.Depth := Result.Sections (1).Token.Depth;
       end if;
