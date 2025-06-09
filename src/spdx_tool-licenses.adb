@@ -222,16 +222,6 @@ package body SPDX_Tool.Licenses is
          return;
       end if;
       declare
-         V : constant String := To_String (Content (From.Pos .. To.Pos));
-      begin
-         if GNAT.Regpat.Match (Token.Pattern, V) then
-            Result := (Line => From.Line, Pos => To.Pos + 1);
-            Next := Check;
-            return;
-         end if;
-         Ada.Strings.Unbounded.Append (Val, V);
-      end;
-      declare
          Token_Count : Positive := 1;
       begin
          while Pos.Pos < Last and then Token_Count <= Token.Max_Token loop
@@ -278,7 +268,7 @@ package body SPDX_Tool.Licenses is
                Token_Count := Token_Count + 1;
             end;
          end loop;
-         if Check.Next = null and then GNAT.Regpat.Match (Token.Pattern, To_String (Val)) then
+         if GNAT.Regpat.Match (Token.Pattern, To_String (Val)) then
             Result := (Line => Pos.Line, Pos => Pos.Pos);
             Next := Check;
             return;
