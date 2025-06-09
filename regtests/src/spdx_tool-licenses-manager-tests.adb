@@ -304,6 +304,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       File    : SPDX_Tool.Files.File_Type (100);
       Result  : License_Match;
    begin
+      Opt_No_Builtin := True;
       Manager.Languages.Initialize (Config);
       Manager.File_Mgr (1).Initialize ("");
       Manager.Load_License ("regtests/files/templates/Beerware.jsonld");
@@ -312,6 +313,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       Result := Manager.Find_License (File);
       Util.Tests.Assert_Equals (T, "Beerware", Result.Info.Name,
                                 "Invalid license found");
+      Opt_No_Builtin := False;
    end Test_JSONLD_Template;
 
    --  ------------------------------
