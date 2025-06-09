@@ -358,6 +358,9 @@ package body SPDX_Tool.Licenses is
                           Content : in Buffer_Type;
                           Line    : in Infos.Line_Number;
                           From    : in Buffer_Index) return Infos.License_Info is
+      function Ignore (C : Byte) return Boolean
+        is (Is_Space (C) or else C in Character'Pos ('*') | Character'Pos ('/'));
+
       Pos    : Buffer_Index := From;
       Last   : Buffer_Index := Lines (Line).Style.Text_Last;
       Result : Infos.License_Info;
@@ -368,7 +371,7 @@ package body SPDX_Tool.Licenses is
             Last := Last - 1;
          end loop;
       end if;
-      while Last > Pos and then Is_Space (Content (Last)) loop
+      while Last > Pos and then Ignore (Content (Last)) loop
          Last := Last - 1;
       end loop;
 
