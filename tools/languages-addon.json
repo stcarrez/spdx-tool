@@ -108,6 +108,9 @@
    "JavaScript": {
       "comment_style": "C-style",
    },
+   "Jinja": {
+      "comment_style": "Jinja-style",
+   },
    "Smalltalk": {
       "comment_style": "Smalltalk-style",
    },

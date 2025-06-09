@@ -280,6 +280,7 @@ package body SPDX_Tool.Languages.Manager is
       Add_Builtin ("Semicolon", ";");
       Add_Builtin ("JSP-style", "<%--", "--%>");
       Add_Builtin ("Smarty-style", "{*", "*}");
+      Add_Builtin ("Jinja-style", "{#", "#}");
       Add_Builtin ("Haskell-style", "{-", "-}");
       Add_Builtin ("Smalltalk-style", """", """");
       Add_Builtin ("PowerShell-block", "<#", "#>");

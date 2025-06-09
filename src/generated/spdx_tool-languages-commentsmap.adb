@@ -632,7 +632,7 @@ package body SPDX_Tool.Languages.CommentsMap is
    K_254           : aliased constant String := "Latte";
    M_254           : aliased constant String := "";
    K_255           : aliased constant String := "Jinja";
-   M_255           : aliased constant String := "";
+   M_255           : aliased constant String := "Jinja-style";
    K_256           : aliased constant String := "DataWeave";
    M_256           : aliased constant String := "";
    K_257           : aliased constant String := "WebVTT";
