@@ -123,6 +123,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
       File    : SPDX_Tool.Files.File_Type (100);
       Result  : License_Match;
    begin
+      Opt_No_Builtin := True;
       Manager.Languages.Initialize (Config);
       Manager.File_Mgr (1).Initialize ("");
 
@@ -140,6 +141,7 @@ package body SPDX_Tool.Licenses.Manager.Tests is
                                 "Invalid last line");
       T.Assert (Result.Info.Confidence = 1.0,
                 "Invalid confidence:" & Result.Info.Confidence'Image);
+      Opt_No_Builtin := False;
    end Check_License;
 
    --  ------------------------------
