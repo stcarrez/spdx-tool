@@ -10,18 +10,16 @@
     <file>regtests/files/identify/apache-2.0-8.ts</file>
     <file>regtests/files/identify/apache-2.0-9.ads</file>
   </license>
-  <license name="BSD-3-Clause" spdx="false" confidence="1.000" count="5">
-    <file>regtests/files/identify/bsd-3-clause-2.c</file>
-    <file>regtests/files/identify/bsd-3-clause-or-gpl.c</file>
-    <file>regtests/files/identify/bsd-3-clause.c</file>
-    <file>regtests/files/identify/bsd-3-clause.ps1</file>
-    <file>regtests/files/identify/bsd-3-clause.tex</file>
-  </license>
   <license name="Unknown" spdx="false" confidence="0.000" count="4">
     <file>regtests/files/identify/gpl-3.0-1.sub</file>
     <file>regtests/files/identify/lgpl-2.1.ml</file>
     <file>regtests/files/identify/misc-1.ml</file>
     <file>regtests/files/identify/uri.d</file>
+  </license>
+  <license name="BSD-3-Clause" spdx="false" confidence="1.000" count="3">
+    <file>regtests/files/identify/bsd-3-clause-2.c</file>
+    <file>regtests/files/identify/bsd-3-clause.c</file>
+    <file>regtests/files/identify/bsd-3-clause.ps1</file>
   </license>
   <license name="ISC" spdx="false" confidence="1.000" count="3">
     <file>regtests/files/identify/isc-1.h</file>
@@ -32,6 +30,10 @@
     <file>regtests/files/identify/antlr-pd-1.c</file>
     <file>regtests/files/identify/antlr-pd-2.c</file>
   </license>
+  <license name="GPL-2.0" spdx="true" confidence="1.000" count="2">
+    <file>regtests/files/identify/definition.j2</file>
+    <file>regtests/files/identify/gpl-2.0-3.rs</file>
+  </license>
   <license name="None" spdx="false" confidence="0.000" count="2">
     <file>regtests/files/identify/none.keywords</file>
     <file>regtests/files/identify/none.l</file>
@@ -40,10 +42,16 @@
     <file>regtests/files/identify/blessing-1.c</file>
     <file>regtests/files/identify/blessing-2.ads</file>
   </license>
-  <license name="Apache-2.0" spdx="false" confidence="0.979" count="1">
+  <license name="Apache-2.0" spdx="false" confidence="0.980" count="1">
     <file>regtests/files/identify/apache-2.0-7.cs</file>
   </license>
-  <license name="BSD-Source-beginning-file" spdx="false" confidence="0.940" count="1">
+  <license name="BSD-1-Clause" spdx="false" confidence="0.919" count="1">
+    <file>regtests/files/identify/bsd-3-clause-or-gpl.c</file>
+  </license>
+  <license name="BSD-3-Clause" spdx="false" confidence="0.965" count="1">
+    <file>regtests/files/identify/bsd-3-clause.tex</file>
+  </license>
+  <license name="BSD-Source-beginning-file" spdx="false" confidence="0.941" count="1">
     <file>regtests/files/identify/bsd-source-beginning-file-1.c</file>
   </license>
   <license name="Beerware" spdx="false" confidence="1.000" count="1">
@@ -58,11 +66,8 @@
   <license name="GPL-2.0" spdx="false" confidence="0.853" count="1">
     <file>regtests/files/identify/gpl2-or-later.java</file>
   </license>
-  <license name="GPL-2.0" spdx="false" confidence="0.862" count="1">
+  <license name="GPL-2.0" spdx="false" confidence="0.864" count="1">
     <file>regtests/files/identify/gpl-2.0-2.st</file>
-  </license>
-  <license name="GPL-2.0" spdx="true" confidence="1.000" count="1">
-    <file>regtests/files/identify/gpl-2.0-3.rs</file>
   </license>
   <license name="GPL-2.0+ OR BSD-3-Clause" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-2.0-or-bsd.c</file>
@@ -70,13 +75,19 @@
   <license name="GPL-2.0-only" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-2.0-only-1.sh</file>
   </license>
-  <license name="GPL-3.0" spdx="false" confidence="0.826" count="1">
+  <license name="GPL-2.0-only OR BSD-2-Clause" spdx="true" confidence="1.000" count="1">
+    <file>regtests/files/identify/gpl-2-or-bsd-2-clause.sh</file>
+  </license>
+  <license name="GPL-3.0" spdx="false" confidence="0.857" count="1">
     <file>regtests/files/identify/gpl-3.0-2.el</file>
   </license>
-  <license name="GPL-3.0" spdx="false" confidence="0.946" count="1">
+  <license name="GPL-3.0" spdx="false" confidence="0.982" count="1">
+    <file>regtests/files/identify/gnat-3.0.ads</file>
+  </license>
+  <license name="GPL-3.0+" spdx="false" confidence="1.000" count="1">
     <file>regtests/files/identify/gpl-3.0.c</file>
   </license>
-  <license name="HPND-sell-MIT-disclaimer-xserver" spdx="false" confidence="0.926" count="1">
+  <license name="HPND-sell-MIT-disclaimer-xserver" spdx="false" confidence="0.927" count="1">
     <file>regtests/files/identify/HPND-sell-MIT-disclaimer-xserver-1.c</file>
   </license>
   <license name="LGPL-2.1+" spdx="false" confidence="1.000" count="1">
@@ -87,9 +98,6 @@
   </license>
   <license name="MIT" spdx="true" confidence="1.000" count="1">
     <file>regtests/files/identify/mit-2.c</file>
-  </license>
-  <license name="gnat-gcc" spdx="false" confidence="0.982" count="1">
-    <file>regtests/files/identify/gnat-3.0.ads</file>
   </license>
   <language name="C" count="13">
     <file>regtests/files/identify/HPND-sell-MIT-disclaimer-xserver-1.c</file>
@@ -124,13 +132,14 @@
     <file>regtests/files/identify/gpl2-or-later.java</file>
     <file>regtests/files/identify/lgpl-2.1.java</file>
   </language>
+  <language name="Shell" count="3">
+    <file>regtests/files/identify/gpl-2-or-bsd-2-clause.sh</file>
+    <file>regtests/files/identify/gpl-2.0-only-1.sh</file>
+    <file>regtests/files/identify/gpl-3.0-1.sub</file>
+  </language>
   <language name="OCaml" count="2">
     <file>regtests/files/identify/lgpl-2.1.ml</file>
     <file>regtests/files/identify/misc-1.ml</file>
-  </language>
-  <language name="Shell" count="2">
-    <file>regtests/files/identify/gpl-2.0-only-1.sh</file>
-    <file>regtests/files/identify/gpl-3.0-1.sub</file>
   </language>
   <language name="TeX" count="2">
     <file>regtests/files/identify/bsd-3-clause.tex</file>
@@ -153,6 +162,9 @@
   </language>
   <language name="Java Server Pages" count="1">
     <file>regtests/files/identify/apache-2.0-6.jsp</file>
+  </language>
+  <language name="Jinja" count="1">
+    <file>regtests/files/identify/definition.j2</file>
   </language>
   <language name="Lex" count="1">
     <file>regtests/files/identify/none.l</file>

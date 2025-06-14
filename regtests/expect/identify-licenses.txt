@@ -14,12 +14,14 @@ regtests/files/identify/beerware.java: Beerware
 regtests/files/identify/blessing-1.c: blessing
 regtests/files/identify/blessing-2.ads: blessing
 regtests/files/identify/bsd-3-clause-2.c: BSD-3-Clause
-regtests/files/identify/bsd-3-clause-or-gpl.c: BSD-3-Clause
+regtests/files/identify/bsd-3-clause-or-gpl.c: BSD-1-Clause
 regtests/files/identify/bsd-3-clause.c: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.ps1: BSD-3-Clause
 regtests/files/identify/bsd-3-clause.tex: BSD-3-Clause
 regtests/files/identify/bsd-source-beginning-file-1.c: BSD-Source-beginning-file
+regtests/files/identify/definition.j2: GPL-2.0
 regtests/files/identify/gnat-3.0.ads: GPL-3.0
+regtests/files/identify/gpl-2-or-bsd-2-clause.sh: GPL-2.0-only OR BSD-2-Clause
 regtests/files/identify/gpl-2.0-1.C: GPL-1.0
 regtests/files/identify/gpl-2.0-2.st: GPL-2.0
 regtests/files/identify/gpl-2.0-3.rs: GPL-2.0

@@ -19,7 +19,9 @@ regtests/files/identify/bsd-3-clause.c: C
 regtests/files/identify/bsd-3-clause.ps1: PowerShell
 regtests/files/identify/bsd-3-clause.tex: TeX
 regtests/files/identify/bsd-source-beginning-file-1.c: C
+regtests/files/identify/definition.j2: Jinja
 regtests/files/identify/gnat-3.0.ads: Ada
+regtests/files/identify/gpl-2-or-bsd-2-clause.sh: Shell
 regtests/files/identify/gpl-2.0-1.C: C++
 regtests/files/identify/gpl-2.0-2.st: Smalltalk
 regtests/files/identify/gpl-2.0-3.rs: Rust

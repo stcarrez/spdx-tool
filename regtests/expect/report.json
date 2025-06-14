@@ -18,19 +18,6 @@
       ]
     },
     {
-      "name": "BSD-3-Clause",
-      "spdx": false,
-      "confidence": "1.000",
-      "count":  5,
-      "files": [
-        "regtests/files/identify/bsd-3-clause-2.c",
-        "regtests/files/identify/bsd-3-clause-or-gpl.c",
-        "regtests/files/identify/bsd-3-clause.c",
-        "regtests/files/identify/bsd-3-clause.ps1",
-        "regtests/files/identify/bsd-3-clause.tex"
-      ]
-    },
-    {
       "name": "Unknown",
       "spdx": false,
       "confidence": "0.000",
@@ -40,6 +27,17 @@
         "regtests/files/identify/lgpl-2.1.ml",
         "regtests/files/identify/misc-1.ml",
         "regtests/files/identify/uri.d"
+      ]
+    },
+    {
+      "name": "BSD-3-Clause",
+      "spdx": false,
+      "confidence": "1.000",
+      "count":  3,
+      "files": [
+        "regtests/files/identify/bsd-3-clause-2.c",
+        "regtests/files/identify/bsd-3-clause.c",
+        "regtests/files/identify/bsd-3-clause.ps1"
       ]
     },
     {
@@ -61,6 +59,16 @@
       "files": [
         "regtests/files/identify/antlr-pd-1.c",
         "regtests/files/identify/antlr-pd-2.c"
+      ]
+    },
+    {
+      "name": "GPL-2.0",
+      "spdx": true,
+      "confidence": "1.000",
+      "count":  2,
+      "files": [
+        "regtests/files/identify/definition.j2",
+        "regtests/files/identify/gpl-2.0-3.rs"
       ]
     },
     {
@@ -86,16 +94,34 @@
     {
       "name": "Apache-2.0",
       "spdx": false,
-      "confidence": "0.979",
+      "confidence": "0.980",
       "count":  1,
       "files": [
         "regtests/files/identify/apache-2.0-7.cs"
       ]
     },
     {
+      "name": "BSD-1-Clause",
+      "spdx": false,
+      "confidence": "0.919",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/bsd-3-clause-or-gpl.c"
+      ]
+    },
+    {
+      "name": "BSD-3-Clause",
+      "spdx": false,
+      "confidence": "0.965",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/bsd-3-clause.tex"
+      ]
+    },
+    {
       "name": "BSD-Source-beginning-file",
       "spdx": false,
-      "confidence": "0.940",
+      "confidence": "0.941",
       "count":  1,
       "files": [
         "regtests/files/identify/bsd-source-beginning-file-1.c"
@@ -140,19 +166,10 @@
     {
       "name": "GPL-2.0",
       "spdx": false,
-      "confidence": "0.862",
+      "confidence": "0.864",
       "count":  1,
       "files": [
         "regtests/files/identify/gpl-2.0-2.st"
-      ]
-    },
-    {
-      "name": "GPL-2.0",
-      "spdx": true,
-      "confidence": "1.000",
-      "count":  1,
-      "files": [
-        "regtests/files/identify/gpl-2.0-3.rs"
       ]
     },
     {
@@ -174,9 +191,18 @@
       ]
     },
     {
+      "name": "GPL-2.0-only OR BSD-2-Clause",
+      "spdx": true,
+      "confidence": "1.000",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/gpl-2-or-bsd-2-clause.sh"
+      ]
+    },
+    {
       "name": "GPL-3.0",
       "spdx": false,
-      "confidence": "0.826",
+      "confidence": "0.857",
       "count":  1,
       "files": [
         "regtests/files/identify/gpl-3.0-2.el"
@@ -185,7 +211,16 @@
     {
       "name": "GPL-3.0",
       "spdx": false,
-      "confidence": "0.946",
+      "confidence": "0.982",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/gnat-3.0.ads"
+      ]
+    },
+    {
+      "name": "GPL-3.0+",
+      "spdx": false,
+      "confidence": "1.000",
       "count":  1,
       "files": [
         "regtests/files/identify/gpl-3.0.c"
@@ -194,7 +229,7 @@
     {
       "name": "HPND-sell-MIT-disclaimer-xserver",
       "spdx": false,
-      "confidence": "0.926",
+      "confidence": "0.927",
       "count":  1,
       "files": [
         "regtests/files/identify/HPND-sell-MIT-disclaimer-xserver-1.c"
@@ -225,15 +260,6 @@
       "count":  1,
       "files": [
         "regtests/files/identify/mit-2.c"
-      ]
-    },
-    {
-      "name": "gnat-gcc",
-      "spdx": false,
-      "confidence": "0.982",
-      "count":  1,
-      "files": [
-        "regtests/files/identify/gnat-3.0.ads"
       ]
     }
   ],
@@ -288,19 +314,20 @@
       ]
     },
     {
+      "name": "Shell",
+      "count":  3,
+      "files": [
+        "regtests/files/identify/gpl-2-or-bsd-2-clause.sh",
+        "regtests/files/identify/gpl-2.0-only-1.sh",
+        "regtests/files/identify/gpl-3.0-1.sub"
+      ]
+    },
+    {
       "name": "OCaml",
       "count":  2,
       "files": [
         "regtests/files/identify/lgpl-2.1.ml",
         "regtests/files/identify/misc-1.ml"
-      ]
-    },
-    {
-      "name": "Shell",
-      "count":  2,
-      "files": [
-        "regtests/files/identify/gpl-2.0-only-1.sh",
-        "regtests/files/identify/gpl-3.0-1.sub"
       ]
     },
     {
@@ -351,6 +378,13 @@
       "count":  1,
       "files": [
         "regtests/files/identify/apache-2.0-6.jsp"
+      ]
+    },
+    {
+      "name": "Jinja",
+      "count":  1,
+      "files": [
+        "regtests/files/identify/definition.j2"
       ]
     },
     {
