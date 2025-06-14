@@ -206,5 +206,6 @@ Recognized comment styles include:
 * https://github.com/spdx/license-list-data
 * https://spdx.org
 * https://spdx.dev/learn/handling-license-info/
+* https://reuse.software/dev/
 * https://github.com/github-linguist/linguist.git
 
