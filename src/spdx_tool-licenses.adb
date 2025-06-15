@@ -550,7 +550,7 @@ package body SPDX_Tool.Licenses is
                      Result.Info.Lines.Last_Line := Pos.Line;
                      Result.Info.Match := Infos.TEMPLATE_LICENSE;
                      Result.Last := Current;
-                     Result.Confidence := Confidence (Match_Count, Match_Count + Miss_Count);
+                     Result.Confidence := Confidence (Match_Count, Miss_Count);
                      Result.Count := Section_Count;
                      return Result;
                   end if;

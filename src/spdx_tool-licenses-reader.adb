@@ -258,6 +258,12 @@ package body SPDX_Tool.Licenses.Reader is
                if Len > 0 then
                   if Is_Quote (Content (Pos)) then
                      Token := TOK_QUOTE;
+                     --  If we have a `` we only emit a single TOK_QUOTE because
+                     --  the Quote_Token_Type matcher will handle special mapping
+                     --  to match ``AS IS'' as well as "AS IS".
+                     if Pos + 1 <= Last and then Is_Quote (Content (Pos + 1)) then
+                        Len := Len + 1;
+                     end if;
                   end if;
                   Pos := Pos + Len;
                   exit;
@@ -410,6 +416,9 @@ package body SPDX_Tool.Licenses.Reader is
          Cnt : Natural := 1;
          Pos : Positive := Regpat'First;
       begin
+         if Regpat = "[^.]+\." then
+            return 20;
+         end if;
          while Pos <= Regpat'Last loop
             --  Example: "SOFTWARE IS|MATERIALS ARE"
             if Regpat (Pos) in ' ' | ':' | ',' | '.' | ';' | '!' | '"' | '<' | '>'
