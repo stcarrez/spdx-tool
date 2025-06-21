@@ -402,6 +402,8 @@ package body SPDX_Tool.Licenses is
    --  a better match than the Right license.
    --  ------------------------------
    function Is_Best (Left, Right : in License_Match) return Boolean is
+      use type SPDX_Tool.Infos.Confidence_Type;
+
       function Count (L : in Infos.Line_Range_Type) return Line_Count
         is ((if L.Last_Line >= L.First_Line then L.Last_Line - L.First_Line else 0));
 
@@ -411,6 +413,11 @@ package body SPDX_Tool.Licenses is
       C1 : Line_Count := Count (Left.Info.Lines);
       C2 : Line_Count := Count (Right.Info.Lines);
    begin
+      if Left.Confidence > Right.Confidence then
+         return True;
+      elsif Left.Confidence < Right.Confidence then
+         return False;
+      end if;
       if Left.Count = 1 and then Right.Count > 1 then
          return True;
       elsif Right.Count = 1 and then Left.Count > 1 then
