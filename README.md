@@ -97,6 +97,8 @@ in the project.  For each file, the spdx-tool tries to:
 # Documentation
 
 * Man page: [spdx-tool (1)](https://gitlab.com/stcarrez/spdx-tool/-/blob/main/docs/spdx-tool.md?ref_type=heads)
+* Presentation: [Automating License Identification with SPDX-Tool in Ada](https://www.slideshare.net/slideshow/automating-license-identification-with-spdx-tool-in-ada/280525407) Ada Developers Workshop 2025
+* Video: [Automating License Identification with SPDX-Tool in Ada](https://www.youtube.com/watch?v=cBBXe8e4rIo&list=PLlAtvZuAzANYjoFDYdj0sfV4Qx5aJwHnr&index=2)
 
 # Debian Packages for x86_64
 
