@@ -1,4 +1,4 @@
-## Version 0.5.0  - Under development
+## Version 1.0.0  - Jun 2026
   - Update licenses templates from https://github.com/spdx/license-list-data.git
   - Update language detection rules from https://github.com/github-linguist/linguist.git
 
