@@ -1,7 +1,7 @@
 # This is a crate
 name = "spdx_tool"
 description = "SPDX license detection and management tool"
-version = "0.4.1"
+version = "1.0.0"
 
 authors = ["ciceron"]
 maintainers = ["ciceron <Stephane.Carrez@gmail.com>"]

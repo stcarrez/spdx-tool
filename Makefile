@@ -1,6 +1,6 @@
 MAKE_ARGS=
 JSON_PP=json_pp
-VERSION=0.4.1
+VERSION=1.0.0
 DEBUG_MODE=True
 INSTALL=install
 
